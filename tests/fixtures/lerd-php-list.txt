@@ -1,0 +1,2 @@
+Installed PHP versions:
+* 8.5

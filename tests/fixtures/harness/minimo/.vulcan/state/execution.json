@@ -1,0 +1,23 @@
+{
+  "task_id": "drive-upload-retry",
+  "status": "RUNNING",
+  "required_checks_passed": false,
+  "items": [
+    {
+      "id": "C1",
+      "status": "done",
+      "validated": true,
+      "evidence": "npm run build exit 0"
+    },
+    {
+      "id": "C2",
+      "status": "blocked",
+      "validated": false,
+      "attempts": 3,
+      "cause": "mock do Redis não sobe no CI"
+    }
+  ],
+  "last_green_commit": "a1b2c3d",
+  "next": "C3",
+  "blocked_reason": null
+}

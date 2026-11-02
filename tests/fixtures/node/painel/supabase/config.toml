@@ -1,0 +1,9 @@
+# A string used to distinguish different Supabase projects on the same host.
+project_id = "painel-clientes"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322

@@ -1,0 +1,4471 @@
+[
+ {
+  "v": 1,
+  "id": "32bc50eddbc50bdaf85425ea",
+  "ts": "2026-10-31T21:01:16.338Z",
+  "kind": "dump",
+  "ctx": {
+   "type": "fpm",
+   "site": "vitrine",
+   "domain": "vitrine.test",
+   "request": "GET /",
+   "pid": 3,
+   "rid": "0065f2936b412f330"
+  },
+  "src": {
+   "file": "/Users/dev/Code/vitrine/public/index.php",
+   "line": 2
+  },
+  "text": "Array\n(\n    [pedido] => 42\n    [cliente] => Ana\n)\n"
+ },
+ {
+  "v": 1,
+  "id": "17a41b48f1143e40fa318160",
+  "ts": "2026-10-31T21:01:16.339Z",
+  "kind": "dump",
+  "ctx": {
+   "type": "fpm",
+   "site": "vitrine",
+   "domain": "vitrine.test",
+   "request": "GET /",
+   "pid": 3,
+   "rid": "0065f2936b412f330"
+  },
+  "src": {
+   "file": "/Users/dev/Code/vitrine/public/index.php",
+   "line": 3
+  },
+  "text": "texto simples"
+ },
+ {
+  "v": 1,
+  "id": "152abd65382ba26712d269c4",
+  "ts": "2026-10-31T21:01:16.340Z",
+  "kind": "request",
+  "ctx": {
+   "type": "fpm",
+   "site": "vitrine",
+   "domain": "vitrine.test",
+   "request": "GET /",
+   "pid": 3,
+   "rid": "0065f2936b412f330"
+  },
+  "src": {
+   "file": "",
+   "line": 0
+  },
+  "data": {
+   "time_ms": 8.044,
+   "memory_peak": 2097152,
+   "queue_ms": 2.144,
+   "trace": []
+  }
+ },
+ {
+  "v": 1,
+  "id": "5d68c79ed1b445d62b13de40",
+  "ts": "2026-10-31T21:01:16.359Z",
+  "kind": "dump",
+  "ctx": {
+   "type": "fpm",
+   "site": "vitrine",
+   "domain": "vitrine.test",
+   "request": "GET /?erro=1",
+   "pid": 2,
+   "rid": "0065f2936b4795620"
+  },
+  "src": {
+   "file": "/Users/dev/Code/vitrine/public/index.php",
+   "line": 2
+  },
+  "text": "Array\n(\n    [pedido] => 42\n    [cliente] => Ana\n)\n"
+ },
+ {
+  "v": 1,
+  "id": "bff9b25da6780efd0d9cf5ae",
+  "ts": "2026-10-31T21:01:16.360Z",
+  "kind": "dump",
+  "ctx": {
+   "type": "fpm",
+   "site": "vitrine",
+   "domain": "vitrine.test",
+   "request": "GET /?erro=1",
+   "pid": 2,
+   "rid": "0065f2936b4795620"
+  },
+  "src": {
+   "file": "/Users/dev/Code/vitrine/public/index.php",
+   "line": 3
+  },
+  "text": "texto simples"
+ },
+ {
+  "v": 1,
+  "id": "74269839df10320dc92e9993",
+  "ts": "2026-10-31T21:01:16.361Z",
+  "kind": "request",
+  "ctx": {
+   "type": "fpm",
+   "site": "vitrine",
+   "domain": "vitrine.test",
+   "request": "GET /?erro=1",
+   "pid": 2,
+   "rid": "0065f2936b4795620"
+  },
+  "src": {
+   "file": "",
+   "line": 0
+  },
+  "data": {
+   "time_ms": 2.643,
+   "memory_peak": 2097152,
+   "queue_ms": 1.62,
+   "trace": []
+  }
+ },
+ {
+  "v": 1,
+  "id": "8417f909ed442450aa5ae458",
+  "ts": "2026-10-31T21:01:57.923Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+   "line": 498
+  },
+  "data": {
+   "sql": "select * from \"sessions\" where \"id\" = ? limit 1",
+   "bindings": [
+    "SESSAO-ANONIMA"
+   ],
+   "time_ms": 1.85,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3640,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3624,
+     "func": "Illuminate\\Database\\Query\\Builder->runSelect"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php",
+     "line": 427,
+     "func": "Illuminate\\Database\\Query\\Builder->get"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3542,
+     "func": "Illuminate\\Database\\Query\\Builder->first"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 117,
+     "func": "Illuminate\\Database\\Query\\Builder->find"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 128,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->read"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 116,
+     "func": "Illuminate\\Session\\Store->readFromHandler"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 100,
+     "func": "Illuminate\\Session\\Store->loadSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 146,
+     "func": "Illuminate\\Session\\Store->start"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/helpers.php",
+     "line": 393,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->{closure:Illuminate\\Session\\Middleware\\StartSession::startSession():143}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 143,
+     "func": "tap"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 115,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->startSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "5798f93cfa68c6cccddde3ee",
+  "ts": "2026-10-31T21:01:57.927Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 10
+  },
+  "data": {
+   "sql": "select * from users where id = ?",
+   "bindings": [
+    1
+   ],
+   "time_ms": 0.13,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php",
+     "line": 502,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php",
+     "line": 364,
+     "func": "Illuminate\\Database\\DatabaseManager->__call"
+    },
+    {
+     "file": "/Users/dev/Code/loja/routes/web.php",
+     "line": 10,
+     "func": "Illuminate\\Support\\Facades\\Facade::__callStatic"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php",
+     "line": 39,
+     "func": "Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 254,
+     "func": "Illuminate\\Routing\\CallableDispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Route->runCallable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 835,
+     "func": "Illuminate\\Routing\\Route->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():834}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "971a910a8b860fde5b073cff",
+  "ts": "2026-10-31T21:01:57.928Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 11
+  },
+  "data": {
+   "sql": "select * from users where id = ?",
+   "bindings": [
+    1
+   ],
+   "time_ms": 0.12,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php",
+     "line": 502,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php",
+     "line": 364,
+     "func": "Illuminate\\Database\\DatabaseManager->__call"
+    },
+    {
+     "file": "/Users/dev/Code/loja/routes/web.php",
+     "line": 11,
+     "func": "Illuminate\\Support\\Facades\\Facade::__callStatic"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php",
+     "line": 39,
+     "func": "Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 254,
+     "func": "Illuminate\\Routing\\CallableDispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Route->runCallable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 835,
+     "func": "Illuminate\\Routing\\Route->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():834}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "071f40f1e3507dc9e15e1e0a",
+  "ts": "2026-10-31T21:01:57.943Z",
+  "kind": "log",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "pid": 3,
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 12
+  },
+  "data": {
+   "level": "error",
+   "message": "Erro de teste do vt-06",
+   "channel": "local",
+   "context": "array:1 [\n  \"pedido\" => 42\n]",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+     "line": 340,
+     "func": "Lerd\\Collector\\seam_begin"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+     "line": 654,
+     "func": "Monolog\\Logger->addRecord"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/Logger.php",
+     "line": 187,
+     "func": "Monolog\\Logger->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/Logger.php",
+     "line": 96,
+     "func": "Illuminate\\Log\\Logger->writeLog"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/LogManager.php",
+     "line": 747,
+     "func": "Illuminate\\Log\\Logger->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php",
+     "line": 364,
+     "func": "Illuminate\\Log\\LogManager->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/routes/web.php",
+     "line": 12,
+     "func": "Illuminate\\Support\\Facades\\Facade::__callStatic"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php",
+     "line": 39,
+     "func": "Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 254,
+     "func": "Illuminate\\Routing\\CallableDispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Route->runCallable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 835,
+     "func": "Illuminate\\Routing\\Route->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():834}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "219b1f0ea02eb0ca538b0f2f",
+  "ts": "2026-10-31T21:01:57.946Z",
+  "kind": "dump",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "pid": 3,
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 13
+  },
+  "text": "array:1 [\n  \"pedido\" => 42\n]\n"
+ },
+ {
+  "v": 1,
+  "id": "71beec61c64e612b03ffa691",
+  "ts": "2026-10-31T21:01:57.954Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+   "line": 498
+  },
+  "data": {
+   "sql": "select * from \"sessions\" where \"id\" = ? limit 1",
+   "bindings": [
+    "SESSAO-ANONIMA"
+   ],
+   "time_ms": 0.11,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3640,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3624,
+     "func": "Illuminate\\Database\\Query\\Builder->runSelect"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php",
+     "line": 427,
+     "func": "Illuminate\\Database\\Query\\Builder->get"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3542,
+     "func": "Illuminate\\Database\\Query\\Builder->first"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 117,
+     "func": "Illuminate\\Database\\Query\\Builder->find"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 156,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->read"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 187,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->write"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 248,
+     "func": "Illuminate\\Session\\Store->save"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 129,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->saveSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php",
+     "line": 28,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "86b3661ea50f4961eac0c65a",
+  "ts": "2026-10-31T21:01:57.957Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+   "line": 498
+  },
+  "data": {
+   "sql": "insert into \"sessions\" (\"payload\", \"last_activity\", \"user_id\", \"ip_address\", \"user_agent\", \"id\") values (?, ?, ?, ?, ?, ?)",
+   "bindings": [
+    "eyJfdG9rZW4iOiJUT0tFTi1BTk9OSU1PMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL3Z0bGFyYXZlbC50ZXN0XC92dDA2Iiwicm91dGUiOm51bGx9LCJfZmxhc2giOnsib2xkIjpbXSwibmV3IjpbXX19",
+    1793480517,
+    null,
+    "192.168.127.1",
+    "curl/8.7.1",
+    "SESSAO-ANONIMA"
+   ],
+   "time_ms": 2.39,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 597,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 561,
+     "func": "Illuminate\\Database\\Connection->statement"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 4231,
+     "func": "Illuminate\\Database\\Connection->insert"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 178,
+     "func": "Illuminate\\Database\\Query\\Builder->insert"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 162,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->performInsert"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 187,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->write"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 248,
+     "func": "Illuminate\\Session\\Store->save"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 129,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->saveSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php",
+     "line": 28,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 175,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 144,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "590e7125903e4de0c1d5a2b0",
+  "ts": "2026-10-31T21:01:57.960Z",
+  "kind": "request",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06",
+   "pid": 3,
+   "rid": "0065f29392b873830"
+  },
+  "src": {
+   "file": "",
+   "line": 0
+  },
+  "data": {
+   "time_ms": 245.268,
+   "memory_peak": 10485760,
+   "queue_ms": 2.026,
+   "trace": []
+  }
+ },
+ {
+  "v": 1,
+  "id": "ab1755012faa34615f05f185",
+  "ts": "2026-10-31T21:01:57.975Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+   "line": 498
+  },
+  "data": {
+   "sql": "select * from \"sessions\" where \"id\" = ? limit 1",
+   "bindings": [
+    "SESSAO-ANONIMA"
+   ],
+   "time_ms": 0.58,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3640,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3624,
+     "func": "Illuminate\\Database\\Query\\Builder->runSelect"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php",
+     "line": 427,
+     "func": "Illuminate\\Database\\Query\\Builder->get"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3542,
+     "func": "Illuminate\\Database\\Query\\Builder->first"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 117,
+     "func": "Illuminate\\Database\\Query\\Builder->find"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 128,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->read"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 116,
+     "func": "Illuminate\\Session\\Store->readFromHandler"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 100,
+     "func": "Illuminate\\Session\\Store->loadSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 146,
+     "func": "Illuminate\\Session\\Store->start"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/helpers.php",
+     "line": 393,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->{closure:Illuminate\\Session\\Middleware\\StartSession::startSession():143}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 143,
+     "func": "tap"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 115,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->startSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "3c3a20a795be87c4891a4613",
+  "ts": "2026-10-31T21:01:57.976Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 10
+  },
+  "data": {
+   "sql": "select * from users where id = ?",
+   "bindings": [
+    1
+   ],
+   "time_ms": 0.12,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php",
+     "line": 502,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php",
+     "line": 364,
+     "func": "Illuminate\\Database\\DatabaseManager->__call"
+    },
+    {
+     "file": "/Users/dev/Code/loja/routes/web.php",
+     "line": 10,
+     "func": "Illuminate\\Support\\Facades\\Facade::__callStatic"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php",
+     "line": 39,
+     "func": "Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 254,
+     "func": "Illuminate\\Routing\\CallableDispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Route->runCallable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 835,
+     "func": "Illuminate\\Routing\\Route->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():834}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "bd190b588c9e1db6ec7269f4",
+  "ts": "2026-10-31T21:01:57.976Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 11
+  },
+  "data": {
+   "sql": "select * from users where id = ?",
+   "bindings": [
+    1
+   ],
+   "time_ms": 0.09,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php",
+     "line": 502,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php",
+     "line": 364,
+     "func": "Illuminate\\Database\\DatabaseManager->__call"
+    },
+    {
+     "file": "/Users/dev/Code/loja/routes/web.php",
+     "line": 11,
+     "func": "Illuminate\\Support\\Facades\\Facade::__callStatic"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php",
+     "line": 39,
+     "func": "Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 254,
+     "func": "Illuminate\\Routing\\CallableDispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Route->runCallable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 835,
+     "func": "Illuminate\\Routing\\Route->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():834}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "beb21cff55cdc4cff3255ab8",
+  "ts": "2026-10-31T21:01:57.978Z",
+  "kind": "log",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "pid": 2,
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 12
+  },
+  "data": {
+   "level": "error",
+   "message": "Erro de teste do vt-06",
+   "channel": "local",
+   "context": "array:1 [\n  \"pedido\" => 42\n]",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+     "line": 340,
+     "func": "Lerd\\Collector\\seam_begin"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+     "line": 654,
+     "func": "Monolog\\Logger->addRecord"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/Logger.php",
+     "line": 187,
+     "func": "Monolog\\Logger->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/Logger.php",
+     "line": 96,
+     "func": "Illuminate\\Log\\Logger->writeLog"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/LogManager.php",
+     "line": 747,
+     "func": "Illuminate\\Log\\Logger->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php",
+     "line": 364,
+     "func": "Illuminate\\Log\\LogManager->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/routes/web.php",
+     "line": 12,
+     "func": "Illuminate\\Support\\Facades\\Facade::__callStatic"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php",
+     "line": 39,
+     "func": "Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 254,
+     "func": "Illuminate\\Routing\\CallableDispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Route->runCallable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 835,
+     "func": "Illuminate\\Routing\\Route->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():834}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "53ea221b4a929d49c818e53b",
+  "ts": "2026-10-31T21:01:57.978Z",
+  "kind": "dump",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "pid": 2,
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/routes/web.php",
+   "line": 13
+  },
+  "text": "array:1 [\n  \"pedido\" => 42\n]\n"
+ },
+ {
+  "v": 1,
+  "id": "2543172b1dc6e2b4de5e0daa",
+  "ts": "2026-10-31T21:01:57.993Z",
+  "kind": "log",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "pid": 2,
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+   "line": 340
+  },
+  "data": {
+   "level": "error",
+   "message": "Falha de teste do vt-06",
+   "channel": "local",
+   "context": "array:1 [\n  \"exception\" => RuntimeException {#307\n    #message: \"Falha de teste do vt-06\"\n    #code: 0\n    #file: \"/Users/dev/Code/loja/routes/web.php\"\n    #line: 15\n    trace: {\n      /Users/dev/Code/loja/routes/web.php:15 {\n        Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}\n        › if (request('erro') === '1') {\n        ›     throw new \\RuntimeException('Falha de teste do vt-06');\n        › }\n      }\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php:39 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php:254 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:835 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php:52 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php:104 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php:48 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:120 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:63 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php:36 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php:74 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:834 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:813 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:777 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:766 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:38 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php:31 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:38 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php:51 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php:27 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php:110 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php:61 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php:58 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php:22 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php:28 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1228 { …}\n      /Users/dev/Code/loja/public/index.php:20 { …}\n    }\n  }\n]",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+     "line": 340,
+     "func": "Lerd\\Collector\\seam_begin"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
+     "line": 654,
+     "func": "Monolog\\Logger->addRecord"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/Logger.php",
+     "line": 187,
+     "func": "Monolog\\Logger->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/Logger.php",
+     "line": 96,
+     "func": "Illuminate\\Log\\Logger->writeLog"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Log/LogManager.php",
+     "line": 747,
+     "func": "Illuminate\\Log\\Logger->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 475,
+     "func": "Illuminate\\Log\\LogManager->error"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 433,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Pipeline.php",
+     "line": 49,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->report"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 182,
+     "func": "Illuminate\\Routing\\Pipeline->handleException"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php",
+     "line": 28,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "65aaea1d6293c5f377be2fe1",
+  "ts": "2026-10-31T21:01:58.644Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+   "line": 498
+  },
+  "data": {
+   "sql": "select * from \"sessions\" where \"id\" = ? limit 1",
+   "bindings": [
+    "SESSAO-ANONIMA"
+   ],
+   "time_ms": 0.13,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 433,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3640,
+     "func": "Illuminate\\Database\\Connection->select"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3624,
+     "func": "Illuminate\\Database\\Query\\Builder->runSelect"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php",
+     "line": 427,
+     "func": "Illuminate\\Database\\Query\\Builder->get"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 3542,
+     "func": "Illuminate\\Database\\Query\\Builder->first"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 117,
+     "func": "Illuminate\\Database\\Query\\Builder->find"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 156,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->read"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 187,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->write"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 248,
+     "func": "Illuminate\\Session\\Store->save"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 129,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->saveSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php",
+     "line": 28,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "6c055ee1252547b4bc3adf68",
+  "ts": "2026-10-31T21:01:58.647Z",
+  "kind": "query",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+   "line": 498
+  },
+  "data": {
+   "sql": "insert into \"sessions\" (\"payload\", \"last_activity\", \"user_id\", \"ip_address\", \"user_agent\", \"id\") values (?, ?, ?, ?, ?, ?)",
+   "bindings": [
+    "eyJfdG9rZW4iOiJUT0tFTi1BTk9OSU1PMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwiX3ByZXZpb3VzIjp7InVybCI6Imh0dHA6XC9cL3Z0bGFyYXZlbC50ZXN0XC92dDA2P2Vycm89MSIsInJvdXRlIjpudWxsfSwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119fQ==",
+    1793480518,
+    null,
+    "192.168.127.1",
+    "curl/8.7.1",
+    "SESSAO-ANONIMA"
+   ],
+   "time_ms": 2.35,
+   "connection": "sqlite",
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 498,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:874}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 1160,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 920,
+     "func": "Illuminate\\Database\\Connection->event"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 830,
+     "func": "Illuminate\\Database\\Connection->logQuery"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 597,
+     "func": "Illuminate\\Database\\Connection->run"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Connection.php",
+     "line": 561,
+     "func": "Illuminate\\Database\\Connection->statement"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php",
+     "line": 4231,
+     "func": "Illuminate\\Database\\Connection->insert"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 178,
+     "func": "Illuminate\\Database\\Query\\Builder->insert"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php",
+     "line": 162,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->performInsert"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Store.php",
+     "line": 187,
+     "func": "Illuminate\\Session\\DatabaseSessionHandler->write"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 248,
+     "func": "Illuminate\\Session\\Store->save"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 129,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->saveSession"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\TrustProxies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+     "line": 22,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php",
+     "line": 28,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 175,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 144,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "44cbef3342509db036c41bd1",
+  "ts": "2026-10-31T21:01:58.649Z",
+  "kind": "request",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "pid": 2,
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "",
+   "line": 0
+  },
+  "data": {
+   "time_ms": 680.161,
+   "memory_peak": 10485760,
+   "queue_ms": 1.1,
+   "trace": []
+  }
+ },
+ {
+  "v": 1,
+  "id": "b4318ab69a954583eddbc985",
+  "ts": "2026-10-31T21:01:58.034Z",
+  "kind": "view",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+   "line": 162
+  },
+  "data": {
+   "name": "laravel-exceptions-renderer::markdown",
+   "path": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/resources/exceptions/renderer/markdown.blade.php",
+   "data_keys": [
+    "exception"
+   ],
+   "data_preview": {
+    "exception": "Exception"
+   },
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+     "line": 162,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:849}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 495,
+     "func": "Illuminate\\View\\Factory->{closure:Illuminate\\View\\Concerns\\ManagesEvents::addEventListener():161}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+     "line": 178,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 189,
+     "func": "Illuminate\\View\\Factory->callComposer"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 160,
+     "func": "Illuminate\\View\\View->renderContents"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Renderer/Renderer.php",
+     "line": 95,
+     "func": "Illuminate\\View\\View->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 995,
+     "func": "Illuminate\\Foundation\\Exceptions\\Renderer\\Renderer->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 976,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionContent"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 955,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->convertExceptionToResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 844,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->prepareResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 731,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Pipeline.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 182,
+     "func": "Illuminate\\Routing\\Pipeline->handleException"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "9e2100065f9c4cb75d4692c1",
+  "ts": "2026-10-31T21:01:58.425Z",
+  "kind": "view",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+   "line": 162
+  },
+  "data": {
+   "name": "laravel-exceptions-renderer::show",
+   "path": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/resources/exceptions/renderer/show.blade.php",
+   "data_keys": [
+    "exception",
+    "exceptionAsMarkdown"
+   ],
+   "data_preview": {
+    "exception": "Exception",
+    "exceptionAsMarkdown": "\"# RuntimeException - Internal Server Error\n\nFalha de teste do vt-06\n\nPHP 8.5.12\nLaravel 13.39.0\nloja.test\n\n## Stack Trace\n\n0 - routes/web.php:15\n1 - ven...\""
+   },
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+     "line": 162,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:849}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 495,
+     "func": "Illuminate\\View\\Factory->{closure:Illuminate\\View\\Concerns\\ManagesEvents::addEventListener():161}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+     "line": 178,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 189,
+     "func": "Illuminate\\View\\Factory->callComposer"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 160,
+     "func": "Illuminate\\View\\View->renderContents"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Renderer/Renderer.php",
+     "line": 100,
+     "func": "Illuminate\\View\\View->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 995,
+     "func": "Illuminate\\Foundation\\Exceptions\\Renderer\\Renderer->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 976,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionContent"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 955,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->convertExceptionToResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 844,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->prepareResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 731,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Pipeline.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 182,
+     "func": "Illuminate\\Routing\\Pipeline->handleException"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+     "line": 27,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\ValidatePostSize->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+     "line": 110,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+     "line": 61,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Http\\Middleware\\HandleCors->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+     "line": 58,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ },
+ {
+  "v": 1,
+  "id": "4bbe1b111a6a2161b649e3f4",
+  "ts": "2026-10-31T21:01:58.433Z",
+  "kind": "view",
+  "ctx": {
+   "type": "fpm",
+   "site": "loja",
+   "domain": "loja.test",
+   "request": "GET /vt06?erro=1",
+   "rid": "0065f29392f658220"
+  },
+  "src": {
+   "file": "/Users/dev/Code/loja/storage/framework/views/a96c701a2a9a9d595d02189ab1154a84.php",
+   "line": 31
+  },
+  "data": {
+   "name": "laravel-exceptions-renderer::components.topbar",
+   "path": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/resources/exceptions/renderer/components/topbar.blade.php",
+   "data_keys": [
+    "title",
+    "markdown"
+   ],
+   "data_preview": {
+    "title": "\"Internal Server Error\"",
+    "markdown": "\"# RuntimeException - Internal Server Error\n\nFalha de teste do vt-06\n\nPHP 8.5.12\nLaravel 13.39.0\nloja.test\n\n## Stack Trace\n\n0 - routes/web.php:15\n1 - ven...\""
+   },
+   "trace": [
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+     "line": 162,
+     "func": "Illuminate\\Foundation\\Application::{closure:/usr/local/etc/lerd/laravel-adapter.php:849}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 495,
+     "func": "Illuminate\\View\\Factory->{closure:Illuminate\\View\\Concerns\\ManagesEvents::addEventListener():161}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 328,
+     "func": "Illuminate\\Events\\Dispatcher->{closure:Illuminate\\Events\\Dispatcher::makeListener():493}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Events/Dispatcher.php",
+     "line": 308,
+     "func": "Illuminate\\Events\\Dispatcher->invokeListeners"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesEvents.php",
+     "line": 178,
+     "func": "Illuminate\\Events\\Dispatcher->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 189,
+     "func": "Illuminate\\View\\Factory->callComposer"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 160,
+     "func": "Illuminate\\View\\View->renderContents"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Concerns/ManagesComponents.php",
+     "line": 103,
+     "func": "Illuminate\\View\\View->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/storage/framework/views/a96c701a2a9a9d595d02189ab1154a84.php",
+     "line": 31,
+     "func": "Illuminate\\View\\Factory->renderComponent"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php",
+     "line": 127,
+     "func": "require"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php",
+     "line": 128,
+     "func": "Illuminate\\Filesystem\\Filesystem::{closure:Illuminate\\Filesystem\\Filesystem::getRequire():124}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Engines/PhpEngine.php",
+     "line": 57,
+     "func": "Illuminate\\Filesystem\\Filesystem->getRequire"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Engines/CompilerEngine.php",
+     "line": 76,
+     "func": "Illuminate\\View\\Engines\\PhpEngine->evaluatePath"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 208,
+     "func": "Illuminate\\View\\Engines\\CompilerEngine->get"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 191,
+     "func": "Illuminate\\View\\View->getContents"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/View.php",
+     "line": 160,
+     "func": "Illuminate\\View\\View->renderContents"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Renderer/Renderer.php",
+     "line": 100,
+     "func": "Illuminate\\View\\View->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 995,
+     "func": "Illuminate\\Foundation\\Exceptions\\Renderer\\Renderer->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 976,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionContent"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 955,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->convertExceptionToResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 844,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->prepareResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php",
+     "line": 731,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionResponse"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Pipeline.php",
+     "line": 51,
+     "func": "Illuminate\\Foundation\\Exceptions\\Handler->render"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 182,
+     "func": "Illuminate\\Routing\\Pipeline->handleException"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+     "line": 52,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Routing\\Middleware\\SubstituteBindings->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php",
+     "line": 104,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php",
+     "line": 48,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 120,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php",
+     "line": 63,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Session\\Middleware\\StartSession->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php",
+     "line": 36,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php",
+     "line": 74,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Cookie\\Middleware\\EncryptCookies->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 137,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 834,
+     "func": "Illuminate\\Pipeline\\Pipeline->then"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 813,
+     "func": "Illuminate\\Routing\\Router->runRouteWithinStack"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 777,
+     "func": "Illuminate\\Routing\\Router->runRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+     "line": 766,
+     "func": "Illuminate\\Routing\\Router->dispatchToRoute"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+     "line": 200,
+     "func": "Illuminate\\Routing\\Router->dispatch"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 180,
+     "func": "Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+     "line": 31,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+     "line": 219,
+     "func": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle"
+    },
+    {
+     "file": "/Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+     "line": 38,
+     "func": "Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}"
+    }
+   ]
+  }
+ }
+]

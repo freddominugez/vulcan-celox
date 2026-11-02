@@ -1,0 +1,8 @@
+Declared, for every PHP version:
+  - mongodb
+  - swoole
+
+Per version:
+  PHP 7.4  swoole (cannot load: mongodb)
+  PHP 8.1  image predates this set, run 'lerd php:rebuild 8.1'
+  PHP 8.4  mongodb, swoole

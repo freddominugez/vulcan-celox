@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+dist/
+build/
+.venv/
+*.corrupt-*
+
+# pacotes gerados por scripts/package.sh (refeitos a cada versão)
+executaveis/
+

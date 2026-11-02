@@ -1,0 +1,2 @@
+Version  Xdebug    Mode
+8.5      disabled  

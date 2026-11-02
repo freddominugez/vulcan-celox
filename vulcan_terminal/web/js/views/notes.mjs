@@ -1,0 +1,230 @@
+// Post-its de um site (ou Global): editar no lugar, cores, fixar, tags e arrastar para reordenar.
+
+import { del, get, patch, post } from "../api.mjs";
+import { $, debounce, flashFocus, esc, icon, reportError } from "../dom.mjs";
+
+const COLOR_NAMES = { amarelo: "Amarelo", rosa: "Rosa", verde: "Verde", azul: "Azul", laranja: "Laranja", roxo: "Roxo" };
+
+export class NotesView {
+  /** @param {{site: string|null, onChange: Function}} options */
+  constructor(root, options) {
+    this.root = root;
+    this.options = options;
+    this.query = "";
+    this.scope = options.terminal ? "session" : "site";
+    this.tag = "";
+    this.notes = [];
+    this.tags = [];
+    this.colors = Object.keys(COLOR_NAMES);
+    this.dragging = null;
+    this.saveText = new Map();
+    this.root.addEventListener("click", (e) => this.onClick(e));
+    this.root.addEventListener("input", (e) => this.onInput(e));
+    this.root.addEventListener("keydown", (e) => this.onKey(e));
+    // o card só fica arrastável enquanto a alça está pressionada (no WebKit, draggable impede editar o texto)
+    this.root.addEventListener("pointerdown", (e) => {
+      const grip = e.target.closest(".note-grip");
+      if (grip) grip.closest(".note").setAttribute("draggable", "true");
+    });
+    this.root.addEventListener("pointerup", () => this.root.querySelectorAll(".note[draggable]").forEach((n) => n.removeAttribute("draggable")));
+    this.root.addEventListener("dragstart", (e) => this.onDragStart(e));
+    this.root.addEventListener("dragover", (e) => e.preventDefault());
+    this.root.addEventListener("drop", (e) => this.onDrop(e));
+    this.root.addEventListener("dragend", () => this.root.querySelectorAll(".is-dragging, .note[draggable]").forEach((n) => {
+      n.classList.remove("is-dragging");
+      n.removeAttribute("draggable");
+    }));
+    this.renderShell();
+    this.load();
+  }
+
+  get siteParam() {
+    return this.options.site || "";
+  }
+
+  get sessionScoped() {
+    return Boolean(this.options.terminal) && this.scope === "session";
+  }
+
+  async load() {
+    const params = new URLSearchParams({ site: this.siteParam });
+    if (this.sessionScoped) params.set("terminal", this.options.terminal);
+    if (this.query) params.set("q", this.query);
+    if (this.tag) params.set("tag", this.tag);
+    try {
+      const [data, tags] = await Promise.all([get(`/api/notes?${params}`), get("/api/tags")]);
+      if (!this.root.isConnected) return; // a tela foi trocada enquanto carregava
+      this.notes = data.notes;
+      this.colors = data.colors;
+      this.tags = tags.tags;
+      this.renderGrid();
+    } catch (err) {
+      reportError(err);
+    }
+  }
+
+  renderShell() {
+    this.root.innerHTML = `
+      <div class="notes">
+        <div class="notes-bar">
+          <button class="btn btn-primary" data-action="new-note">${icon("plus")}<span>Novo post-it</span></button>
+          ${this.options.terminal ? `<div class="segmented" role="tablist" aria-label="Escopo">
+            <button type="button" class="seg ${this.scope === "session" ? "is-on" : ""}" data-scope="session" title="Só o que foi criado nesta sessão de terminal">${icon("terminal")}<span>Esta sessão</span></button>
+            <button type="button" class="seg ${this.scope === "site" ? "is-on" : ""}" data-scope="site">Todo o ${this.options.site ? "site" : "Global"}</button>
+          </div>` : ""}
+          <label class="search-field">${icon("search")}<input data-role="query" placeholder="Buscar nos post-its" aria-label="Buscar nos post-its"></label>
+          <select class="select select-sm" data-role="tag" aria-label="Filtrar por tag"><option value="">Todas as tags</option></select>
+          <div class="spacer"></div>
+          <span class="dim hint">Salva sozinho · arraste para reordenar</span>
+        </div>
+        <div class="note-grid" data-role="grid"></div>
+      </div>`;
+    $("[data-role=tag]", this.root).addEventListener("change", (e) => {
+      this.tag = e.target.value;
+      this.load();
+    });
+    $("[data-role=query]", this.root).addEventListener("input", debounce((e) => {
+      this.query = e.target.value.trim();
+      this.load();
+    }, 200));
+  }
+
+  renderGrid() {
+    const tagSelect = $("[data-role=tag]", this.root);
+    tagSelect.innerHTML = `<option value="">Todas as tags</option>` +
+      this.tags.map((t) => `<option value="${t.id}" ${t.id === this.tag ? "selected" : ""}>${esc(t.name)}</option>`).join("");
+    const grid = $("[data-role=grid]", this.root);
+    if (!this.notes.length) {
+      grid.innerHTML = `<div class="empty-inline">${icon("note")}<span>${this.query || this.tag
+        ? "Nenhum post-it encontrado com esse filtro."
+        : this.sessionScoped ? `Nenhum post-it nesta sessão. Os que você criar aqui entram na memória de “${esc(this.options.sessionTitle)}”.`
+        : "Nenhum post-it ainda. Use “Novo post-it” para anotar comandos, credenciais de teste ou lembretes do projeto."}</span></div>`;
+      return;
+    }
+    grid.innerHTML = this.notes.map((n) => `
+      <article class="note note-${n.color} ${n.pinned ? "is-pinned" : ""}" data-id="${n.id}">
+        <header class="note-head">
+          <span class="note-grip" title="Arraste para reordenar">${icon("grip")}</span>
+          <button class="icon-btn icon-btn-sm ${n.pinned ? "is-on" : ""}" data-action="pin" aria-label="${n.pinned ? "Desafixar" : "Fixar no topo"}" title="${n.pinned ? "Desafixar" : "Fixar no topo"}">${icon("pin")}</button>
+          <div class="note-colors" role="group" aria-label="Cor">
+            ${this.colors.map((c) => `<button class="swatch swatch-${c} ${c === n.color ? "is-on" : ""}" data-action="color" data-color="${c}" aria-label="${COLOR_NAMES[c] || c}" title="${COLOR_NAMES[c] || c}"></button>`).join("")}
+          </div>
+          <div class="spacer"></div>
+          <button class="icon-btn icon-btn-sm" data-action="delete" aria-label="Apagar post-it">${icon("trash")}</button>
+        </header>
+        <textarea class="note-text" rows="5" placeholder="Escreva aqui…" aria-label="Texto do post-it">${esc(n.text)}</textarea>
+        ${n.terminal_title && !this.sessionScoped ? `<div class="note-session">${icon("terminal")}${esc(n.terminal_title)}</div>` : ""}
+        <footer class="note-foot">
+          ${n.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}<button class="chip-x" data-action="untag" data-tag="${c.id}" aria-label="Remover tag ${esc(c.name)}">${icon("x")}</button></span>`).join("")}
+          <input class="note-tag-input" data-role="add-tag" placeholder="+ tag" list="note-tag-options" aria-label="Adicionar tag">
+        </footer>
+      </article>`).join("") + `<datalist id="note-tag-options">${this.tags.map((t) => `<option value="${esc(t.name)}">`).join("")}</datalist>`;
+    grid.querySelectorAll(".note-text").forEach((ta) => this.autosize(ta));
+    const card = flashFocus(grid, this.options, (id) => `.note[data-id="${id}"]`);
+    const text = card && card.querySelector(".note-text");
+    if (text && !text.value) text.focus(); // post-it novo criado pelo menu da sessão: já pronto para escrever
+  }
+
+  autosize(textarea) {
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.max(96, textarea.scrollHeight)}px`;
+  }
+
+  note(el) {
+    const card = el.closest(".note");
+    return card ? this.notes.find((n) => n.id === card.dataset.id) : null;
+  }
+
+  onInput(event) {
+    if (!event.target.classList.contains("note-text")) return;
+    const note = this.note(event.target);
+    if (!note) return;
+    this.autosize(event.target);
+    note.text = event.target.value;
+    if (!this.saveText.has(note.id)) {
+      this.saveText.set(note.id, debounce((id, text) => patch(`/api/notes/${id}`, { text }).catch(reportError), 600));
+    }
+    this.saveText.get(note.id)(note.id, note.text);
+  }
+
+  async onKey(event) {
+    if (event.target.dataset.role !== "add-tag" || event.key !== "Enter") return;
+    event.preventDefault();
+    const note = this.note(event.target);
+    const name = event.target.value.trim();
+    if (!note || !name) return;
+    try {
+      await patch(`/api/notes/${note.id}`, { tags: [...note.chips.map((c) => c.id), name] });
+      await this.load();
+    } catch (err) {
+      reportError(err);
+    }
+  }
+
+  async onClick(event) {
+    const scope = event.target.closest("[data-scope]");
+    if (scope) {
+      this.scope = scope.dataset.scope;
+      this.root.querySelectorAll("[data-scope]").forEach((b) => b.classList.toggle("is-on", b === scope));
+      this.load();
+      return;
+    }
+    const target = event.target.closest("[data-action]");
+    if (!target) return;
+    const action = target.dataset.action;
+    try {
+      if (action === "new-note") {
+        const note = await post("/api/notes", { site: this.siteParam, text: "", tags: this.tag ? [this.tag] : [],
+          terminal: this.sessionScoped ? this.options.terminal : null });
+        await this.load();
+        const ta = this.root.querySelector(`.note[data-id="${note.id}"] .note-text`);
+        if (ta) ta.focus();
+        this.options.onChange();
+        return;
+      }
+      const note = this.note(target);
+      if (!note) return;
+      if (this.saveText.has(note.id)) this.saveText.get(note.id).flush(note.id, note.text);
+      if (action === "pin") await patch(`/api/notes/${note.id}`, { pinned: !note.pinned });
+      if (action === "color") await patch(`/api/notes/${note.id}`, { color: target.dataset.color });
+      if (action === "untag") await patch(`/api/notes/${note.id}`, { tags: note.chips.map((c) => c.id).filter((id) => id !== target.dataset.tag) });
+      if (action === "delete") {
+        await del(`/api/notes/${note.id}`);
+        this.options.onChange();
+      }
+      await this.load();
+    } catch (err) {
+      reportError(err);
+    }
+  }
+
+  onDragStart(event) {
+    const card = event.target.closest(".note");
+    if (!card || event.target.closest("textarea, input")) return;
+    this.dragging = card.dataset.id;
+    card.classList.add("is-dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", card.dataset.id);
+  }
+
+  async onDrop(event) {
+    event.preventDefault();
+    const card = event.target.closest(".note");
+    if (!card || !this.dragging || card.dataset.id === this.dragging) return;
+    try {
+      // posição relativa a outro post-it: o índice da lista filtrada (sessão, busca, tag) não vale para o site inteiro
+      await post(`/api/notes/${this.dragging}/move`, { target: card.dataset.id });
+      this.dragging = null;
+      await this.load();
+    } catch (err) {
+      reportError(err);
+    }
+  }
+
+  destroy() {
+    this.saveText.forEach((fn, id) => {
+      const note = this.notes.find((n) => n.id === id);
+      if (note) fn.flush(id, note.text);
+    });
+  }
+}

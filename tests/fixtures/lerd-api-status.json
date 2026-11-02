@@ -1,0 +1,64 @@
+{
+    "dns": {
+        "ok": true,
+        "status": "ok",
+        "vpn": true,
+        "enabled": true,
+        "tld": "test"
+    },
+    "nginx": {
+        "running": true
+    },
+    "php_fpms": [
+        {
+            "version": "8.5",
+            "patch": "8.5.10",
+            "running": true,
+            "xdebug_enabled": false
+        }
+    ],
+    "php_default": "8.5",
+    "node_default": "22",
+    "node_managed_by_lerd": true,
+    "node_manager": "fnm",
+    "nvm_available": false,
+    "bun_available": false,
+    "bun_version": "",
+    "using_system_bun": false,
+    "watcher_running": true,
+    "frankenphp_php_versions": [
+        "8.2",
+        "8.3",
+        "8.4",
+        "8.5"
+    ],
+    "prerelease_php_versions": [
+        "8.6"
+    ],
+    "home": "/Users/dev",
+    "workspaces": [],
+    "instance": "exemplo",
+    "tools": [
+        {
+            "name": "composer",
+            "installed": "2.10.3",
+            "pinned": "2.10.3",
+            "present": true,
+            "update_available": false
+        },
+        {
+            "name": "fnm",
+            "installed": "v1.39.0",
+            "pinned": "v1.39.0",
+            "present": true,
+            "update_available": false
+        },
+        {
+            "name": "mkcert",
+            "installed": "v1.4.4",
+            "pinned": "v1.4.4",
+            "present": true,
+            "update_available": false
+        }
+    ]
+}

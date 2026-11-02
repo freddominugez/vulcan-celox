@@ -1,0 +1,6 @@
+
+  Site            loja.test
+  PHP             8.5
+  Node            22
+  Document root   /Users/dev/Code/loja/public
+  Nginx config    /Users/dev/.local/share/lerd/nginx/conf.d/loja.test.conf

@@ -1,0 +1,22 @@
+name: Feature request / Pedido de recurso
+description: A problem the app could solve. / Um problema que o app poderia resolver.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem / O problema
+      description: What are you trying to do, and what gets in the way? / O que você tenta fazer e o que atrapalha?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea / Sua ideia
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Project rules / Regras do projeto
+      options:
+        - label: It keeps the app local, without new pip dependencies. / Mantém o app local, sem dependência pip nova.
+          required: true

@@ -1,0 +1,40 @@
+php:
+    default_version: "8.5"
+    xdebug_enabled: {}
+    extensions: []
+node:
+    default_version: "22"
+    managed: true
+    manager: fnm
+nginx:
+    http_port: 80
+    https_port: 443
+dns:
+    enabled: true
+    tld: test
+auto_cleanup: true
+parked_directories:
+    - /Users/dev/Lerd
+services:
+    mailpit:
+        enabled: true
+        image: docker.io/axllent/mailpit:latest
+        port: 1025
+        extra_ports: []
+    meilisearch:
+        enabled: true
+        image: ""
+        port: 7700
+        extra_ports: []
+    mysql:
+        enabled: true
+        image: ""
+        port: 3306
+        extra_ports: []
+    postgres:
+        enabled: true
+        image: ""
+        port: 5432
+        extra_ports: []
+    redis:
+        enabled: true

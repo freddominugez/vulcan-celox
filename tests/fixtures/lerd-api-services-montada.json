@@ -1,0 +1,6 @@
+[
+  {"name": "mysql", "status": "active", "version": "8.4", "pinned": false, "is_database": true,
+   "connection_url": "mysql://root:lerd@127.0.0.1:3306", "idle_suspended": false, "site_count": 2},
+  {"name": "redis", "status": "inactive", "version": "7.4", "pinned": true, "is_database": false,
+   "connection_url": "redis://127.0.0.1:6379", "idle_suspended": false, "site_count": 0}
+]

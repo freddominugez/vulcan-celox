@@ -1,0 +1,26 @@
+# formato real do ~/.local/share/lerd/sites.yaml (Lerd 1.34.3), mais um site seguro e um legado
+sites:
+    - name: vulcan-demo
+      domains:
+        - vulcan-demo.test
+      path: /Users/dev/Lerd/vulcan-demo
+      php_version: "8.5"
+      node_version: "22"
+      secured: false
+      public_dir: public
+    - name: loja
+      domains:
+        - loja.test
+        - admin.loja.test
+      path: /Users/dev/Code/loja
+      php_version: "8.3"
+      node_version: "22"
+      secured: true
+      worker_ports: {}
+      paused_workers: []
+    - name: legado
+      domain: legado.test
+      path: '/Users/dev/Code/sistema legado'
+      php_version: "7.4"
+      node_version: ""
+      secured: false

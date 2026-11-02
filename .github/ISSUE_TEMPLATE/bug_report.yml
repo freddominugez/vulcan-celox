@@ -1,0 +1,36 @@
+name: Bug report / Relato de defeito
+description: Something does not work as documented. / Algo não funciona como documentado.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version / Versão
+      description: Help screen, or `--doctor`. / Tela Ajuda, ou `--doctor`.
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: System / Sistema
+      options: [macOS Apple Silicon, macOS Intel, Linux Mint, Other Linux / Outro Linux]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / Passos para reproduzir
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result / Resultado esperado e obtido
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `--doctor` / Saída do `--doctor`
+      description: Remove paths or names you do not want to publish. / Tire caminhos ou nomes que não quer publicar.
+      render: json

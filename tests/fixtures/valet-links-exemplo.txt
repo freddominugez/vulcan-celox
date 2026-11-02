@@ -1,0 +1,9 @@
+Sites linkados no Valet:
++-------------+-----+---------------------------+-------------------------------+-------------+
+| Site        | SSL | URL                       | Path                          | PHP Version |
++-------------+-----+---------------------------+-------------------------------+-------------+
+| loja        | X   | https://loja.test         | /Users/dev/Sites/loja         | php@8.3     |
+| blog        |     | http://blog.test          | /Users/dev/Sites/meu blog     | php@8.2     |
+| api-interna |     | http://api-interna.test   | /Users/dev/Code/api-interna   |             |
++-------------+-----+---------------------------+-------------------------------+-------------+
+

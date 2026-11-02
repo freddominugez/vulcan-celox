@@ -1,0 +1,42 @@
+name: Linux Mint distribution
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Existing Linux test sensor (Python 3.9)
+        run: bash scripts/test_linux.sh
+      - name: Build Linux packages
+        run: python3 scripts/package_linux.py
+      - name: Verify package hashes and installation
+        env:
+          VULCAN_AUTOSTART: '0'
+          VULCAN_KEYSTORE: memory
+          VULCAN_LERD_BIN: /nonexistent/lerd
+          VULCAN_VALET_BIN: /nonexistent/valet
+          VULCAN_LERD_API: http://127.0.0.1:1
+        run: |
+          set -euo pipefail
+          cd executaveis/linux
+          sha256sum -c SHA256SUMS
+          sudo apt-get install -y --no-install-recommends ./vulcan-terminal_1.0.0_all.deb
+          VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-deb-home" vulcan-terminal --check
+          VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-deb-home" vulcan-terminal --doctor
+          tar xzf vulcan-terminal-1.0.0-linux.tar.gz -C "$RUNNER_TEMP"
+          PREFIX="$RUNNER_TEMP/vulcan-prefix" sh "$RUNNER_TEMP/vulcan-terminal-1.0.0/install.sh" --sem-dependencias
+          VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-tar-home" "$RUNNER_TEMP/vulcan-prefix/bin/vulcan-terminal" --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vulcan-terminal-linux-mint
+          path: executaveis/linux/
+          if-no-files-found: error

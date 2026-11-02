@@ -1,0 +1,51 @@
+{
+  "feature": "vt-22-uso-e-custo",
+  "contract": "specs/vt-22-uso-e-custo/contract.md",
+  "updated_at": "2026-10-31T12:00:00+00:00",
+  "items": [
+    {
+      "id": "C1",
+      "title": "Uso por turno no índice",
+      "status": "done",
+      "validated": true,
+      "pending": false
+    },
+    {
+      "id": "C2",
+      "title": "Tabela de preços",
+      "status": "done",
+      "validated": true,
+      "pending": false
+    },
+    {
+      "id": "C3",
+      "title": "API de uso",
+      "status": "in_progress",
+      "validated": false,
+      "pending": false
+    },
+    {
+      "id": "C4",
+      "title": "Tela Uso",
+      "status": "todo",
+      "validated": false,
+      "pending": true
+    },
+    {
+      "id": "C5",
+      "title": "Uso no --doctor e na exportação",
+      "status": "todo",
+      "validated": false,
+      "pending": false
+    }
+  ],
+  "completed": [
+    "vt-01-fundacao",
+    "vt-21-correcoes-lerd"
+  ],
+  "queue": [
+    "specs/vt-23-harness-pela-interface/contract.md"
+  ],
+  "last_green_commit": "1f024ffabcdef0123456789abcdef0123456789a",
+  "next": "C3"
+}
