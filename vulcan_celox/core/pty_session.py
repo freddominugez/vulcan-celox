@@ -12,7 +12,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence
 
 from vulcan_celox.core import procinfo
 from vulcan_celox.core.quick_commands import is_long_running
-from vulcan_celox.core.runner import set_winsize, spawn_pty, terminate_many, terminate_pty
+from vulcan_celox.core.runner import WINDOWS, set_winsize, spawn_pty, terminate_many, terminate_pty
 
 HISTORY_LIMIT = 256 * 1024
 READ_CHUNK = 65536
@@ -38,10 +38,13 @@ class PtySession:
         self._history = bytearray()
         self._listeners: List[Listener] = []
         self._lock = threading.Lock()
-        self.pid, self.fd = spawn_pty(self.argv, cwd, env, rows, cols)
+        self.pid, handle = spawn_pty(self.argv, cwd, env, rows, cols)
+        self._win = handle if WINDOWS else None  # no Windows o terminal é um objeto ConPTY, com dois descritores
+        self.fd = self._win.read_fd if WINDOWS else handle
         # Mestre não bloqueante e uma escrita por vez. Uma colagem grande não se mistura com teclas do
         # WebSocket, e uma aba que não lê a entrada não prende a thread que escreve.
-        os.set_blocking(self.fd, False)
+        if not WINDOWS:
+            os.set_blocking(self.fd, False)
         self._write_lock = threading.Lock()
         self._closed = False
         # self-pipe: close() acorda a thread leitora, que é a única a fechar o fd do PTY. Fechar o fd
@@ -73,11 +76,12 @@ class PtySession:
     def _pump(self) -> None:
         while True:
             try:
-                ready, _, _ = select.select([self.fd, self._wake_r], [], [], 0.5)
-                if self._wake_r in ready or (not ready and self._closed):
-                    break
-                if not ready:
-                    continue
+                if not WINDOWS:  # no Windows select não serve para pipe: a leitura bloqueia até o console fechar
+                    ready, _, _ = select.select([self.fd, self._wake_r], [], [], 0.5)
+                    if self._wake_r in ready or (not ready and self._closed):
+                        break
+                    if not ready:
+                        continue
                 chunk = os.read(self.fd, READ_CHUNK)
             except BlockingIOError:
                 continue  # select acordou sem dado de verdade
@@ -103,7 +107,9 @@ class PtySession:
             self._fds_closed = True
         with self._write_lock:  # quem escreve vê _fds_closed e sai; o número do fd não fica livre no meio da escrita
             pass
-        for fd in (self.fd, self._wake_r, self._wake_w):
+        if self._win is not None:
+            self._win.release()
+        for fd in ((self._wake_r, self._wake_w) if WINDOWS else (self.fd, self._wake_r, self._wake_w)):
             try:
                 os.close(fd)
             except OSError:
@@ -111,6 +117,9 @@ class PtySession:
 
     def _reap(self) -> None:
         if self.exit_code is not None:
+            return
+        if self._win is not None:
+            self.exit_code = self._win.wait()
             return
         try:
             done, status = os.waitpid(self.pid, 0)
@@ -124,6 +133,13 @@ class PtySession:
         with self._write_lock:
             view = memoryview(data)
             deadline = time.monotonic() + timeout
+            if self._win is not None:  # pipe do console: escrita bloqueante
+                try:
+                    while view and self.alive and not self._fds_closed:
+                        view = view[self._win.write(view[:4096]):]
+                except OSError:
+                    return False
+                return not view
             while view:
                 if not self.alive or self._fds_closed:
                     return False
@@ -148,7 +164,7 @@ class PtySession:
 
     def foreground(self) -> Optional[List[procinfo.Proc]]:
         """Processos do grupo em primeiro plano da aba; None quando não dá para saber."""
-        if not self.alive or self._fds_closed:
+        if not self.alive or self._fds_closed or self._win is not None:  # o Windows não tem grupo em primeiro plano
             return None
         return procinfo.group_processes(procinfo.foreground_pgid(self.fd))
 
@@ -156,7 +172,10 @@ class PtySession:
         self.rows, self.cols = int(rows), int(cols)
         if self.alive:
             try:
-                set_winsize(self.fd, self.rows, self.cols)
+                if self._win is not None:
+                    self._win.resize(self.rows, self.cols)
+                else:
+                    set_winsize(self.fd, self.rows, self.cols)
             except OSError:
                 pass
 
@@ -194,6 +213,8 @@ class PtySession:
                     else (status >> 8)
             if self.exit_code is None:
                 self.exit_code = -1
+        if self._win is not None:
+            self._win.close_console()  # é isto que encerra a leitura bloqueante
         with self._lock:
             wake = not self._fds_closed
         if wake:
@@ -219,10 +240,11 @@ def new_session_id() -> str:
 def terminal_env(base: Mapping[str, str]) -> Dict[str, str]:
     env = dict(base)
     home = env.get("HOME") or str(Path.home())
-    extra = [str(Path(home) / ".local" / "share" / "lerd" / "bin"), str(Path(home) / ".local" / "bin"),
-             "/opt/homebrew/bin", "/usr/local/bin"]
-    current = [p for p in env.get("PATH", "/usr/bin:/bin:/usr/sbin:/sbin").split(":") if p]
-    env["PATH"] = ":".join(extra + [p for p in current if p not in extra])
+    if not WINDOWS:
+        extra = [str(Path(home) / ".local" / "share" / "lerd" / "bin"), str(Path(home) / ".local" / "bin"),
+                 "/opt/homebrew/bin", "/usr/local/bin"]
+        current = [p for p in env.get("PATH", "/usr/bin:/bin:/usr/sbin:/sbin").split(":") if p]
+        env["PATH"] = ":".join(extra + [p for p in current if p not in extra])
     env["TERM"] = "xterm-256color"
     env["COLORTERM"] = "truecolor"
     env["TERM_PROGRAM"] = "VulcanCelox"
@@ -243,11 +265,8 @@ class TerminalManager:
         return default_shell(self.base_env)
 
     def argv_for(self, command: Optional[str]) -> List[str]:
-        shell = self.shell()
-        if not command:
-            return [shell, "-l"]
-        # roda o comando e depois continua num shell interativo, como no Terminal.app
-        return [shell, "-l", "-i", "-c", f"{command}; exec {shell} -l"]
+        from vulcan_celox.core.oscompat import interactive_argv
+        return interactive_argv(self.shell(), command)
 
     def create(self, cwd: str, command: Optional[str] = None, title: str = "", site: Optional[str] = None,
                rows: int = 24, cols: int = 80, theme: Optional[str] = None) -> PtySession:

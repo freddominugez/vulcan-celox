@@ -46,6 +46,18 @@ bash scripts/install_app.sh  # compila com swiftc, instala em ~/Applications e c
 bash scripts/package.sh      # pacotes de macOS e Linux em executaveis/
 ```
 
+## Windows (versão de teste)
+
+Windows 10 versão 1809 ou mais novo, ou Windows 11. O Python vem junto, então não há mais nada para instalar.
+
+1. Baixe `Vulcan-Celox-<versão>-windows.zip` em Releases e confira com `SHA256SUMS-windows`.
+2. Extraia a pasta onde quiser e abra `Vulcan Celox.cmd`.
+3. O pacote não é assinado, então o Windows pode avisar de editor desconhecido: escolha **Mais informações** e depois **Executar assim mesmo**.
+
+O app abre em janela própria do Microsoft Edge ou do Chrome. O shell padrão é o PowerShell. Os dados ficam em `%APPDATA%\VulcanCelox`, e a chave da Anthropic vai para o Gerenciador de Credenciais do Windows.
+
+Sem suporte no Windows: Lerd e Valet (os sites PHP ficam em modo local), o hook opcional dos agentes (`--instalar-hook`) e clicar em caminhos `C:\...` no terminal. Sem a checagem de primeiro plano, a aba pareada vale enquanto estiver aberta.
+
 ## Linux (ainda não distribuído)
 
 O código está no repositório e os testes rodam em contêiner e no CI, incluindo a instalação do `.deb` no Ubuntu 22.04. Ele **não** foi aceito numa área de trabalho real, então nenhum pacote de Linux é publicado. Para ajudar, gere o pacote e experimente numa área de trabalho real:
@@ -60,4 +72,3 @@ vulcan-celox --check
 
 Python 3.9+ é o único requisito para gerar. A janela usa GTK e WebKit, ou Chromium/Chrome em modo app, ou o navegador. Os atalhos usam Ctrl+Shift. As bibliotecas podem ser instaladas com `vulcan-celox --instalar-dependencias` (apt, dnf ou pacman), com a sua permissão.
 
-Windows não é suportado: o módulo `pty` do Python não existe lá.

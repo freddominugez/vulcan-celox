@@ -32,6 +32,9 @@ def main(argv=None) -> int:
     paths.migrate_data_folder()
 
     if args.instalar_hook:
+        if sys.platform == "win32":
+            print("The hook is not available on Windows yet. Sessions still show up in Agents.", file=sys.stderr)
+            return 2
         return install_pairing_hook()
     if args.reindexar_agentes:
         return reindex_agents()

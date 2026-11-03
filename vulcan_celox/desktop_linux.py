@@ -43,6 +43,19 @@ def gtk_webkit_version() -> Optional[str]:
     return None
 
 
+def windows_browser(env, exists=os.path.exists) -> Optional[str]:
+    """No Windows o Edge já vem instalado, mas fora do PATH."""
+    if sys.platform != "win32":
+        return None
+    for base in ("PROGRAMFILES(X86)", "PROGRAMFILES", "LOCALAPPDATA"):
+        root = env.get(base)
+        for tail in (("Microsoft", "Edge", "Application", "msedge.exe"), ("Google", "Chrome", "Application", "chrome.exe")):
+            path = os.path.join(root, *tail) if root else ""
+            if path and exists(path):
+                return path
+    return None
+
+
 def choose_mode(env, which: Callable[[str], Optional[str]] = shutil.which,
                 gtk: Callable[[], Optional[str]] = gtk_webkit_version) -> Tuple[str, Optional[str]]:
     """(modo, detalhe): ("gtk", versão) | ("app", navegador) | ("browser", None)."""
@@ -54,7 +67,7 @@ def choose_mode(env, which: Callable[[str], Optional[str]] = shutil.which,
         if version:
             return "gtk", version
     if forced in (None, "", "app", "gtk"):
-        browser = next((which(b) for b in BROWSERS if which(b)), None)
+        browser = next((which(b) for b in BROWSERS if which(b)), None) or windows_browser(env)
         if browser:
             return "app", browser
     return "browser", None
@@ -92,7 +105,7 @@ def write_launcher(data_dir, port: int, token: str, route: str = "#/overview"):
     html = ("<!doctype html><meta charset=\"utf-8\"><title>Vulcan Celox</title>"
             f"<script>location.replace({json.dumps(target)});</script>")
     fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+    with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
         fh.write(html)
     os.chmod(str(path), 0o600)  # arquivo antigo com outro modo
     return path
@@ -145,7 +158,9 @@ def run_app_window(app, token: str, browser: str) -> int:
 def run_browser(app, token: str) -> int:
     url = write_launcher(app.data_dir, app.server.port, token).as_uri()  # sem o token na linha de comando
     opener = shutil.which("xdg-open")
-    if opener:
+    if sys.platform == "win32":
+        Runner().stream(["explorer.exe", url])
+    elif opener:
         Runner().stream([opener, url])  # em segundo plano: alguns xdg-open só retornam quando o navegador fecha
     print(f"{APP_NAME} running at http://127.0.0.1:{app.server.port} (open this file if the browser did not open):\n{url}",
           flush=True)

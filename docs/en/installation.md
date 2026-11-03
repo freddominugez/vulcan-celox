@@ -46,6 +46,18 @@ bash scripts/install_app.sh  # builds with swiftc, installs in ~/Applications, c
 bash scripts/package.sh      # packages for macOS and Linux in executaveis/
 ```
 
+## Windows (test build)
+
+Windows 10 version 1809 or newer, or Windows 11. Python is included, so there is nothing else to install.
+
+1. Download `Vulcan-Celox-<version>-windows.zip` from Releases and check it against `SHA256SUMS-windows`.
+2. Extract the folder wherever you like and open `Vulcan Celox.cmd`.
+3. The package is not signed, so Windows may warn about an unknown publisher: choose **More info**, then **Run anyway**.
+
+The app opens in its own Microsoft Edge or Chrome window. The default shell is PowerShell. Data stays in `%APPDATA%\VulcanCelox`, and the Anthropic key goes to the Windows Credential Manager.
+
+Not available on Windows: Lerd and Valet (PHP sites run in local mode), the optional agent hook (`--instalar-hook`), and clicking `C:\...` paths in the terminal. Without the foreground check, a paired tab counts as long as it is open.
+
 ## Linux (not released yet)
 
 The code is in the repository and its tests run in a container and in CI, including `.deb` installation on Ubuntu 22.04. It has **not** been accepted on a real desktop, so no Linux package is published. If you want to help, build it and try it on a real desktop:
@@ -60,4 +72,3 @@ vulcan-celox --check
 
 Python 3.9+ is the only build requirement. The window uses GTK and WebKit, or Chromium/Chrome in app mode, or the browser. Shortcuts use Ctrl+Shift. Libraries can be installed with `vulcan-celox --instalar-dependencias` (apt, dnf or pacman), with your permission.
 
-Windows is not supported: Python's `pty` module does not exist there.

@@ -64,10 +64,10 @@ def read_for_viewer(path: str, roots: Iterable[str]) -> Dict[str, Any]:
         raise CodeReadError(403, "sensitive", "arquivo com nome sensível não é exibido")
     try:
         # sem seguir link no último trecho, e sem travar se alguém trocar o arquivo por um FIFO
-        fd = os.open(real, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        fd = os.open(real, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0))
     except FileNotFoundError:
         raise CodeReadError(404, "missing", "o arquivo não existe mais") from None
-    except OSError:
+    except OSError:  # no Windows, abrir uma pasta dá erro de permissão: o resultado é o mesmo
         raise CodeReadError(403, "unreadable", "não foi possível abrir o arquivo") from None
     try:
         info = os.fstat(fd)

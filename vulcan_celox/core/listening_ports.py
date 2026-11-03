@@ -16,8 +16,35 @@ TIMEOUT = 5.0
 LISTEN = "0A"
 
 
+def parse_netstat(text: str, pids: Iterable[int]) -> List[Tuple[int, int, str]]:
+    """Saída de `netstat -ano -p tcp`: (pid, porta, comando), só de quem está em `pids` e em escuta."""
+    wanted = set(pids)
+    found: List[Tuple[int, int, str]] = []
+    for line in text.splitlines():
+        cols = line.split()
+        if len(cols) >= 5 and cols[0].upper().startswith("TCP") and cols[3].upper() == "LISTENING" and cols[4].isdigit():
+            port = cols[1].rsplit(":", 1)[-1]
+            if int(cols[4]) in wanted and port.isdigit():
+                found.append((int(cols[4]), int(port), ""))
+    return found
+
+
+def netstat_ports(runner, pids: Iterable[int]) -> Tuple[List[Tuple[int, int, str]], str]:
+    pids = list(pids)
+    rows: List[Tuple[int, int, str]] = []
+    for protocol in ("tcp", "tcpv6"):
+        result = runner.run(["netstat", "-ano", "-p", protocol], timeout=TIMEOUT)
+        if result.code in (126, 127) or result.timed_out:
+            return [], "netstat não rodou"
+        rows += parse_netstat(result.stdout, pids)
+    return rows, ""
+
+
 def process_tree(runner) -> Optional[Dict[int, List[int]]]:
     """pai -> filhos. None se o `ps` não rodou."""
+    if sys.platform == "win32":
+        from vulcan_celox.core.win32 import children_map
+        return children_map()
     result = runner.run(["ps", "-A", "-o", "pid=,ppid="], timeout=TIMEOUT)
     if not result.ok:
         return None
@@ -128,7 +155,12 @@ class PortWatcher:
         for tab, root in tabs:
             for pid in descendants(children, root):
                 owners.setdefault(pid, tab)
-        rows, reason = lsof_ports(self.runner, owners) if self.platform == "darwin" else proc_ports(self.proc_root, owners)
+        if self.platform == "win32":
+            rows, reason = netstat_ports(self.runner, owners)
+        elif self.platform == "darwin":
+            rows, reason = lsof_ports(self.runner, owners)
+        else:
+            rows, reason = proc_ports(self.proc_root, owners)
         out: Dict[str, Dict[int, Dict]] = {}
         for pid, port, command in rows:
             if pid in owners:  # o que não é da aba não aparece, mesmo se o comando devolver

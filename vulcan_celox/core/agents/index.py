@@ -161,7 +161,11 @@ class AgentIndex:
         db = sqlite3.connect(str(self.path), check_same_thread=False, timeout=10)
         db.row_factory = sqlite3.Row
         # WAL: --doctor, --reindexar-agentes e --podar-agentes leem com o app aberto sem "database is locked"
-        db.execute("PRAGMA journal_mode=WAL")
+        try:
+            db.execute("PRAGMA journal_mode=WAL")
+        except sqlite3.DatabaseError:
+            db.close()  # no Windows, arquivo aberto não pode ser movido para o lado
+            raise
         for suffix in ("", "-wal", "-shm"):
             try:
                 os.chmod(str(self.path) + suffix, 0o600)  # eventos dos agentes: só do usuário

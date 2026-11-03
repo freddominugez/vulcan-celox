@@ -28,6 +28,5 @@ Still waiting: the Linux release after the acceptance on Mint.
 
 ## Not planned
 
-- Windows: Python's `pty` module does not exist there.
 - Herd as a backend.
 - Reimplementing a chat, an editor or the agents' protocols. The terminal stays the official CLI, and the Code tab only displays files.

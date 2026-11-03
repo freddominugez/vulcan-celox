@@ -80,7 +80,7 @@ export function renderSidebar() {
   $("#site-list").innerHTML = sites.length
     ? (fav.length ? `<div class="site-group">${icon("star", "i-sm")}${t("Favoritos")}</div>${fav.map(siteHtml).join("")}`
       + (rest.length ? `<div class="site-group">${t("Sites")}</div>` : "") : "") + rest.map(siteHtml).join("")
-    : `<div class="side-empty">${state.sites.length ? t("Nenhum site com esse nome.") : t("Nenhum site. Rode <code>lerd link</code> numa pasta de projeto.")}</div>`;
+    : `<div class="side-empty">${state.sites.length ? t("Nenhum site com esse nome.") : state.backend.name === "local" ? t("Nenhum site. Use o + acima para adicionar uma pasta.") : t("Nenhum site. Rode <code>lerd link</code> numa pasta de projeto.")}</div>`;
 
   const nodeHtml = (p) => {
     const active = app.route.name === "node-projeto" && app.route.project === p.name;

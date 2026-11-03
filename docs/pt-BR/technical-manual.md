@@ -252,6 +252,10 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 
 - `core/i18n.py`, `web/js/i18n.mjs`: idioma da interface. `web/i18n/en.json` é o dicionário, e `HttpError` passa por `tr()` ao responder.
 
+### Windows
+
+`core/pty_windows.py` é o terminal no Windows, com ConPTY por `ctypes`, e `core/win32.py` guarda Lixeira, Gerenciador de Credenciais e lista de processos. `core/runner.py` escolhe o caminho pelo sistema. No Windows, abrir arquivo nunca passa por `cmd.exe`, porque um `&` no nome viraria outro comando. A janela é a mesma de `desktop_linux.py`, em modo app do Edge ou Chrome, chamada por `desktop_windows.py`. `scripts/package_windows.py` monta o zip portátil com Python embutido, e `scripts/smoke_windows.py` confere na CI.
+
 ## 6. Servidor HTTP e WebSocket
 
 `server/local_http.py` usa `ThreadingHTTPServer`, com uma thread por conexão. As rotas, por grupo, estão em [http-api.md](http-api.md). O modelo de ameaça está em [security.md](security.md). As regras do próprio servidor:

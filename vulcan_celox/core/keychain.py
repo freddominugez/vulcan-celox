@@ -126,8 +126,33 @@ class SecretToolStore:
             self.runner.run([self.tool, "clear", *self._attrs()], timeout=15)
 
 
+class WindowsCredentialStore:
+    """Gerenciador de Credenciais do Windows: a chave fica protegida pela conta do usuário."""
+
+    def __init__(self, service: str = SERVICE, account: str = ACCOUNT):
+        self.target, self.account = service, account
+
+    def get(self) -> Optional[str]:
+        from vulcan_celox.core.win32 import credential_read
+        value = credential_read(self.target)
+        return value if value and valid_key(value) else None
+
+    def set(self, value: str) -> None:
+        from vulcan_celox.core.win32 import credential_write
+        if not valid_key(value):
+            raise SecretError("formato de chave inválido")
+        if not credential_write(self.target, self.account, value) or self.get() != value:
+            raise SecretError("não foi possível gravar a chave no chaveiro do sistema")
+
+    def delete(self) -> None:
+        from vulcan_celox.core.win32 import credential_delete
+        credential_delete(self.target)
+
+
 def default_keystore(runner=None, system: Optional[str] = None):
-    from vulcan_celox.core.oscompat import is_macos
+    from vulcan_celox.core.oscompat import is_macos, is_windows
+    if is_windows(system):
+        return WindowsCredentialStore()
     return KeychainStore(runner=runner) if is_macos(system) else SecretToolStore(runner=runner)
 
 

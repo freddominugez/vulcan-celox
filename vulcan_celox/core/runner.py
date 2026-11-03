@@ -2,21 +2,29 @@
 
 from __future__ import annotations
 
-import fcntl
 import os
 import signal
 import struct
 import subprocess
-import termios
+import sys
 import threading
 import time
 import warnings
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from vulcan_celox.core.oscompat import default_shell
+from vulcan_celox.core.oscompat import default_shell, shell_command_argv
 
-SHELL = default_shell()  # zsh no macOS; no Linux, $SHELL ou o que existir
+WINDOWS = sys.platform == "win32"
+if WINDOWS:
+    from vulcan_celox.core.pty_windows import WinPty
+else:
+    import fcntl
+    import termios
+
+SHELL = default_shell()  # zsh no macOS; no Linux, $SHELL ou o que existir; no Windows, PowerShell
+# sem janela de console piscando para cada comando no Windows; no resto, sessão própria para encerrar o grupo inteiro
+SPAWN_KWARGS = {"creationflags": subprocess.CREATE_NO_WINDOW} if WINDOWS else {"start_new_session": True}
 KILL_GRACE_SECONDS = 3.0
 
 
@@ -37,7 +45,15 @@ class Result:
         return (self.stdout or "") + (self.stderr or "")
 
 
+def _kill_tree(pid: int) -> None:
+    """Windows: encerra o processo e os filhos dele."""
+    subprocess.run(["taskkill", "/T", "/F", "/PID", str(pid)], capture_output=True, **SPAWN_KWARGS)
+
+
 def _kill_group(proc: subprocess.Popen, sig: int) -> None:
+    if WINDOWS:
+        _kill_tree(proc.pid)
+        return
     try:
         os.killpg(proc.pid, sig)
     except (ProcessLookupError, PermissionError):
@@ -52,7 +68,7 @@ def _terminate(proc: subprocess.Popen) -> None:
     try:
         proc.wait(timeout=KILL_GRACE_SECONDS)
     except subprocess.TimeoutExpired:
-        _kill_group(proc, signal.SIGKILL)
+        _kill_group(proc, getattr(signal, "SIGKILL", signal.SIGTERM))
         proc.wait()
 
 
@@ -90,7 +106,7 @@ class Runner:
             proc = subprocess.Popen(list(argv), cwd=cwd, env=dict(env) if env is not None else None,
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     stdin=subprocess.PIPE if input is not None else subprocess.DEVNULL,
-                                    text=True, start_new_session=True)
+                                    text=True, **SPAWN_KWARGS)
         except FileNotFoundError as exc:
             return Result(127, "", str(exc), time.monotonic() - start)
         except PermissionError as exc:
@@ -105,7 +121,7 @@ class Runner:
 
     def run_shell(self, cmdline: str, cwd: Optional[str] = None,
                   env: Optional[Mapping[str, str]] = None, timeout: float = 60.0) -> Result:
-        return self.run([SHELL, "-lc", cmdline], cwd=cwd, env=env, timeout=timeout)
+        return self.run(shell_command_argv(SHELL, cmdline), cwd=cwd, env=env, timeout=timeout)
 
     def stream(self, argv: Sequence[str], cwd: Optional[str] = None,
                env: Optional[Mapping[str, str]] = None,
@@ -118,8 +134,7 @@ class Runner:
         try:
             proc = subprocess.Popen(list(argv), cwd=cwd, env=dict(env) if env is not None else None,
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                    stdin=subprocess.DEVNULL, text=True, bufsize=1,
-                                    start_new_session=True)
+                                    stdin=subprocess.DEVNULL, text=True, bufsize=1, **SPAWN_KWARGS)
         except (FileNotFoundError, PermissionError) as exc:
             on_line(f"erro: {exc}")
             on_exit(127 if isinstance(exc, FileNotFoundError) else 126)
@@ -140,13 +155,12 @@ class Runner:
                      env: Optional[Mapping[str, str]] = None,
                      on_line: Callable[[str], None] = lambda _l: None,
                      on_exit: Callable[[int], None] = lambda _c: None) -> Handle:
-        return self.stream([SHELL, "-lc", cmdline], cwd=cwd, env=env, on_line=on_line, on_exit=on_exit)
+        return self.stream(shell_command_argv(SHELL, cmdline), cwd=cwd, env=env, on_line=on_line, on_exit=on_exit)
 
 
 def open_pipe(argv: Sequence[str]) -> subprocess.Popen:
     """Saída de um comando em stream, sem guardar tudo na memória. Levanta OSError se não rodar."""
-    return subprocess.Popen(list(argv), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                            start_new_session=True)
+    return subprocess.Popen(list(argv), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, **SPAWN_KWARGS)
 
 
 def close_pipe(proc: subprocess.Popen, grace: float = 5.0) -> Optional[int]:
@@ -165,13 +179,16 @@ def set_winsize(fd: int, rows: int, cols: int) -> None:
 
 
 def spawn_pty(argv: Sequence[str], cwd: Optional[str], env: Mapping[str, str],
-              rows: int = 24, cols: int = 80) -> Tuple[int, int]:
-    """Processo com terminal controlador próprio (forkpty). Retorna (pid, fd do mestre).
+              rows: int = 24, cols: int = 80) -> Tuple[int, object]:
+    """Processo com terminal controlador próprio (forkpty). Retorna (pid, fd do mestre); no Windows, (pid, WinPty).
 
     O filho só faz chdir e exec, então o fork a partir de um processo com threads é seguro.
     """
     argv = list(argv)
     env = dict(env)
+    if WINDOWS:
+        pty = WinPty(subprocess.list2cmdline(argv), cwd, env, rows, cols)
+        return pty.pid, pty
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)  # aviso de fork com threads (Python 3.12+)
         pid, fd = os.forkpty()
@@ -197,6 +214,9 @@ def spawn_pty(argv: Sequence[str], cwd: Optional[str], env: Mapping[str, str],
 
 def terminate_pty(pid: int, grace: float = 2.0) -> Optional[int]:
     """SIGHUP no grupo do terminal, SIGKILL se não sair em `grace` segundos. Retorna o status."""
+    if WINDOWS:
+        _kill_tree(pid)
+        return None
     for sig in (signal.SIGHUP, signal.SIGTERM):
         try:
             os.killpg(pid, sig)
@@ -224,6 +244,10 @@ def terminate_pty(pid: int, grace: float = 2.0) -> Optional[int]:
 def terminate_many(pids: Sequence[int], grace: float = 2.0) -> Dict[int, Optional[int]]:
     """Como terminate_pty para várias abas de uma vez: sinal para todas, uma espera só.
     Dez abas que ignoram SIGHUP levam `grace` segundos, não dez vezes isso."""
+    if WINDOWS:
+        for pid in pids:
+            _kill_tree(pid)
+        return {pid: None for pid in pids}
     for pid in pids:
         for sig in (signal.SIGHUP, signal.SIGTERM):
             try:
@@ -307,4 +331,4 @@ class FakeRunner:
 
     def stream_shell(self, cmdline, cwd=None, env=None, on_line=lambda _l: None,
                      on_exit=lambda _c: None):
-        return self.stream([SHELL, "-lc", cmdline], cwd=cwd, env=env, on_line=on_line, on_exit=on_exit)
+        return self.stream(shell_command_argv(SHELL, cmdline), cwd=cwd, env=env, on_line=on_line, on_exit=on_exit)

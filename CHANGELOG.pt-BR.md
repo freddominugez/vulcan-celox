@@ -2,6 +2,14 @@
 
 Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Versão em inglês: [CHANGELOG.md](CHANGELOG.md).
 
+## [1.2.0] - 2026-11-03
+
+### Adicionado
+- **Windows, como versão de teste.** Terminal real com ConPTY, PowerShell por padrão, Lixeira, Gerenciador de Credenciais e portas por aba, num pacote portátil com Python incluído. O guia de instalação diz o que não está disponível lá.
+
+### Corrigido
+- Um índice de agentes corrompido podia impedir o app de abrir no Windows.
+
 ## [1.1.1] - 2026-11-03
 
 ### Corrigido

@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from vulcan_celox.core.oscompat import is_macos
+from vulcan_celox.core.oscompat import is_macos, is_windows
 
 TRASH_DIR = "lixeira"
 
@@ -22,7 +22,10 @@ def move_to_trash(path, data_dir, runner, system: Optional[str] = None) -> Path:
     path = Path(path)
     if not path.exists():
         return path
-    if is_macos(system):
+    if is_windows(system):
+        from vulcan_celox.core.win32 import to_recycle_bin
+        to_recycle_bin(str(path))
+    elif is_macos(system):
         script = f"tell application \"Finder\" to delete POSIX file {_applescript_string(str(path))}"
         runner.run(["/usr/bin/osascript", "-e", script], timeout=20)
     else:

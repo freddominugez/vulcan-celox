@@ -121,8 +121,8 @@ export class OverviewView {
             </table>` : `
             <div class="empty-block">
               <h3>${t("Nenhum site registrado")}</h3>
-              <p>${t("Registre um projeto no {backend} para ele aparecer aqui.", { backend: esc(state.backend.label) })}</p>
-              <code class="code-line">cd ~/Lerd/meu-projeto &amp;&amp; lerd link</code>
+              ${state.backend.name === "local" ? `<p>${t("Use o + em Sites PHP, na barra lateral, para adicionar uma pasta.")}</p>` : `<p>${t("Registre um projeto no {backend} para ele aparecer aqui.", { backend: esc(state.backend.label) })}</p>
+              <code class="code-line">cd ~/Lerd/meu-projeto &amp;&amp; lerd link</code>`}
             </div>`}
           </section>
 

@@ -1,0 +1,55 @@
+name: Windows
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Windows tests
+        run: python -m unittest tests.test_windows -v
+      - name: Whole suite, for information
+        continue-on-error: true
+        shell: bash
+        run: |
+          python -m unittest discover -s tests -t . > suite.log 2>&1 || true
+          grep -E '^(FAIL|ERROR):' suite.log | sed 's/ (.*//' | sort | uniq -c | sort -rn | head -60
+          tail -3 suite.log
+      - name: Build package
+        run: python scripts/package_windows.py out
+      - name: Run from the extracted package
+        shell: pwsh
+        run: |
+          Expand-Archive out\*.zip -DestinationPath extracted
+          $root = (Get-ChildItem extracted | Select-Object -First 1).FullName
+          $env:VULCAN_CELOX_HOME = "$env:RUNNER_TEMP\celox-check"
+          & "$root\python\python.exe" -X utf8 -m vulcan_celox.desktop_windows --check
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & "$root\python\python.exe" -X utf8 -m vulcan_celox.desktop_windows --doctor | Select-Object -First 8
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & "$root\python\python.exe" -X utf8 scripts\smoke_windows.py "$env:GITHUB_WORKSPACE\tela.png"
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Checksums
+        shell: bash
+        run: cd out && sha256sum *.zip > SHA256SUMS-windows
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vulcan-celox-windows
+          path: |
+            out/
+            tela.png
+            suite.log

@@ -8,7 +8,7 @@ Um painel desktop para quem programa sozinho com agentes de código. Terminais r
 
 ![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](vulcan_celox/web/img/manual/visao-geral.png)
 
-**Situação: 1.1.1 para macOS.** O código do Linux está no repositório e os testes passam no CI, mas ele ainda não foi aceito numa área de trabalho real, então nenhum pacote de Linux é distribuído. A interface vem em inglês, com português disponível no ⌘K.
+**Situação: 1.2.0 para macOS; Windows e Linux como versões de teste.** O código do Linux está no repositório e os testes passam no CI, mas ele ainda não foi aceito numa área de trabalho real, então nenhum pacote de Linux é distribuído. A interface vem em inglês, com português disponível no ⌘K.
 
 ## Por que existe
 

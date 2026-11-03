@@ -120,8 +120,8 @@ class CodeService:
     @staticmethod
     def _relative(path: str, roots: List[str]) -> str:
         for root in roots:
-            if path == root or path.startswith(root.rstrip("/") + "/"):
-                return os.path.relpath(path, root)
+            if path == root or path.startswith(root.rstrip("/\\") + os.sep):
+                return os.path.relpath(path, root).replace(os.sep, "/")
         return path
 
     def diff(self, session: AgentSession, path: str, scope: str, seq: Optional[int]) -> Dict[str, Any]:

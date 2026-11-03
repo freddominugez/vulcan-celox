@@ -28,6 +28,5 @@ Ainda espera: a Release de Linux, depois do aceite no Mint.
 
 ## Fora dos planos
 
-- Windows: o módulo `pty` do Python não existe lá.
 - Herd como backend.
 - Reimplementar chat, editor ou os protocolos dos agentes. O terminal continua sendo a CLI oficial, e a aba Código só exibe arquivos.
