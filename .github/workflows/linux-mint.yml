@@ -32,8 +32,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends ./vulcan-celox_*_all.deb
           VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-deb-home" vulcan-terminal --check
           VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-deb-home" vulcan-terminal --doctor
-          tar xzf vulcan-terminal-1.0.0-linux.tar.gz -C "$RUNNER_TEMP"
-          PREFIX="$RUNNER_TEMP/vulcan-prefix" sh "$RUNNER_TEMP/vulcan-terminal-1.0.0/install.sh" --sem-dependencias
+          tar xzf vulcan-terminal-*-linux.tar.gz -C "$RUNNER_TEMP"
+          PREFIX="$RUNNER_TEMP/vulcan-prefix" sh "$RUNNER_TEMP/vulcan-terminal-*/install.sh" --sem-dependencias
           VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-tar-home" "$RUNNER_TEMP/vulcan-prefix/bin/vulcan-terminal" --check
       - uses: actions/upload-artifact@v4
         with:
