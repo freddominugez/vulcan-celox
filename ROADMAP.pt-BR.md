@@ -20,6 +20,7 @@ Painel de agentes para Claude Code e Codex, busca no histórico, prompts, uso e 
 - **⌘-clique em caminho no terminal.** Abre o arquivo na linha certa.
 - **Navegar entre turnos.** Atalhos saltam entre os seus pedidos, no terminal e na tela da sessão.
 - **Portas abertas e estado do PR.** Cada aba mostra as portas que abriu. O estado real do PR pelo seu próprio `gh` é opcional e vem desligado, porque usa a rede.
+- **Identidade visual.** Aplicar a identidade Vulcan Celox em todo o app: temas claro e escuro, paleta, tipografia e logo.
 
 ## Depois, sem decisão
 
