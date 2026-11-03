@@ -4,6 +4,7 @@
 
 import { isMac } from "./api.mjs";
 import { icon } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 import { terminals, TerminalWorkspace } from "./terminals.mjs";
 
 const KEY = "vulcan-celox-panel";
@@ -28,13 +29,13 @@ export class TerminalPanel {
     this.ws = null;
     this.route = null;
     this.el.innerHTML = `
-      <div class="tp-grip" title="Arraste para mudar a altura" aria-hidden="true"></div>
+      <div class="tp-grip" title="${t("Arraste para mudar a altura")}" aria-hidden="true"></div>
       <div class="tp-head">
-        <button type="button" class="tp-title" data-tp="toggle" title="Mostrar ou esconder o terminal (${isMac ? "⌘J" : "Ctrl+⇧+J"})">
-          ${icon("terminal")}<span>Terminal</span><span class="count" data-tp-count></span></button>
+        <button type="button" class="tp-title" data-tp="toggle" title="${t("Mostrar ou esconder o terminal ({key})", { key: isMac ? "⌘J" : "Ctrl+⇧+J" })}">
+          ${icon("terminal")}<span>${t("Terminal")}</span><span class="count" data-tp-count></span></button>
         <span class="spacer"></span>
         <kbd class="tp-kbd">${isMac ? "⌘J" : "Ctrl+⇧+J"}</kbd>
-        <button type="button" class="icon-btn icon-btn-sm" data-tp="toggle" aria-label="Minimizar ou mostrar o terminal" title="Minimizar ou mostrar">
+        <button type="button" class="icon-btn icon-btn-sm" data-tp="toggle" aria-label="${t("Minimizar ou mostrar o terminal")}" title="${t("Minimizar ou mostrar")}">
           <span data-tp-chevron>${icon("chevron-down")}</span></button>
       </div>
       <div class="tp-body"></div>`;

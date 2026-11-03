@@ -2,6 +2,7 @@
 
 import { get, post } from "./api.mjs";
 import { esc, icon, reportError, toast } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 
 const listeners = new Set();
 let polling = null;
@@ -22,7 +23,7 @@ async function poll() {
       if (before === "running" && job.status !== "running") {
         changed = true;
         if (job.status === "done") toast(`${job.message[0].toUpperCase()}${job.message.slice(1)}.`, { kind: "ok", timeout: 7000 });
-        else toast(`A geração de “${job.label}” falhou: ${job.message}`, { kind: "error", timeout: 12000 });
+        else toast(t("A geração de “{label}” falhou: {message}", { label: job.label, message: job.message }), { kind: "error", timeout: 12000 });
       }
       lastStatus.set(job.id, job.status);
     }
@@ -41,7 +42,7 @@ export function watchJobs(seed) {
 }
 
 /** Diálogo modal simples. Resolve true ao confirmar. */
-export function confirmDialog({ title, body, confirmLabel = "Confirmar", confirmDisabled = false, danger = false, onDecide = null }) {
+export function confirmDialog({ title, body, confirmLabel = t("Confirmar"), confirmDisabled = false, danger = false, onDecide = null }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement("div");
     backdrop.className = "dialog-backdrop";
@@ -50,7 +51,7 @@ export function confirmDialog({ title, body, confirmLabel = "Confirmar", confirm
         <h2 id="dialog-title">${esc(title)}</h2>
         <div class="dialog-body">${body}</div>
         <div class="dialog-actions">
-          <button class="btn" data-answer="no">Cancelar</button>
+          <button class="btn" data-answer="no">${t("Cancelar")}</button>
           <button class="btn ${danger ? "btn-danger" : "btn-primary"}" data-answer="yes" ${confirmDisabled ? "disabled" : ""}>${esc(confirmLabel)}</button>
         </div>
       </div>`;
@@ -77,17 +78,17 @@ export function confirmDialog({ title, body, confirmLabel = "Confirmar", confirm
 
 function previewBody(preview, what) {
   if (!preview.configured) {
-    return `<p>Para documentar com IA, cadastre a chave da Anthropic na tela Índice.</p>
-      <p><a class="btn btn-sm" href="#/index" data-go="#/index">${icon("book")}<span>Abrir Índice</span></a></p>`;
+    return `<p>${t("Para documentar com IA, cadastre a chave da Anthropic na tela Índice.")}</p>
+      <p><a class="btn btn-sm" href="#/index" data-go="#/index">${icon("book")}<span>${t("Abrir Índice")}</span></a></p>`;
   }
   const kb = Math.max(1, Math.round(preview.chars / 1000));
   return `
-    <p>${what} vai para a Anthropic, modelo <code>${esc(preview.model)}</code>.</p>
+    <p>${t("{what} vai para a Anthropic, modelo {model}.", { what, model: `<code>${esc(preview.model)}</code>` })}</p>
     <ul class="dialog-facts">
-      <li>${icon("info")}<span>Cerca de ${kb} mil caracteres${preview.truncated ? ", com o registro do terminal cortado nos trechos mais recentes" : ""}.</span></li>
-      <li>${icon("lock")}<span>${preview.redactions ? `${preview.redactions} ${preview.redactions === 1 ? "segredo mascarado" : "segredos mascarados"} antes do envio` : "Nenhum segredo reconhecido; o texto é verificado de novo no envio"}.</span></li>
+      <li>${icon("info")}<span>${t("Cerca de {kb} mil caracteres{cut}.", { kb, cut: preview.truncated ? `, ${t("com o registro do terminal cortado nos trechos mais recentes")}` : "" })}</span></li>
+      <li>${icon("lock")}<span>${preview.redactions ? (preview.redactions === 1 ? t("1 segredo mascarado antes do envio") : t("{n} segredos mascarados antes do envio", { n: preview.redactions })) : t("Nenhum segredo reconhecido; o texto é verificado de novo no envio")}.</span></li>
     </ul>
-    <p class="dim">O resultado é gravado ao lado da memória e entra no índice geral. Nada é enviado sem este clique.</p>`;
+    <p class="dim">${t("O resultado é gravado ao lado da memória e entra no índice geral. Nada é enviado sem este clique.")}</p>`;
 }
 
 /** Fluxo completo para uma sessão: prévia, confirmação, geração e acompanhamento. */
@@ -95,14 +96,14 @@ export async function documentSession(sessionId, title) {
   try {
     const preview = await get(`/api/ai/preview/session/${sessionId}`);
     const ok = await confirmDialog({
-      title: `Documentar “${title}” com IA`,
-      body: previewBody(preview, "A memória desta sessão (comandos, saída do terminal, tarefas, post-its e tags)"),
-      confirmLabel: "Gerar documentação",
+      title: t("Documentar “{title}” com IA", { title }),
+      body: previewBody(preview, t("A memória desta sessão (comandos, saída do terminal, tarefas, post-its e tags)")),
+      confirmLabel: t("Gerar documentação"),
       confirmDisabled: !preview.configured,
     });
     if (!ok) return null;
     const job = await post(`/api/ai/docs/session/${sessionId}`);
-    toast(`Gerando a documentação de “${title}”… pode levar um minuto.`, { timeout: 8000 });
+    toast(t("Gerando a documentação de “{title}”… pode levar um minuto.", { title }), { timeout: 8000 });
     watchJobs(job);
     return job;
   } catch (err) {
@@ -116,14 +117,14 @@ export async function documentGeneral() {
   try {
     const preview = await get("/api/ai/preview/general");
     const ok = await confirmDialog({
-      title: "Gerar a documentação geral com IA",
-      body: previewBody(preview, `O resumo de ${preview.stats.sessions} ${preview.stats.sessions === 1 ? "sessão" : "sessões"} (documentações já geradas, comandos, tarefas e post-its)`),
-      confirmLabel: "Gerar documentação geral",
+      title: t("Gerar a documentação geral com IA"),
+      body: previewBody(preview, preview.stats.sessions === 1 ? t("O resumo de 1 sessão (documentações já geradas, comandos, tarefas e post-its)") : t("O resumo de {n} sessões (documentações já geradas, comandos, tarefas e post-its)", { n: preview.stats.sessions })),
+      confirmLabel: t("Gerar documentação geral"),
       confirmDisabled: !preview.configured,
     });
     if (!ok) return null;
     const job = await post("/api/ai/docs/general");
-    toast("Gerando a documentação geral… pode levar alguns minutos.", { timeout: 8000 });
+    toast(t("Gerando a documentação geral… pode levar alguns minutos."), { timeout: 8000 });
     watchJobs(job);
     return job;
   } catch (err) {

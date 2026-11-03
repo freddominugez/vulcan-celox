@@ -3,6 +3,7 @@
 import { get, isMac, post } from "./api.mjs";
 import { attentionTerminal, syncTabs as syncAttention } from "./attention-state.mjs";
 import { reportError, toast } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 import { watchTerminal as watchAttention } from "./terminal-attention.mjs";
 import { pathLinkProvider } from "./terminal-path-links.mjs";
 import { syncPorts } from "./terminal-ports.mjs";
@@ -37,7 +38,7 @@ window.addEventListener("blur", () => { held = false; });  // ⌘Tab: o keyup va
 export function openTarget(terminal, event, target) {
   if (!pressed(event)) return;
   if (target.sensitive) {
-    toast("Arquivo com nome sensível: o app não abre.", { kind: "error" });
+    toast(t("Arquivo com nome sensível: o app não abre."), { kind: "error" });
     return;
   }
   if (target.kind === "dir") {
@@ -54,7 +55,7 @@ export function watchTerminal(term, id) {
   watchAttention(term, id, attentionTerminal);
   const marks = new TurnMarks(term, {
     isAgent: () => get(`/api/agents/paired?terminal=${encodeURIComponent(id)}`).then((d) => d.alive),
-    warn: () => toast("Este agente usa a tela inteira do terminal, sem histórico para navegar. Os pedidos estão em Agentes, na Linha do tempo.", { timeout: 7000 }),
+    warn: () => toast(t("Este agente usa a tela inteira do terminal, sem histórico para navegar. Os pedidos estão em Agentes, na Linha do tempo."), { timeout: 7000 }),
   });
   turns.set(id, { term, marks });
   term.onData((data) => {

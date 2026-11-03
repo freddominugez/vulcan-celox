@@ -2,8 +2,9 @@
 
 import { del, get, patch, post } from "../api.mjs";
 import { $, debounce, flashFocus, esc, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 
-const COLOR_NAMES = { amarelo: "Amarelo", rosa: "Rosa", verde: "Verde", azul: "Azul", laranja: "Laranja", roxo: "Roxo" };
+const COLOR_NAMES = { amarelo: t("Amarelo"), rosa: t("Rosa"), verde: t("Verde"), azul: t("Azul"), laranja: t("Laranja"), roxo: t("Roxo") };
 
 export class NotesView {
   /** @param {{site: string|null, onChange: Function}} options */
@@ -67,15 +68,15 @@ export class NotesView {
     this.root.innerHTML = `
       <div class="notes">
         <div class="notes-bar">
-          <button class="btn btn-primary" data-action="new-note">${icon("plus")}<span>Novo post-it</span></button>
-          ${this.options.terminal ? `<div class="segmented" role="tablist" aria-label="Escopo">
-            <button type="button" class="seg ${this.scope === "session" ? "is-on" : ""}" data-scope="session" title="Só o que foi criado nesta sessão de terminal">${icon("terminal")}<span>Esta sessão</span></button>
-            <button type="button" class="seg ${this.scope === "site" ? "is-on" : ""}" data-scope="site">Todo o ${this.options.site ? "site" : "Global"}</button>
+          <button class="btn btn-primary" data-action="new-note">${icon("plus")}<span>${t("Novo post-it")}</span></button>
+          ${this.options.terminal ? `<div class="segmented" role="tablist" aria-label="${t("Escopo")}">
+            <button type="button" class="seg ${this.scope === "session" ? "is-on" : ""}" data-scope="session" title="${t("Só o que foi criado nesta sessão de terminal")}">${icon("terminal")}<span>${t("Esta sessão")}</span></button>
+            <button type="button" class="seg ${this.scope === "site" ? "is-on" : ""}" data-scope="site">${this.options.site ? t("Todo o site") : t("Todo o Global")}</button>
           </div>` : ""}
-          <label class="search-field">${icon("search")}<input data-role="query" placeholder="Buscar nos post-its" aria-label="Buscar nos post-its"></label>
-          <select class="select select-sm" data-role="tag" aria-label="Filtrar por tag"><option value="">Todas as tags</option></select>
+          <label class="search-field">${icon("search")}<input data-role="query" placeholder="${t("Buscar nos post-its")}" aria-label="${t("Buscar nos post-its")}"></label>
+          <select class="select select-sm" data-role="tag" aria-label="${t("Filtrar por tag")}"><option value="">${t("Todas as tags")}</option></select>
           <div class="spacer"></div>
-          <span class="dim hint">Salva sozinho · arraste para reordenar</span>
+          <span class="dim hint">${t("Salva sozinho · arraste para reordenar")}</span>
         </div>
         <div class="note-grid" data-role="grid"></div>
       </div>`;
@@ -91,32 +92,32 @@ export class NotesView {
 
   renderGrid() {
     const tagSelect = $("[data-role=tag]", this.root);
-    tagSelect.innerHTML = `<option value="">Todas as tags</option>` +
-      this.tags.map((t) => `<option value="${t.id}" ${t.id === this.tag ? "selected" : ""}>${esc(t.name)}</option>`).join("");
+    tagSelect.innerHTML = `<option value="">${t("Todas as tags")}</option>` +
+      this.tags.map((tag) => `<option value="${tag.id}" ${tag.id === this.tag ? "selected" : ""}>${esc(tag.name)}</option>`).join("");
     const grid = $("[data-role=grid]", this.root);
     if (!this.notes.length) {
       grid.innerHTML = `<div class="empty-inline">${icon("note")}<span>${this.query || this.tag
-        ? "Nenhum post-it encontrado com esse filtro."
-        : this.sessionScoped ? `Nenhum post-it nesta sessão. Os que você criar aqui entram na memória de “${esc(this.options.sessionTitle)}”.`
-        : "Nenhum post-it ainda. Use “Novo post-it” para anotar comandos, credenciais de teste ou lembretes do projeto."}</span></div>`;
+        ? t("Nenhum post-it encontrado com esse filtro.")
+        : this.sessionScoped ? t("Nenhum post-it nesta sessão. Os que você criar aqui entram na memória de “{title}”.", { title: esc(this.options.sessionTitle) })
+        : t("Nenhum post-it ainda. Use “Novo post-it” para anotar comandos, credenciais de teste ou lembretes do projeto.")}</span></div>`;
       return;
     }
     grid.innerHTML = this.notes.map((n) => `
       <article class="note note-${n.color} ${n.pinned ? "is-pinned" : ""}" data-id="${n.id}">
         <header class="note-head">
-          <span class="note-grip" title="Arraste para reordenar">${icon("grip")}</span>
-          <button class="icon-btn icon-btn-sm ${n.pinned ? "is-on" : ""}" data-action="pin" aria-label="${n.pinned ? "Desafixar" : "Fixar no topo"}" title="${n.pinned ? "Desafixar" : "Fixar no topo"}">${icon("pin")}</button>
-          <div class="note-colors" role="group" aria-label="Cor">
+          <span class="note-grip" title="${t("Arraste para reordenar")}">${icon("grip")}</span>
+          <button class="icon-btn icon-btn-sm ${n.pinned ? "is-on" : ""}" data-action="pin" aria-label="${n.pinned ? t("Desafixar") : t("Fixar no topo")}" title="${n.pinned ? t("Desafixar") : t("Fixar no topo")}">${icon("pin")}</button>
+          <div class="note-colors" role="group" aria-label="${t("Cor")}">
             ${this.colors.map((c) => `<button class="swatch swatch-${c} ${c === n.color ? "is-on" : ""}" data-action="color" data-color="${c}" aria-label="${COLOR_NAMES[c] || c}" title="${COLOR_NAMES[c] || c}"></button>`).join("")}
           </div>
           <div class="spacer"></div>
-          <button class="icon-btn icon-btn-sm" data-action="delete" aria-label="Apagar post-it">${icon("trash")}</button>
+          <button class="icon-btn icon-btn-sm" data-action="delete" aria-label="${t("Apagar post-it")}">${icon("trash")}</button>
         </header>
-        <textarea class="note-text" rows="5" placeholder="Escreva aqui…" aria-label="Texto do post-it">${esc(n.text)}</textarea>
+        <textarea class="note-text" rows="5" placeholder="${t("Escreva aqui…")}" aria-label="${t("Texto do post-it")}">${esc(n.text)}</textarea>
         ${n.terminal_title && !this.sessionScoped ? `<div class="note-session">${icon("terminal")}${esc(n.terminal_title)}</div>` : ""}
         <footer class="note-foot">
-          ${n.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}<button class="chip-x" data-action="untag" data-tag="${c.id}" aria-label="Remover tag ${esc(c.name)}">${icon("x")}</button></span>`).join("")}
-          <input class="note-tag-input" data-role="add-tag" placeholder="+ tag" list="note-tag-options" aria-label="Adicionar tag">
+          ${n.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}<button class="chip-x" data-action="untag" data-tag="${c.id}" aria-label="${t("Remover tag {name}", { name: esc(c.name) })}">${icon("x")}</button></span>`).join("")}
+          <input class="note-tag-input" data-role="add-tag" placeholder="${t("+ tag")}" list="note-tag-options" aria-label="${t("Adicionar tag")}">
         </footer>
       </article>`).join("") + `<datalist id="note-tag-options">${this.tags.map((t) => `<option value="${esc(t.name)}">`).join("")}</datalist>`;
     grid.querySelectorAll(".note-text").forEach((ta) => this.autosize(ta));

@@ -3,6 +3,7 @@
 import { get, hasBridge, post } from "./api.mjs";
 import { esc, icon, toast } from "./dom.mjs";
 import { pickNative } from "./folder-dialog.mjs";
+import { t } from "./i18n.mjs";
 
 const DOMAIN = /^[a-z0-9-]+$/;
 
@@ -16,24 +17,24 @@ function suggest(name) {
 export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
   const available = Boolean(backend && backend.available);
   // só o Lerd escreve no projeto ao registrar (.php-version); o Valet só cria o link
-  const note = !available ? `${icon("text")}<span>Sem Lerd ou Valet: instale um dos dois para adicionar sites.</span>`
-    : backend.name === "lerd" ? `${icon("text")}<span>O Lerd grava <code>.php-version</code> na pasta do projeto ao registrar o site.</span>` : "";
+  const note = !available ? `${icon("text")}<span>${t("Sem Lerd ou Valet: instale um dos dois para adicionar sites.")}</span>`
+    : backend.name === "lerd" ? `${icon("text")}<span>${t("O Lerd grava <code>.php-version</code> na pasta do projeto ao registrar o site.")}</span>` : "";
   const backdrop = document.createElement("div");
   backdrop.className = "dialog-backdrop";
   backdrop.innerHTML = `
     <form class="dialog site-add" role="dialog" aria-modal="true" aria-labelledby="site-add-title" autocomplete="off">
-      <h2 id="site-add-title">Adicionar site</h2>
-      <div class="segmented" role="radiogroup" aria-label="Como adicionar">
-        <button type="button" class="seg is-on" data-kind="link" role="radio" aria-checked="true">Linkar pasta</button>
-        <button type="button" class="seg" data-kind="park" role="radio" aria-checked="false">Parkear pasta</button>
+      <h2 id="site-add-title">${t("Adicionar site")}</h2>
+      <div class="segmented" role="radiogroup" aria-label="${t("Como adicionar")}">
+        <button type="button" class="seg is-on" data-kind="link" role="radio" aria-checked="true">${t("Linkar pasta")}</button>
+        <button type="button" class="seg" data-kind="park" role="radio" aria-checked="false">${t("Parkear pasta")}</button>
       </div>
       <p class="dim site-add-sub" data-sub></p>
       <div class="folder-field">
         ${icon("folder")}
-        <input name="path" class="folder-input" spellcheck="false" aria-label="Pasta" placeholder="/Users/voce/Code/projeto">
-        ${hasBridge ? `<button type="button" class="btn btn-sm" data-pick>Escolher…</button>` : ""}
+        <input name="path" class="folder-input" spellcheck="false" aria-label="${t("Pasta")}" placeholder="${t("/Users/voce/Code/projeto")}">
+        ${hasBridge ? `<button type="button" class="btn btn-sm" data-pick>${t("Escolher…")}</button>` : ""}
       </div>
-      <label class="field-label" for="site-domain" data-domain-label>Domínio</label>
+      <label class="field-label" for="site-domain" data-domain-label>${t("Domínio")}</label>
       <div class="site-add-domain" data-domain-row>
         <input id="site-domain" name="domain" class="input" spellcheck="false" aria-describedby="site-add-status"><span class="dim">.test</span>
       </div>
@@ -41,8 +42,8 @@ export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
       ${note ? `<p class="site-add-note dim">${note}</p>` : ""}
       <pre class="site-add-output" data-output hidden></pre>
       <div class="dialog-actions">
-        <button type="button" class="btn" data-cancel>Cancelar</button>
-        <button type="submit" class="btn btn-primary" data-ok ${available ? "" : "disabled"}>${icon("plus")}<span>Adicionar</span></button>
+        <button type="button" class="btn" data-cancel>${t("Cancelar")}</button>
+        <button type="submit" class="btn btn-primary" data-ok ${available ? "" : "disabled"}>${icon("plus")}<span>${t("Adicionar")}</span></button>
       </div>
     </form>`;
   document.body.appendChild(backdrop);
@@ -55,8 +56,8 @@ export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
 
   const describe = () => {
     backdrop.querySelector("[data-sub]").textContent = kind === "link"
-      ? "Registra esta pasta como um site, no domínio escolhido."
-      : "Cada subpasta com um projeto PHP vira um site, inclusive as que você criar depois.";
+      ? t("Registra esta pasta como um site, no domínio escolhido.")
+      : t("Cada subpasta com um projeto PHP vira um site, inclusive as que você criar depois.");
     backdrop.querySelector("[data-domain-row]").hidden = kind !== "link";
     backdrop.querySelector("[data-domain-label]").hidden = kind !== "link";
   };
@@ -70,8 +71,8 @@ export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
     }
     const better = suggest(value);
     status.className = "folder-status is-error";
-    status.innerHTML = `<span>Só letras minúsculas, números e hífen, sem <code>.test</code>.</span>${
-      better ? ` <button type="button" class="link-btn" data-use="${esc(better)}">Usar ${esc(better)}</button>` : ""}`;
+    status.innerHTML = `<span>${t("Só letras minúsculas, números e hífen, sem <code>.test</code>.")}</span>${
+      better ? ` <button type="button" class="link-btn" data-use="${esc(better)}">${t("Usar {name}", { name: esc(better) })}</button>` : ""}`;
     return false;
   };
   const close = () => backdrop.remove();
@@ -122,16 +123,16 @@ export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
       const result = await post("/api/sites", { kind, path: path.value.trim(), domain: domain.value.trim() });
       if (result.ok) {
         close();
-        toast(kind === "link" ? `Site ${domain.value.trim()}.test adicionado.` : "Pasta parkeada.", { kind: "ok" });
+        toast(kind === "link" ? t("Site {domain}.test adicionado.", { domain: domain.value.trim() }) : t("Pasta parkeada."), { kind: "ok" });
         onDone();
       } else {
         output.hidden = false;
-        output.textContent = result.output || `o backend respondeu com código ${result.code}`;
+        output.textContent = result.output || t("o backend respondeu com código {code}", { code: result.code });
       }
     } catch (err) {
       status.className = "folder-status is-error";
       status.textContent = err.message;
-      if (err.status === 400 && /domínio/.test(err.message)) validate();
+      if (err.status === 400 && /domínio|domain/i.test(err.message)) validate();
     } finally {
       ok.disabled = false;
     }
@@ -139,6 +140,6 @@ export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
   describe();
   path.focus();
   get("/api/fs/recent").then((data) => {
-    if (!path.value && data && data.home) path.placeholder = `${data.home.path}/Code/projeto`;
+    if (!path.value && data && data.home) path.placeholder = t("{home}/Code/projeto", { home: data.home.path });
   }).catch(() => {});
 }

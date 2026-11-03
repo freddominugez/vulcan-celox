@@ -35,7 +35,7 @@ Corpo:
 Respostas:
 
 - Sucesso é JSON com `Cache-Control: no-store`. A única exceção é `GET /api/agents/usage.csv`, um download em CSV.
-- Erros vêm em JSON: `{"error": "..."}`, com mensagens em português. Alguns erros trazem campos de que a interface precisa, como `needs_terminal`, `needs_confirmation`, `needs_parent`, `suggestion` ou `missing`. Esses campos estão indicados nas tabelas abaixo.
+- Erros vêm em JSON: `{"error": "..."}`, com mensagens no idioma da interface. Alguns erros trazem campos de que a interface precisa, como `needs_terminal`, `needs_confirmation`, `needs_parent`, `suggestion` ou `missing`. Esses campos estão indicados nas tabelas abaixo.
 - As rotas marcadas com "resultado do comando" devolvem `{"ok": bool, "code": int, "output": "..."}` com status 200, mesmo quando o comando falhou. Leia `ok`, não o status. `output` traz as últimas linhas da saída.
 - As rotas marcadas com "aba" rodam um comando demorado numa aba de terminal nova e devolvem 201 com a descrição do terminal (`id`, `title`, `site`, `cwd`, `alive`, `theme`, `command` e outros).
 
@@ -136,6 +136,7 @@ O escopo de projeto vale só para a pasta de um site, de um projeto Node salvo o
 | GET | `/api/code/session/<sid>/diff` | Diff de um arquivo, cortado em 2 MB | query `path`, `scope` (`edit`, `turn`, `git`), `seq` | 400, 403, 404 |
 | POST | `/api/code/resolve` | Quais caminhos impressos numa aba existem em pasta conhecida | `terminal`, `candidates` (até 50) | 400, 404 |
 | GET | `/api/terminals/ports` | Portas abertas pelos processos de cada aba | | |
+| GET | `/api/i18n` | Idioma da interface e o dicionário dele | | |
 | GET | `/api/terminals` | Abas abertas | | |
 | POST | `/api/terminals` | Abrir uma aba | `site`, `cwd`, `command`, `theme` (um nome ou `auto`), `agent` (`shell`, `claude` ou `codex`), `title`, `rows`, `cols` (de 1 a 1000; padrão 24 por 80) | 201, 400, 404 |
 | PATCH | `/api/terminals/<tid>` | Renomear a aba | `title` (até 60 caracteres) | 404 |

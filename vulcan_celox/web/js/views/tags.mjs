@@ -2,6 +2,7 @@
 
 import { del, get, patch, post } from "../api.mjs";
 import { $, esc, icon, progressBar, reportError, toast } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 
 export class TagsView {
   constructor(root, options) {
@@ -27,25 +28,25 @@ export class TagsView {
   }
 
   render() {
-    const rows = this.tags.map((t) => `
-      <tr data-id="${t.id}">
-        <td class="col-swatch"><button class="tag-swatch" style="--chip:${esc(t.color)}" data-action="color" aria-label="Trocar cor de ${esc(t.name)}" title="Trocar cor"></button></td>
-        <td><input class="input input-inline" value="${esc(t.name)}" data-role="name" aria-label="Nome da tag"></td>
-        <td class="num">${t.usage}</td>
-        <td class="col-progress">${t.progress ? `${progressBar(t.progress)}<span class="num dim">${esc(t.progress.label)}</span>` : `<span class="dim">sem tarefas</span>`}</td>
-        <td class="col-actions"><button class="icon-btn" data-action="delete" aria-label="Excluir tag ${esc(t.name)}">${icon("trash")}</button></td>
+    const rows = this.tags.map((tag) => `
+      <tr data-id="${tag.id}">
+        <td class="col-swatch"><button class="tag-swatch" style="--chip:${esc(tag.color)}" data-action="color" aria-label="${t("Trocar cor de {name}", { name: esc(tag.name) })}" title="${t("Trocar cor")}"></button></td>
+        <td><input class="input input-inline" value="${esc(tag.name)}" data-role="name" aria-label="${t("Nome da tag")}"></td>
+        <td class="num">${tag.usage}</td>
+        <td class="col-progress">${tag.progress ? `${progressBar(tag.progress)}<span class="num dim">${esc(tag.progress.label)}</span>` : `<span class="dim">${t("sem tarefas")}</span>`}</td>
+        <td class="col-actions"><button class="icon-btn" data-action="delete" aria-label="${t("Excluir tag {name}", { name: esc(tag.name) })}">${icon("trash")}</button></td>
       </tr>`).join("");
     this.root.innerHTML = `
       <div class="page">
         <form class="inline-form" autocomplete="off">
-          <input name="name" class="input" placeholder="Nova tag" aria-label="Nome da nova tag" required>
-          <button class="btn btn-primary" type="submit">${icon("plus")}<span>Criar tag</span></button>
+          <input name="name" class="input" placeholder="${t("Nova tag")}" aria-label="${t("Nome da nova tag")}" required>
+          <button class="btn btn-primary" type="submit">${icon("plus")}<span>${t("Criar tag")}</span></button>
         </form>
         ${this.tags.length ? `
         <table class="table">
-          <thead><tr><th class="col-swatch"></th><th>Nome</th><th class="num">Itens</th><th>Tarefas</th><th></th></tr></thead>
+          <thead><tr><th class="col-swatch"></th><th>${t("Nome")}</th><th class="num">${t("Itens")}</th><th>${t("Tarefas")}</th><th></th></tr></thead>
           <tbody>${rows}</tbody>
-        </table>` : `<div class="empty-inline">${icon("tag")}<span>Nenhuma tag ainda. Tags criadas em tarefas e post-its aparecem aqui.</span></div>`}
+        </table>` : `<div class="empty-inline">${icon("tag")}<span>${t("Nenhuma tag ainda. Tags criadas em tarefas e post-its aparecem aqui.")}</span></div>`}
       </div>`;
   }
 
@@ -87,7 +88,7 @@ export class TagsView {
       }
       if (target.dataset.action === "delete") {
         const result = await del(`/api/tags/${tag.id}`);
-        toast(`Tag “${tag.name}” excluída de ${result.affected} ${result.affected === 1 ? "item" : "itens"}`, { kind: "ok" });
+        toast(result.affected === 1 ? t("Tag “{name}” excluída de 1 item", { name: tag.name }) : t("Tag “{name}” excluída de {n} itens", { name: tag.name, n: result.affected }), { kind: "ok" });
       }
       await this.load();
       this.options.onChange();

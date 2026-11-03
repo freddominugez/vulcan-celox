@@ -4,11 +4,14 @@
 import { every, get, hasBridge, post } from "../api.mjs";
 import { esc, icon, reportError, shortPath, toast } from "../dom.mjs";
 import { confirmDialog } from "../ai.mjs";
+import { t } from "../i18n.mjs";
 import { pickNative } from "../folder-dialog.mjs";
 import { terminals } from "../terminals.mjs";
 
 const NAME = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const MAIN_SCRIPTS = ["dev", "start", "build", "preview", "test", "lint"];
+// estados de projeto quebrado, mostrados no lugar do framework
+const ESTADOS = { sumiu: t("pasta ausente"), nenhum: t("sem package.json"), erro: t("package.json ilegível") };
 
 function slug(text) {
   return (text.split("/").filter(Boolean).pop() || "projeto").toLowerCase().replace(/[^a-z0-9._-]+/g, "-")
@@ -18,11 +21,11 @@ function slug(text) {
 /** Diálogo de adicionar: pasta (com seletor nativo) e nome; o servidor confere o package.json. */
 export async function addNodeDialog(path = "") {
   let data = null;
-  const body = `<p>Escolha a pasta raiz do projeto, onde fica o <code>package.json</code>. Nada é gravado nela.</p>
+  const body = `<p>${t("Escolha a pasta raiz do projeto, onde fica o <code>package.json</code>. Nada é gravado nela.")}</p>
     <div class="folder-field">${icon("folder")}<input class="folder-input" data-np="path" spellcheck="false"
-      placeholder="/Users/voce/Code/projeto" aria-label="Pasta" value="${esc(path)}">
-      ${hasBridge ? `<button type="button" class="btn btn-sm" data-np-pick>Escolher…</button>` : ""}</div>
-    <label class="field-label" for="np-name">Nome na lista</label>
+      placeholder="${t("/Users/voce/Code/projeto")}" aria-label="${t("Pasta")}" value="${esc(path)}">
+      ${hasBridge ? `<button type="button" class="btn btn-sm" data-np-pick>${t("Escolher…")}</button>` : ""}</div>
+    <label class="field-label" for="np-name">${t("Nome na lista")}</label>
     <input id="np-name" class="input mono" data-np="name" value="${esc(path ? slug(path) : "")}" spellcheck="false">`;
   const picker = (e) => {
     if (!e.target.closest("[data-np-pick]")) return;
@@ -35,16 +38,16 @@ export async function addNodeDialog(path = "") {
   };
   document.addEventListener("click", picker);
   const ok = await confirmDialog({
-    title: "Adicionar projeto Node", body, confirmLabel: "Adicionar",
+    title: t("Adicionar projeto Node"), body, confirmLabel: t("Adicionar"),
     onDecide: (answer, root) => {
       if (answer) data = { path: root.querySelector("[data-np=path]").value.trim(), name: root.querySelector("[data-np=name]").value.trim() };
     },
   });
   document.removeEventListener("click", picker);
   if (!ok || !data) return null;
-  if (data.name && !NAME.test(data.name)) throw new Error("Nome só com letras minúsculas, números, ponto, hífen e sublinhado.");
+  if (data.name && !NAME.test(data.name)) throw new Error(t("Nome só com letras minúsculas, números, ponto, hífen e sublinhado."));
   const added = await post("/api/node-projects", data.name ? data : { path: data.path });
-  toast(`Projeto ${added.name} adicionado.`, { kind: "ok" });
+  toast(t("Projeto {name} adicionado.", { name: added.name }), { kind: "ok" });
   return added;
 }
 
@@ -74,7 +77,7 @@ export class NodeListView {
     const projects = this.list.projects;
     const rows = projects.map((p) => `<tr data-go="#/node/${encodeURIComponent(p.name)}" class="np-row">
         <td><span class="np-mark">${icon("hex")}</span><b>${esc(p.name)}</b></td>
-        <td>${esc(p.framework || (p.estado === "ok" ? "Node" : p.estado))}</td>
+        <td>${esc(p.framework || (p.estado === "ok" ? "Node" : ESTADOS[p.estado] || p.estado))}</td>
         <td class="mono">${esc(p.gerenciador || "")}</td>
         <td class="num">${p.porta || ""}</td>
         <td>${p.supabase ? `<span class="badge">Supabase</span>` : ""}${p.vercel ? `<span class="badge">Vercel</span>` : ""}</td>
@@ -82,17 +85,16 @@ export class NodeListView {
     const sug = this.suggest.suggestions;
     this.root.innerHTML = `<div class="page np-page">
       <section class="panel">
-        <header class="panel-head">${icon("hex")}<h2>Projetos Node</h2><span class="count">${projects.length}</span><span class="spacer"></span>
-          <button class="btn btn-primary btn-sm" data-np-add>${icon("plus")}<span>Adicionar projeto</span></button></header>
-        ${projects.length ? `<table class="table np-table"><thead><tr><th>Projeto</th><th>Framework</th><th>Gerenciador</th><th class="num">Porta</th><th>Serviços</th><th>Pasta</th></tr></thead>
-          <tbody>${rows}</tbody></table>` : `<div class="empty-block"><h3>Nenhum projeto Node ainda</h3>
-          <p>Next.js, Vite, Nuxt, Astro e afins: o app lê o <code>package.json</code>, liga e para o servidor de desenvolvimento
-          num terminal à vista e mostra o Supabase local e o vínculo com a Vercel.</p></div>`}
+        <header class="panel-head">${icon("hex")}<h2>${t("Projetos Node")}</h2><span class="count">${projects.length}</span><span class="spacer"></span>
+          <button class="btn btn-primary btn-sm" data-np-add>${icon("plus")}<span>${t("Adicionar projeto")}</span></button></header>
+        ${projects.length ? `<table class="table np-table"><thead><tr><th>${t("Projeto")}</th><th>Framework</th><th>${t("Gerenciador")}</th><th class="num">${t("Porta")}</th><th>${t("Serviços")}</th><th>${t("Pasta")}</th></tr></thead>
+          <tbody>${rows}</tbody></table>` : `<div class="empty-block"><h3>${t("Nenhum projeto Node ainda")}</h3>
+          <p>${t("Next.js, Vite, Nuxt, Astro e afins: o app lê o <code>package.json</code>, liga e para o servidor de desenvolvimento num terminal à vista e mostra o Supabase local e o vínculo com a Vercel.")}</p></div>`}
       </section>
-      ${sug.length ? `<section class="panel"><header class="panel-head">${icon("spark")}<h2>Sugestões</h2>
-          <span class="dim hint">pastas com package.json onde seus agentes trabalharam</span></header>
+      ${sug.length ? `<section class="panel"><header class="panel-head">${icon("spark")}<h2>${t("Sugestões")}</h2>
+          <span class="dim hint">${t("pastas com package.json onde seus agentes trabalharam")}</span></header>
         <ul class="np-sug">${sug.map((s) => `<li><span class="mono">${esc(shortPath(s.path))}</span><span class="spacer"></span>
-          <button class="btn btn-sm" data-np-add="${esc(s.path)}">${icon("plus")}<span>Adicionar</span></button></li>`).join("")}</ul></section>` : ""}
+          <button class="btn btn-sm" data-np-add="${esc(s.path)}">${icon("plus")}<span>${t("Adicionar")}</span></button></li>`).join("")}</ul></section>` : ""}
     </div>`;
   }
 
@@ -137,8 +139,8 @@ export class NodeProjectView {
       this.render();
     } catch (err) {
       if (err.status === 404) {
-        this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>Projeto “${esc(this.name)}” não está na lista</h3>
-          <button class="btn" data-go="#/node">Projetos Node</button></div></div>`;
+        this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>${t("Projeto “{name}” não está na lista", { name: esc(this.name) })}</h3>
+          <button class="btn" data-go="#/node">${t("Projetos Node")}</button></div></div>`;
         this.stopTimer();
         return;
       }
@@ -154,9 +156,9 @@ export class NodeProjectView {
     const i = this.info;
     if (i.estado !== "ok") {
       this.root.innerHTML = `<div class="page"><section class="panel"><header class="panel-head">${icon("alert")}<h2>${esc(this.name)}</h2></header>
-        <p class="hs-pad">${i.estado === "sumiu" ? "A pasta não existe mais." : i.estado === "nenhum" ? "A pasta não tem package.json." : "O package.json não pôde ser lido."}</p>
+        <p class="hs-pad">${i.estado === "sumiu" ? t("A pasta não existe mais.") : i.estado === "nenhum" ? t("A pasta não tem package.json.") : t("O package.json não pôde ser lido.")}</p>
         ${i.erro ? `<pre class="hs-pre mono">${esc(i.erro)}</pre>` : ""}
-        <div class="hs-pad"><button class="btn btn-sm" data-np-remove>${icon("x")}<span>Tirar da lista</span></button></div></section></div>`;
+        <div class="hs-pad"><button class="btn btn-sm" data-np-remove>${icon("x")}<span>${t("Tirar da lista")}</span></button></div></section></div>`;
       return;
     }
     const scripts = [...i.scripts].sort((a, b) => {
@@ -171,13 +173,13 @@ export class NodeProjectView {
         <span class="dot ${run ? "dot-ok" : "dot-idle"}"></span>
         <span class="np-svc-main"><b>${esc(s.nome)}</b><span class="dim mono">${esc(s.comando)}</span></span>
         ${run && run.url ? `<button class="btn btn-ghost btn-sm mono" data-np-open="${esc(run.url)}">${esc(run.url.replace(/^https?:\/\//, ""))}</button>` : ""}
-        ${run ? `<button class="btn btn-ghost btn-sm" data-np-show="${run.terminal}">${icon("terminal")}<span>Ver</span></button>
-          <button class="btn btn-sm" data-np-stop="${run.terminal}">${icon("stop")}<span>Parar</span></button>`
-        : `<button class="btn btn-sm" data-np-run="${esc(s.nome)}">${icon("play")}<span>Rodar</span></button>`}</li>`;
+        ${run ? `<button class="btn btn-ghost btn-sm" data-np-show="${run.terminal}">${icon("terminal")}<span>${t("Ver")}</span></button>
+          <button class="btn btn-sm" data-np-stop="${run.terminal}">${icon("stop")}<span>${t("Parar")}</span></button>`
+        : `<button class="btn btn-sm" data-np-run="${esc(s.nome)}">${icon("play")}<span>${t("Rodar")}</span></button>`}</li>`;
     };
     const sb = i.supabase;
     const sbRuns = (i.rodando || []).filter((r) => r.script.startsWith("supabase "));
-    const supa = sb ? `<section class="panel np-supabase"><header class="panel-head">${icon("database")}<h2>Supabase local</h2>
+    const supa = sb ? `<section class="panel np-supabase"><header class="panel-head">${icon("database")}<h2>${t("Supabase local")}</h2>
         ${sb.project_id ? `<span class="dim mono">${esc(sb.project_id)}</span>` : ""}</header>
       ${sb.estado === "ok" ? `<div class="hs-pad np-facts-inline"><span>API <span class="mono">localhost:${sb.porta_api}</span></span>
         <span>Studio <span class="mono">localhost:${sb.studio}</span></span></div>
@@ -185,37 +187,37 @@ export class NodeProjectView {
         <button class="btn btn-sm" data-np-sb="start">${icon("play")}<span>supabase start</span></button>
         <button class="btn btn-sm" data-np-sb="status">${icon("info")}<span>status</span></button>
         <button class="btn btn-sm" data-np-sb="stop">${icon("stop")}<span>supabase stop</span></button>
-        <button class="btn btn-ghost btn-sm" data-np-open="http://localhost:${sb.studio}">${icon("external")}<span>Abrir Studio</span></button>
-        ${sbRuns.length ? `<span class="dim hint">${sbRuns.length} aba(s) do Supabase abertas</span>` : ""}</div>
-      <p class="dim hint hs-pad">Os comandos rodam numa aba de terminal; o app não fala com o Supabase remoto.</p>`
+        <button class="btn btn-ghost btn-sm" data-np-open="http://localhost:${sb.studio}">${icon("external")}<span>${t("Abrir Studio")}</span></button>
+        ${sbRuns.length ? `<span class="dim hint">${t("{n} aba(s) do Supabase abertas", { n: sbRuns.length })}</span>` : ""}</div>
+      <p class="dim hint hs-pad">${t("Os comandos rodam numa aba de terminal; o app não fala com o Supabase remoto.")}</p>`
       : `<pre class="hs-pre mono">${esc(sb.erro || "")}</pre>`}</section>` : "";
     const vc = i.vercel;
     const vercel = `<section class="panel np-vercel"><header class="panel-head">${icon("globe")}<h2>Vercel</h2></header>
-      <p class="hs-pad">${vc ? (vc.estado === "ok" ? `Vinculado pelo <code>.vercel/project.json</code> (projeto <span class="mono">${esc(vc.projectId || "?")}</span>). Deploy e logs ficam no painel da Vercel ou no <code>vercel</code> do terminal.`
-        : `O <code>.vercel/project.json</code> não pôde ser lido.`) : `Sem vínculo local. Rode <code>vercel link</code> no terminal do projeto se ele for publicado na Vercel.`}</p></section>`;
+      <p class="hs-pad">${vc ? (vc.estado === "ok" ? t("Vinculado pelo <code>.vercel/project.json</code> (projeto <span class=\"mono\">{id}</span>). Deploy e logs ficam no painel da Vercel ou no <code>vercel</code> do terminal.", { id: esc(vc.projectId || "?") })
+        : t("O <code>.vercel/project.json</code> não pôde ser lido.")) : t("Sem vínculo local. Rode <code>vercel link</code> no terminal do projeto se ele for publicado na Vercel.")}</p></section>`;
     const fw = i.framework;
     this.root.innerHTML = `<div class="page np-page">
       <div class="np-head"><span class="np-logo">${icon("hex")}</span>
         <div class="np-title"><h1>${esc(this.name)}</h1><span class="dim mono">${esc(shortPath(i.pasta))}</span></div><span class="spacer"></span>
-        ${url ? `<button class="btn btn-sm" data-np-open="${esc(url)}">${icon("external")}<span>Abrir no navegador</span></button>` : ""}
+        ${url ? `<button class="btn btn-sm" data-np-open="${esc(url)}">${icon("external")}<span>${t("Abrir no navegador")}</span></button>` : ""}
         <button class="btn btn-sm" data-np-term>${icon("terminal")}<span>Terminal</span></button>
-        <button class="btn btn-ghost btn-sm" data-np-remove title="Só tira da lista do app; a pasta fica intacta">${icon("x")}<span>Tirar da lista</span></button></div>
+        <button class="btn btn-ghost btn-sm" data-np-remove title="${t("Só tira da lista do app; a pasta fica intacta")}">${icon("x")}<span>${t("Tirar da lista")}</span></button></div>
       <div class="np-grid">
         <div class="np-col">
-          <section class="panel np-scripts"><header class="panel-head">${icon("play")}<h2>Scripts</h2><span class="count">${scripts.length}</span>
-            <span class="dim hint">rodam com ${esc(i.gerenciador)} numa aba de terminal</span></header>
-            ${scripts.length ? `<ul class="np-list">${scripts.map(scriptRow).join("")}</ul>` : `<p class="hs-pad dim">O package.json não tem scripts.</p>`}</section>
+          <section class="panel np-scripts"><header class="panel-head">${icon("play")}<h2>${t("Scripts")}</h2><span class="count">${scripts.length}</span>
+            <span class="dim hint">${t("rodam com {manager} numa aba de terminal", { manager: esc(i.gerenciador) })}</span></header>
+            ${scripts.length ? `<ul class="np-list">${scripts.map(scriptRow).join("")}</ul>` : `<p class="hs-pad dim">${t("O package.json não tem scripts.")}</p>`}</section>
           ${supa}
         </div>
-        <section class="panel np-facts"><header class="panel-head">${icon("info")}<h2>Projeto</h2></header>
+        <section class="panel np-facts"><header class="panel-head">${icon("info")}<h2>${t("Projeto")}</h2></header>
           <dl class="np-dl">
-            <div><dt>Nome no package.json</dt><dd>${esc(i.nome)}</dd></div>
-            <div><dt>Framework</dt><dd>${fw ? `${esc(fw.nome)} <span class="dim mono">${esc(fw.versao)}</span>` : "não reconhecido"}</dd></div>
-            <div><dt>Gerenciador</dt><dd class="mono">${esc(i.gerenciador)}</dd></div>
-            <div><dt>Porta provável</dt><dd class="mono">${i.porta_provavel || "?"}</dd></div>
-            <div><dt>Node pedido</dt><dd>${i.node ? `<span class="mono">${esc(i.node.valor)}</span> <span class="dim">(${esc(i.node.fonte)})</span>` : "não fixado"}</dd></div>
+            <div><dt>${t("Nome no package.json")}</dt><dd>${esc(i.nome)}</dd></div>
+            <div><dt>Framework</dt><dd>${fw ? `${esc(fw.nome)} <span class="dim mono">${esc(fw.versao)}</span>` : t("não reconhecido")}</dd></div>
+            <div><dt>${t("Gerenciador")}</dt><dd class="mono">${esc(i.gerenciador)}</dd></div>
+            <div><dt>${t("Porta provável")}</dt><dd class="mono">${i.porta_provavel || "?"}</dd></div>
+            <div><dt>${t("Node pedido")}</dt><dd>${i.node ? `<span class="mono">${esc(i.node.valor)}</span> <span class="dim">(${esc(i.node.fonte)})</span>` : t("não fixado")}</dd></div>
           </dl>
-          <p class="dim hint hs-pad">O app nunca abre o <code>.env</code> do projeto.</p>
+          <p class="dim hint hs-pad">${t("O app nunca abre o <code>.env</code> do projeto.")}</p>
         </section>
       </div>
       ${vercel}
@@ -223,19 +225,19 @@ export class NodeProjectView {
   }
 
   async onClick(event) {
-    const t = event.target;
+    const tg = event.target;
     const base = `/api/node-projects/${encodeURIComponent(this.name)}`;
     try {
-      const run = t.closest("[data-np-run]");
+      const run = tg.closest("[data-np-run]");
       if (run) {
         const res = await post(`${base}/run`, { script: run.dataset.npRun });
         await terminals.sync();
         showTerminal(res.terminal);
-        toast(`Rodando ${res.comando}`, { kind: "ok" });
+        toast(t("Rodando {cmd}", { cmd: res.comando }), { kind: "ok" });
         this.key = null;
         return this.load();
       }
-      const sb = t.closest("[data-np-sb]");
+      const sb = tg.closest("[data-np-sb]");
       if (sb) {
         const res = await post(`${base}/supabase/${sb.dataset.npSb}`, {});
         await terminals.sync();
@@ -243,23 +245,23 @@ export class NodeProjectView {
         this.key = null;
         return this.load();
       }
-      const stop = t.closest("[data-np-stop]");
+      const stop = tg.closest("[data-np-stop]");
       if (stop) {
         await post(`${base}/stop`, { terminal: stop.dataset.npStop });
-        toast("Ctrl-C enviado. A aba continua aberta com a saída.", { kind: "ok" });
+        toast(t("Ctrl-C enviado. A aba continua aberta com a saída."), { kind: "ok" });
         setTimeout(() => { this.key = null; this.load(); }, 800);
         return null;
       }
-      const show = t.closest("[data-np-show]");
+      const show = tg.closest("[data-np-show]");
       if (show) return showTerminal(show.dataset.npShow);
-      const open = t.closest("[data-np-open]");
+      const open = tg.closest("[data-np-open]");
       if (open) return await post("/api/open", { kind: "url", target: open.dataset.npOpen });
-      if (t.closest("[data-np-term]")) {
+      if (tg.closest("[data-np-term]")) {
         const session = await terminals.create({ site: null, cwd: this.info.pasta, command: null, title: this.name, theme: "auto", agent: "shell" });
         return showTerminal(session.info.id);
       }
-      if (t.closest("[data-np-remove]")) {
-        const yes = await confirmDialog({ title: `Tirar ${this.name} da lista`, body: "<p>Só a lista do app muda. A pasta e os arquivos ficam como estão.</p>", confirmLabel: "Tirar da lista" });
+      if (tg.closest("[data-np-remove]")) {
+        const yes = await confirmDialog({ title: t("Tirar {name} da lista", { name: this.name }), body: `<p>${t("Só a lista do app muda. A pasta e os arquivos ficam como estão.")}</p>`, confirmLabel: t("Tirar da lista") });
         if (!yes) return null;
         await post(`${base}/remove`, {});
         window.dispatchEvent(new CustomEvent("vulcan-node-changed"));

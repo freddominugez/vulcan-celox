@@ -1,12 +1,12 @@
 #!/bin/sh
-# Verifica e instala, com a permissão do usuário, as bibliotecas de que o Vulcan Celox precisa no Linux.
+# Checks and installs, with the user's permission, the libraries Vulcan Celox needs on Linux.
 #
-#   vulcan-celox-deps              verifica, mostra o que falta e pergunta antes de instalar
-#   vulcan-celox-deps --verificar  só verifica (0 = tudo ok, 1 = falta algo)
-#   vulcan-celox-deps -y           instala o que falta sem perguntar (autorização dada na linha de comando)
+#   vulcan-celox-deps              checks, shows what is missing and asks before installing
+#   vulcan-celox-deps --check      only checks (0 = all good, 1 = something is missing)
+#   vulcan-celox-deps -y           installs what is missing without asking (consent given on the command line)
 #
-# Códigos de saída: 0 ok ou instalado, 1 falta algo (--verificar), 2 gerenciador não suportado,
-# 3 não autorizado ou sem como pedir permissão, 4 a instalação falhou.
+# Exit codes: 0 ok or installed, 1 something is missing (--check), 2 unsupported package manager,
+# 3 not authorized or no way to ask for permission, 4 the installation failed.
 set -u
 
 MODE="ask"
@@ -15,7 +15,7 @@ for arg in "$@"; do
     --verificar|--check) MODE="check" ;;
     -y|--sim|--yes) MODE="yes" ;;
     -h|--help|--ajuda) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "opção desconhecida: $arg (use --ajuda)" >&2; exit 2 ;;
+    *) echo "unknown option: $arg (use --help)" >&2; exit 2 ;;
   esac
 done
 
@@ -44,17 +44,17 @@ MISSING=""
 LABELS=""
 add() { MISSING="$MISSING $1"; LABELS="$LABELS
   - $2"; }
-python_ok || add python "Python 3.9 ou mais novo (obrigatório)"
-gtk_ok || add gtk "janela nativa: PyGObject + WebKit2GTK (recomendado)"
-have secret-tool || add secret "secret-tool, para guardar a chave da Anthropic no chaveiro (recomendado)"
-have xdg-open || add xdg "xdg-open, para abrir sites, pastas e arquivos (recomendado)"
+python_ok || add python "Python 3.9 or newer (required)"
+gtk_ok || add gtk "native window: PyGObject + WebKit2GTK (recommended)"
+have secret-tool || add secret "secret-tool, to keep the Anthropic key in the keyring (recommended)"
+have xdg-open || add xdg "xdg-open, to open sites, folders and files (recommended)"
 
 if [ -z "$MISSING" ]; then
-  echo "Vulcan Celox: todas as dependências estão instaladas."
+  echo "Vulcan Celox: all dependencies are installed."
   exit 0
 fi
 
-# ── gerenciador de pacotes ────────────────────────────────────────────────
+# ── package manager ────────────────────────────────────────────────
 PM=""
 if have apt-get; then PM=apt; elif have dnf; then PM=dnf; elif have pacman; then PM=pacman; fi
 
@@ -62,7 +62,7 @@ packages() {
   for item in $MISSING; do
     case "$PM:$item" in
       apt:python) echo python3 ;;
-      apt:gtk) echo python3-gi ;;          # o WebKit entra no comando com recuo 4.1 -> 4.0
+      apt:gtk) echo python3-gi ;;          # WebKit goes into the command with a fallback from 4.1 to 4.0
       apt:secret) echo libsecret-tools ;;
       apt:xdg) echo xdg-utils ;;
       dnf:python) echo python3 ;;
@@ -88,13 +88,13 @@ case "$PM" in
   *) COMMAND="" ;;
 esac
 
-echo "Vulcan Celox: faltam dependências:$LABELS"
+echo "Vulcan Celox: missing dependencies:$LABELS"
 if [ -z "$COMMAND" ]; then
-  echo "Gerenciador de pacotes não reconhecido (suportados: apt, dnf, pacman). Instale os itens acima pelo seu sistema."
+  echo "Package manager not recognized (supported: apt, dnf, pacman). Install the items above with your system tools."
   [ "$MODE" = "check" ] && exit 1
   exit 2
 fi
-echo "Comando: sudo sh -c '$COMMAND'"
+echo "Command: sudo sh -c '$COMMAND'"
 [ "$MODE" = "check" ] && exit 1
 
 run_elevated() {
@@ -105,30 +105,30 @@ run_elevated() {
   elif have pkexec; then
     pkexec sh -c "$COMMAND"
   else
-    echo "Sem sudo ou pkexec: rode o comando acima como administrador." >&2
+    echo "No sudo or pkexec: run the command above as an administrator." >&2
     return 3
   fi
 }
 
 if [ "$MODE" = "ask" ]; then
-  # abrir /dev/tty num subshell: falha de redirecionamento num comando embutido encerraria o script
+  # open /dev/tty in a subshell: a redirection failure on a builtin would end the script
   if [ -t 0 ] || ( : </dev/tty ) 2>/dev/null; then
-    printf 'Instalar agora? A senha de administrador pode ser pedida. [s/N] '
+    printf 'Install now? The administrator password may be requested. [y/N] '
     read -r answer </dev/tty 2>/dev/null || answer=""
-    case "$answer" in s|S|sim|SIM|y|Y|yes) ;; *) echo "Nada foi instalado."; exit 3 ;; esac
+    case "$answer" in s|S|sim|SIM|y|Y|yes) ;; *) echo "Nothing was installed."; exit 3 ;; esac
   elif [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] && have pkexec && { have zenity || have kdialog; }; then
-    question="O Vulcan Celox precisa instalar:$LABELS
+    question="Vulcan Celox needs to install:$LABELS
 
-Instalar agora? O sistema vai pedir a senha de administrador."
+Install now? The system will ask for the administrator password."
     if have zenity; then
-      zenity --question --title="Vulcan Celox" --text="$question" --width=460 2>/dev/null || { echo "Nada foi instalado."; exit 3; }
+      zenity --question --title="Vulcan Celox" --text="$question" --width=460 2>/dev/null || { echo "Nothing was installed."; exit 3; }
     else
-      kdialog --title "Vulcan Celox" --yesno "$question" 2>/dev/null || { echo "Nada foi instalado."; exit 3; }
+      kdialog --title "Vulcan Celox" --yesno "$question" 2>/dev/null || { echo "Nothing was installed."; exit 3; }
     fi
     pkexec sh -c "$COMMAND" || exit 4
-    exec sh "$0" --verificar
+    exec sh "$0" --check
   else
-    echo "Sem terminal para pedir permissão. Rode no terminal: vulcan-celox --instalar-dependencias"
+    echo "No terminal to ask for permission. Run in a terminal: vulcan-celox --install-deps"
     exit 3
   fi
 fi
@@ -141,8 +141,8 @@ gtk_ok || MISSING="$MISSING gtk"
 have secret-tool || MISSING="$MISSING secret"
 have xdg-open || MISSING="$MISSING xdg"
 if [ -n "$MISSING" ]; then
-  echo "A instalação terminou, mas ainda falta:$MISSING" >&2
+  echo "The installation finished, but this is still missing:$MISSING" >&2
   exit 4
 fi
-echo "Dependências instaladas."
+echo "Dependencies installed."
 exit 0

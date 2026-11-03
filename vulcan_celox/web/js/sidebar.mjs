@@ -3,6 +3,7 @@
 import { attentionCount } from "./attention-state.mjs";
 import { AGENT_NAV, HELP_NAV, NAV, NAV_GROUPS, app } from "./app-state.mjs";
 import { $, esc, icon } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 import { terminals } from "./terminals.mjs";
 
 window.addEventListener("vulcan-attention", () => {
@@ -25,11 +26,11 @@ export function renderSidebar() {
     if (n.id === "ambiente" && state) {
       label = state.backend.available ? state.backend.label : "Lerd";
       const run = state.status.running;
-      const word = run ? "rodando" : state.backend.available ? "parado" : "ausente";
+      const word = run ? t("rodando") : state.backend.available ? t("parado") : t("ausente");
       dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
     }
     return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" ${active ? 'aria-current="page"' : ""}>
-      ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${count} aguardando você"` : ""}>${count}</span>` : ""}${dot}</a>`;
+      ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${t("{n} aguardando você", { n: count })}"` : ""}>${count}</span>` : ""}${dot}</a>`;
   };
   const byId = Object.fromEntries([...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => [n.id, n]));
   // O redesenho troca os elementos do #nav; guarda o que tinha o foco (grupo ou link) para devolver
@@ -72,14 +73,14 @@ export function renderSidebar() {
         title="${esc(s.domain)}" ${active ? 'aria-current="page"' : ""}>
       <span class="dot ${tone}"></span>
       <span class="site-name">${esc(s.domain.split(".")[0])}<span class="site-tld">.${esc(s.domain.split(".").slice(1).join("."))}</span></span>
-      ${open ? `<span class="site-term" title="${open} terminal(is) aberto(s)">${icon("terminal")}${open}</span>` : ""}
+      ${open ? `<span class="site-term" title="${t("{n} terminal(is) aberto(s)", { n: open })}">${icon("terminal")}${open}</span>` : ""}
       ${p && p.total ? `<span class="site-count" title="${esc(p.label)}">${p.done}/${p.total}</span>` : ""}
     </a>`;
   };
   $("#site-list").innerHTML = sites.length
-    ? (fav.length ? `<div class="site-group">${icon("star", "i-sm")}Favoritos</div>${fav.map(siteHtml).join("")}`
-      + (rest.length ? `<div class="site-group">Sites</div>` : "") : "") + rest.map(siteHtml).join("")
-    : `<div class="side-empty">${state.sites.length ? "Nenhum site com esse nome." : `Nenhum site. Rode <code>lerd link</code> numa pasta de projeto.`}</div>`;
+    ? (fav.length ? `<div class="site-group">${icon("star", "i-sm")}${t("Favoritos")}</div>${fav.map(siteHtml).join("")}`
+      + (rest.length ? `<div class="site-group">${t("Sites")}</div>` : "") : "") + rest.map(siteHtml).join("")
+    : `<div class="side-empty">${state.sites.length ? t("Nenhum site com esse nome.") : t("Nenhum site. Rode <code>lerd link</code> numa pasta de projeto.")}</div>`;
 
   const nodeHtml = (p) => {
     const active = app.route.name === "node-projeto" && app.route.project === p.name;
@@ -88,13 +89,13 @@ export function renderSidebar() {
       <span class="site-name">${esc(p.name)}</span>${p.framework ? `<span class="site-tld node-fw">${esc(p.framework)}</span>` : ""}</a>`;
   };
   $("#node-list").innerHTML = app.nodeProjects.length ? app.nodeProjects.map(nodeHtml).join("")
-    : `<div class="side-empty">Nenhum projeto. Use + para adicionar a pasta de um app Next.js, Vite ou outro Node.</div>`;
+    : `<div class="side-empty">${t("Nenhum projeto. Use + para adicionar a pasta de um app Next.js, Vite ou outro Node.")}</div>`;
 
   $("#side-env").innerHTML = `
     <button class="side-env-btn" data-action="dashboard" ${state.backend.dashboard ? "" : "disabled"} title="${esc(state.status.summary)}">
       <span class="dot ${running ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}"></span>
       <span class="side-env-label">${esc(state.backend.label)}</span>
-      <span class="dim">${running ? "rodando" : state.backend.available ? "parado" : "ausente"}</span>
+      <span class="dim">${running ? t("rodando") : state.backend.available ? t("parado") : t("ausente")}</span>
       ${state.backend.dashboard ? icon("external", "i-sm") : ""}
     </button>`;
 }

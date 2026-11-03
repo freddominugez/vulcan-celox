@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.models import Note, Tag, Task
 from vulcan_celox.core.redact import redact
 from vulcan_celox.core.session_memory import agent_lines, format_duration, format_when
@@ -114,7 +115,7 @@ def session_doc_prompt(record, tasks: List[Task], notes: List[Note], tags: Dict[
         "```",
     ]
     user, count = redact("\n".join(lines))
-    return Prompt(SESSION_SYSTEM, user, count + early, truncated,
+    return Prompt(tr(SESSION_SYSTEM), user, count + early, truncated,
                   {"commands": len(record.commands), "tasks": len(tasks), "notes": len(notes), "transcript": len(tail)})
 
 
@@ -153,7 +154,7 @@ def general_doc_prompt(entries: List[SessionEntry], tags: Dict[str, Tag], budget
     if brief:
         text += "\n# Sessões sem detalhes (orçamento de contexto)\n" + "\n".join(brief)
     user, count = redact(text)
-    return Prompt(GENERAL_SYSTEM, user, count, bool(brief), {"sessions": len(entries), "detailed": detailed})
+    return Prompt(tr(GENERAL_SYSTEM), user, count, bool(brief), {"sessions": len(entries), "detailed": detailed})
 
 
 def relative_link(path: Optional[str], data_dir: Path) -> str:

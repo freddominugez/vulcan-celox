@@ -1,8 +1,9 @@
 // Tema da interface: Sistema (padrão), Claro ou Escuro. A área do terminal mantém o tema de cada aba nos dois.
 
 import { patch } from "./api.mjs";
+import { t } from "./i18n.mjs";
 
-export const THEME_OPTIONS = [["sistema", "Sistema"], ["claro", "Claro"], ["escuro", "Escuro"]];
+export const THEME_OPTIONS = [["sistema", t("Sistema")], ["claro", t("Claro")], ["escuro", t("Escuro")]];
 const KEY = "vulcan-theme";
 let pref = "sistema";
 const media = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;

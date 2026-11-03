@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Tuple
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.laravel_log import read_log
 from vulcan_celox.core.oscompat import open_argv
 from vulcan_celox.core.pty_session import terminal_env
@@ -171,13 +172,13 @@ def register_sites_api(app) -> None:
             url = b.dashboard_url(site.domain)
             result = app.runner.run(open_argv("url", url, app.env), timeout=15)
             if not result.ok:
-                raise HttpError(500, (result.output or "falha ao abrir").strip())
+                raise HttpError(500, (result.output or tr("falha ao abrir")).strip())
             return {"ok": True, "url": url}
         try:
             argv, cwd = b.site_argv(name, site.path)
         except NotImplementedError:
             raise HttpError(409, f"{b.label} não tem esta ação") from None
-        session = app.spawn_terminal(cwd or site.path, f"{site.name} · {SITE_ACTIONS[name]}", None, site=site.name,
+        session = app.spawn_terminal(cwd or site.path, f"{site.name} · {tr(SITE_ACTIONS[name])}", None, site=site.name,
                                      command=shlex.join(argv))
         return 201, session.info()
 

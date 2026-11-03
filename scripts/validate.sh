@@ -35,6 +35,7 @@ isolated_env() {
       VULCAN_LERD_API="http://127.0.0.1:1" \
       VULCAN_KEYSTORE=memory \
       VULCAN_AUTOSTART=0 \
+      VULCAN_LANGUAGE="${SENSOR_LANGUAGE:-pt}" \
       CLAUDE_CONFIG_DIR="$ROOT/tests/fixtures/agents/claude" \
       CODEX_HOME="$ROOT/tests/fixtures/agents/codex" \
       "$@"
@@ -48,6 +49,8 @@ step "compileall"
 step "manual em Markdown igual à Ajuda"
 "$PY" scripts/manual_md.py "$TMP_ROOT/MANUAL.md" > /dev/null
 cmp -s "$TMP_ROOT/MANUAL.md" docs/pt-BR/user-guide.md || { echo "docs/pt-BR/user-guide.md desatualizado: rode python3 scripts/manual_md.py"; exit 1; }
+"$PY" scripts/manual_md.py "$TMP_ROOT/user-guide.md" --en > /dev/null
+cmp -s "$TMP_ROOT/user-guide.md" docs/en/user-guide.md || { echo "docs/en/user-guide.md desatualizado: rode python3 scripts/manual_md.py"; exit 1; }
 
 step "unittest"
 "$PY" -m unittest discover -s tests -t .

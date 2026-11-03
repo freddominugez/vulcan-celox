@@ -10,7 +10,7 @@ from vulcan_celox.core.sites import KIND_ORDER, Site
 from vulcan_celox.ui import theme
 
 GLOBAL_IID = "global"
-SECTION_LABELS = {"lerd": "LERD", "linked": "LINKED", "parked": "PARKED", "manual": "MANUAIS"}
+SECTION_LABELS = {"lerd": "LERD", "linked": "LINKED", "parked": "PARKED", "manual": "MANUAL"}
 
 
 def site_iid(name: str) -> str:
@@ -30,7 +30,7 @@ class Sidebar(ttk.Frame):
         self._sites: Dict[str, Site] = {}
         self._suppress = False
 
-        ttk.Label(self, text="PROJETOS", style="Section.TLabel").pack(anchor="w", padx=12, pady=(12, 4))
+        ttk.Label(self, text="PROJECTS", style="Section.TLabel").pack(anchor="w", padx=12, pady=(12, 4))
 
         frame = ttk.Frame(self, style="Panel.TFrame")
         frame.pack(fill="both", expand=True, padx=(8, 0))
@@ -49,7 +49,7 @@ class Sidebar(ttk.Frame):
         buttons.pack(fill="x", padx=8, pady=8)
         for text, cmd, side in (("＋", on_add, "left"), ("－", on_remove, "left"),
                                 ("⟳", on_reload, "left"), ("Terminal", on_terminal, "right"),
-                                ("Abrir", on_browser, "right")):
+                                ("Open", on_browser, "right")):
             ttk.Button(buttons, text=text, command=cmd, style="Small.TButton").pack(side=side, padx=2)
 
     # ── dados ────────────────────────────────────────────────────────────

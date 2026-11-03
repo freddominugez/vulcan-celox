@@ -17,6 +17,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from vulcan_celox.core.i18n import tr
 MAX_FILE = 1024 * 1024
 HANDOFF_LINES = 60
 REPO_STATE = Path(".harness") / "state.json"
@@ -69,7 +70,7 @@ def _handoff(path: Path) -> Optional[List[str]]:
     try:
         return _read_text(path).splitlines()[:HANDOFF_LINES]
     except Unreadable as exc:
-        return [f"(handoff ilegível: {exc})"]
+        return [tr("(handoff ilegível: {exc})", exc=exc)]
 
 
 def _state_of(item: Dict) -> str:
@@ -91,7 +92,7 @@ def _items(raw: Any, titles: Dict[str, Dict]) -> List[Dict]:
         extra = titles.get(item["id"], {})
         cause = item.get("cause") or item.get("blocked_reason")
         if cause is None and item.get("pending") is True:
-            cause = "pendência registrada"
+            cause = tr("pendência registrada")
         out.append({"id": item["id"], "titulo": str(item.get("title") or extra.get("titulo") or ""),
                     "status": str(item.get("status") or ""), "estado": _state_of(item),
                     "validated": item.get("validated") is True, "causa": str(cause) if cause else None,
@@ -163,7 +164,7 @@ def read(root) -> Dict[str, Any]:
             base.update(_read_min(root))
         base["estado"] = "ok"
     except Unreadable as exc:
-        base.update(estado="ilegivel", erro=str(exc))
+        base.update(estado="ilegivel", erro=tr(str(exc)))
     return base
 
 
@@ -266,10 +267,9 @@ def summary(info: Dict) -> Optional[str]:
     """Uma linha para a sessão de agente: contrato, itens feitos e próximo."""
     if info.get("estado") != "ok" or not info.get("contrato"):
         return None
-    items = info["itens"]
-    done = sum(1 for i in items if i["estado"] == "feito")
-    nxt = f", próximo {info['proximo']}" if info.get("proximo") else ""
-    return f"{info['contrato'].get('id') or 'contrato'}: {done} de {len(items)} itens feitos{nxt}"
+    items, done = info["itens"], sum(1 for i in info["itens"] if i["estado"] == "feito")
+    return (tr("{id}: {done} de {total} itens feitos", id=info["contrato"].get("id") or tr("contrato"), done=done, total=len(items))
+            + (tr(", próximo {next}", next=info["proximo"]) if info.get("proximo") else ""))
 
 
 # ── instalação do formato mínimo ────────────────────────────────

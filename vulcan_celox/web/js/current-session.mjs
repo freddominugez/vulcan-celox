@@ -4,6 +4,7 @@
 import { get, put } from "./api.mjs";
 import { esc, icon, reportError, toast } from "./dom.mjs";
 import { AGENT_NAMES, agentMark, relTime } from "./agents-ui.mjs";
+import { t } from "./i18n.mjs";
 
 export class CurrentSession {
   constructor(root) {
@@ -40,9 +41,9 @@ export class CurrentSession {
       return;
     }
     this.root.innerHTML = `<button type="button" class="cs-btn t-${esc(s.theme || "neutro")}" data-current-toggle aria-haspopup="listbox"
-        title="Sessão atual: os prompts usam os dados dela. Clique para trocar.">
-      <span class="dot ${s.is_active ? "dot-ok" : ""}"></span><span class="cs-label">Sessão atual</span>
-      <span class="cs-proj">${esc(s.project || "sem projeto")}</span>${s.branch ? `<span class="cs-branch">${esc(s.branch)}</span>` : ""}
+        title="${t("Sessão atual: os prompts usam os dados dela. Clique para trocar.")}">
+      <span class="dot ${s.is_active ? "dot-ok" : ""}"></span><span class="cs-label">${t("Sessão atual")}</span>
+      <span class="cs-proj">${esc(s.project || t("sem projeto"))}</span>${s.branch ? `<span class="cs-branch">${esc(s.branch)}</span>` : ""}
       ${agentMark(s.agent)}${icon("chevron-down", "i-sm")}</button>`;
     if (open) this.toggle(true);
   }
@@ -66,12 +67,12 @@ export class CurrentSession {
     pop.className = "cs-pop";
     pop.setAttribute("role", "listbox");
     pop.innerHTML = `
-      <div class="cs-group">Sessão atual dos prompts</div>
-      <button type="button" class="cs-opt ${auto ? "is-on" : ""}" data-pick="">${icon("restart")}<span class="cs-tx"><b>Automática</b>
-        <span>a mais recente, com as ativas primeiro</span></span>${auto ? icon("check") : ""}</button>
+      <div class="cs-group">${t("Sessão atual dos prompts")}</div>
+      <button type="button" class="cs-opt ${auto ? "is-on" : ""}" data-pick="">${icon("restart")}<span class="cs-tx"><b>${t("Automática")}</b>
+        <span>${t("a mais recente, com as ativas primeiro")}</span></span>${auto ? icon("check") : ""}</button>
       ${list.map((s) => `<button type="button" class="cs-opt ${!auto && s.id === current ? "is-on" : ""}" data-pick="${esc(s.id)}" role="option">
-        <span class="dot ${s.is_active ? "dot-ok" : ""}"></span><span class="cs-tx"><b>${esc(s.project || "sem projeto")}</b>
-        <span>${esc(s.branch || "sem branch")} · ${esc(AGENT_NAMES[s.agent] || s.agent)} · ${esc(relTime(s.last_activity_at))}</span></span>
+        <span class="dot ${s.is_active ? "dot-ok" : ""}"></span><span class="cs-tx"><b>${esc(s.project || t("sem projeto"))}</b>
+        <span>${esc(s.branch || t("sem branch"))} · ${esc(AGENT_NAMES[s.agent] || s.agent)} · ${esc(relTime(s.last_activity_at))}</span></span>
         ${!auto && s.id === current ? icon("check") : ""}</button>`).join("")}`;
     pop.addEventListener("click", (e) => {
       const opt = e.target.closest("[data-pick]");
@@ -88,7 +89,7 @@ export class CurrentSession {
       this.close();
       this.render();
       const s = this.data.session;
-      toast(sessionId ? `Sessão atual: ${s.project} · ${s.branch || "sem branch"}` : "Sessão atual automática.", { kind: "ok" });
+      toast(sessionId ? t("Sessão atual: {project} · {branch}", { project: s.project, branch: s.branch || t("sem branch") }) : t("Sessão atual automática."), { kind: "ok" });
       window.dispatchEvent(new CustomEvent("vulcan-current-changed", { detail: this.data }));
     } catch (err) {
       reportError(err);

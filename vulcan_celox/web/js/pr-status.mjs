@@ -2,6 +2,7 @@
 
 import { get, patch, post } from "./api.mjs";
 import { esc, reportError } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 
 let enabled = false;
 
@@ -30,21 +31,21 @@ export function loadPr(query) {
   return get(`/api/agents/pr?${new URLSearchParams(query)}`).catch(() => ({ source: "heuristic", reason: "failed" }));
 }
 
-const STATES = { OPEN: "aberto", MERGED: "integrado", CLOSED: "fechado" };
+const STATES = { OPEN: t("aberto"), MERGED: t("integrado"), CLOSED: t("fechado") };
 const WHY = {
-  off: "Estimado pelos comandos da sessão.", no_gh: "Estimado pelos comandos: o gh não está instalado.",
-  no_login: "Estimado pelos comandos: faça gh auth login.", failed: "Estimado pelos comandos: o gh falhou.",
-  timeout: "Estimado pelos comandos: o gh não respondeu a tempo.", invalid: "Estimado pelos comandos: resposta do gh não reconhecida.",
-  unknown_folder: "Estimado pelos comandos.",
+  off: t("Estimado pelos comandos da sessão."), no_gh: t("Estimado pelos comandos: o gh não está instalado."),
+  no_login: t("Estimado pelos comandos: faça gh auth login."), failed: t("Estimado pelos comandos: o gh falhou."),
+  timeout: t("Estimado pelos comandos: o gh não respondeu a tempo."), invalid: t("Estimado pelos comandos: resposta do gh não reconhecida."),
+  unknown_folder: t("Estimado pelos comandos."),
 };
 
 /** Texto puro do estado, para qualquer tela. */
 export function prText(data) {
   if (data.source !== "gh") return WHY[data.reason] || WHY.off;
-  if (!data.number) return "Sem PR nesta branch, segundo o GitHub.";
-  const parts = [`PR #${data.number}`, data.draft ? "rascunho" : STATES[data.state] || data.state.toLowerCase()];
+  if (!data.number) return t("Sem PR nesta branch, segundo o GitHub.");
+  const parts = [`PR #${data.number}`, data.draft ? t("rascunho") : STATES[data.state] || data.state.toLowerCase()];
   const c = data.checks;
-  if (c && c.total) parts.push(c.failed ? `${c.failed} de ${c.total} checagens falharam` : c.pending ? `${c.pending} de ${c.total} checagens rodando` : `${c.total} checagens ok`);
+  if (c && c.total) parts.push(c.failed ? t("{n} de {total} checagens falharam", { n: c.failed, total: c.total }) : c.pending ? t("{n} de {total} checagens rodando", { n: c.pending, total: c.total }) : t("{total} checagens ok", { total: c.total }));
   return `${parts.join(" · ")} (GitHub)`;
 }
 

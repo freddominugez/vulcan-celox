@@ -11,7 +11,7 @@ class ArquiteturaDocTest(unittest.TestCase):
         doc = "\n".join((ROOT / "docs" / lang / "technical-manual.md").read_text(encoding="utf-8") for lang in ("en", "pt-BR"))
         missing = []
         for folder in ("server", "core"):
-            for path in sorted((ROOT / "vulcan_terminal" / folder).rglob("*.py")):
+            for path in sorted((ROOT / "vulcan_celox" / folder).rglob("*.py")):
                 if path.name == "__init__.py":
                     continue
                 if path.stem not in doc:

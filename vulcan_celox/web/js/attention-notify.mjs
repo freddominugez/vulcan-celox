@@ -4,15 +4,16 @@
 import { isNative, native, patch, post } from "./api.mjs";
 import { ATTENTION_LABELS, attentionCount, onAttention } from "./attention-state.mjs";
 import { toast } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 
 const AGENT_NAMES = { claude: "Claude Code", codex: "Codex" };
 let enabled = true;
 let deniedShown = false;
 
 export function noticeText(event) {
-  if (event.kind !== "session") return { title: "Vulcan", text: "Uma aba do terminal pediu atenção" };
+  if (event.kind !== "session") return { title: "Vulcan", text: t("Uma aba do terminal pediu atenção") };
   const { agent, project, state } = event.item;
-  return { title: AGENT_NAMES[agent] || "Agente", text: `${project || "Sessão"}: ${ATTENTION_LABELS[state] || "pede atenção"}` };
+  return { title: AGENT_NAMES[agent] || t("Agente"), text: `${project || t("Sessão")}: ${ATTENTION_LABELS[state] || t("pede atenção")}` };
 }
 
 export function noticesEnabled() {
@@ -38,6 +39,6 @@ export function startNotices() {
   window.addEventListener("vulcan-notice-denied", () => {
     if (deniedShown) return;
     deniedShown = true;
-    toast("O macOS não autorizou avisos deste app, que não é assinado pela Apple. O número no ícone do Dock continua valendo.", { kind: "info" });
+    toast(t("O macOS não autorizou avisos deste app, que não é assinado pela Apple. O número no ícone do Dock continua valendo."), { kind: "info" });
   });
 }

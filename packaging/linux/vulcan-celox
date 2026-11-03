@@ -1,7 +1,7 @@
 #!/bin/sh
-# Lançador do Vulcan Celox no Linux: usa a biblioteca instalada ao lado deste script.
-#   vulcan-celox --instalar-dependencias   verifica e instala (com sua permissão) as bibliotecas necessárias
-#   vulcan-celox --verificar-dependencias  só verifica
+# Vulcan Celox launcher on Linux: uses the library installed next to this script.
+#   vulcan-celox --install-deps   checks and installs (with your permission) the required libraries
+#   vulcan-celox --check-deps     only checks
 set -e
 SELF="$0"
 while [ -L "$SELF" ]; do
@@ -22,10 +22,10 @@ python_ok() {
   command -v "$PYTHON" >/dev/null 2>&1 && "$PYTHON" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)' 2>/dev/null
 }
 if ! python_ok; then
-  echo "Vulcan Celox precisa do Python 3.9 ou mais novo." >&2
-  # oferece instalar (pergunta no terminal ou por janela); sem permissão, só explica
+  echo "Vulcan Celox needs Python 3.9 or newer." >&2
+  # offers to install (asks in the terminal or in a dialog); without permission, only explains
   sh "$DEPS" || true
-  python_ok || { echo "Instale o Python 3.9+ e abra de novo (vulcan-celox --instalar-dependencias)." >&2; exit 1; }
+  python_ok || { echo "Install Python 3.9+ and open it again (vulcan-celox --install-deps)." >&2; exit 1; }
 fi
 # com -m, a pasta atual entra no começo do sys.path: roda de dentro da biblioteca para um json.py ou secrets.py
 # do repositório onde o usuário está não ser importado no lugar do módulo de verdade

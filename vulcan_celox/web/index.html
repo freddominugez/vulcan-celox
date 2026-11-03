@@ -76,34 +76,34 @@
 </svg>
 
 <div class="app" id="app">
-  <aside class="sidebar" aria-label="Navegação">
+  <aside class="sidebar" aria-label="Navegação" data-i18n-aria-label="Navegação">
     <div class="sidebar-top" data-drag>
-      <a class="side-brand" href="#/overview" aria-label="Vulcan Celox, ir para a Visão geral">
+      <a class="side-brand" href="#/overview" aria-label="Vulcan Celox, ir para a Visão geral" data-i18n-aria-label="Vulcan Celox, ir para a Visão geral">
         <img class="for-light" src="img/brand/celox-mark.png" alt=""><img class="for-dark" src="img/brand/celox-mark-reverse.png" alt="">
       </a>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="side-scroll">
-      <section class="side-section side-sessions" id="side-sessions" aria-label="Sessões"></section>
-      <section class="side-section" id="side-sites" aria-label="Sites">
+      <section class="side-section side-sessions" id="side-sessions" aria-label="Sessões" data-i18n-aria-label="Sessões"></section>
+      <section class="side-section" id="side-sites" aria-label="Sites" data-i18n-aria-label="Sites">
         <button class="side-heading side-toggle" data-side-toggle="section:sites" aria-expanded="true">
-          <svg class="i side-chevron" aria-hidden="true"><use href="#i-chevron-right"></use></svg><span>Sites</span>
+          <svg class="i side-chevron" aria-hidden="true"><use href="#i-chevron-right"></use></svg><span data-i18n="Sites">Sites</span>
         </button>
-        <button class="icon-btn icon-btn-sm side-add" id="add-site" title="Adicionar site" aria-label="Adicionar site">
+        <button class="icon-btn icon-btn-sm side-add" id="add-site" title="Adicionar site" aria-label="Adicionar site" data-i18n-title="Adicionar site" data-i18n-aria-label="Adicionar site">
           <svg class="i" aria-hidden="true"><use href="#i-plus"></use></svg></button>
         <div class="side-sites-body">
           <label class="side-filter">
             <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg>
-            <input id="site-filter" placeholder="Filtrar sites" aria-label="Filtrar sites" autocomplete="off" spellcheck="false">
+            <input id="site-filter" placeholder="Filtrar sites" aria-label="Filtrar sites" data-i18n-placeholder="Filtrar sites" data-i18n-aria-label="Filtrar sites" autocomplete="off" spellcheck="false">
           </label>
           <div class="site-list" id="site-list" role="list"></div>
         </div>
       </section>
-      <section class="side-section" id="side-node" aria-label="Projetos Node">
+      <section class="side-section" id="side-node" aria-label="Projetos Node" data-i18n-aria-label="Projetos Node">
         <button class="side-heading side-toggle" data-side-toggle="section:node" aria-expanded="true">
-          <svg class="i side-chevron" aria-hidden="true"><use href="#i-chevron-right"></use></svg><span>Projetos Node</span>
+          <svg class="i side-chevron" aria-hidden="true"><use href="#i-chevron-right"></use></svg><span data-i18n="Projetos Node">Projetos Node</span>
         </button>
-        <button class="icon-btn icon-btn-sm side-add" id="add-node" title="Adicionar projeto Node" aria-label="Adicionar projeto Node">
+        <button class="icon-btn icon-btn-sm side-add" id="add-node" title="Adicionar projeto Node" aria-label="Adicionar projeto Node" data-i18n-title="Adicionar projeto Node" data-i18n-aria-label="Adicionar projeto Node">
           <svg class="i" aria-hidden="true"><use href="#i-plus"></use></svg></button>
         <div class="side-sites-body">
           <div class="site-list" id="node-list" role="list"></div>
@@ -117,23 +117,23 @@
     <div class="crumb" id="crumb"></div>
     <button class="search-trigger" id="open-palette" type="button">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg>
-      <span>Buscar sites, tarefas, comandos</span><kbd data-mac-shortcut>⌘K</kbd>
+      <span data-i18n="Buscar sites, tarefas, comandos">Buscar sites, tarefas, comandos</span><kbd data-mac-shortcut>⌘K</kbd>
     </button>
-    <button class="icon-btn help-here" id="help-here" type="button" title="Ajuda desta tela (⌘?)" aria-label="Ajuda desta tela">
+    <button class="icon-btn help-here" id="help-here" type="button" title="Ajuda desta tela (⌘?)" aria-label="Ajuda desta tela" data-i18n-title="Ajuda desta tela (⌘?)" data-i18n-aria-label="Ajuda desta tela">
       <svg class="i" aria-hidden="true"><use href="#i-help"></use></svg></button>
     <div class="current-session" id="current-session" data-nodrag></div>
     <div class="env" id="env"></div>
   </header>
 
   <main class="view" id="view"></main>
-  <section class="term-panel" id="term-panel" aria-label="Painel de terminal"></section>
+  <section class="term-panel" id="term-panel" aria-label="Painel de terminal" data-i18n-aria-label="Painel de terminal"></section>
 </div>
 
 <div class="palette-backdrop" id="palette" hidden>
-  <div class="palette" role="dialog" aria-modal="true" aria-label="Buscar">
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Buscar" data-i18n-aria-label="Buscar">
     <label class="palette-field">
       <svg class="i" aria-hidden="true"><use href="#i-search"></use></svg>
-      <input id="palette-input" placeholder="Ir para site, abrir terminal, buscar tarefa…" autocomplete="off" spellcheck="false">
+      <input id="palette-input" placeholder="Ir para site, abrir terminal, buscar tarefa…" data-i18n-placeholder="Ir para site, abrir terminal, buscar tarefa…" autocomplete="off" spellcheck="false">
     </label>
     <ul class="palette-results" id="palette-results" role="listbox"></ul>
   </div>

@@ -8,6 +8,7 @@ import time
 from typing import Any, Callable, Dict, List, Tuple
 
 from vulcan_celox.core.ai import AiError
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.server.local_http import HttpError
 
 KEEP = 30
@@ -36,11 +37,11 @@ class AiJobs:
             file, message = work()
             values = {"status": "done", "file": file, "message": message}
         except AiError as exc:
-            values = {"status": "failed", "message": exc.message}
+            values = {"status": "failed", "message": tr(exc.message)}
         except HttpError as exc:
-            values = {"status": "failed", "message": exc.message}
+            values = {"status": "failed", "message": tr(exc.message)}
         except Exception as exc:  # noqa: BLE001 - a interface precisa saber que falhou, sem derrubar o servidor
-            values = {"status": "failed", "message": f"erro inesperado ({type(exc).__name__})"}
+            values = {"status": "failed", "message": tr("erro inesperado ({kind})", kind=type(exc).__name__)}
         with self._lock:
             self._jobs[job_id].update(values, finished_at=time.time())
 

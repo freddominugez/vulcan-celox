@@ -2,9 +2,10 @@
 // O app marca abas, painéis e a barra lateral, e o aviso some ao focar a aba ou abrir a sessão.
 
 import { get } from "./api.mjs";
+import { t } from "./i18n.mjs";
 
 const POLL_MS = 3000;
-export const ATTENTION_LABELS = { your_turn: "sua vez", maybe_waiting: "talvez esperando", waiting_permission: "pedindo permissão" };
+export const ATTENTION_LABELS = { your_turn: t("sua vez"), maybe_waiting: t("talvez esperando"), waiting_permission: t("pedindo permissão") };
 
 const dismissed = new Map();  // sessão -> `since` já visto
 const fromTerminal = new Map();  // aba -> { text, at }
@@ -33,9 +34,9 @@ function activeTabId() {
 
 function labelFor(id) {
   const session = unread().find((s) => s.terminal_id === id);
-  if (session) return `${session.project || "Sessão"}: ${ATTENTION_LABELS[session.state]}`;
+  if (session) return `${session.project || t("Sessão")}: ${ATTENTION_LABELS[session.state]}`;
   const local = fromTerminal.get(id);
-  return local ? (local.text || "A aba pediu atenção") : "";
+  return local ? (local.text || t("A aba pediu atenção")) : "";
 }
 
 /** Reaplica as marcas: chamado a cada leitura e depois que a barra de abas é redesenhada. */

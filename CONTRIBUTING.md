@@ -8,7 +8,7 @@ Thanks for your interest. Bug reports, tests on other machines (especially **Lin
 
 - Open an issue before large changes, so we can agree on scope.
 - Read [docs/en/development.md](docs/en/development.md) for setup and [docs/en/architecture.md](docs/en/architecture.md) for the structure.
-- The interface and most code comments are in Brazilian Portuguese. Issues and pull requests are welcome in English or Portuguese.
+- The interface is in English by default, with Portuguese available. Source strings and most code comments are in Brazilian Portuguese; new strings need an entry in `vulcan_celox/web/i18n/en.json`. Issues and pull requests are welcome in English or Portuguese.
 
 ## Hard rules
 

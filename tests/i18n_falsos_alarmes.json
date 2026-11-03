@@ -1,0 +1,23 @@
+{
+ "agent-session.mjs": 1,
+ "agents-branches.mjs": 3,
+ "api.mjs": 1,
+ "app.mjs": 1,
+ "code-editor.mjs": 2,
+ "code-text.mjs": 1,
+ "code-view.mjs": 2,
+ "debug.mjs": 1,
+ "environment.mjs": 1,
+ "folder-dialog.mjs": 1,
+ "harness.mjs": 1,
+ "index.html": 7,
+ "overview.mjs": 4,
+ "session-tree.mjs": 1,
+ "sidebar.mjs": 3,
+ "site-add.mjs": 4,
+ "site.mjs": 3,
+ "tasks.mjs": 1,
+ "terminals.mjs": 1,
+ "theme.mjs": 1,
+ "view-mount.mjs": 1
+}

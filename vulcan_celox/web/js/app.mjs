@@ -11,6 +11,7 @@ import { renderSidebar } from "./sidebar.mjs";
 import { palette } from "./palette.mjs";
 import { bindGlobalEvents } from "./global-events.mjs";
 import { mountView } from "./view-mount.mjs";
+import { t, translateStatic } from "./i18n.mjs";
 
 
 // ── roteamento ──────────────────────────────────────────────────────────────
@@ -70,7 +71,7 @@ export function route() {
 function viewTitle() {
   const r = app.route;
   if (r.name === "site") return r.site;
-  if (r.name === "agente") return "Sessão de agente";
+  if (r.name === "agente") return t("Sessão de agente");
   if (r.name === "node-projeto") return r.project;
   const nav = [...NAV, ...AGENT_NAV, ...HELP_NAV].find((n) => n.id === r.name);
   if (nav && nav.id === "ambiente" && app.state && app.state.backend.available) return app.state.backend.label;
@@ -112,24 +113,26 @@ export async function refreshState() {
     $("#app").classList.remove("is-offline");
   } catch (err) {
     $("#app").classList.add("is-offline");
-    if (err.status === 401) toast("Sessão inválida: abra o app pelo Vulcan Celox.", { kind: "error", timeout: 10000 });
+    if (err.status === 401) toast(t("Sessão inválida: abra o app pelo Vulcan Celox."), { kind: "error", timeout: 10000 });
   }
 }
 
 // ── início automático do ambiente ───────────────────────────────────────────
+const cap = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
+
 function reportAutostart(auto) {
   if (!auto) return;
   const before = app.autostartPhase;
   app.autostartPhase = auto.phase;
   if (before === auto.phase) return;
-  if (auto.phase === "starting") toast(`${auto.message[0].toUpperCase()}${auto.message.slice(1)} junto com o app…`, { timeout: 60000 });
+  if (auto.phase === "starting") toast(t("{message} junto com o app…", { message: cap(auto.message) }), { timeout: 60000 });
   // só avisa o fim de um início que esta janela viu acontecer
-  if (before && ["starting", "checking"].includes(before) && auto.phase === "ready" && !/já estava/.test(auto.message)) {
-    toast(`${auto.message[0].toUpperCase()}${auto.message.slice(1)}.`, { kind: "ok", timeout: 5000 });
+  if (before && ["starting", "checking"].includes(before) && auto.phase === "ready" && !/já estava|was already/.test(auto.message)) {
+    toast(`${cap(auto.message)}.`, { kind: "ok", timeout: 5000 });
   }
   if (auto.phase === "failed") {
-    toast(`${auto.message[0].toUpperCase()}${auto.message.slice(1)}`, {
-      kind: "error", timeout: 15000, action: { label: "Tentar de novo", run: () => service("start") },
+    toast(cap(auto.message), {
+      kind: "error", timeout: 15000, action: { label: t("Tentar de novo"), run: () => service("start") },
     });
   }
 }
@@ -139,8 +142,8 @@ export async function toggleAutostart() {
   try {
     const data = await patch("/api/preferences", { autostart_env: enabled });
     if (app.state) app.state.autostart = data.autostart;
-    const label = app.state ? app.state.backend.label : "ambiente";
-    toast(enabled ? `O ${label} vai iniciar junto com o Vulcan Celox.` : `O ${label} não inicia mais sozinho.`, { kind: "ok" });
+    const label = app.state ? app.state.backend.label : t("ambiente");
+    toast(enabled ? t("O {label} vai iniciar junto com o Vulcan Celox.", { label }) : t("O {label} não inicia mais sozinho.", { label }), { kind: "ok" });
     renderToolbar();
   } catch (err) {
     reportError(err);
@@ -155,9 +158,9 @@ async function checkBuild() {
     const build = await get("/api/app/build");
     if (!build.outdated) return;
     outdatedWarned = true;
-    toast("Uma versão nova do Vulcan Celox foi instalada. Reabra o app para usar (os terminais abertos serão fechados).", {
+    toast(t("Uma versão nova do Vulcan Celox foi instalada. Reabra o app para usar (os terminais abertos serão fechados)."), {
       timeout: 600000,
-      action: isNative ? { label: "Reabrir agora", run: () => native({ type: "relaunch" }) } : null,
+      action: isNative ? { label: t("Reabrir agora"), run: () => native({ type: "relaunch" }) } : null,
     });
   } catch {
     /* sem resposta: tenta de novo no próximo ciclo */
@@ -175,8 +178,8 @@ function renderToolbar() {
   const running = state.status.running;
   const auto = state.autostart || {};
   const starting = auto.phase === "starting" || auto.phase === "checking";
-  const pieces = starting ? [auto.phase === "starting" ? "iniciando…" : "verificando…"] : state.backend.name === "lerd"
-    ? [`nginx ${d.nginx ? "ok" : "parado"}`, d.tld ? `.${d.tld} ${d.dns_ok ? "ok" : "falhou"}` : null, d.php_default ? `PHP ${d.php_default}` : null]
+  const pieces = starting ? [auto.phase === "starting" ? t("iniciando…") : t("verificando…")] : state.backend.name === "lerd"
+    ? [`nginx ${d.nginx ? "ok" : t("parado")}`, d.tld ? `.${d.tld} ${d.dns_ok ? "ok" : t("falhou")}` : null, d.php_default ? `PHP ${d.php_default}` : null]
     : [state.status.summary];
   $("#env").innerHTML = `
     <span class="env-pill ${running ? "is-ok" : "is-off"}" title="${esc(state.status.summary)}">
@@ -184,26 +187,26 @@ function renderToolbar() {
       <span class="env-name">${esc(state.backend.label)}</span>
       ${pieces.filter(Boolean).map((p) => `<span class="env-piece">${esc(p)}</span>`).join("")}
     </span>
-    <div class="btn-group" role="group" aria-label="Controle do ambiente">
-      <button class="icon-btn" data-service="start" title="Iniciar ambiente" aria-label="Iniciar ambiente" ${state.backend.available && !app.busyService && !starting ? "" : "disabled"}>${icon("play")}</button>
-      <button class="icon-btn" data-service="stop" title="Parar ambiente" aria-label="Parar ambiente" ${state.backend.available && !app.busyService ? "" : "disabled"}>${icon("stop")}</button>
-      <button class="icon-btn" data-service="restart" title="Reiniciar ambiente" aria-label="Reiniciar ambiente" ${state.backend.available && !app.busyService ? "" : "disabled"}>${icon("restart")}</button>
+    <div class="btn-group" role="group" aria-label="${t("Controle do ambiente")}">
+      <button class="icon-btn" data-service="start" title="${t("Iniciar ambiente")}" aria-label="${t("Iniciar ambiente")}" ${state.backend.available && !app.busyService && !starting ? "" : "disabled"}>${icon("play")}</button>
+      <button class="icon-btn" data-service="stop" title="${t("Parar ambiente")}" aria-label="${t("Parar ambiente")}" ${state.backend.available && !app.busyService ? "" : "disabled"}>${icon("stop")}</button>
+      <button class="icon-btn" data-service="restart" title="${t("Reiniciar ambiente")}" aria-label="${t("Reiniciar ambiente")}" ${state.backend.available && !app.busyService ? "" : "disabled"}>${icon("restart")}</button>
       <button class="icon-btn ${auto.enabled ? "is-on" : ""}" data-action="autostart" aria-pressed="${Boolean(auto.enabled)}"
-        title="Iniciar o ${esc(state.backend.label)} junto com o Vulcan Celox: ${auto.enabled ? "ligado" : "desligado"}"
-        aria-label="Iniciar o ${esc(state.backend.label)} junto com o app" ${state.backend.available ? "" : "disabled"}>${icon("bolt")}</button>
+        title="${auto.enabled ? t("Iniciar o {label} junto com o Vulcan Celox: ligado", { label: esc(state.backend.label) }) : t("Iniciar o {label} junto com o Vulcan Celox: desligado", { label: esc(state.backend.label) })}"
+        aria-label="${t("Iniciar o {label} junto com o app", { label: esc(state.backend.label) })}" ${state.backend.available ? "" : "disabled"}>${icon("bolt")}</button>
     </div>`;
   reportDragRegions();
 }
 
 export async function service(action) {
-  const labels = { start: "Iniciando", stop: "Parando", restart: "Reiniciando" };
+  const labels = { start: t("Iniciando o ambiente… pode levar até um minuto."), stop: t("Parando o ambiente… pode levar até um minuto."), restart: t("Reiniciando o ambiente… pode levar até um minuto.") };
   app.busyService = true;
   renderToolbar();
-  toast(`${labels[action]} o ambiente… pode levar até um minuto.`, { timeout: 60000 });
+  toast(labels[action], { timeout: 60000 });
   try {
     // lerd start pode baixar imagens e subir a VM do Podman (até 300 s no servidor)
     const result = await api(`/api/services/${action}`, { method: "POST", body: {}, timeout: 330000 });
-    toast(result.ok ? "Ambiente atualizado." : `Falhou: ${result.output.split("\n").pop() || "sem detalhes"}`,
+    toast(result.ok ? t("Ambiente atualizado.") : t("Falhou: {detail}", { detail: result.output.split("\n").pop() || t("sem detalhes") }),
       { kind: result.ok ? "ok" : "error", timeout: 6000 });
   } catch (err) {
     reportError(err);
@@ -287,9 +290,10 @@ function boot() {
     mountPopout(root, r.id);
     return;
   }
+  translateStatic();
   if (!token) {
-    $("#view").innerHTML = `<div class="page"><div class="empty-block"><h3>Abra pelo app Vulcan Celox</h3>
-      <p>Esta interface precisa do token de sessão que o app nativo fornece.</p></div></div>`;
+    $("#view").innerHTML = `<div class="page"><div class="empty-block"><h3>${t("Abra pelo app Vulcan Celox")}</h3>
+      <p>${t("Esta interface precisa do token de sessão que o app nativo fornece.")}</p></div></div>`;
     return;
   }
   if (!isNative) document.body.classList.add("is-browser");

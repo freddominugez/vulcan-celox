@@ -1,6 +1,6 @@
 // Paleta de comandos.
 
-import { api, get, isMac, post } from "./api.mjs";
+import { api, get, isMac, patch, post } from "./api.mjs";
 import { noticesEnabled, setNoticesEnabled } from "./attention-notify.mjs";
 import { AGENT_NAV, HELP_NAV, NAV, app } from "./app-state.mjs";
 import { navigate, runCommand, service, toggleAutostart } from "./app.mjs";
@@ -8,9 +8,12 @@ import { prEnabled, setPrEnabled } from "./pr-status.mjs";
 import { setThemePref, THEME_OPTIONS, themePref } from "./theme.mjs";
 import { $, debounce, esc, icon, reportError, shortPath } from "./dom.mjs";
 import { loadHelp } from "./help-content.mjs";
+import { currentLanguage, t } from "./i18n.mjs";
 
 let helpSections = [];
 loadHelp().then((d) => { helpSections = d.secoes; }).catch(() => {});
+
+const setLanguage = (language) => (language === currentLanguage() ? null : patch("/api/preferences", { language }).then(() => location.reload()).catch(reportError));
 
 export const palette = {
   items: [],
@@ -29,22 +32,24 @@ export const palette = {
   actions(query) {
     const q = query.toLowerCase();
     const base = [
-      { kind: "Ações", title: "Novo terminal", hint: isMac ? "⌘T" : "Ctrl+⇧+T", icon: "terminal", run: () => runCommand("newTerminal") },
-      { kind: "Ações", title: "Mostrar ou esconder o painel de terminal", hint: isMac ? "⌘J" : "Ctrl+⇧+J", icon: "terminal", run: () => runCommand("togglePanel") },
-      { kind: "Ações", title: "Abrir terminal em… (pasta, agente e tema)", hint: isMac ? "⇧⌘T" : "", icon: "folder", run: () => runCommand("newTerminalOptions") },
-      { kind: "Ações", title: "Iniciar ambiente", icon: "play", run: () => service("start") },
-      { kind: "Ações", title: "Parar ambiente", icon: "stop", run: () => service("stop") },
-      { kind: "Ações", title: `Iniciar ambiente junto com o app: ${app.state && app.state.autostart && app.state.autostart.enabled ? "desligar" : "ligar"}`, icon: "bolt", run: () => toggleAutostart() },
-      { kind: "Ações", title: `Aviso do sistema quando um agente espera: ${noticesEnabled() ? "desligar" : "ligar"}`, icon: "info", run: () => setNoticesEnabled(!noticesEnabled()).catch(reportError) },
-      ...THEME_OPTIONS.map(([id, label]) => ({ kind: "Tema", title: `Tema: ${label}${themePref() === id ? " (em uso)" : ""}`, icon: "circle-half", run: () => setThemePref(id).catch(reportError) })),
-      { kind: "Ações", title: `Estado do PR pelo GitHub (usa a rede): ${prEnabled() ? "desligar" : "ligar"}`, icon: "branch", run: () => setPrEnabled(!prEnabled()).catch(reportError) },
-      { kind: "Ações", title: "Abrir painel do Lerd", icon: "gauge", run: () => post("/api/open", { kind: "dashboard" }).catch(reportError) },
-      ...[...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => ({ kind: "Ir para", title: n.label, icon: n.icon, run: () => navigate(n.hash) })),
-      ...helpSections.map((h) => ({ kind: "Ajuda", title: `Ajuda: ${h.titulo}`, sub: h.resumo, icon: "help", run: () => navigate(`#/ajuda/${h.id}`) })),
+      { kind: t("Ações"), title: t("Novo terminal"), hint: isMac ? "⌘T" : "Ctrl+⇧+T", icon: "terminal", run: () => runCommand("newTerminal") },
+      { kind: t("Ações"), title: t("Mostrar ou esconder o painel de terminal"), hint: isMac ? "⌘J" : "Ctrl+⇧+J", icon: "terminal", run: () => runCommand("togglePanel") },
+      { kind: t("Ações"), title: t("Abrir terminal em… (pasta, agente e tema)"), hint: isMac ? "⇧⌘T" : "", icon: "folder", run: () => runCommand("newTerminalOptions") },
+      { kind: t("Ações"), title: t("Iniciar ambiente"), icon: "play", run: () => service("start") },
+      { kind: t("Ações"), title: t("Parar ambiente"), icon: "stop", run: () => service("stop") },
+      { kind: t("Ações"), title: app.state && app.state.autostart && app.state.autostart.enabled ? t("Iniciar ambiente junto com o app: desligar") : t("Iniciar ambiente junto com o app: ligar"), icon: "bolt", run: () => toggleAutostart() },
+      { kind: t("Ações"), title: noticesEnabled() ? t("Aviso do sistema quando um agente espera: desligar") : t("Aviso do sistema quando um agente espera: ligar"), icon: "info", run: () => setNoticesEnabled(!noticesEnabled()).catch(reportError) },
+      ...THEME_OPTIONS.map(([id, label]) => ({ kind: t("Tema"), title: themePref() === id ? t("Tema: {label} (em uso)", { label }) : t("Tema: {label}", { label }), icon: "circle-half", run: () => setThemePref(id).catch(reportError) })),
+      { kind: t("Ações"), title: prEnabled() ? t("Estado do PR pelo GitHub (usa a rede): desligar") : t("Estado do PR pelo GitHub (usa a rede): ligar"), icon: "branch", run: () => setPrEnabled(!prEnabled()).catch(reportError) },
+      { kind: t("Ações"), title: t("Abrir painel do Lerd"), icon: "gauge", run: () => post("/api/open", { kind: "dashboard" }).catch(reportError) },
+      { kind: t("Ações"), title: t("Idioma: English"), icon: "help", run: () => setLanguage("en") },
+      { kind: t("Ações"), title: t("Idioma: Português"), icon: "help", run: () => setLanguage("pt") },
+      ...[...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => ({ kind: t("Ir para"), title: n.label, icon: n.icon, run: () => navigate(n.hash) })),
+      ...helpSections.map((h) => ({ kind: t("Ajuda"), title: t("Ajuda: {titulo}", { titulo: h.titulo }), sub: h.resumo, icon: "help", run: () => navigate(`#/ajuda/${h.id}`) })),
     ];
     const sites = (app.state ? app.state.sites : []).flatMap((s) => [
-      { kind: "Sites", title: s.name, sub: s.domain, icon: "globe", run: () => navigate(`#/sites/${encodeURIComponent(s.name)}/terminal`) },
-      { kind: "Sites", title: `Terminal em ${s.name}`, sub: shortPath(s.path), icon: "terminal", run: () => { navigate(`#/sites/${encodeURIComponent(s.name)}/terminal`); runCommand("newTerminal"); } },
+      { kind: t("Sites"), title: s.name, sub: s.domain, icon: "globe", run: () => navigate(`#/sites/${encodeURIComponent(s.name)}/terminal`) },
+      { kind: t("Sites"), title: t("Terminal em {name}", { name: s.name }), sub: shortPath(s.path), icon: "terminal", run: () => { navigate(`#/sites/${encodeURIComponent(s.name)}/terminal`); runCommand("newTerminal"); } },
     ]);
     return [...base, ...sites].filter((a) => !q || a.title.toLowerCase().includes(q) || (a.sub || "").toLowerCase().includes(q));
   },
@@ -54,7 +59,7 @@ export const palette = {
       try {
         const data = await get(`/api/search?q=${encodeURIComponent(query)}`);
         hits = data.hits.filter((h) => h.kind !== "site").map((h) => ({
-          kind: { task: "Tarefas", note: "Post-its", tag: "Tags" }[h.kind] || h.kind,
+          kind: { task: t("Tarefas"), note: t("Post-its"), tag: t("Tags") }[h.kind] || h.kind,
           title: h.title, sub: h.snippet, icon: { task: "check-square", note: "note", tag: "tag" }[h.kind],
           run: () => {
             if (h.kind === "tag") navigate("#/tags");
@@ -78,7 +83,7 @@ export const palette = {
       return `${header}<li class="pal-item ${i === this.index ? "is-on" : ""}" data-index="${i}" role="option" aria-selected="${i === this.index}">
         ${icon(item.icon || "dot")}<span class="pal-title">${esc(item.title)}</span>
         ${item.sub ? `<span class="pal-sub">${esc(item.sub)}</span>` : ""}${item.hint ? `<kbd>${esc(item.hint)}</kbd>` : ""}</li>`;
-    }).join("") : `<li class="pal-empty">Nada encontrado.</li>`;
+    }).join("") : `<li class="pal-empty">${t("Nada encontrado.")}</li>`;
     const on = $(".pal-item.is-on");
     if (on) on.scrollIntoView({ block: "nearest" });
   },

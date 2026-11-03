@@ -2,6 +2,7 @@
 
 import { put } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 import { blockHtml, blockText, fold, inline, loadHelp } from "../help-content.mjs";
 
 export class HelpView {
@@ -34,20 +35,20 @@ export class HelpView {
   render() {
     const d = this.data;
     this.root.innerHTML = `<div class="page hp-page">
-      <aside class="hp-toc" aria-label="Assuntos da Ajuda">
-        <a href="#/ajuda/faq" class="hp-toc-item" data-sec="faq">${icon("help")}<span>Perguntas frequentes</span></a>
-        <div class="hp-toc-label">Manual</div>
+      <aside class="hp-toc" aria-label="${t("Assuntos da Ajuda")}">
+        <a href="#/ajuda/faq" class="hp-toc-item" data-sec="faq">${icon("help")}<span>${t("Perguntas frequentes")}</span></a>
+        <div class="hp-toc-label">${t("Manual")}</div>
         ${d.secoes.map((s) => `<a href="#/ajuda/${s.id}" class="hp-toc-item" data-sec="${s.id}"><span>${esc(s.titulo)}</span></a>`).join("")}
-        <div class="hp-toc-label">Guia</div>
-        <button class="hp-toc-item" data-hp="guide">${icon("home")}<span>Rever o guia do Início</span></button>
+        <div class="hp-toc-label">${t("Guia")}</div>
+        <button class="hp-toc-item" data-hp="guide">${icon("home")}<span>${t("Rever o guia do Início")}</span></button>
       </aside>
       <div class="hp-main">
-        <label class="hp-search">${icon("search")}<input type="search" placeholder="Procure uma dúvida: porta em uso, custo, Lerd parado" aria-label="Buscar na Ajuda" spellcheck="false"></label>
-        <p class="hp-none dim" hidden>Nada encontrado. Tente outra palavra ou veja as perguntas frequentes.</p>
+        <label class="hp-search">${icon("search")}<input type="search" placeholder="${t("Procure uma dúvida: porta em uso, custo, Lerd parado")}" aria-label="${t("Buscar na Ajuda")}" spellcheck="false"></label>
+        <p class="hp-none dim" hidden>${t("Nada encontrado. Tente outra palavra ou veja as perguntas frequentes.")}</p>
         <section class="hp-sec hp-faq" id="hp-faq" data-sec="faq">
-          <h2>Perguntas frequentes</h2>
+          <h2>${t("Perguntas frequentes")}</h2>
           ${d.faq.map((f) => `<details data-text="${esc(fold(`${f.q} ${f.a}`))}"><summary>${inline(f.q)}</summary>
-            <p>${inline(f.a)}</p>${f.secao ? `<a class="hp-more" href="#/ajuda/${f.secao}">Mais em ${esc((d.secoes.find((s) => s.id === f.secao) || {}).titulo || "")}</a>` : ""}</details>`).join("")}
+            <p>${inline(f.a)}</p>${f.secao ? `<a class="hp-more" href="#/ajuda/${f.secao}">${t("Mais em {titulo}", { titulo: esc((d.secoes.find((s) => s.id === f.secao) || {}).titulo || "") })}</a>` : ""}</details>`).join("")}
         </section>
         ${d.secoes.map((s) => `<section class="hp-sec" id="hp-${s.id}" data-sec="${s.id}"
             data-text="${esc(fold(`${s.titulo} ${s.resumo} ${s.blocos.map(blockText).join(" ")}`))}">

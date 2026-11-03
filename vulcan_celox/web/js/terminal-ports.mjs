@@ -3,6 +3,7 @@
 
 import { every, get, post } from "./api.mjs";
 import { esc, reportError } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 
 const POLL_MS = 10000;
 let ports = {};
@@ -11,7 +12,7 @@ function badge(list) {
   const first = list[0].port;
   const rest = list.length > 1 ? ` +${list.length - 1}` : "";
   const names = list.map((p) => `:${p.port}${p.command ? ` (${p.command})` : ""}`).join(", ");
-  return `<button type="button" class="port-badge" data-port="${first}" title="Abrir localhost:${first} no navegador. Portas desta aba: ${esc(names)}">:${first}${rest}</button>`;
+  return `<button type="button" class="port-badge" data-port="${first}" title="${t("Abrir localhost:{port} no navegador. Portas desta aba: {names}", { port: first, names: esc(names) })}">:${first}${rest}</button>`;
 }
 
 /** Reaplica os selos. Chamado a cada leitura e depois que a barra de abas ou a lista de sessões é redesenhada. */

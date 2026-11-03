@@ -8,6 +8,8 @@ import shutil
 from pathlib import Path
 from typing import Dict
 
+from vulcan_celox.core.i18n import tr
+
 WHICH_FIELDS = {"Site": "site", "PHP": "php", "Node": "node", "Document root": "docroot", "Nginx config": "nginx"}
 PHP_VERSION = re.compile(r"^PHP (\d+\.\d+\.\d+)", re.MULTILINE)
 
@@ -40,6 +42,6 @@ def shim_status(path_value: str, home: str) -> Dict[str, object]:
         return {"php_path": found, "ok": True, "warning": ""}
     if not (shims / "php").exists() or str(shims) not in path_value.split(":"):
         return {"php_path": found or "", "ok": False,
-                "warning": "os shims do Lerd não estão no PATH da aba (rode lerd path:enable)"}
+                "warning": tr("os shims do Lerd não estão no PATH da aba (rode lerd path:enable)")}
     return {"php_path": found or "", "ok": False,
-            "warning": f"o php da aba ({found}) não é o do Lerd e pode ter outra versão"}
+            "warning": tr("o php da aba ({found}) não é o do Lerd e pode ter outra versão", found=found)}

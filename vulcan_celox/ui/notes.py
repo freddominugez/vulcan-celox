@@ -13,7 +13,7 @@ from vulcan_celox.ui import theme
 from vulcan_celox.ui.widgets import ChipBar, ScrollFrame, TagEntry
 
 COLUMNS = 3
-ALL_TAGS = "Todas as tags"
+ALL_TAGS = "All tags"
 AUTOSAVE_SECONDS = 0.5
 POLL_MS = 100
 
@@ -82,7 +82,7 @@ class PostItCard(tk.Frame):
         note = self.board.notebook.note(self.note_id)
         if note is None:
             return
-        if note.text.strip() and not messagebox.askyesno("Post-it", "Apagar este post-it?", parent=self):
+        if note.text.strip() and not messagebox.askyesno("Sticky note", "Delete this sticky note?", parent=self):
             return
         self.board.flush()
         self.board.notebook.delete_note(self.note_id)
@@ -115,7 +115,7 @@ class NotesBoard(ttk.Frame):
 
         bar = ttk.Frame(self)
         bar.pack(fill="x", pady=(6, 8))
-        ttk.Button(bar, text="+ Novo post-it", style="Accent.TButton", command=self.new_note).pack(side="left")
+        ttk.Button(bar, text="+ New sticky note", style="Accent.TButton", command=self.new_note).pack(side="left")
         self.var_query = tk.StringVar()
         search = ttk.Entry(bar, textvariable=self.var_query, width=24)
         search.pack(side="left", padx=(12, 6))
@@ -125,7 +125,7 @@ class NotesBoard(ttk.Frame):
         self.tag_filter = ttk.Combobox(bar, textvariable=self.var_tag, state="readonly", width=18)
         self.tag_filter.pack(side="right")
         self.tag_filter.bind("<<ComboboxSelected>>", lambda _e: self.render())
-        ttk.Label(bar, text="⋮⋮ arrasta · ☆ fixa · ● cor · salva sozinho", style="Dim.TLabel").pack(side="right", padx=12)
+        ttk.Label(bar, text="⋮⋮ drag · ☆ pin · ● color · saves itself", style="Dim.TLabel").pack(side="right", padx=12)
 
         self.scroll = ScrollFrame(self)
         self.scroll.pack(fill="both", expand=True)
@@ -214,8 +214,8 @@ class NotesBoard(ttk.Frame):
         self.cards: Dict[str, PostItCard] = {}
         notes = self.notebook.notes_for(self.site, self.var_query.get(), self._selected_tag_id())
         if not notes:
-            empty = "Nenhum post-it encontrado." if self.var_query.get() or self._selected_tag_id() \
-                else "Nenhum post-it ainda. Clique em + Novo post-it."
+            empty = "No sticky notes found." if self.var_query.get() or self._selected_tag_id() \
+                else "No sticky notes yet. Click + New sticky note."
             tk.Label(self.grid_frame, text=empty, bg=theme.BG, fg=theme.FG_DIM,
                      font=theme.FONT).grid(row=0, column=0, columnspan=COLUMNS, pady=40)
             return

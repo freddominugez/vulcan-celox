@@ -122,7 +122,7 @@ final class BackendServer {
         guard let value = parsed else {
             proc.terminate()
             throw NSError(domain: "VulcanCelox", code: 1,
-                          userInfo: [NSLocalizedDescriptionKey: "O servidor local não iniciou (\(pythonPath()))."])
+                          userInfo: [NSLocalizedDescriptionKey: L("O servidor local não iniciou ({python}).", ["python": pythonPath()])])
         }
         port = value
         return value
@@ -372,7 +372,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             _ = try server.start()
         } catch {
             let alert = NSAlert()
-            alert.messageText = "Não foi possível iniciar o Vulcan Celox"
+            alert.messageText = L("Não foi possível iniciar o Vulcan Celox")
             alert.informativeText = error.localizedDescription
             if options.snapshotPath == nil { alert.runModal() }
             fputs("erro: \(error.localizedDescription)\n", stderr)
@@ -448,39 +448,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let appItem = NSMenuItem()
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: "Sobre o Vulcan Celox", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        appMenu.addItem(withTitle: L("Sobre o Vulcan Celox"), action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Ocultar Vulcan Celox", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
+        appMenu.addItem(withTitle: L("Ocultar Vulcan Celox"), action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Sair do Vulcan Celox", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: L("Sair do Vulcan Celox"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appItem.submenu = appMenu
         menubar.addItem(appItem)
 
         let fileItem = NSMenuItem()
-        let fileMenu = NSMenu(title: "Arquivo")
+        let fileMenu = NSMenu(title: L("Arquivo"))
         fileMenu.addItem(item("Novo terminal", #selector(newTerminal), "t"))
         fileMenu.addItem(item("Destacar terminal em janela", #selector(popoutTerminal), "d", [.command, .shift]))
         fileMenu.addItem(.separator())
         fileMenu.addItem(item("Buscar…", #selector(openPalette), "k"))
         fileMenu.addItem(.separator())
-        fileMenu.addItem(withTitle: "Fechar janela", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w")
+        fileMenu.addItem(withTitle: L("Fechar janela"), action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w")
         fileItem.submenu = fileMenu
         menubar.addItem(fileItem)
 
         let editItem = NSMenuItem()
-        let editMenu = NSMenu(title: "Editar")
-        editMenu.addItem(withTitle: "Desfazer", action: Selector(("undo:")), keyEquivalent: "z")
-        editMenu.addItem(withTitle: "Refazer", action: Selector(("redo:")), keyEquivalent: "Z")
+        let editMenu = NSMenu(title: L("Editar"))
+        editMenu.addItem(withTitle: L("Desfazer"), action: Selector(("undo:")), keyEquivalent: "z")
+        editMenu.addItem(withTitle: L("Refazer"), action: Selector(("redo:")), keyEquivalent: "Z")
         editMenu.addItem(.separator())
-        editMenu.addItem(withTitle: "Recortar", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
-        editMenu.addItem(withTitle: "Copiar", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
-        editMenu.addItem(withTitle: "Colar", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
-        editMenu.addItem(withTitle: "Selecionar tudo", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        editMenu.addItem(withTitle: L("Recortar"), action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        editMenu.addItem(withTitle: L("Copiar"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: L("Colar"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        editMenu.addItem(withTitle: L("Selecionar tudo"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
         editItem.submenu = editMenu
         menubar.addItem(editItem)
 
         let goItem = NSMenuItem()
-        let goMenu = NSMenu(title: "Ir")
+        let goMenu = NSMenu(title: L("Ir"))
         goMenu.addItem(item("Visão geral", #selector(goOverview), "1"))
         goMenu.addItem(item("Terminais", #selector(goTerminals), "2"))
         goMenu.addItem(item("Tarefas", #selector(goTasks), "3"))
@@ -491,7 +491,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menubar.addItem(goItem)
 
         let envItem = NSMenuItem()
-        let envMenu = NSMenu(title: "Ambiente")
+        let envMenu = NSMenu(title: L("Ambiente"))
         envMenu.addItem(item("Iniciar ambiente", #selector(startEnv), ""))
         envMenu.addItem(item("Parar ambiente", #selector(stopEnv), ""))
         envMenu.addItem(item("Reiniciar ambiente", #selector(restartEnv), ""))
@@ -501,9 +501,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menubar.addItem(envItem)
 
         let windowItem = NSMenuItem()
-        let windowMenu = NSMenu(title: "Janela")
-        windowMenu.addItem(withTitle: "Minimizar", action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m")
-        windowMenu.addItem(withTitle: "Zoom", action: #selector(NSWindow.performZoom(_:)), keyEquivalent: "")
+        let windowMenu = NSMenu(title: L("Janela"))
+        windowMenu.addItem(withTitle: L("Minimizar"), action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m")
+        windowMenu.addItem(withTitle: L("Zoom"), action: #selector(NSWindow.performZoom(_:)), keyEquivalent: "")
         windowMenu.addItem(.separator())
         windowMenu.addItem(item("Janela principal", #selector(showMain), "0"))
         windowItem.submenu = windowMenu
@@ -512,7 +512,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         // Menu Ajuda do macOS; ⌘? abre a Ajuda na seção da tela atual
         let helpItem = NSMenuItem()
-        let helpMenu = NSMenu(title: "Ajuda")
+        let helpMenu = NSMenu(title: L("Ajuda"))
         helpMenu.addItem(item("Ajuda do Vulcan Celox", #selector(goHelp), "?"))
         helpMenu.addItem(item("Início e guia", #selector(goHome), ""))
         helpItem.submenu = helpMenu
@@ -523,7 +523,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func item(_ title: String, _ action: Selector, _ key: String, _ mods: NSEvent.ModifierFlags = [.command]) -> NSMenuItem {
-        let menuItem = NSMenuItem(title: title, action: action, keyEquivalent: key)
+        let menuItem = NSMenuItem(title: L(title), action: action, keyEquivalent: key)
         menuItem.keyEquivalentModifierMask = mods
         menuItem.target = self
         return menuItem
@@ -542,7 +542,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(item("Iniciar ambiente", #selector(startEnv), ""))
         menu.addItem(item("Parar ambiente", #selector(stopEnv), ""))
         menu.addItem(.separator())
-        let quit = NSMenuItem(title: "Sair", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quit = NSMenuItem(title: L("Sair"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quit)
         status.menu = menu
         statusItem = status
@@ -650,12 +650,12 @@ func offerPythonInstall() {
     NSApplication.shared.activate(ignoringOtherApps: true)
     let brew = ["/opt/homebrew/bin/brew", "/usr/local/bin/brew"].first { FileManager.default.isExecutableFile(atPath: $0) }
     let alert = NSAlert()
-    alert.messageText = "O Vulcan Celox precisa do Python 3"
-    alert.informativeText = "Não encontramos um Python 3.9 ou mais novo neste Mac. Escolha como instalar; " +
-        "nada é instalado sem a sua confirmação. Quando terminar, abra o Vulcan Celox de novo."
-    alert.addButton(withTitle: "Instalar ferramentas da Apple")
-    if brew != nil { alert.addButton(withTitle: "Instalar com Homebrew") }
-    alert.addButton(withTitle: "Cancelar")
+    alert.messageText = L("O Vulcan Celox precisa do Python 3")
+    alert.informativeText = L("Não encontramos um Python 3.9 ou mais novo neste Mac. Escolha como instalar; " +
+        "nada é instalado sem a sua confirmação. Quando terminar, abra o Vulcan Celox de novo.")
+    alert.addButton(withTitle: L("Instalar ferramentas da Apple"))
+    if brew != nil { alert.addButton(withTitle: L("Instalar com Homebrew")) }
+    alert.addButton(withTitle: L("Cancelar"))
     let response = alert.runModal()
     if response == .alertFirstButtonReturn {
         // abre o diálogo do sistema "Instalar ferramentas de linha de comando"
@@ -669,10 +669,10 @@ func offerPythonInstall() {
 /// `vulcan-celox --verificar-dependencias`: diz qual Python será usado (0) ou o que falta (1).
 func checkDependenciesAndExit() -> Never {
     if let python = BackendServer.usablePython() {
-        print("Vulcan Celox: dependências ok (Python: \(python))")
+        print(L("Vulcan Celox: dependências ok (Python: {python})", ["python": python]))
         exit(0)
     }
-    print("Vulcan Celox: falta o Python 3.9 ou mais novo. Instale com `xcode-select --install` ou `brew install python`.")
+    print(L("Vulcan Celox: falta o Python 3.9 ou mais novo. Instale com `xcode-select --install` ou `brew install python`."))
     exit(1)
 }
 

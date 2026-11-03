@@ -7,16 +7,18 @@ from datetime import date
 from tkinter import ttk
 from typing import Callable, List, Optional
 
-from vulcan_celox.core.models import PRIORITY_LABELS
+from vulcan_celox.core.i18n import tr
+from vulcan_celox.core.models import PRIORITY_LABELS as _PRIORITY_LABELS
 from vulcan_celox.core.notebook import InvalidDue, Notebook, chip_specs
 from vulcan_celox.ui import theme
 from vulcan_celox.ui.widgets import ChipBar, TagEntry
 
+PRIORITY_LABELS = {key: tr(text) for key, text in _PRIORITY_LABELS.items()}
 STATUS_ICONS = {"todo": "○", "doing": "◐", "done": "●"}
-STATUS_FILTERS = [("Todas", None), ("A fazer", ["todo"]), ("Em andamento", ["doing"]),
-                  ("Concluídas", ["done"]), ("Abertas", ["todo", "doing"])]
-SORTS = [("Prioridade", "priority"), ("Prazo", "due"), ("Manual", "manual")]
-ALL_TAGS = "Todas as tags"
+STATUS_FILTERS = [("All", None), ("To do", ["todo"]), ("In progress", ["doing"]),
+                  ("Done", ["done"]), ("Open", ["todo", "doing"])]
+SORTS = [("Priority", "priority"), ("Due date", "due"), ("Manual", "manual")]
+ALL_TAGS = "All tags"
 UNDO_MS = 5000
 COLUMNS = ("status", "prioridade", "titulo", "tags", "prazo")
 
@@ -60,11 +62,11 @@ class TasksPanel(ttk.Frame):
         due.bind("<Return>", lambda _e: self.add())
         self.new_tag_entry = TagEntry(row, names_provider=self._tag_names, on_submit=self._queue_tag, width=10)
         self.new_tag_entry.pack(side="left", padx=(6, 0))
-        ttk.Button(row, text="Adicionar", style="Accent.TButton", command=self.add).pack(side="left", padx=(6, 0))
+        ttk.Button(row, text="Add", style="Accent.TButton", command=self.add).pack(side="left", padx=(6, 0))
 
         hint = ttk.Frame(self)
         hint.pack(fill="x")
-        ttk.Label(hint, text="título · prioridade · prazo AAAA-MM-DD · tag (Enter adiciona)",
+        ttk.Label(hint, text="title · priority · due date YYYY-MM-DD · tag (Enter adds)",
                   style="Dim.TLabel").pack(side="left")
         self.pending_chips = ChipBar(hint, on_remove=self._unqueue_tag)
         self.pending_chips.pack(side="left", padx=8)
@@ -72,12 +74,12 @@ class TasksPanel(ttk.Frame):
     def _build_filters(self) -> None:
         row = ttk.Frame(self)
         row.pack(fill="x", pady=(8, 4))
-        self.var_status = tk.StringVar(value="Todas")
+        self.var_status = tk.StringVar(value="All")
         self.var_tag = tk.StringVar(value=ALL_TAGS)
-        self.var_sort = tk.StringVar(value="Prioridade")
+        self.var_sort = tk.StringVar(value="Priority")
         for label, var, values, width in (("Status", self.var_status, [s for s, _ in STATUS_FILTERS], 12),
                                           ("Tag", self.var_tag, [ALL_TAGS], 16),
-                                          ("Ordenar", self.var_sort, [s for s, _ in SORTS], 10)):
+                                          ("Sort", self.var_sort, [s for s, _ in SORTS], 10)):
             ttk.Label(row, text=label, style="Dim.TLabel").pack(side="left", padx=(0, 4))
             box = ttk.Combobox(row, textvariable=var, values=values, state="readonly", width=width)
             box.pack(side="left", padx=(0, 12))
@@ -90,10 +92,10 @@ class TasksPanel(ttk.Frame):
         frame.pack(fill="both", expand=True, pady=(4, 0))
         self.tree = ttk.Treeview(frame, columns=COLUMNS, show="headings", selectmode="browse")
         for col, text, width, anchor, stretch in (("status", "", 36, "center", False),
-                                                  ("prioridade", "Prioridade", 84, "w", False),
-                                                  ("titulo", "Título", 360, "w", True),
+                                                  ("prioridade", "Priority", 84, "w", False),
+                                                  ("titulo", "Title", 360, "w", True),
                                                   ("tags", "Tags", 160, "w", False),
-                                                  ("prazo", "Prazo", 96, "w", False)):
+                                                  ("prazo", "Due date", 96, "w", False)):
             self.tree.heading(col, text=text)
             self.tree.column(col, width=width, anchor=anchor, stretch=stretch)
         self.tree.tag_configure("done", foreground=theme.FG_DIM)
@@ -114,13 +116,13 @@ class TasksPanel(ttk.Frame):
         row.pack(fill="x", pady=6)
         ttk.Button(row, text="↑", style="Small.TButton", command=lambda: self._move(-1)).pack(side="left")
         ttk.Button(row, text="↓", style="Small.TButton", command=lambda: self._move(1)).pack(side="left", padx=4)
-        ttk.Button(row, text="Excluir", style="Small.TButton", command=self.delete_selected).pack(side="left", padx=(8, 0))
-        ttk.Label(row, text="clique no ○ muda o status · duplo clique edita",
+        ttk.Button(row, text="Delete", style="Small.TButton", command=self.delete_selected).pack(side="left", padx=(8, 0))
+        ttk.Label(row, text="click ○ to change status · double-click to edit",
                   style="Dim.TLabel").pack(side="left", padx=12)
         self.undo_frame = ttk.Frame(row)
-        self.undo_label = ttk.Label(self.undo_frame, text="Tarefa excluída.", style="Dim.TLabel")
+        self.undo_label = ttk.Label(self.undo_frame, text="Task deleted.", style="Dim.TLabel")
         self.undo_label.pack(side="left")
-        ttk.Button(self.undo_frame, text="Desfazer", style="Small.TButton", command=self.undo).pack(side="left", padx=6)
+        ttk.Button(self.undo_frame, text="Undo", style="Small.TButton", command=self.undo).pack(side="left", padx=6)
 
     # ── dados ────────────────────────────────────────────────────────────
     def _tag_names(self) -> List[str]:
@@ -161,7 +163,7 @@ class TasksPanel(ttk.Frame):
             task = self.notebook.add_task(self.site, title, priority=priority,
                                           tags=list(self._pending_tags), due=self.var_due.get())
         except InvalidDue:
-            self.on_message("prazo inválido: use AAAA-MM-DD (ex.: 2026-09-30)")
+            self.on_message("invalid due date: use YYYY-MM-DD (e.g. 2026-09-30)")
             return None
         self.var_title.set("")
         self.var_due.set("")
@@ -175,7 +177,7 @@ class TasksPanel(ttk.Frame):
         if not task_id:
             return
         task = self.notebook.delete_task(task_id)
-        self.undo_label.configure(text=f"Excluída: {task.title[:40]}")
+        self.undo_label.configure(text=f"Deleted: {task.title[:40]}")
         self.undo_frame.pack(side="right")
         if self._undo_job:
             self.after_cancel(self._undo_job)
@@ -259,9 +261,9 @@ class TasksPanel(ttk.Frame):
             try:
                 commit(value)
             except InvalidDue:
-                self.on_message("prazo inválido: use AAAA-MM-DD")
+                self.on_message("invalid due date: use YYYY-MM-DD")
             except ValueError as exc:
-                self.on_message(f"não salvo: {exc}")
+                self.on_message(f"not saved: {exc}")
 
         entry.bind("<Return>", lambda _e: done(True))
         entry.bind("<FocusOut>", lambda _e: done(True))

@@ -3,6 +3,7 @@
 import { confirmDialog, documentGeneral, documentSession, onJobsChange } from "../ai.mjs";
 import { del, get, patch, post, put } from "../api.mjs";
 import { $, esc, icon, reportError, toast } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 import { renderMarkdown } from "../markdown.mjs";
 import { sessionHash } from "../session-tree.mjs";
 
@@ -54,9 +55,9 @@ export class IndexView {
         <div class="index-grid">
           <section class="panel index-main">
             <header class="panel-head">
-              <div class="segmented" role="tablist" aria-label="Documento">
-                <button class="seg is-on" role="tab" data-doc-tab="index" aria-selected="true">${icon("book")}<span>Índice geral</span></button>
-                <button class="seg" role="tab" data-doc-tab="documentation" aria-selected="false">${icon("note")}<span>Documentação</span></button>
+              <div class="segmented" role="tablist" aria-label="${t("Documento")}">
+                <button class="seg is-on" role="tab" data-doc-tab="index" aria-selected="true">${icon("book")}<span>${t("Índice geral")}</span></button>
+                <button class="seg" role="tab" data-doc-tab="documentation" aria-selected="false">${icon("note")}<span>${t("Documentação")}</span></button>
               </div>
               <div class="spacer"></div>
               <div class="index-actions" data-role="doc-actions"></div>
@@ -66,7 +67,7 @@ export class IndexView {
           <aside class="index-side">
             <section class="panel" data-role="key"></section>
             <section class="panel">
-              <header class="panel-head"><h2>Sessões</h2><span class="count" data-role="session-count"></span></header>
+              <header class="panel-head"><h2>${t("Sessões")}</h2><span class="count" data-role="session-count"></span></header>
               <ul class="index-sessions" data-role="sessions"></ul>
             </section>
           </aside>
@@ -92,22 +93,22 @@ export class IndexView {
     const generalRunning = this.running.has("all");
     if (this.tab === "index") {
       const index = this.docs.index;
-      actions.innerHTML = index ? `<button class="btn btn-ghost btn-sm" data-action="open-file" data-file="${esc(index.path)}">${icon("external")}<span>Abrir arquivo</span></button>` : "";
+      actions.innerHTML = index ? `<button class="btn btn-ghost btn-sm" data-action="open-file" data-file="${esc(index.path)}">${icon("external")}<span>${t("Abrir arquivo")}</span></button>` : "";
       article.innerHTML = index ? renderMarkdown(index.markdown) : "";
       return;
     }
     const doc = this.docs.documentation;
     const generate = `<button class="btn ${doc ? "btn-ghost btn-sm" : "btn-primary"}" data-action="generate-general" ${generalRunning || !this.sessions.length ? "disabled" : ""}>
-        ${icon("book")}<span>${generalRunning ? "Gerando…" : doc ? "Gerar de novo" : "Gerar documentação geral"}</span></button>`;
+        ${icon("book")}<span>${generalRunning ? t("Gerando…") : doc ? t("Gerar de novo") : t("Gerar documentação geral")}</span></button>`;
     actions.innerHTML = doc
-      ? `<button class="btn btn-ghost btn-sm" data-action="open-file" data-file="${esc(doc.path)}">${icon("external")}<span>Abrir arquivo</span></button>${generate}`
+      ? `<button class="btn btn-ghost btn-sm" data-action="open-file" data-file="${esc(doc.path)}">${icon("external")}<span>${t("Abrir arquivo")}</span></button>${generate}`
       : "";
     article.innerHTML = doc ? renderMarkdown(doc.markdown) : `
       <div class="index-empty">
-        <h3>A documentação geral ainda não existe</h3>
-        <p>A IA lê as sessões de terminal (e as documentações de sessão já geradas) e escreve um documento por site, com linha do tempo, decisões, pendências e comandos recorrentes, gravado em <code>DOCUMENTACAO.md</code>.</p>
-        ${configured ? generate : `<p class="dim">Cadastre a chave da Anthropic ao lado para começar.</p>`}
-        ${!this.sessions.length ? `<p class="dim">Abra e use um terminal primeiro: sem sessões não há o que documentar.</p>` : ""}
+        <h3>${t("A documentação geral ainda não existe")}</h3>
+        <p>${t("A IA lê as sessões de terminal (e as documentações de sessão já geradas) e escreve um documento por site, com linha do tempo, decisões, pendências e comandos recorrentes, gravado em {file}.", { file: "<code>DOCUMENTACAO.md</code>" })}</p>
+        ${configured ? generate : `<p class="dim">${t("Cadastre a chave da Anthropic ao lado para começar.")}</p>`}
+        ${!this.sessions.length ? `<p class="dim">${t("Abra e use um terminal primeiro: sem sessões não há o que documentar.")}</p>` : ""}
       </div>`;
   }
 
@@ -117,22 +118,22 @@ export class IndexView {
     if (!cfg) return;
     if (!cfg.configured) {
       box.innerHTML = `
-        <header class="panel-head"><h2>Chave da Anthropic</h2></header>
+        <header class="panel-head"><h2>${t("Chave da Anthropic")}</h2></header>
         <form class="key-form" data-role="key-form" autocomplete="off">
-          <p class="dim">Usada só quando você pede uma documentação. Fica no Keychain do macOS; o app nunca mostra nem grava a chave em arquivo.</p>
-          <label class="field-label" for="ai-key">Chave de API</label>
+          <p class="dim">${t("Usada só quando você pede uma documentação. Fica no Keychain do macOS; o app nunca mostra nem grava a chave em arquivo.")}</p>
+          <label class="field-label" for="ai-key">${t("Chave de API")}</label>
           <input id="ai-key" class="input" name="key" type="password" placeholder="sk-ant-…" spellcheck="false" autocomplete="off" required>
-          <button class="btn btn-primary" type="submit">${icon("lock")}<span>Validar e salvar</span></button>
+          <button class="btn btn-primary" type="submit">${icon("lock")}<span>${t("Validar e salvar")}</span></button>
         </form>`;
       return;
     }
     const models = cfg.models.length ? cfg.models : [{ id: cfg.model, name: cfg.model }];
     box.innerHTML = `
-      <header class="panel-head"><h2>Chave da Anthropic</h2><span class="badge badge-ok">${icon("check")}ativa</span></header>
+      <header class="panel-head"><h2>${t("Chave da Anthropic")}</h2><span class="badge badge-ok">${icon("check")}${t("ativa")}</span></header>
       <div class="key-form">
         <div class="key-row"><span class="mono">${esc(cfg.masked)}</span><div class="spacer"></div>
-          <button class="btn btn-ghost btn-sm" data-action="remove-key">${icon("trash")}<span>Remover</span></button></div>
-        <label class="field-label" for="ai-model">Modelo</label>
+          <button class="btn btn-ghost btn-sm" data-action="remove-key">${icon("trash")}<span>${t("Remover")}</span></button></div>
+        <label class="field-label" for="ai-model">${t("Modelo")}</label>
         <select id="ai-model" class="select" data-role="model">
           ${models.map((m) => `<option value="${esc(m.id)}" ${m.id === cfg.model ? "selected" : ""}>${esc(m.name)}</option>`).join("")}
         </select>
@@ -151,11 +152,11 @@ export class IndexView {
             <span class="index-session-title">${esc(s.title)}</span>
             <span class="index-session-meta">${esc(s.site || "Global")} · ${stamp(s.created_at)}</span>
           </a>
-          ${s.has_doc ? `<a class="index-doc-badge" href="${sessionHash(s)}" title="Tem documentação">${icon("book")}</a>` : ""}
+          ${s.has_doc ? `<a class="index-doc-badge" href="${sessionHash(s)}" title="${t("Tem documentação")}">${icon("book")}</a>` : ""}
           <button class="btn btn-ghost btn-sm" data-action="document" data-id="${s.id}" data-title="${esc(s.title)}" ${busy ? "disabled" : ""}>
-            ${busy ? "Gerando…" : s.has_doc ? "Refazer" : "Documentar"}</button>
+            ${busy ? t("Gerando…") : s.has_doc ? t("Refazer") : t("Documentar")}</button>
         </li>`;
-    }).join("") : `<li class="empty-inline">${icon("terminal")}<span>Nenhuma sessão ainda.</span></li>`;
+    }).join("") : `<li class="empty-inline">${icon("terminal")}<span>${t("Nenhuma sessão ainda.")}</span></li>`;
   }
 
   async onClick(event) {
@@ -181,11 +182,11 @@ export class IndexView {
         if (job) { this.running.add(target.dataset.id); this.renderSessions(); }
       }
       if (action === "remove-key") {
-        const ok = await confirmDialog({ title: "Remover a chave da Anthropic?", confirmLabel: "Remover",
-          body: "<p>A chave sai do Keychain. As documentações já geradas continuam nos arquivos.</p>" });
+        const ok = await confirmDialog({ title: t("Remover a chave da Anthropic?"), confirmLabel: t("Remover"),
+          body: `<p>${t("A chave sai do Keychain. As documentações já geradas continuam nos arquivos.")}</p>` });
         if (!ok) return;
         this.config = await del("/api/ai/key");
-        toast("Chave removida.", { kind: "ok" });
+        toast(t("Chave removida."), { kind: "ok" });
         this.render();
       }
     } catch (err) {
@@ -208,7 +209,7 @@ export class IndexView {
     if (event.target.dataset.role !== "model") return;
     try {
       this.config = await patch("/api/ai/config", { model: event.target.value });
-      toast(`Modelo trocado para ${event.target.selectedOptions[0].textContent}.`, { kind: "ok" });
+      toast(t("Modelo trocado para {model}.", { model: event.target.selectedOptions[0].textContent }), { kind: "ok" });
     } catch (err) {
       reportError(err);
       this.renderKey();
@@ -221,17 +222,17 @@ export class IndexView {
     const input = event.target.elements.key;
     const button = event.target.querySelector("button[type=submit]");
     button.disabled = true;
-    button.querySelector("span").textContent = "Validando…";
+    button.querySelector("span").textContent = t("Validando…");
     try {
       this.config = await put("/api/ai/key", { key: input.value.trim() });
       input.value = "";
-      toast("Chave validada e guardada no Keychain.", { kind: "ok" });
+      toast(t("Chave validada e guardada no Keychain."), { kind: "ok" });
       this.render();
     } catch (err) {
       input.value = "";
       reportError(err);
       button.disabled = false;
-      button.querySelector("span").textContent = "Validar e salvar";
+      button.querySelector("span").textContent = t("Validar e salvar");
     }
   }
 

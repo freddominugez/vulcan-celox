@@ -2,6 +2,7 @@
 
 import { get, patch } from "../api.mjs";
 import { $, esc, flashFocus, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 
 export class SessionTagsView {
   /** @param {{sessionId: string, onChange: Function}} options */
@@ -37,8 +38,8 @@ export class SessionTagsView {
 
   render() {
     const s = this.session;
-    const chips = s.tags.map((t) => `<span class="chip chip-lg" data-tag="${esc(t.id)}" style="--chip:${esc(t.color)}">${esc(t.name)}
-      <button class="chip-x" data-action="remove" data-tag="${t.id}" aria-label="Remover tag ${esc(t.name)}">${icon("x")}</button></span>`).join("");
+    const chips = s.tags.map((tg) => `<span class="chip chip-lg" data-tag="${esc(tg.id)}" style="--chip:${esc(tg.color)}">${esc(tg.name)}
+      <button class="chip-x" data-action="remove" data-tag="${tg.id}" aria-label="${t("Remover tag {name}", { name: esc(tg.name) })}">${icon("x")}</button></span>`).join("");
 
     const groups = new Map();
     const push = (key, entry) => {
@@ -63,10 +64,10 @@ export class SessionTagsView {
       const tag = tagById.get(key);
       const entries = groups.get(key);
       const rows = entries.map(({ kind, item }) => kind === "task"
-        ? `<li class="tag-item status-${item.status}">${icon(item.status === "done" ? "circle-check" : item.status === "doing" ? "circle-half" : "circle")}<span>${esc(item.title)}</span><span class="dim">tarefa</span></li>`
-        : `<li class="tag-item">${icon("note")}<span>${esc(item.title || "(post-it sem título)")}</span><span class="dim">post-it</span></li>`).join("");
+        ? `<li class="tag-item status-${item.status}">${icon(item.status === "done" ? "circle-check" : item.status === "doing" ? "circle-half" : "circle")}<span>${esc(item.title)}</span><span class="dim">${t("tarefa")}</span></li>`
+        : `<li class="tag-item">${icon("note")}<span>${esc(item.title || t("(post-it sem título)"))}</span><span class="dim">${t("post-it")}</span></li>`).join("");
       return `<section class="tag-group" data-tag="${esc(key)}">
-          <h3>${tag ? `<span class="chip" style="--chip:${esc(tag.color)}">${esc(tag.name)}</span>` : `<span class="dim">Sem tag</span>`}
+          <h3>${tag ? `<span class="chip" style="--chip:${esc(tag.color)}">${esc(tag.name)}</span>` : `<span class="dim">${t("Sem tag")}</span>`}
             <span class="count">${entries.length}</span></h3>
           <ul>${rows}</ul>
         </section>`;
@@ -75,17 +76,17 @@ export class SessionTagsView {
     this.root.innerHTML = `
       <div class="session-tags">
         <div class="session-tags-head">
-          <h2>Tags desta sessão</h2>
-          <p class="dim">Marcam a sessão “${esc(s.title)}” no índice geral e na memória em Markdown.</p>
+          <h2>${t("Tags desta sessão")}</h2>
+          <p class="dim">${t("Marcam a sessão “{title}” no índice geral e na memória em Markdown.", { title: esc(s.title) })}</p>
           <div class="session-tag-row">
-            ${chips || `<span class="dim">Nenhuma tag ainda.</span>`}
-            <input class="input input-tags" data-role="add" placeholder="adicionar tag" list="session-tag-options" aria-label="Adicionar tag à sessão">
+            ${chips || `<span class="dim">${t("Nenhuma tag ainda.")}</span>`}
+            <input class="input input-tags" data-role="add" placeholder="${t("adicionar tag")}" list="session-tag-options" aria-label="${t("Adicionar tag à sessão")}">
             <datalist id="session-tag-options">${this.tags.map((t) => `<option value="${esc(t.name)}">`).join("")}</datalist>
           </div>
         </div>
         <div class="session-tags-body">
-          <h2>Itens da sessão por tag</h2>
-          ${sections || `<div class="empty-inline">${icon("tag")}<span>Esta sessão ainda não tem tarefas nem post-its. Crie nas abas Tarefas e Post-its.</span></div>`}
+          <h2>${t("Itens da sessão por tag")}</h2>
+          ${sections || `<div class="empty-inline">${icon("tag")}<span>${t("Esta sessão ainda não tem tarefas nem post-its. Crie nas abas Tarefas e Post-its.")}</span></div>`}
         </div>
       </div>`;
     flashFocus(this.root, this.options, (id) => `.tag-group[data-tag="${id}"], .session-tag-row .chip[data-tag="${id}"]`);

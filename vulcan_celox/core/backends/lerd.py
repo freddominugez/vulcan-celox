@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from vulcan_celox.core import miniyaml
 from vulcan_celox.core.backends.base import Backend, EnvStatus
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.runner import Result
 from vulcan_celox.core.sites import KIND_ORDER, Site, discover_sites
 
@@ -67,7 +68,7 @@ class LerdBackend(Backend):
             self._version = self.version()
         data = self.api_get("/api/status")
         if not isinstance(data, dict):
-            return EnvStatus(False, f"{self._label()} parado (painel indisponível)")
+            return EnvStatus(False, tr("{label} parado (painel indisponível)", label=self._label()))
         return summarize_status(data, self._label())
 
     def _label(self) -> str:
@@ -169,15 +170,15 @@ def summarize_status(data: Mapping[str, Any], label: str = "Lerd") -> EnvStatus:
     dns = data.get("dns") or {}
     fpms = [f for f in (data.get("php_fpms") or []) if isinstance(f, dict)]
     running_fpms = [str(f.get("version")) for f in fpms if f.get("running")]
-    parts = [label, "nginx ok" if nginx else "nginx parado"]
+    parts = [label, "nginx ok" if nginx else tr("nginx parado")]
     if dns.get("enabled"):
-        parts.append(f"DNS .{dns.get('tld') or 'test'} {'ok' if dns.get('ok') else 'com problema'}")
+        parts.append(f"DNS .{dns.get('tld') or 'test'} {'ok' if dns.get('ok') else tr('com problema')}")
     else:
         parts.append("DNS .localhost")
     if data.get("php_default"):
         parts.append(f"PHP {data['php_default']}")
     if not data.get("watcher_running", True):
-        parts.append("watcher parado")
+        parts.append(tr("watcher parado"))
     details = {"nginx": nginx, "dns_ok": bool(dns.get("ok")), "tld": dns.get("tld"),
                "php_default": data.get("php_default"), "php_running": running_fpms,
                "watcher": bool(data.get("watcher_running"))}

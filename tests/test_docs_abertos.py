@@ -26,7 +26,8 @@ class DocsAbertosTest(unittest.TestCase):
     def test_mesmas_paginas_nas_duas_linguas(self):
         en = {p.name for p in (ROOT / "docs" / "en").glob("*.md")}
         pt = {p.name for p in (ROOT / "docs" / "pt-BR").glob("*.md")}
-        self.assertEqual(en, pt - {"guia-detalhado.md"})
+        self.assertEqual(en - {"detailed-guide.md"}, pt - {"guia-detalhado.md"})
+        self.assertIn("detailed-guide.md", en)
 
     def test_links_internos_existem(self):
         faltando = []

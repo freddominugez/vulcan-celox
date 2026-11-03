@@ -121,7 +121,7 @@ def check(app, token: str) -> int:
         with urllib.request.urlopen(f"{base}/", timeout=10) as response:
             page = response.read().decode("utf-8")
     except Exception as exc:  # noqa: BLE001
-        print(f"check falhou: {exc}", file=sys.stderr)
+        print(f"check failed: {exc}", file=sys.stderr)
         return 1
     ok = "Vulcan Celox" in page and "backend" in state
     print(json.dumps({"ok": ok, "version": __version__, "backend": state["backend"]["label"],
@@ -147,7 +147,7 @@ def run_browser(app, token: str) -> int:
     opener = shutil.which("xdg-open")
     if opener:
         Runner().stream([opener, url])  # em segundo plano: alguns xdg-open só retornam quando o navegador fecha
-    print(f"{APP_NAME} rodando em http://127.0.0.1:{app.server.port} (abra este arquivo se o navegador não abriu):\n{url}",
+    print(f"{APP_NAME} running at http://127.0.0.1:{app.server.port} (open this file if the browser did not open):\n{url}",
           flush=True)
     started = time.monotonic()
     while not should_exit_idle(app.server.last_api_request, started, time.monotonic()):
@@ -255,10 +255,10 @@ def run_gtk(app, token: str, version: str) -> int:
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog="vulcan-celox", description=f"{APP_NAME} para Linux")
-    parser.add_argument("--check", action="store_true", help="sobe o servidor sem janela, verifica e sai (0 = ok)")
-    parser.add_argument("--mode", choices=("gtk", "app", "browser"), help="força o modo de janela")
-    parser.add_argument("--doctor", action="store_true", help="diagnóstico em JSON do ambiente")
+    parser = argparse.ArgumentParser(prog="vulcan-celox", description=f"{APP_NAME} for Linux")
+    parser.add_argument("--check", action="store_true", help="start the server without a window, verify and exit (0 = ok)")
+    parser.add_argument("--mode", choices=("gtk", "app", "browser"), help="force the window mode")
+    parser.add_argument("--doctor", action="store_true", help="environment diagnostics as JSON")
     parser.add_argument("--version", action="version", version=f"{APP_NAME} {__version__}")
     args = parser.parse_args(argv)
 

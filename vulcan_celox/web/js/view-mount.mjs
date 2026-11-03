@@ -3,6 +3,7 @@
 import { app } from "./app-state.mjs";
 import { navigate, refreshState, runCommand } from "./app.mjs";
 import { $, esc } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 import { AgentSessionView } from "./views/agent-session.mjs";
 import { AgentsBranchesView } from "./views/agents-branches.mjs";
 import { AgentsHistoryView } from "./views/agents-history.mjs";
@@ -40,9 +41,9 @@ export function mountView() {
     case "site": {
       const site = state.sites.find((s) => s.name === app.route.site);
       if (!site) {
-        root.innerHTML = `<div class="page"><div class="empty-block"><h3>Site “${esc(app.route.site)}” não encontrado</h3>
-          <p>Ele pode ter sido removido do Lerd. Volte para a visão geral.</p>
-          <button class="btn" data-go="#/overview">Visão geral</button></div></div>`;
+        root.innerHTML = `<div class="page"><div class="empty-block"><h3>${t("Site “{site}” não encontrado", { site: esc(app.route.site) })}</h3>
+          <p>${t("Ele pode ter sido removido do Lerd. Volte para a visão geral.")}</p>
+          <button class="btn" data-go="#/overview">${t("Visão geral")}</button></div></div>`;
         return;
       }
       app.view = new SiteView(root, { ...common, site, tab: app.route.tab, sessionId: app.route.session, focus: app.route.focus });
@@ -56,7 +57,7 @@ export function mountView() {
       app.view = new TasksView(root.firstElementChild, { site: "*", sites: state.sites, onChange });
       break;
     case "notes":
-      root.innerHTML = `<div class="page page-flush"><p class="page-note">Post-its globais, fora de projeto. Os de cada site ficam na aba Post-its do site.</p><div></div></div>`;
+      root.innerHTML = `<div class="page page-flush"><p class="page-note">${t("Post-its globais, fora de projeto. Os de cada site ficam na aba Post-its do site.")}</p><div></div></div>`;
       app.view = new NotesView(root.firstElementChild.lastElementChild, { site: null, onChange });
       break;
     case "tags":

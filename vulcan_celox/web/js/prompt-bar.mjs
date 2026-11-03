@@ -4,6 +4,7 @@
 import { get, post, put } from "./api.mjs";
 import { esc, icon, toast } from "./dom.mjs";
 import { AGENT_NAMES, copy } from "./agents-ui.mjs";
+import { t } from "./i18n.mjs";
 
 const FRESH_MS = 10000;
 
@@ -67,13 +68,13 @@ export class PromptBar {
       this.el.hidden = true;
       return;
     }
-    const who = s ? `${s.pairing_id === this.terminal ? "pareada · " : ""}${esc(s.project || "sem projeto")}${s.branch ? ` · ${esc(s.branch)}` : ""} · ${esc(AGENT_NAMES[s.agent] || s.agent)}` : "sem sessão de agente";
+    const who = s ? `${s.pairing_id === this.terminal ? `${t("pareada")} · ` : ""}${esc(s.project || t("sem projeto"))}${s.branch ? ` · ${esc(s.branch)}` : ""} · ${esc(AGENT_NAMES[s.agent] || s.agent)}` : t("sem sessão de agente");
     this.el.hidden = false;
-    this.el.innerHTML = `<span class="pb-label" title="Variáveis preenchidas com esta sessão de agente">${icon("text")}<span>${who}</span></span>
+    this.el.innerHTML = `<span class="pb-label" title="${t("Variáveis preenchidas com esta sessão de agente")}">${icon("text")}<span>${who}</span></span>
       ${d.prompts.map((p) => `<button type="button" class="pb-chip ${p.missing.length ? "is-missing" : ""}" data-prompt="${esc(p.id)}"
-        title="${esc(this.canSend(p) ? `Colar no terminal (sem Enter): ${p.summary}` : `Copiar: ${p.summary}`)}">${icon(this.canSend(p) ? "terminal" : "copy")}<span>${esc(p.title)}</span></button>`).join("")}
-      ${d.prompts.length ? `<a class="pb-more" href="#/prompts">Todos…</a>` : ""}
-      ${paired ? `<a class="pb-chip pb-code" href="#/agentes/${encodeURIComponent(s.id)}/codigo" title="Ver o código que esta sessão está mexendo">${icon("code")}<span>Código</span></a>` : ""}`;
+        title="${esc(this.canSend(p) ? t("Colar no terminal (sem Enter): {summary}", { summary: p.summary }) : t("Copiar: {summary}", { summary: p.summary }))}">${icon(this.canSend(p) ? "terminal" : "copy")}<span>${esc(p.title)}</span></button>`).join("")}
+      ${d.prompts.length ? `<a class="pb-more" href="#/prompts">${t("Todos…")}</a>` : ""}
+      ${paired ? `<a class="pb-chip pb-code" href="#/agentes/${encodeURIComponent(s.id)}/codigo" title="${t("Ver o código que esta sessão está mexendo")}">${icon("code")}<span>${t("Código")}</span></a>` : ""}`;
   }
 
   /** Colar direto só quando a sessão é a pareada com esta aba e nenhuma variável falta. */
@@ -90,7 +91,7 @@ export class PromptBar {
     if (this.canSend(p)) {
       try {
         await post("/api/prompts/send", { prompt: p.id, session: this.data.session.id, values: {} });
-        toast(`${p.title}: texto colado no terminal. Revise e aperte Enter.`, { kind: "ok" });
+        toast(t("{title}: texto colado no terminal. Revise e aperte Enter.", { title: p.title }), { kind: "ok" });
         chip.classList.add("is-done");
         setTimeout(() => chip.classList.remove("is-done"), 1200);
         return;
@@ -98,7 +99,7 @@ export class PromptBar {
         /* sem aba viva: cai na cópia */
       }
     }
-    const ok = await copy(p.rendered, `Copiado: ${p.title}. Cole no terminal com ⌘V.`);
+    const ok = await copy(p.rendered, t("Copiado: {title}. Cole no terminal com ⌘V.", { title: p.title }));
     if (ok) {
       chip.classList.add("is-done");
       setTimeout(() => chip.classList.remove("is-done"), 1200);

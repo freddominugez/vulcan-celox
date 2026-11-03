@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Callable, Dict, Iterable
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.search import KIND_LABELS, KIND_ORDER, Hit, search
 from vulcan_celox.ui import theme
 
@@ -14,7 +15,7 @@ class SearchWindow(tk.Toplevel):
     def __init__(self, master, sites_provider: Callable[[], Iterable], notebook,
                  on_open: Callable[[Hit], None]):
         super().__init__(master)
-        self.title("Buscar")
+        self.title("Search")
         self.configure(bg=theme.BG)
         self.geometry("620x460")
         self.transient(master)
@@ -57,7 +58,7 @@ class SearchWindow(tk.Toplevel):
             group = [h for h in hits if h.kind == kind]
             if not group:
                 continue
-            parent = self.tree.insert("", "end", iid=f"group:{kind}", text=f"{KIND_LABELS[kind]} ({len(group)})",
+            parent = self.tree.insert("", "end", iid=f"group:{kind}", text=f"{tr(KIND_LABELS[kind])} ({len(group)})",
                                       open=True, tags=("group",))
             for hit in group:
                 iid = f"{hit.kind}:{hit.key}"

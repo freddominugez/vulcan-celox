@@ -250,6 +250,8 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 - `core/pr_status.py`, `server/pr_api.py`: estado do PR pelo `gh` do usuário, só com a preferência `pr_status` ligada, com cache de 60 s.
 - Interface: `web/js/views/code/`, `web/js/terminal-watch.mjs` (atenção, links de caminho e marcas de pedido de cada terminal), `web/js/terminal-ports.mjs`, `web/js/pr-status.mjs`, `web/js/theme.mjs`, `web/styles/tokens.css` (único arquivo com cor solta) e `web/vendor/codemirror.js`, carregado na primeira vez que a aba Código abre.
 
+- `core/i18n.py`, `web/js/i18n.mjs`: idioma da interface. `web/i18n/en.json` é o dicionário, e `HttpError` passa por `tr()` ao responder.
+
 ## 6. Servidor HTTP e WebSocket
 
 `server/local_http.py` usa `ThreadingHTTPServer`, com uma thread por conexão. As rotas, por grupo, estão em [http-api.md](http-api.md). O modelo de ameaça está em [security.md](security.md). As regras do próprio servidor:

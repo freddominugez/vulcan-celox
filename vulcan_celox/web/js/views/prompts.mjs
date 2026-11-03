@@ -2,6 +2,7 @@
 
 import { get, post } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 import { AGENT_NAMES, copy, keepScroll } from "../agents-ui.mjs";
 
 const VAR = /\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
@@ -57,6 +58,11 @@ export class PromptsView {
     this.load();
   }
 
+  /** Agente · projeto · branch da sessão, já escapado. */
+  who(s) {
+    return `${esc(AGENT_NAMES[s.agent] || s.agent)} · ${esc(s.project || t("sem projeto"))}${s.branch ? ` · ${esc(s.branch)}` : ""}`;
+  }
+
   async load() {
     try {
       this.data = await get("/api/prompts");
@@ -76,24 +82,24 @@ export class PromptsView {
        <div class="pr-main">
         <div class="pr-ctx t-${esc((s && s.theme) || "neutro")}">
           <span class="dot ${s && s.is_active ? "dot-ok" : ""}"></span>
-          ${s ? `<span>Os campos vêm preenchidos com <b>${esc(AGENT_NAMES[s.agent] || s.agent)} · ${esc(s.project || "sem projeto")}${s.branch ? ` · ${esc(s.branch)}` : ""}</b>${d.automatic ? ` <span class="dim">(sessão mais recente)</span>` : ""}</span>`
-            : `<span class="dim">Nenhuma sessão de agente: você preenche os campos à mão.</span>`}
+          ${s ? `<span>${t("Os campos vêm preenchidos com {session}", { session: `<b>${this.who(s)}</b>` })}${d.automatic ? ` <span class="dim">${t("(sessão mais recente)")}</span>` : ""}</span>`
+            : `<span class="dim">${t("Nenhuma sessão de agente: você preenche os campos à mão.")}</span>`}
           <span class="spacer"></span>
-          ${s ? `<button class="btn btn-sm" data-action="switch">${icon("restart")}<span>Trocar sessão</span></button>` : ""}
-          <button class="btn btn-sm" data-action="new-category">${icon("plus")}<span>Nova categoria</span></button>
-          <button class="btn btn-primary btn-sm" data-action="new-prompt">${icon("plus")}<span>Novo prompt</span></button>
+          ${s ? `<button class="btn btn-sm" data-action="switch">${icon("restart")}<span>${t("Trocar sessão")}</span></button>` : ""}
+          <button class="btn btn-sm" data-action="new-category">${icon("plus")}<span>${t("Nova categoria")}</span></button>
+          <button class="btn btn-primary btn-sm" data-action="new-prompt">${icon("plus")}<span>${t("Novo prompt")}</span></button>
         </div>
-        ${d.warnings.length ? `<div class="ag-note">${icon("alert")}<div><b>Arquivos ignorados</b><p>${d.warnings.map(esc).join("<br>")}</p></div></div>` : ""}
+        ${d.warnings.length ? `<div class="ag-note">${icon("alert")}<div><b>${t("Arquivos ignorados")}</b><p>${d.warnings.map(esc).join("<br>")}</p></div></div>` : ""}
         ${groups.map((g) => `
           <section class="pr-cat">
-            <div class="pr-cat-head"><h3>${esc(g.name)}</h3>${g.user ? `<span class="pr-scope is-user">criada por você</span>` : ""}<span class="count">${g.items.length}</span></div>
+            <div class="pr-cat-head"><h3>${esc(g.name)}</h3>${g.user ? `<span class="pr-scope is-user">${t("criada por você")}</span>` : ""}<span class="count">${g.items.length}</span></div>
             <div class="pr-grid">
               ${g.items.map((p) => this.button(p)).join("")}
-              <button type="button" class="pr-btn pr-add" data-action="new-prompt" data-category="${esc(g.name)}">${icon("plus")}<span>Prompt em ${esc(g.name)}</span></button>
+              <button type="button" class="pr-btn pr-add" data-action="new-prompt" data-category="${esc(g.name)}">${icon("plus")}<span>${t("Prompt em {name}", { name: esc(g.name) })}</span></button>
             </div>
           </section>`).join("")}
        </div>
-       ${this.picked && this.prompt(this.picked) ? `<aside class="pc" aria-label="Compositor do prompt">${this.composer(this.prompt(this.picked))}</aside>` : ""}
+       ${this.picked && this.prompt(this.picked) ? `<aside class="pc" aria-label="${t("Compositor do prompt")}">${this.composer(this.prompt(this.picked))}</aside>` : ""}
       </div>`;
     if (this.picked) this.refreshPreview();
   }
@@ -104,22 +110,22 @@ export class PromptsView {
     const values = this.values[p.id] || (this.values[p.id] = Object.fromEntries(p.variables.map((v) => [v,
       this.typed[p.id] && v in this.typed[p.id] ? this.typed[p.id][v] : this.data.context[v] || ""])));
     return `<div class="pc-head"><span class="pr-ic">${icon(p.icon && document.getElementById(`i-${p.icon}`) ? p.icon : "text")}</span>
-        <h2>${esc(p.title)}</h2><button type="button" class="icon-btn icon-btn-sm" data-pc="close" aria-label="Fechar o compositor" title="Fechar (Esc)">${icon("x")}</button></div>
-      <p class="pc-target">${icon("terminal")}<span>Para: ${s ? `<b>${esc(AGENT_NAMES[s.agent] || s.agent)} · ${esc(s.project || "sem projeto")}${s.branch ? ` · ${esc(s.branch)}` : ""}</b>` : `<b>nenhuma sessão</b>`}</span></p>
+        <h2>${esc(p.title)}</h2><button type="button" class="icon-btn icon-btn-sm" data-pc="close" aria-label="${t("Fechar o compositor")}" title="${t("Fechar (Esc)")}">${icon("x")}</button></div>
+      <p class="pc-target">${icon("terminal")}<span>${t("Para: {target}", { target: s ? `<b>${this.who(s)}</b>` : `<b>${t("nenhuma sessão")}</b>` })}</span></p>
       ${p.variables.length ? `<div class="pc-fields">${p.variables.map((v, i) => `<label class="pc-field"><span>${esc(this.label(v))}</span>
           <input class="input" name="${esc(v)}" value="${esc(values[v] || "")}" autocomplete="off" spellcheck="false" ${i === 0 ? "data-first" : ""}
             placeholder="${esc(this.label(v))}"></label>`).join("")}</div>` : ""}
-      <div class="pc-label">Texto que vai para o agente</div>
+      <div class="pc-label">${t("Texto que vai para o agente")}</div>
       <div class="pc-preview" aria-live="polite"></div>
       <p class="pc-missing" hidden></p>
       <div class="pc-actions">
-        <button type="button" class="btn btn-primary" data-pc="send" title="Cola o texto no terminal do agente (⌘Enter). Você revisa e aperta Enter lá.">${icon("terminal")}<span>Enviar ao terminal</span></button>
-        <button type="button" class="btn" data-pc="copy">${icon("copy")}<span>Copiar</span></button>
-        <button type="button" class="btn btn-ghost btn-sm" data-pc="edit">${icon("edit")}<span>Editar o arquivo</span></button>
+        <button type="button" class="btn btn-primary" data-pc="send" title="${t("Cola o texto no terminal do agente (⌘Enter). Você revisa e aperta Enter lá.")}">${icon("terminal")}<span>${t("Enviar ao terminal")}</span></button>
+        <button type="button" class="btn" data-pc="copy">${icon("copy")}<span>${t("Copiar")}</span></button>
+        <button type="button" class="btn btn-ghost btn-sm" data-pc="edit">${icon("edit")}<span>${t("Editar o arquivo")}</span></button>
       </div>
       <div class="pc-result" hidden></div>
-      <p class="dim hint">O texto entra no campo do agente como colagem, sem apertar Enter: confira no terminal e envie você.</p>
-      <p class="dim hint">${p.scope === "project" ? "Prompt do projeto" : "Prompt global"} · ${esc(p.category)}</p>`;
+      <p class="dim hint">${t("O texto entra no campo do agente como colagem, sem apertar Enter: confira no terminal e envie você.")}</p>
+      <p class="dim hint">${p.scope === "project" ? t("Prompt do projeto") : t("Prompt global")} · ${esc(p.category)}</p>`;
   }
 
   /** Valores atuais, a prévia e o aviso do que falta. */
@@ -133,7 +139,7 @@ export class PromptsView {
     const missing = p.variables.filter((v) => !values[v]);
     const note = box.querySelector(".pc-missing");
     note.hidden = !missing.length;
-    note.innerHTML = missing.length ? `${icon("alert")}<span>Preencha ${missing.map((m) => `<b>${esc(this.label(m))}</b>`).join(", ")} para enviar.</span>` : "";
+    note.innerHTML = missing.length ? `${icon("alert")}<span>${t("Preencha {fields} para enviar.", { fields: missing.map((m) => `<b>${esc(this.label(m))}</b>`).join(", ") })}</span>` : "";
     box.querySelectorAll("[data-pc=copy], [data-pc=send]").forEach((b) => { b.disabled = missing.length > 0; });
     return { text: compose(p.body.trim(), values), missing };
   }
@@ -152,7 +158,7 @@ export class PromptsView {
   /** Etiqueta "Branch: main"; sem valor, "Branch: a preencher". Nunca o marcador {{nome}}. */
   tag(name) {
     const value = this.data.context[name];
-    const shown = value ? (name === "sessionId" ? short(value) : value) : "a preencher";
+    const shown = value ? (name === "sessionId" ? short(value) : value) : t("a preencher");
     return `<span class="pr-tag ${value ? "" : "is-missing"}"><b>${esc(this.label(name))}</b>${esc(shown)}</span>`;
   }
 
@@ -162,9 +168,9 @@ export class PromptsView {
       <span class="pr-head"><span class="pr-ic">${icon(ic)}</span><span class="pr-title">${esc(p.title)}</span></span>
       <span class="pr-desc">${esc(p.summary)}</span>
       ${p.variables.length ? `<span class="pr-tags">${p.variables.map((v) => this.tag(v)).join("")}</span>` : ""}
-      <span class="pr-foot"><span class="pr-scope ${p.scope === "project" ? "is-project" : ""}">${p.scope === "project" ? (p.overrides ? "projeto, sobrescreve" : "projeto") : "global"}</span>
-        ${p.pin ? `<span class="dim">fixado no terminal</span>` : ""}
-        <span class="pr-go"><span>Usar</span>${icon("chevron-right")}</span></span>
+      <span class="pr-foot"><span class="pr-scope ${p.scope === "project" ? "is-project" : ""}">${p.scope === "project" ? (p.overrides ? t("projeto, sobrescreve") : t("projeto")) : t("global")}</span>
+        ${p.pin ? `<span class="dim">${t("fixado no terminal")}</span>` : ""}
+        <span class="pr-go"><span>${t("Usar")}</span>${icon("chevron-right")}</span></span>
     </button>`;
   }
 
@@ -184,13 +190,13 @@ export class PromptsView {
       const data = await post("/api/prompts/send", { prompt: p.id, session: s ? s.id : null, values });
       result.hidden = true;
       window.dispatchEvent(new CustomEvent("vulcan-show-terminal", { detail: { id: data.terminal } }));
-      toast(`${p.title}: texto colado no terminal. Revise e aperte Enter para enviar.`, { kind: "ok" });
+      toast(t("{title}: texto colado no terminal. Revise e aperte Enter para enviar.", { title: p.title }), { kind: "ok" });
     } catch (err) {
       if (err.status !== 409 || !err.data || !err.data.needs_terminal) return reportError(err);
       result.hidden = false;
-      result.innerHTML = `${icon("info")}<span>${err.data.session ? "Esta sessão não tem um terminal aberto e pareado." : "Nenhuma sessão de agente para receber o texto."}</span>
-        ${err.data.session ? `<button type="button" class="btn btn-sm btn-primary" data-pc="resume">${icon("play")}<span>Retomar a sessão num terminal</span></button>` : ""}
-        <span class="dim">Ou use Copiar e cole com ⌘V.</span>`;
+      result.innerHTML = `${icon("info")}<span>${err.data.session ? t("Esta sessão não tem um terminal aberto e pareado.") : t("Nenhuma sessão de agente para receber o texto.")}</span>
+        ${err.data.session ? `<button type="button" class="btn btn-sm btn-primary" data-pc="resume">${icon("play")}<span>${t("Retomar a sessão num terminal")}</span></button>` : ""}
+        <span class="dim">${t("Ou use Copiar e cole com ⌘V.")}</span>`;
       const resume = result.querySelector("[data-pc=resume]");
       if (resume) resume.addEventListener("click", () => this.resume(err.data.session, result));
     }
@@ -201,7 +207,7 @@ export class PromptsView {
     try {
       const tab = await post(`/api/agents/sessions/${encodeURIComponent(sessionId)}/resume`, {});
       window.dispatchEvent(new CustomEvent("vulcan-show-terminal", { detail: { id: tab.id } }));
-      result.innerHTML = `${icon("check")}<span>Terminal aberto com o agente. Quando ele estiver pronto, clique em Enviar ao terminal.</span>`;
+      result.innerHTML = `${icon("check")}<span>${t("Terminal aberto com o agente. Quando ele estiver pronto, clique em Enviar ao terminal.")}</span>`;
     } catch (err) {
       reportError(err);
     }
@@ -211,7 +217,7 @@ export class PromptsView {
     const out = this.refreshPreview();
     if (!out || out.missing.length) return;
     const p = this.prompt(this.picked);
-    await copy(out.text, `Copiado: ${p.title}. Cole no terminal com ⌘V.`);
+    await copy(out.text, t("Copiado: {title}. Cole no terminal com ⌘V.", { title: p.title }));
   }
 
   dialog(html, onSubmit) {
@@ -245,21 +251,21 @@ export class PromptsView {
     const projectRoot = d.project.root;
     this.dialog(`
       <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="np-title" autocomplete="off">
-        <h2 id="np-title">Novo prompt</h2>
-        <label class="field-label" for="np-name">Título</label>
-        <input id="np-name" name="title" class="input" maxlength="80" required placeholder="Ex.: Rodar só os testes do módulo">
-        <label class="field-label" for="np-cat">Categoria</label>
+        <h2 id="np-title">${t("Novo prompt")}</h2>
+        <label class="field-label" for="np-name">${t("Título")}</label>
+        <input id="np-name" name="title" class="input" maxlength="80" required placeholder="${t("Ex.: Rodar só os testes do módulo")}">
+        <label class="field-label" for="np-cat">${t("Categoria")}</label>
         <select id="np-cat" name="category" class="select">${d.categories.map((c) => `<option ${c.name === category ? "selected" : ""}>${esc(c.name)}</option>`).join("")}</select>
-        <span class="field-label">Onde</span>
+        <span class="field-label">${t("Onde")}</span>
         <div class="segmented" role="radiogroup">
-          <label class="seg is-on"><input type="radio" name="scope" value="global" checked hidden>Global</label>
-          <label class="seg ${projectRoot ? "" : "is-disabled"}" title="${projectRoot ? esc(d.project.dir) : "sem sessão com projeto"}"><input type="radio" name="scope" value="project" hidden ${projectRoot ? "" : "disabled"}>Só neste projeto</label>
+          <label class="seg is-on"><input type="radio" name="scope" value="global" checked hidden>${t("Global")}</label>
+          <label class="seg ${projectRoot ? "" : "is-disabled"}" title="${projectRoot ? esc(d.project.dir) : t("sem sessão com projeto")}"><input type="radio" name="scope" value="project" hidden ${projectRoot ? "" : "disabled"}>${t("Só neste projeto")}</label>
         </div>
-        <p class="dim hint">Cria um arquivo .md com cabeçalho e abre no editor. Variáveis: ${d.variables.map((v) => `{{${v}}}`).join(", ")}.
-          Campos opcionais do cabeçalho: <code>descricao</code> (o que o cartão mostra) e <code>icone</code>.</p>
-        <p class="dim hint">Globais em <code>${esc(d.global_dir)}</code>${projectRoot ? `; do projeto em <code>${esc(d.project.dir)}</code>` : ""}. O do projeto sobrescreve o global de mesmo id.</p>
-        <div class="dialog-actions"><button type="button" class="btn" data-cancel>Cancelar</button>
-          <button type="submit" class="btn btn-primary">Criar e abrir no editor</button></div>
+        <p class="dim hint">${t("Cria um arquivo .md com cabeçalho e abre no editor. Variáveis: {vars}.", { vars: d.variables.map((v) => `{{${v}}}`).join(", ") })}
+          ${t("Campos opcionais do cabeçalho: {desc} (o que o cartão mostra) e {icon}.", { desc: "<code>descricao</code>", icon: "<code>icone</code>" })}</p>
+        <p class="dim hint">${t("Globais em {dir}{project}. O do projeto sobrescreve o global de mesmo id.", { dir: `<code>${esc(d.global_dir)}</code>`, project: projectRoot ? `; ${t("do projeto em {dir}", { dir: `<code>${esc(d.project.dir)}</code>` })}` : "" })}</p>
+        <div class="dialog-actions"><button type="button" class="btn" data-cancel>${t("Cancelar")}</button>
+          <button type="submit" class="btn btn-primary">${t("Criar e abrir no editor")}</button></div>
       </form>`, (form, close, el) => this.create(form, close, el, projectRoot));
     this.bindSegments();
   }
@@ -278,15 +284,15 @@ export class PromptsView {
     try {
       const data = await post("/api/prompts", body);
       close();
-      toast(`Prompt criado em ${data.path}. Abrindo no editor.`, { kind: "ok" });
+      toast(t("Prompt criado em {path}. Abrindo no editor.", { path: data.path }), { kind: "ok" });
       this.edit(data.path);
       this.load();
     } catch (err) {
       if (err.status === 409 && !confirmed) {
         const note = el.querySelector(".pr-confirm") || el.insertBefore(document.createElement("div"), el.querySelector(".dialog-actions"));
         note.className = "pr-confirm";
-        note.innerHTML = `${icon("alert")}<span>Isso cria a pasta <code>${esc(this.data.project.dir)}</code> dentro do projeto.</span>
-          <button type="button" class="btn btn-sm btn-primary">Criar a pasta e o prompt</button>`;
+        note.innerHTML = `${icon("alert")}<span>${t("Isso cria a pasta {dir} dentro do projeto.", { dir: `<code>${esc(this.data.project.dir)}</code>` })}</span>
+          <button type="button" class="btn btn-sm btn-primary">${t("Criar a pasta e o prompt")}</button>`;
         note.querySelector("button").addEventListener("click", () => this.create(form, close, el, projectRoot, true));
         return;
       }
@@ -297,17 +303,17 @@ export class PromptsView {
   newCategory() {
     this.dialog(`
       <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="nc-title" autocomplete="off">
-        <h2 id="nc-title">Nova categoria</h2>
-        <label class="field-label" for="nc-name">Nome</label>
-        <input id="nc-name" name="name" class="input" maxlength="60" required placeholder="Ex.: Laravel">
-        <p class="dim hint">Vira uma pasta em ${esc(this.data.global_dir)}. Os prompts dela aparecem como uma nova seção de botões.</p>
-        <div class="dialog-actions"><button type="button" class="btn" data-cancel>Cancelar</button>
-          <button type="submit" class="btn btn-primary">Criar categoria</button></div>
+        <h2 id="nc-title">${t("Nova categoria")}</h2>
+        <label class="field-label" for="nc-name">${t("Nome")}</label>
+        <input id="nc-name" name="name" class="input" maxlength="60" required placeholder="${t("Ex.: Laravel")}">
+        <p class="dim hint">${t("Vira uma pasta em {dir}. Os prompts dela aparecem como uma nova seção de botões.", { dir: esc(this.data.global_dir) })}</p>
+        <div class="dialog-actions"><button type="button" class="btn" data-cancel>${t("Cancelar")}</button>
+          <button type="submit" class="btn btn-primary">${t("Criar categoria")}</button></div>
       </form>`, async (form, close) => {
       try {
         await post("/api/prompts/categories", { name: form.get("name"), scope: "global" });
         close();
-        toast(`Categoria ${form.get("name")} criada.`, { kind: "ok" });
+        toast(t("Categoria {name} criada.", { name: form.get("name") }), { kind: "ok" });
         this.load();
       } catch (err) {
         reportError(err);

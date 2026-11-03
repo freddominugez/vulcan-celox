@@ -4,15 +4,15 @@
 import { get, isMac, native, patch, post, put } from "../api.mjs";
 import { confirmDialog } from "../ai.mjs";
 import { copy } from "../agents-ui.mjs";
-
+import { t } from "../i18n.mjs";
 const NEW_TERMINAL_KEY = isMac ? "⌘T" : "Ctrl+Shift+T";
 import { $, esc, icon, progressBar, reportError, toast } from "../dom.mjs";
 import { terminals, TerminalWorkspace } from "../terminals.mjs";
 
 const TABS = [
   { id: "terminal", label: "Terminal", icon: "terminal" },
-  { id: "tasks", label: "Tarefas", icon: "check-square" },
-  { id: "notes", label: "Post-its", icon: "note" },
+  { id: "tasks", label: t("Tarefas"), icon: "check-square" },
+  { id: "notes", label: t("Post-its"), icon: "note" },
   { id: "tags", label: "Tags", icon: "tag" },
 ];
 
@@ -37,9 +37,9 @@ class SessionTabsView {
 
   tabsHtml() {
     return `
-      <div class="segmented seg-tabs" role="tablist" aria-label="Seções da sessão">
-        ${this.tabList.map((t) => `<button class="seg ${t.id === this.tab ? "is-on" : ""}" role="tab" aria-selected="${t.id === this.tab}" data-tab="${t.id}">
-          ${icon(t.icon)}<span>${t.label}</span><span class="count" data-count="${t.id}"></span></button>`).join("")}
+      <div class="segmented seg-tabs" role="tablist" aria-label="${t("Seções da sessão")}">
+        ${this.tabList.map((tb) => `<button class="seg ${tb.id === this.tab ? "is-on" : ""}" role="tab" aria-selected="${tb.id === this.tab}" data-tab="${tb.id}">
+          ${icon(tb.icon)}<span>${tb.label}</span><span class="count" data-count="${tb.id}"></span></button>`).join("")}
       </div>`;
   }
 
@@ -146,7 +146,7 @@ export class SiteView extends SessionTabsView {
   get tabList() {
     return [...TABS, { id: "harness", label: "Harness", icon: "check-square" },  // Contrato dos agentes
       { id: "logs", label: "Logs", icon: "text" },  // Laravel.log e logs do Lerd
-      ...(this.options.state.backend && this.options.state.backend.name === "lerd" ? [{ id: "debug", label: "Depuração", icon: "bolt" }] : [])];
+      ...(this.options.state.backend && this.options.state.backend.name === "lerd" ? [{ id: "debug", label: t("Depuração"), icon: "bolt" }] : [])];
   }
 
   /** @param {{site: object, tab: string, sessionId?: string, state: object, navigate: Function, onChange: Function}} options */
@@ -174,11 +174,11 @@ export class SiteView extends SessionTabsView {
       ? `<button type="button" class="badge badge-btn ${cls}" data-action="${action}" title="${esc(title)}">${inner}</button>`
       : `<span class="badge ${cls}" title="${esc(title)}">${inner}</span>`;
     const badges = [
-      chip("site-php", "", `PHP ${esc(s.php || "?")}`, live ? "Trocar a versão de PHP do site" : "Versão de PHP"),
-      s.node || live ? chip("site-node", "", `Node ${esc(s.node || "?")}`, live ? "Trocar a versão de Node do site" : "Versão de Node") : "",
+      chip("site-php", "", `PHP ${esc(s.php || "?")}`, live ? t("Trocar a versão de PHP do site") : t("Versão de PHP")),
+      s.node || live ? chip("site-node", "", `Node ${esc(s.node || "?")}`, live ? t("Trocar a versão de Node do site") : t("Versão de Node")) : "",
       chip("site-https", s.secured ? "badge-ok" : "", `${icon(s.secured ? "lock" : "unlock")}${s.secured ? "HTTPS" : "HTTP"}`,
-        live ? (s.secured ? "Desligar HTTPS" : "Ligar HTTPS") : (s.secured ? "Servido com HTTPS" : "Sem HTTPS")),
-      !s.exists ? `<span class="badge badge-err">${icon("alert")}pasta não encontrada</span>` : "",
+        live ? (s.secured ? t("Desligar HTTPS") : t("Ligar HTTPS")) : (s.secured ? t("Servido com HTTPS") : t("Sem HTTPS"))),
+      !s.exists ? `<span class="badge badge-err">${icon("alert")}${t("pasta não encontrada")}</span>` : "",
     ].join("");
     this.root.innerHTML = `
       <section class="site">
@@ -186,24 +186,24 @@ export class SiteView extends SessionTabsView {
           <div class="site-ident" title="${esc(s.path)}">
             <h1 class="site-title">${esc(s.name)}</h1>
             <button class="icon-btn icon-btn-sm site-star ${starred ? "is-on" : ""}" data-action="site-favorite" aria-pressed="${starred}"
-              title="${starred ? "Tirar dos favoritos" : "Marcar como favorito"}" aria-label="Favorito">${icon(starred ? "star-on" : "star")}</button>
-            <a class="site-domain" href="${esc(s.url)}" data-action="open-url" title="Abrir ${esc(s.url)}">${esc(label)}<span>${esc(tld)}</span></a>
+              title="${starred ? t("Tirar dos favoritos") : t("Marcar como favorito")}" aria-label="${t("Favorito")}">${icon(starred ? "star-on" : "star")}</button>
+            <a class="site-domain" href="${esc(s.url)}" data-action="open-url" title="${t("Abrir {url}", { url: esc(s.url) })}">${esc(label)}<span>${esc(tld)}</span></a>
             <div class="badges">${badges}</div>
           </div>
           ${this.tabsHtml()}
           <div class="site-actions">
-            ${progress && progress.total ? `<span class="site-progress" title="Tarefas concluídas no site">${progressBar(progress)}<span class="num dim">${progress.done}/${progress.total}</span></span>` : ""}
-            <button class="icon-btn" data-action="open-url" title="Abrir site" aria-label="Abrir site">${icon("globe")}</button>
-            <button class="icon-btn" data-action="copy-url" title="Copiar URL" aria-label="Copiar URL">${icon("copy")}</button>
-            ${live ? `<button class="icon-btn" data-action="site-share" title="Compartilhar na internet" aria-label="Compartilhar o site">${icon("external")}</button>` : ""}
-            ${lerd ? `<button class="icon-btn" data-action="site-db" title="Banco de dados (lerd db:shell)" aria-label="Abrir o banco de dados">${icon("database")}</button>
-            <button class="icon-btn" data-action="site-doctor" title="Diagnóstico do site (lerd site:doctor)" aria-label="Diagnóstico do site">${icon("check-square")}</button>
-            <button class="icon-btn" data-action="site-dashboard" title="Abrir este site no painel do Lerd" aria-label="Abrir no painel do Lerd">${icon("gauge")}</button>` : ""}
-            ${s.has_artisan ? `<button class="icon-btn" data-action="tinker" title="Tinker" aria-label="Abrir Tinker">${icon("bolt")}</button>` : ""}
-            <button class="icon-btn" data-action="finder" title="Mostrar no Finder" aria-label="Mostrar no Finder" ${s.exists ? "" : "disabled"}>${icon("folder")}</button>
-            <button class="icon-btn" data-action="editor" title="Abrir no editor" aria-label="Abrir no editor" ${s.exists ? "" : "disabled"}>${icon("code")}</button>
-            <button class="icon-btn" data-action="site-remove" title="Remover o site" aria-label="Remover o site">${icon("trash")}</button>
-            <button class="btn btn-primary" data-action="new-terminal" title="Novo terminal (${NEW_TERMINAL_KEY})" ${s.exists ? "" : "disabled"}>${icon("plus")}<span>Terminal</span></button>
+            ${progress && progress.total ? `<span class="site-progress" title="${t("Tarefas concluídas no site")}">${progressBar(progress)}<span class="num dim">${progress.done}/${progress.total}</span></span>` : ""}
+            <button class="icon-btn" data-action="open-url" title="${t("Abrir site")}" aria-label="${t("Abrir site")}">${icon("globe")}</button>
+            <button class="icon-btn" data-action="copy-url" title="${t("Copiar URL")}" aria-label="${t("Copiar URL")}">${icon("copy")}</button>
+            ${live ? `<button class="icon-btn" data-action="site-share" title="${t("Compartilhar na internet")}" aria-label="${t("Compartilhar o site")}">${icon("external")}</button>` : ""}
+            ${lerd ? `<button class="icon-btn" data-action="site-db" title="${t("Banco de dados (lerd db:shell)")}" aria-label="${t("Abrir o banco de dados")}">${icon("database")}</button>
+            <button class="icon-btn" data-action="site-doctor" title="${t("Diagnóstico do site (lerd site:doctor)")}" aria-label="${t("Diagnóstico do site")}">${icon("check-square")}</button>
+            <button class="icon-btn" data-action="site-dashboard" title="${t("Abrir este site no painel do Lerd")}" aria-label="${t("Abrir no painel do Lerd")}">${icon("gauge")}</button>` : ""}
+            ${s.has_artisan ? `<button class="icon-btn" data-action="tinker" title="Tinker" aria-label="${t("Abrir Tinker")}">${icon("bolt")}</button>` : ""}
+            <button class="icon-btn" data-action="finder" title="${t("Mostrar no Finder")}" aria-label="${t("Mostrar no Finder")}" ${s.exists ? "" : "disabled"}>${icon("folder")}</button>
+            <button class="icon-btn" data-action="editor" title="${t("Abrir no editor")}" aria-label="${t("Abrir no editor")}" ${s.exists ? "" : "disabled"}>${icon("code")}</button>
+            <button class="icon-btn" data-action="site-remove" title="${t("Remover o site")}" aria-label="${t("Remover o site")}">${icon("trash")}</button>
+            <button class="btn btn-primary" data-action="new-terminal" title="${t("Novo terminal ({key})", { key: NEW_TERMINAL_KEY })}" ${s.exists ? "" : "disabled"}>${icon("plus")}<span>Terminal</span></button>
           </div>
         </header>
         <div class="site-body" data-role="body"></div>
@@ -232,7 +232,7 @@ export class SiteView extends SessionTabsView {
       if (action === "site-https") await this.toggleHttps();
       if (action === "site-share") await this.share();
       if (action === "site-remove") await this.remove();
-      if (action === "share-copy") await copy(target.dataset.url, `Copiado: ${target.dataset.url}`);
+      if (action === "share-copy") await copy(target.dataset.url, t("Copiado: {url}", { url: target.dataset.url }));
       if (action === "site-favorite") {
         const on = target.getAttribute("aria-pressed") !== "true";
         await put(`${this.siteUrl()}/favorite`, { favorite: on });
@@ -240,7 +240,7 @@ export class SiteView extends SessionTabsView {
         target.setAttribute("aria-pressed", String(on));
         if (window.vulcanCommand) window.vulcanCommand("refresh");
       }
-      if (action === "copy-url" && await copy(this.site.url, `Copiado: ${this.site.url}`)) target.blur();
+      if (action === "copy-url" && await copy(this.site.url, t("Copiado: {url}", { url: this.site.url }))) target.blur();
       if (action === "site-db" || action === "site-doctor") await this.siteAction(action.slice(5));
       if (action === "site-dashboard") await post(`${this.siteUrl()}/actions/dashboard`);
       if (action === "site-php") await this.changeVersion("php");
@@ -262,13 +262,13 @@ export class SiteView extends SessionTabsView {
     let trash = false;
     let typed = "";
     const yes = await confirmDialog({
-      title: `Remover ${s.name}`,
-      body: `<p>${manual ? "Tira o site da lista do Vulcan Celox." : `Desregistra o site do ${esc(backend.label)}: ele deixa de ser servido em <code>${esc(s.domain)}</code>.`}
-        A pasta fica onde está.</p>
-        <label class="dialog-check"><input type="checkbox" data-trash><span>Também mover a pasta <code>${esc(s.path)}</code> para a Lixeira</span></label>
-        <label class="field-label" for="remove-confirm">Para mover para a Lixeira, digite <b>${esc(s.name)}</b></label>
+      title: t("Remover {name}", { name: s.name }),
+      body: `<p>${manual ? t("Tira o site da lista do Vulcan Celox.") : t("Desregistra o site do {backend}: ele deixa de ser servido em <code>{domain}</code>.", { backend: esc(backend.label), domain: esc(s.domain) })}
+        ${t("A pasta fica onde está.")}</p>
+        <label class="dialog-check"><input type="checkbox" data-trash><span>${t("Também mover a pasta <code>{path}</code> para a Lixeira", { path: esc(s.path) })}</span></label>
+        <label class="field-label" for="remove-confirm">${t("Para mover para a Lixeira, digite <b>{name}</b>", { name: esc(s.name) })}</label>
         <input id="remove-confirm" class="input" data-typed spellcheck="false" autocomplete="off">`,
-      confirmLabel: "Remover",
+      confirmLabel: t("Remover"),
       danger: true,
       onDecide: (answer, root) => {
         trash = root.querySelector("[data-trash]").checked;
@@ -277,7 +277,7 @@ export class SiteView extends SessionTabsView {
     });
     if (!yes) return;
     if (trash && typed !== s.name) {
-      toast("O nome digitado não confere: nada foi removido.", { kind: "error" });
+      toast(t("O nome digitado não confere: nada foi removido."), { kind: "error" });
       return;
     }
     const url = `${this.siteUrl()}/remove`;
@@ -285,22 +285,22 @@ export class SiteView extends SessionTabsView {
     try {
       result = await post(url, { level: manual ? "list" : "backend" });
     } catch (err) {
-      if (err.status !== 409 || !/parkeado/.test(err.message)) throw err;
-      const parent = await confirmDialog({ title: "Site parkeado", body: `<p>${esc(err.message)}.</p>`, confirmLabel: "Esquecer a pasta mãe", danger: true });
+      if (err.status !== 409 || !(err.data && err.data.needs_parent)) throw err;
+      const parent = await confirmDialog({ title: t("Site parkeado"), body: `<p>${esc(err.message)}.</p>`, confirmLabel: t("Esquecer a pasta mãe"), danger: true });
       if (!parent) return;
       result = await post(url, { level: "backend", parent: true });
     }
     if (result.ok === false) {
-      toast(`O backend recusou: ${(result.output || "").split("\n").pop()}`, { kind: "error", timeout: 8000 });
+      toast(t("O backend recusou: {msg}", { msg: (result.output || "").split("\n").pop() }), { kind: "error", timeout: 8000 });
       return;
     }
     if (trash) {
       if (window.vulcanCommand) window.vulcanCommand("refresh");
       await new Promise((r) => setTimeout(r, 1200));  // o backend precisa parar de listar o site
       const moved = await post("/api/sites/trash", { name: s.name, confirm: typed });
-      toast(`Pasta movida para a Lixeira: ${moved.moved_to}`, { kind: "ok", timeout: 6000 });
+      toast(t("Pasta movida para a Lixeira: {path}", { path: moved.moved_to }), { kind: "ok", timeout: 6000 });
     } else {
-      toast(manual ? "Site tirado da lista." : "Site desregistrado. A pasta continua no lugar.", { kind: "ok" });
+      toast(manual ? t("Site tirado da lista.") : t("Site desregistrado. A pasta continua no lugar."), { kind: "ok" });
     }
     location.hash = "#/overview";
     if (window.vulcanCommand) window.vulcanCommand("refresh");
@@ -308,15 +308,15 @@ export class SiteView extends SessionTabsView {
 
   async share() {
     const lerd = this.options.state.backend.name === "lerd";
-    const tools = [["", "Padrão do Lerd"], ["cloudflare", "Cloudflare Tunnel"], ["ngrok", "ngrok"], ["expose", "Expose"],
-      ["localhost-run", "localhost.run (sem conta)"], ["serveo", "serveo.net (sem conta)"], ["pinggy", "Pinggy (sem conta)"]];
+    const tools = [["", t("Padrão do Lerd")], ["cloudflare", "Cloudflare Tunnel"], ["ngrok", "ngrok"], ["expose", "Expose"],
+      ["localhost-run", t("localhost.run (sem conta)")], ["serveo", t("serveo.net (sem conta)")], ["pinggy", t("Pinggy (sem conta)")]];
     let tool = "";
     const yes = await confirmDialog({
-      title: `Compartilhar ${this.site.domain}`,
-      body: `<p>O site fica acessível na internet por um túnel enquanto a aba do compartilhamento estiver aberta.
-        Fechar a aba encerra o túnel.</p>${lerd ? `<select class="select" data-tool>${tools.map(([id, label]) =>
+      title: t("Compartilhar {domain}", { domain: this.site.domain }),
+      body: `<p>${t("O site fica acessível na internet por um túnel enquanto a aba do compartilhamento estiver aberta.")}
+        ${t("Fechar a aba encerra o túnel.")}</p>${lerd ? `<select class="select" data-tool>${tools.map(([id, label]) =>
         `<option value="${id}">${esc(label)}</option>`).join("")}</select>` : ""}`,
-      confirmLabel: "Compartilhar",
+      confirmLabel: t("Compartilhar"),
       onDecide: (answer, root) => { const el = root.querySelector("[data-tool]"); tool = el ? el.value : ""; },
     });
     if (!yes) return;
@@ -344,7 +344,7 @@ export class SiteView extends SessionTabsView {
         chip.className = "share-chip";
         chip.dataset.action = "share-copy";
         chip.dataset.url = data.url;
-        chip.title = "Copiar a URL pública";
+        chip.title = t("Copiar a URL pública");
         chip.innerHTML = `${icon("copy")}<span>${esc(data.url.replace("https://", ""))}</span>`;
         actions.prepend(chip);
         const off = terminals.subscribe(() => {
@@ -365,17 +365,17 @@ export class SiteView extends SessionTabsView {
   async toggleHttps() {
     const s = this.site;
     const info = await get(`${this.siteUrl()}/versions`);
-    const writes = info.writes.secure ? `<p class="dim">O backend vai atualizar ${esc(info.writes.secure)} do projeto.</p>` : "";
+    const writes = info.writes.secure ? `<p class="dim">${t("O backend vai atualizar {file} do projeto.", { file: esc(info.writes.secure) })}</p>` : "";
     const yes = await confirmDialog({
-      title: s.secured ? `Desligar HTTPS em ${s.domain}` : `Ligar HTTPS em ${s.domain}`,
-      body: `<p>${s.secured ? "O site volta a ser servido por <code>http://</code> e o certificado sai."
-        : "O backend emite um certificado local (mkcert) e passa a servir por <code>https://</code>."}</p>${writes}`,
-      confirmLabel: s.secured ? "Desligar HTTPS" : "Ligar HTTPS",
+      title: s.secured ? t("Desligar HTTPS em {domain}", { domain: s.domain }) : t("Ligar HTTPS em {domain}", { domain: s.domain }),
+      body: `<p>${s.secured ? t("O site volta a ser servido por <code>http://</code> e o certificado sai.")
+        : t("O backend emite um certificado local (mkcert) e passa a servir por <code>https://</code>.")}</p>${writes}`,
+      confirmLabel: s.secured ? t("Desligar HTTPS") : t("Ligar HTTPS"),
     });
     if (!yes) return;
     const result = await patch(this.siteUrl(), { secured: !s.secured });
-    if (result.ok) toast(s.secured ? "HTTPS desligado." : "HTTPS ligado.", { kind: "ok" });
-    else toast(`O backend recusou: ${(result.output || "").split("\n").pop()}`, { kind: "error", timeout: 8000 });
+    if (result.ok) toast(s.secured ? t("HTTPS desligado.") : t("HTTPS ligado."), { kind: "ok" });
+    else toast(t("O backend recusou: {msg}", { msg: (result.output || "").split("\n").pop() }), { kind: "error", timeout: 8000 });
     if (window.vulcanCommand) window.vulcanCommand("refresh");
   }
 
@@ -384,14 +384,14 @@ export class SiteView extends SessionTabsView {
     const info = await get(`${this.siteUrl()}/versions`);
     const current = info.current[kind] || "";
     const field = kind === "php"
-      ? `<select class="select" data-version>${info.php.map((v) => `<option value="${esc(v.version)}" ${v.version === current ? "selected" : ""}>PHP ${esc(v.version)}${v.default ? " (padrão)" : ""}</option>`).join("")}</select>`
-      : `<input class="input" data-version value="${esc(current)}" placeholder="22, 20.11 ou lts" spellcheck="false">`;
-    const writes = info.writes[kind] ? `<p class="dim">O backend grava ${esc(info.writes[kind])} na pasta do projeto.</p>` : "";
+      ? `<select class="select" data-version>${info.php.map((v) => `<option value="${esc(v.version)}" ${v.version === current ? "selected" : ""}>PHP ${esc(v.version)}${v.default ? t(" (padrão)") : ""}</option>`).join("")}</select>`
+      : `<input class="input" data-version value="${esc(current)}" placeholder="${t("22, 20.11 ou lts")}" spellcheck="false">`;
+    const writes = info.writes[kind] ? `<p class="dim">${t("O backend grava {file} na pasta do projeto.", { file: esc(info.writes[kind]) })}</p>` : "";
     let chosen = "";
     const yes = await confirmDialog({
-      title: kind === "php" ? `Versão de PHP de ${s.name}` : `Versão de Node de ${s.name}`,
-      body: `${field}${writes}<p class="dim">O comando roda numa aba deste site; pode demorar se a imagem da versão ainda não existir.</p>`,
-      confirmLabel: "Trocar",
+      title: kind === "php" ? t("Versão de PHP de {name}", { name: s.name }) : t("Versão de Node de {name}", { name: s.name }),
+      body: `${field}${writes}<p class="dim">${t("O comando roda numa aba deste site; pode demorar se a imagem da versão ainda não existir.")}</p>`,
+      confirmLabel: t("Trocar"),
       confirmDisabled: kind === "php" && !info.php.length,
       onDecide: (answer, root) => { chosen = root.querySelector("[data-version]").value.trim(); },
     });
@@ -416,11 +416,11 @@ export class TerminalsView extends SessionTabsView {
     this.root.innerHTML = `
       <section class="site">
         <header class="site-bar">
-          <div class="site-ident"><h1 class="site-title">Todas as sessões</h1>
-            <span class="dim">terminais de todos os sites e globais</span></div>
+          <div class="site-ident"><h1 class="site-title">${t("Todas as sessões")}</h1>
+            <span class="dim">${t("terminais de todos os sites e globais")}</span></div>
           ${this.tabsHtml()}
           <div class="site-actions">
-            <button class="btn btn-primary" data-action="new-terminal" title="Novo terminal (${NEW_TERMINAL_KEY})">${icon("plus")}<span>Terminal</span></button>
+            <button class="btn btn-primary" data-action="new-terminal" title="${t("Novo terminal ({key})", { key: NEW_TERMINAL_KEY })}">${icon("plus")}<span>Terminal</span></button>
           </div>
         </header>
         <div class="site-body" data-role="body"></div>

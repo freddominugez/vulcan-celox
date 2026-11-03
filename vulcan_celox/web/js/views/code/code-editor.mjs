@@ -54,11 +54,11 @@ function highlightStyle(CM) {
   return highlight;
 }
 
-function extensions(CM, language) {
+function extensions(CM, language, phrases = PHRASES) {
   const lang = LANGUAGES[language];
   return [
     CM.EditorState.readOnly.of(true),
-    CM.EditorState.phrases.of(PHRASES),
+    CM.EditorState.phrases.of(phrases),
     CM.lineNumbers(),
     CM.drawSelection(),
     CM.highlightSelectionMatches(),
@@ -70,8 +70,8 @@ function extensions(CM, language) {
 }
 
 /** Arquivo inteiro. `setText` troca o conteúdo sem remontar, e `reveal` rola até o trecho e o marca. */
-export function mountFile(CM, parent, text, language) {
-  const view = new CM.EditorView({ parent, state: CM.EditorState.create({ doc: text, extensions: extensions(CM, language) }) });
+export function mountFile(CM, parent, text, language, phrases) {
+  const view = new CM.EditorView({ parent, state: CM.EditorState.create({ doc: text, extensions: extensions(CM, language, phrases) }) });
   return {
     editor: view,
     setText(next) {
@@ -110,8 +110,8 @@ export function findSnippet(text, snippet) {
 }
 
 /** Diff: lado a lado ou unificado, com as partes iguais recolhidas. */
-export function mountDiff(CM, parent, { old, current, language, layout }) {
-  const base = extensions(CM, language);
+export function mountDiff(CM, parent, { old, current, language, layout, phrases }) {
+  const base = extensions(CM, language, phrases);
   const collapse = { margin: 3, minSize: 6 };
   if (layout === "unified") {
     const view = new CM.EditorView({ parent, state: CM.EditorState.create({ doc: current, extensions: [

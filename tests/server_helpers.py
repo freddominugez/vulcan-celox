@@ -15,7 +15,7 @@ class ServerTestCase(TempDirTestCase):
         return {"VULCAN_CELOX_HOME": str(self.tmp / "home"), "VULCAN_LEGACY_HOME": str(self.tmp / "legacy"),
                 "VULCAN_VALET_HOME": str(self.tmp / "valet"), "VULCAN_VALET_BIN": str(self.tmp / "sem-valet"),
                 "VULCAN_LERD_BIN": str(self.tmp / "sem-lerd"), "VULCAN_LERD_DATA": str(self.tmp / "lerd"),
-                "VULCAN_LERD_API": "http://127.0.0.1:1", "HOME": str(self.tmp)}
+                "VULCAN_LERD_API": "http://127.0.0.1:1", "HOME": str(self.tmp), "VULCAN_LANGUAGE": "pt"}
 
     def setUp(self):
         super().setUp()

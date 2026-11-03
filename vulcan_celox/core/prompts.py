@@ -16,6 +16,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from vulcan_celox.core.agents import rules
 from vulcan_celox.core.agents.model import AgentSession
 from vulcan_celox.core.agents.repos import SAFE_GIT
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.miniyaml import MiniYamlError, loads
 from vulcan_celox.core.store import make_private
 
@@ -48,6 +49,19 @@ class Prompt:
         return {"id": self.id, "title": self.title, "category": self.category, "scope": self.scope,
                 "body": self.body, "path": str(self.path), "pin": self.pin, "overrides": self.overrides,
                 "description": self.description, "icon": self.icon, "variables": variables_in(self.body)}
+
+
+NEW_PROMPT_TEXT = ("Escreva aqui o texto que vai para o terminal. Variáveis preenchidas pela sessão atual: "
+                   "{{projectName}}, {{branch}}, {{base}}, {{sessionId}}, {{agent}} e {{cwd}}.\n")
+
+
+def default_categories() -> List[str]:
+    """Categorias padrão na língua atual (as pastas dos exemplos nascem com esses nomes)."""
+    return [tr(c) for c in DEFAULT_CATEGORIES]
+
+
+def label_names() -> Dict[str, str]:
+    return {k: tr(v) for k, v in LABELS.items()}
 
 
 def slugify(text: str, fallback: str = "prompt") -> str:
@@ -87,20 +101,20 @@ def parse_file(path: Path, scope: str, default_category: str) -> Tuple[Optional[
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
-        return None, f"{path.name}: não deu para ler ({exc.__class__.__name__})"
+        return None, tr("{name}: não deu para ler ({kind})", name=path.name, kind=exc.__class__.__name__)
     meta: Dict = {}
     body = text
     normalized = text.replace("\r\n", "\n")
     if normalized.startswith("---\n"):
         end = normalized.find("\n---", 3)
         if end < 0:
-            return None, f"{path.name}: cabeçalho sem a linha --- de fechamento"
+            return None, tr("{name}: cabeçalho sem a linha --- de fechamento", name=path.name)
         try:
             meta = loads(normalized[4:end]) or {}
         except MiniYamlError as exc:
-            return None, f"{path.name}: cabeçalho inválido ({exc})"
+            return None, tr("{name}: cabeçalho inválido ({exc})", name=path.name, exc=tr(str(exc)))
         if not isinstance(meta, dict):
-            return None, f"{path.name}: cabeçalho não é um mapa"
+            return None, tr("{name}: cabeçalho não é um mapa", name=path.name)
         body = normalized[end + 4:].lstrip("\n")
     pid = str(meta.get("id") or path.stem).strip()
     title = str(meta.get("title") or _humanize(path.stem)).strip()
@@ -271,13 +285,12 @@ def _quoted(value: str) -> str:
 
 def create_prompt(root, title: str, category: str, body: Optional[str] = None) -> Path:
     """Novo arquivo a partir de um modelo, na subpasta da categoria. Nunca sobrescreve: acrescenta -2, -3."""
-    title = " ".join((title or "").split()) or "Novo prompt"
+    title = " ".join((title or "").split()) or tr("Novo prompt")
     category = " ".join((category or "").split()) or FALLBACK_CATEGORY  # uma linha: não injeta chave no cabeçalho
     folder = create_category(root, category)
     path = _free_path(folder, slugify(title))
     text = body if body is not None else (
-        "Escreva aqui o texto que vai para o terminal. Variáveis preenchidas pela sessão atual: "
-        "{{projectName}}, {{branch}}, {{base}}, {{sessionId}}, {{agent}} e {{cwd}}.\n")
+        tr(NEW_PROMPT_TEXT))
     path.write_text(f"---\nid: {path.stem}\ntitle: {_quoted(title)}\ncategory: {_quoted(category)}\npin: false\n---\n{text}",
                     encoding="utf-8")
     make_private(path)
@@ -319,6 +332,7 @@ def seed_global(root) -> List[Path]:
         return []
     created = []
     for category, pid, title, pin, body in EXAMPLES:
+        category, title, body = tr(category), tr(title), tr(body)
         folder = create_category(root, category)
         path = folder / f"{pid}.md"
         path.write_text(f"---\nid: {pid}\ntitle: {title}\ncategory: {category}\npin: {'true' if pin else 'false'}\n---\n"

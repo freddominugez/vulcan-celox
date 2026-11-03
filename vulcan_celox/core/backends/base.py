@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.runner import Result, Runner
 from vulcan_celox.core.sites import Site, discover_sites
 
@@ -49,7 +50,7 @@ class Backend:
         if not self.available:
             return EnvStatus(False, self.label)
         running = self.nginx_running()
-        return EnvStatus(running, f"{self.label} · nginx {'rodando' if running else 'parado'}",
+        return EnvStatus(running, tr("{label} · nginx rodando" if running else "{label} · nginx parado", label=self.label),
                          {"nginx": running})
 
     # ── sites ────────────────────────────────────────────────────────────

@@ -9,6 +9,8 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+from vulcan_celox.core.i18n import tr
+
 API_BASE = "https://api.anthropic.com"
 API_VERSION = "2023-06-01"
 DEFAULT_MODEL = "claude-sonnet-5-5"
@@ -43,7 +45,7 @@ def urllib_transport(method: str, url: str, headers: Dict[str, str], body: Optio
         return exc.code, exc.read() or b""
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         reason = getattr(exc, "reason", exc)
-        raise AiError(f"sem conexão com a Anthropic ({reason})") from None
+        raise AiError(tr("sem conexão com a Anthropic ({reason})", reason=reason)) from None
 
 
 class AnthropicClient:
@@ -77,17 +79,17 @@ class AnthropicClient:
             return data
         detail = self._clean(str((data.get("error") or {}).get("message") or "")).strip()
         if status in (401, 403):
-            message = "chave recusada pela Anthropic (inválida ou sem permissão)"
+            message = tr("chave recusada pela Anthropic (inválida ou sem permissão)")
         elif status == 404:
-            message = "modelo ou recurso não encontrado na Anthropic"
+            message = tr("modelo ou recurso não encontrado na Anthropic")
         elif status == 429:
-            message = "limite de uso da Anthropic atingido; tente de novo em instantes"
+            message = tr("limite de uso da Anthropic atingido; tente de novo em instantes")
         elif status == 400:
-            message = "a Anthropic recusou o pedido"
+            message = tr("a Anthropic recusou o pedido")
         elif status >= 500:
-            message = "a Anthropic está indisponível no momento"
+            message = tr("a Anthropic está indisponível no momento")
         else:
-            message = f"resposta inesperada da Anthropic (HTTP {status})"
+            message = tr("resposta inesperada da Anthropic (HTTP {status})", status=status)
         raise AiError(f"{message}: {detail}" if detail else message, status)
 
     def list_models(self, timeout: float = 20.0) -> List[Dict[str, str]]:
@@ -102,10 +104,10 @@ class AnthropicClient:
         data = self._call("POST", "/v1/messages", payload, timeout)
         if data.get("stop_reason") == "refusal":  # O texto parcial não pode virar documento
             details = data.get("stop_details") if isinstance(data.get("stop_details"), dict) else {}
-            category = f" (categoria: {details['category']})" if details.get("category") else ""
-            raise AiError(f"a Anthropic recusou o pedido{category}; tente outro modelo ou reduza o texto enviado")
+            category = tr(" (categoria: {category})", category=details["category"]) if details.get("category") else ""
+            raise AiError(tr("a Anthropic recusou o pedido{category}; tente outro modelo ou reduza o texto enviado", category=category))
         text = "".join(block.get("text", "") for block in data.get("content", []) if block.get("type") == "text")
         if not text.strip():
-            raise AiError("a Anthropic respondeu sem texto")
+            raise AiError(tr("a Anthropic respondeu sem texto"))
         return Completion(text=text, model=str(data.get("model") or model), stop_reason=str(data.get("stop_reason") or ""),
                           usage=data.get("usage") or {})

@@ -6,6 +6,8 @@ import threading
 import time
 from typing import Any, Dict
 
+from vulcan_celox.core.i18n import tr
+
 PREFERENCES = "preferences"
 PREF_KEY = "autostart_env"
 
@@ -46,25 +48,25 @@ class EnvAutostart:
     def run(self) -> str:
         backend = self.app.backend
         if not self.enabled():
-            self._set(phase="skipped", message="início automático desligado")
+            self._set(phase="skipped", message=tr("início automático desligado"))
             return "skipped"
         if not backend.available:
-            self._set(phase="skipped", message="nenhum ambiente instalado")
+            self._set(phase="skipped", message=tr("nenhum ambiente instalado"))
             return "skipped"
-        self._set(phase="checking", message=f"verificando o {backend.label}")
+        self._set(phase="checking", message=tr("verificando o {label}", label=backend.label))
         if backend.status().running:
-            self._set(phase="ready", message=f"{backend.label} já estava rodando")
+            self._set(phase="ready", message=tr("{label} já estava rodando", label=backend.label))
             return "ready"
         # divide a trava com Iniciar/Parar da interface: nunca duas operações de serviço ao mesmo tempo
         with self.app._service_lock:
-            self._set(phase="starting", message=f"iniciando o {backend.label}", started_at=time.time())
+            self._set(phase="starting", message=tr("iniciando o {label}", label=backend.label), started_at=time.time())
             result = backend.start()
         lines = (result.output or "").strip().splitlines()
         tail = "\n".join(lines[-20:])
         if result.ok and backend.status().running:
-            self._set(phase="ready", message=f"{backend.label} iniciado", output=tail, finished_at=time.time())
+            self._set(phase="ready", message=tr("{label} iniciado", label=backend.label), output=tail, finished_at=time.time())
             return "ready"
-        reason = "tempo esgotado" if result.timed_out else (lines[-1] if lines else f"código {result.code}")
-        self._set(phase="failed", message=f"não foi possível iniciar o {backend.label}: {reason}", output=tail,
+        reason = tr("tempo esgotado") if result.timed_out else (lines[-1] if lines else tr("código {code}", code=result.code))
+        self._set(phase="failed", message=tr("não foi possível iniciar o {label}: {reason}", label=backend.label, reason=reason), output=tail,
                   finished_at=time.time())
         return "failed"

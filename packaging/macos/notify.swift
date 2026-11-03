@@ -45,3 +45,34 @@ func configureWebPreferences(_ preferences: WKPreferences, inspect: Bool) {
         preferences.inactiveSchedulingPolicy = .none
     }
 }
+
+// MARK: - Idioma da casca
+
+/// Idioma da casca: VULCAN_LANGUAGE, senão `language` em preferences.json na pasta de dados; padrão en.
+private let shellLanguage: String = {
+    let env = ProcessInfo.processInfo.environment
+    if let chosen = env["VULCAN_LANGUAGE"], ["en", "pt"].contains(chosen) { return chosen }
+    let home = env["VULCAN_CELOX_HOME"].map { URL(fileURLWithPath: $0) }
+        ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/VulcanCelox")
+    if let data = try? Data(contentsOf: home.appendingPathComponent("preferences.json")),
+       let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+        let stored = ((root["data"] as? [String: Any]) ?? root)["language"] as? String
+        if let language = stored, ["en", "pt"].contains(language) { return language }
+    }
+    return "en"
+}()
+
+/// O mesmo dicionário da interface (texto-fonte em português -> inglês), lido uma vez dos Resources do bundle.
+private let shellDictionary: [String: String] = {
+    guard let url = Bundle.main.resourceURL?.appendingPathComponent("vulcan_celox/web/i18n/en.json"),
+          let data = try? Data(contentsOf: url),
+          let table = (try? JSONSerialization.jsonObject(with: data)) as? [String: String] else { return [:] }
+    return table
+}()
+
+/// Texto na língua atual; `{nome}` é preenchido com `values`. Em português devolve o texto-fonte.
+func L(_ text: String, _ values: [String: String] = [:]) -> String {
+    var out = shellLanguage == "pt" ? text : (shellDictionary[text] ?? text)
+    for (name, value) in values { out = out.replacingOccurrences(of: "{\(name)}", with: value) }
+    return out
+}

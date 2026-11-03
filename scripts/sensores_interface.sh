@@ -94,14 +94,14 @@ PATH_JS="(function () { var tag = 'caminho no terminal incompleto'; window.__vtE
     return m[0].post('/api/terminals', { cwd: '$CODE3' }).then(function (tab) {
       var box = document.createElement('div'); box.style.cssText = 'position:fixed;left:-9999px;width:800px;height:200px'; document.body.appendChild(box);
       var term = new window.Terminal({ cols: 80, rows: 8 }); term.open(box);
-      term.write('ver sub/pasta/app.py:2 e .env e nao/existe.py e https://x.test/a.py fim\r\n', function () {
+      term.write('ver src/core/app.py:2 e .env e nao/existe.py e https://x.test/a.py fim\r\n', function () {
         var provider = m[1].pathLinkProvider(term, { modifier: function () { return true; },
           resolve: function (c) { return m[0].post('/api/code/resolve', { terminal: tab.id, candidates: c }).then(function (d) { return d.results; }); },
           activate: function () {} });
         provider.provideLinks(1, function (links) {
           links = links || [];
           if (links.length !== 2) return fail('links esperados: 2, vieram ' + links.length);
-          if (links[0].text !== 'sub/pasta/app.py:2' || links[0].range.start.x !== 5) fail('link no lugar errado: ' + links[0].text + ' em ' + links[0].range.start.x);
+          if (links[0].text !== 'src/core/app.py:2' || links[0].range.start.x !== 5) fail('link no lugar errado: ' + links[0].text + ' em ' + links[0].range.start.x);
           if (links[1].text !== '.env') fail('.env deveria voltar marcado: ' + links[1].text);
           location.hash = '#/agentes/$CODE_SID/codigo/' + encodeURIComponent('$CODE3/passo-9.py') + '/390';
           var t = setInterval(function () { var c = document.querySelector('.code-body .cm-content'); var p = document.querySelector('.code-path');
@@ -166,5 +166,19 @@ for tema in claro escuro; do
     if (getComputedStyle(document.body).fontFamily.indexOf('Inter') < 0) window.__vtErrors.push('Inter não é a fonte do app');
   }, 1200);"
   isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/marca-$tema.png" --route "#/overview" --wait 3 --eval "$BRAND_JS"
+done
+
+step "interface em inglês: nenhuma tela com texto em português"
+# os nomes vindos das fixtures são dados, não interface: o sensor olha o texto, tirando o que veio de sessão, site ou arquivo
+EN_JS="$UNHIDE_JS setTimeout(function () {
+  var pt = /[ãõç]|\b(para|sem|não|você|arquivo|arquivos|pasta|sessão|sessões|tarefas|nenhum|nenhuma|abrir|editar|ainda|pedido|pedidos|comandos)\b/i;
+  var walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, found = [];
+  while ((n = walk.nextNode())) { var el = n.parentElement; if (!el || el.closest('script,style,.xterm,.cm-editor,.ag-first,.turn-ask,.ag-path,.code-dir,.ag-hit,.code-path,.mono')) continue;
+    var s = n.textContent.trim(); if (s && pt.test(s) && !/^pedido \d+$/.test(s) && s.indexOf('/') !== 0) found.push(s.slice(0, 70)); }
+  if (document.documentElement.lang !== 'en') found.push('lang=' + document.documentElement.lang);
+  if (found.length) window.__vtErrors.push('português em ' + location.hash + ': ' + found.slice(0, 12).join(' | '));
+}, 2500);"
+for route in "#/inicio" "#/overview" "#/terminals" "#/agentes" "#/agentes/$CODE_SID" "#/agentes/$CODE_SID/codigo" "#/agentes/historico" "#/agentes/branches" "#/agentes/uso" "#/prompts" "#/tasks" "#/notes" "#/tags" "#/index" "#/ajuda" "#/lerd" "#/depuracao" "#/node"; do
+  SENSOR_LANGUAGE=en isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/en-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png" --route "$route" --wait 4 --eval "$EN_JS" || { echo "português em $route"; exit 1; }
 done
 

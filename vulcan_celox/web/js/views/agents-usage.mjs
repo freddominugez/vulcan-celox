@@ -2,24 +2,27 @@
 
 import { get, token } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
+import { currentLanguage, t } from "../i18n.mjs";
 import { AGENT_NAMES, agentMark, copy, RevisionWatch } from "../agents-ui.mjs";
 
 const PERIODS = [7, 30, 90];
 // cores por agente validadas contra a superfície escura (#202024): faixa de luminosidade, croma, daltonismo e contraste
 const AGENT_ORDER = ["claude", "codex"];
 
+const decimal = (v) => (currentLanguage() === "pt" ? v.replace(".", ",") : v);
+
 export function fmtTokens(n) {
   n = n || 0;
-  if (n >= 1e9) return `${(n / 1e9).toFixed(1).replace(".", ",")} bi`;
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1).replace(".", ",")} mi`;
-  if (n >= 1000) return `${Math.round(n / 1000)} mil`;
+  if (n >= 1e9) return t("{n} bi", { n: decimal((n / 1e9).toFixed(1)) });
+  if (n >= 1e6) return t("{n} mi", { n: decimal((n / 1e6).toFixed(1)) });
+  if (n >= 1000) return t("{n} mil", { n: Math.round(n / 1000) });
   return String(n);
 }
 
 export function fmtCost(c, partial = false) {
-  if (c === null || c === undefined) return "sem preço";
+  if (c === null || c === undefined) return t("sem preço");
   const v = c >= 100 ? c.toFixed(0) : c >= 0.01 || !c ? c.toFixed(2) : c.toFixed(4);
-  return `${partial ? "≥ " : ""}US$ ${v.replace(".", ",")}`;
+  return `${partial ? "≥ " : ""}US$ ${decimal(v)}`;
 }
 
 function isoDay(d) {
@@ -89,32 +92,32 @@ export class AgentsUsageView {
 
   render() {
     const { day, project, model, session, from, to } = this.data;
-    const t = day.total;
+    const tot = day.total;
     const csv = `/api/agents/usage.csv?from=${from}&to=${to}&group=session`;
     this.root.innerHTML = `
       <div class="page ag-page">
         <div class="ag-bar-row">
-          <div class="segmented" role="tablist" aria-label="Período">
-            ${PERIODS.map((p) => `<button type="button" class="seg ${p === this.days ? "is-on" : ""}" data-days="${p}" role="tab" aria-selected="${p === this.days}">${p} dias</button>`).join("")}
+          <div class="segmented" role="tablist" aria-label="${t("Período")}">
+            ${PERIODS.map((p) => `<button type="button" class="seg ${p === this.days ? "is-on" : ""}" data-days="${p}" role="tab" aria-selected="${p === this.days}">${t("{n} dias", { n: p })}</button>`).join("")}
           </div>
-          <span class="dim hint">${esc(shortDay(from))} a ${esc(shortDay(to))}</span>
+          <span class="dim hint">${t("{from} a {to}", { from: esc(shortDay(from)), to: esc(shortDay(to)) })}</span>
           <span class="spacer"></span>
-          <button class="btn btn-sm" data-csv="${esc(csv)}">${icon("copy")}<span>Copiar CSV</span></button>
+          <button class="btn btn-sm" data-csv="${esc(csv)}">${icon("copy")}<span>${t("Copiar CSV")}</span></button>
         </div>
-        <p class="us-note">${icon("info")}<span><b>Estimativa no preço da API.</b> ${esc(day.estimate_note.replace(/^Estimativa no preço da API\.\s*/, ""))}</span></p>
+        <p class="us-note">${icon("info")}<span><b>${t("Estimativa no preço da API.")}</b> ${esc(day.estimate_note.replace(/^[^.]*API[^.]*\.\s*/, ""))}</span></p>
         <div class="ag-kpis us-kpis">
-          <div class="ag-kpi"><span class="ag-kpi-v">${fmtTokens(t.total_tokens)}</span><span class="ag-kpi-l">tokens no período</span></div>
-          <div class="ag-kpi"><span class="ag-kpi-v">${fmtCost(t.cost, t.cost_partial)}</span><span class="ag-kpi-l">custo estimado no preço da API</span></div>
-          <div class="ag-kpi"><span class="ag-kpi-v">${fmtTokens(t.tokens.cache_read)}</span><span class="ag-kpi-l">tokens lidos do cache</span></div>
-          <div class="ag-kpi"><span class="ag-kpi-v">${t.turns}</span><span class="ag-kpi-l">turnos do modelo</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${fmtTokens(tot.total_tokens)}</span><span class="ag-kpi-l">${t("tokens no período")}</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${fmtCost(tot.cost, tot.cost_partial)}</span><span class="ag-kpi-l">${t("custo estimado no preço da API")}</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${fmtTokens(tot.tokens.cache_read)}</span><span class="ag-kpi-l">${t("tokens lidos do cache")}</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${tot.turns}</span><span class="ag-kpi-l">${t("turnos do modelo")}</span></div>
         </div>
         ${this.chart(day, from, to)}
         <div class="us-tables">
-          ${this.table("Por projeto", project.groups, (g) => esc(g.key))}
-          ${this.table("Por modelo", model.groups, (g) => `<span class="mono">${esc(g.key)}</span>`)}
+          ${this.table(t("Por projeto"), project.groups, (g) => esc(g.key))}
+          ${this.table(t("Por modelo"), model.groups, (g) => `<span class="mono">${esc(g.key)}</span>`)}
         </div>
-        ${this.table("Por sessão", session.groups.slice(0, 50), (g) => `<button type="button" class="us-link" data-open="${esc(g.key)}">${agentMark(g.agent)}<span>${esc(g.project || "sem projeto")}</span><span class="dim mono">${esc(g.key.slice(0, 8))}</span></button>`, true)}
-        ${t.unpriced ? `<p class="dim hint">${fmtTokens(t.unpriced)} tokens de modelos sem preço conferido ficaram fora do custo. Edite <span class="mono">precos.json</span> na pasta de dados para incluir.</p>` : ""}
+        ${this.table(t("Por sessão"), session.groups.slice(0, 50), (g) => `<button type="button" class="us-link" data-open="${esc(g.key)}">${agentMark(g.agent)}<span>${esc(g.project || t("sem projeto"))}</span><span class="dim mono">${esc(g.key.slice(0, 8))}</span></button>`, true)}
+        ${tot.unpriced ? `<p class="dim hint">${t("{tokens} tokens de modelos sem preço conferido ficaram fora do custo. Edite {file} na pasta de dados para incluir.", { tokens: fmtTokens(tot.unpriced), file: `<span class="mono">precos.json</span>` })}</p>` : ""}
       </div>`;
   }
 
@@ -131,15 +134,15 @@ export class AgentsUsageView {
         const n = g && g.agents[a] ? g.agents[a].total_tokens : 0;
         return n ? `<span class="us-seg us-${a}" style="height:${(n / max) * 100}%"></span>` : "";
       }).join("");
-      const tip = g ? `${shortDay(d)}: ${fmtTokens(g.total_tokens)} tokens, ${fmtCost(g.cost, g.cost_partial)}`
+      const tip = g ? t("{day}: {tokens} tokens, {cost}", { day: shortDay(d), tokens: fmtTokens(g.total_tokens), cost: fmtCost(g.cost, g.cost_partial) })
         + present.map((a) => g.agents[a] ? ` · ${AGENT_NAMES[a]} ${fmtTokens(g.agents[a].total_tokens)}` : "").join("")
-        : `${shortDay(d)}: sem uso`;
+        : t("{day}: sem uso", { day: shortDay(d) });
       return `<div class="us-col" title="${esc(tip)}" aria-label="${esc(tip)}"><div class="us-stack">${parts}</div>
         <span class="us-x">${i % label === 0 || i === days.length - 1 ? esc(shortDay(d)) : ""}</span></div>`;
     }).join("");
     return `<section class="panel us-chart-panel">
-      <div class="panel-head">${icon("gauge")}<h2>Tokens por dia</h2><span class="spacer"></span>${legend}</div>
-      <div class="us-chart" role="img" aria-label="Tokens por dia, separados por agente">
+      <div class="panel-head">${icon("gauge")}<h2>${t("Tokens por dia")}</h2><span class="spacer"></span>${legend}</div>
+      <div class="us-chart" role="img" aria-label="${t("Tokens por dia, separados por agente")}">
         ${max > 1 ? `<span class="us-max dim">${fmtTokens(max)}</span>` : ""}${cols}</div>
     </section>`;
   }
@@ -148,10 +151,10 @@ export class AgentsUsageView {
     const rows = groups.length ? groups.map((g) => `<tr>
         <td>${labelOf(g)}</td><td class="num">${fmtTokens(g.total_tokens)}</td>
         <td class="num">${fmtTokens(g.tokens.cache_read)}</td><td class="num">${fmtCost(g.cost, g.cost_partial)}</td></tr>`).join("")
-      : `<tr><td colspan="4" class="dim">Sem uso no período.</td></tr>`;
+      : `<tr><td colspan="4" class="dim">${t("Sem uso no período.")}</td></tr>`;
     return `<section class="panel us-table${session ? " us-wide" : ""}">
       <div class="panel-head"><h2>${esc(title)}</h2></div>
-      <table class="table"><thead><tr><th>${session ? "Sessão" : "Nome"}</th><th class="num">Tokens</th><th class="num">Cache lido</th><th class="num">Custo estimado</th></tr></thead>
+      <table class="table"><thead><tr><th>${session ? t("Sessão") : t("Nome")}</th><th class="num">${t("Tokens")}</th><th class="num">${t("Cache lido")}</th><th class="num">${t("Custo estimado")}</th></tr></thead>
       <tbody>${rows}</tbody></table></section>`;
   }
 
@@ -169,7 +172,7 @@ export class AgentsUsageView {
     try {
       const res = await fetch(path, { headers: { "X-Vulcan-Token": token } });
       if (!res.ok) throw new Error(`CSV: HTTP ${res.status}`);
-      copy(await res.text(), "CSV copiado");
+      copy(await res.text(), t("CSV copiado"));
     } catch (err) {
       reportError(err);
     }

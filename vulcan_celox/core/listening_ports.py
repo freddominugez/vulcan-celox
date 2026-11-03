@@ -9,6 +9,8 @@ import time
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple
 
+from vulcan_celox.core.i18n import tr
+
 TTL = 10.0
 TIMEOUT = 5.0
 LISTEN = "0A"
@@ -62,7 +64,7 @@ def lsof_ports(runner, pids: Iterable[int]) -> Tuple[List[Tuple[int, int, str]],
         return [], ""
     result = runner.run(["lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-a", "-p", wanted, "-F", "pcn"], timeout=TIMEOUT)
     if result.code in (126, 127) or result.timed_out:
-        return [], "lsof não rodou"
+        return [], tr("lsof não rodou")
     return parse_lsof(result.stdout), ""  # lsof sai com 1 quando nada escuta
 
 
@@ -121,7 +123,7 @@ class PortWatcher:
             return {"ports": {}, "reason": ""}
         children = process_tree(self.runner)
         if children is None:
-            return {"ports": {}, "reason": "ps não rodou"}
+            return {"ports": {}, "reason": tr("ps não rodou")}
         owners: Dict[int, str] = {}
         for tab, root in tabs:
             for pid in descendants(children, root):

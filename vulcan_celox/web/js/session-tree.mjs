@@ -7,11 +7,12 @@ import { esc, icon, reportError, toast } from "./dom.mjs";
 import { syncPorts } from "./terminal-ports.mjs";
 import { terminals } from "./terminals.mjs";
 import { agentMark } from "./agents-ui.mjs";
+import { t } from "./i18n.mjs";
 
 const STORAGE_KEY = "vulcan-tree-open";
 const DEFAULT_OPEN = ["section:sessions", "section:sites", "group:open", "group:closed"];
 const PAGE = 30;
-const WEEKDAYS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+const WEEKDAYS = [t("dom"), t("seg"), t("ter"), t("qua"), t("qui"), t("sex"), t("sáb")];
 
 function dayKey(iso) {
   const d = new Date(iso);
@@ -22,8 +23,8 @@ function dayKey(iso) {
 function dayLabel(key) {
   const today = dayKey(new Date().toISOString());
   const yesterday = dayKey(new Date(Date.now() - 86400000).toISOString());
-  if (key === today) return "Hoje";
-  if (key === yesterday) return "Ontem";
+  if (key === today) return t("Hoje");
+  if (key === yesterday) return t("Ontem");
   const [y, m, d] = key.split("-").map(Number);
   const date = new Date(y, m - 1, d);
   return `${WEEKDAYS[date.getDay()]}, ${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}${y !== new Date().getFullYear() ? `/${y}` : ""}`;
@@ -104,10 +105,10 @@ export class SessionTree {
     const sectionOpen = this.isOpen("section:sessions");
     this.root.innerHTML = `
       <button class="side-heading side-toggle" data-toggle="section:sessions" aria-expanded="${sectionOpen}">
-        ${icon("chevron-right", "side-chevron")}<span>Sessões</span><span class="side-heading-count">${open.length + closedTotal || ""}</span>
+        ${icon("chevron-right", "side-chevron")}<span>${t("Sessões")}</span><span class="side-heading-count">${open.length + closedTotal || ""}</span>
       </button>
-      ${sectionOpen ? `<div class="tree" role="tree" aria-label="Sessões de terminal">
-        ${this.groupHtml("open", "Abertas", open, open.length, active)}
+      ${sectionOpen ? `<div class="tree" role="tree" aria-label="${t("Sessões de terminal")}">
+        ${this.groupHtml("open", t("Abertas"), open, open.length, active)}
         ${this.historyHtml(closed, closedTotal, active)}
       </div>` : ""}`;
   }
@@ -117,7 +118,7 @@ export class SessionTree {
     const expanded = this.isOpen(groupKey);
     const body = sessions.length
       ? sessions.map((s) => this.sessionHtml(s, active)).join("")
-      : `<div class="tree-empty">Nenhum terminal aberto.</div>`;
+      : `<div class="tree-empty">${t("Nenhum terminal aberto.")}</div>`;
     return `
       <div class="tree-group" role="group">
         <button class="tree-group-head" data-toggle="${groupKey}" aria-expanded="${expanded}">
@@ -148,12 +149,12 @@ export class SessionTree {
         </div>`;
     }).join("");
     const body = closed.length
-      ? folders + (total > closed.length ? `<button class="tree-more" data-action="more">Carregar mais (${total - closed.length})</button>` : "")
-      : `<div class="tree-empty">Ao fechar um terminal ele aparece aqui, com a memória do que foi feito.</div>`;
+      ? folders + (total > closed.length ? `<button class="tree-more" data-action="more">${t("Carregar mais ({n})", { n: total - closed.length })}</button>` : "")
+      : `<div class="tree-empty">${t("Ao fechar um terminal ele aparece aqui, com a memória do que foi feito.")}</div>`;
     return `
       <div class="tree-group tree-history" role="group">
         <button class="tree-group-head" data-toggle="group:closed" aria-expanded="${expanded}">
-          ${icon("chevron-right", "side-chevron")}${icon("folder")}<span>Histórico</span><span class="tree-count">${total || ""}</span>
+          ${icon("chevron-right", "side-chevron")}${icon("folder")}<span>${t("Histórico")}</span><span class="tree-count">${total || ""}</span>
         </button>
         ${expanded ? `<div class="tree-group-body">${body}</div>` : ""}
       </div>`;
@@ -168,23 +169,23 @@ export class SessionTree {
     return `
       <div class="tree-node ${s.id === active ? "is-on" : ""} ${s.open ? "is-open" : "is-closed"} ${s.theme ? `has-theme t-${esc(s.theme)}` : ""}" data-id="${s.id}" role="treeitem" aria-expanded="${expanded}">
         <div class="tree-row">
-          <button class="tree-twisty" data-toggle="${key}" aria-expanded="${expanded && items > 0}" aria-label="${expanded ? "Recolher" : "Expandir"} ${esc(s.title)}" ${items ? "" : "disabled"}>
+          <button class="tree-twisty" data-toggle="${key}" aria-expanded="${expanded && items > 0}" aria-label="${expanded ? t("Recolher {title}", { title: esc(s.title) }) : t("Expandir {title}", { title: esc(s.title) })}" ${items ? "" : "disabled"}>
             ${items ? icon("chevron-right", "side-chevron") : ""}</button>
-          <a class="tree-link" href="${sessionHash(s)}" title="${esc(`${s.title} · ${where}${s.has_doc ? " · documentada" : ""}`)}">
+          <a class="tree-link" href="${sessionHash(s)}" title="${esc(`${s.title} · ${where}${s.has_doc ? ` · ${t("documentada")}` : ""}`)}">
             ${icon(s.open ? "terminal" : "clock")}
             <span class="tree-title">${esc(s.title)}</span>
             <span class="tree-site">${esc(where)}</span>
-            ${(s.agents || []).length ? `<span class="tree-agents" title="Sessões de agente pareadas">${[...new Set(s.agents.map((a) => a.agent))].map(agentMark).join("")}</span>` : ""}
-            ${s.has_doc ? `<span class="tree-doc" title="Tem documentação">${icon("book")}</span>` : ""}
+            ${(s.agents || []).length ? `<span class="tree-agents" title="${t("Sessões de agente pareadas")}">${[...new Set(s.agents.map((a) => a.agent))].map(agentMark).join("")}</span>` : ""}
+            ${s.has_doc ? `<span class="tree-doc" title="${t("Tem documentação")}">${icon("book")}</span>` : ""}
             ${progress}
           </a>
-          <button class="tree-menu-btn" data-menu="${s.id}" aria-label="Opções da sessão ${esc(s.title)}" title="Opções">${icon("dots")}</button>
+          <button class="tree-menu-btn" data-menu="${s.id}" aria-label="${t("Opções da sessão {title}", { title: esc(s.title) })}" title="${t("Opções")}">${icon("dots")}</button>
         </div>
         ${expanded && items ? `<div class="tree-children">
           ${s.task_list.map((t) => `<a class="tree-leaf status-${t.status}" href="${sessionHash(s, "tasks", t.id)}">
               ${icon(t.status === "done" ? "circle-check" : t.status === "doing" ? "circle-half" : "circle")}<span>${esc(t.title)}</span></a>`).join("")}
           ${s.note_list.map((n) => `<a class="tree-leaf" href="${sessionHash(s, "notes", n.id)}">
-              <span class="tree-swatch swatch-${esc(n.color)}"></span><span>${esc(n.title || "Post-it sem texto")}</span></a>`).join("")}
+              <span class="tree-swatch swatch-${esc(n.color)}"></span><span>${esc(n.title || t("Post-it sem texto"))}</span></a>`).join("")}
           ${s.tags.length ? `<div class="tree-tags">${s.tags.map((t) => `<a class="chip" style="--chip:${esc(t.color)}" href="${sessionHash(s, "tags", t.id)}">${esc(t.name)}</a>`).join("")}</div>` : ""}
         </div>` : ""}
       </div>`;
@@ -204,11 +205,11 @@ export class SessionTree {
     menu.setAttribute("role", "menu");
     menu.innerHTML = `
       <div class="tree-menu-head">${esc(s.title)}</div>
-      <button role="menuitem" data-op="rename">${icon("edit")}<span>Renomear</span></button>
-      <button role="menuitem" data-op="note">${icon("note")}<span>Adicionar post-it</span></button>
-      <button role="menuitem" data-op="task">${icon("check-square")}<span>Adicionar tarefa</span></button>
+      <button role="menuitem" data-op="rename">${icon("edit")}<span>${t("Renomear")}</span></button>
+      <button role="menuitem" data-op="note">${icon("note")}<span>${t("Adicionar post-it")}</span></button>
+      <button role="menuitem" data-op="task">${icon("check-square")}<span>${t("Adicionar tarefa")}</span></button>
       <div class="tree-menu-sep"></div>
-      <button role="menuitem" data-op="delete" class="is-danger" ${s.open ? "disabled title=\"Feche o terminal antes de apagar\"" : ""}>${icon("trash")}<span>Apagar sessão…</span></button>`;
+      <button role="menuitem" data-op="delete" class="is-danger" ${s.open ? `disabled title="${t("Feche o terminal antes de apagar")}"` : ""}>${icon("trash")}<span>${t("Apagar sessão…")}</span></button>`;
     document.body.appendChild(menu);
     const rect = menu.getBoundingClientRect();
     menu.style.left = `${Math.min(x, window.innerWidth - rect.width - 8)}px`;
@@ -264,7 +265,7 @@ export class SessionTree {
         try {
           if (terminals.get(s.id)) await terminals.rename(s.id, title);
           else await patch(`/api/sessions/${s.id}`, { title });
-          toast(`Sessão renomeada para “${title}”.`, { kind: "ok" });
+          toast(t("Sessão renomeada para “{title}”.", { title }), { kind: "ok" });
           window.dispatchEvent(new CustomEvent("vulcan-sessions-changed"));
         } catch (err) {
           reportError(err);
@@ -286,13 +287,13 @@ export class SessionTree {
     const items = s.task_list.length + s.note_list.length;
     let deleteItems = false;
     const ok = await confirmDialog({
-      title: `Apagar a sessão “${s.title}”?`,
-      confirmLabel: "Apagar sessão",
+      title: t("Apagar a sessão “{title}”?", { title: s.title }),
+      confirmLabel: t("Apagar sessão"),
       danger: true,
-      body: `<p>A sessão sai do Histórico e do índice. ${s.has_doc ? "A memória e a documentação vão para a Lixeira, de onde podem ser recuperadas." : "A memória vai para a Lixeira, de onde pode ser recuperada."}</p>
+      body: `<p>${t("A sessão sai do Histórico e do índice.")} ${s.has_doc ? t("A memória e a documentação vão para a Lixeira, de onde podem ser recuperadas.") : t("A memória vai para a Lixeira, de onde pode ser recuperada.")}</p>
         ${items ? `<label class="dialog-check"><input type="checkbox" data-delete-items>
-          <span>Apagar também ${s.task_list.length} ${s.task_list.length === 1 ? "tarefa" : "tarefas"} e ${s.note_list.length} ${s.note_list.length === 1 ? "post-it" : "post-its"} desta sessão</span></label>
-          <p class="dim">Sem marcar, eles continuam no ${esc(s.site || "Global")}, sem sessão.</p>` : ""}`,
+          <span>${t("Apagar também {tasks} e {notes} desta sessão", { tasks: s.task_list.length === 1 ? t("1 tarefa") : t("{n} tarefas", { n: s.task_list.length }), notes: s.note_list.length === 1 ? t("1 post-it") : t("{n} post-its", { n: s.note_list.length }) })}</span></label>
+          <p class="dim">${t("Sem marcar, eles continuam no {where}, sem sessão.", { where: esc(s.site || "Global") })}</p>` : ""}`,
       onDecide: (answer, root) => {
         const box = root.querySelector("[data-delete-items]");
         deleteItems = Boolean(answer && box && box.checked);
@@ -300,7 +301,7 @@ export class SessionTree {
     });
     if (!ok) return;
     await del(`/api/sessions/${s.id}?items=${deleteItems ? "delete" : "keep"}`);
-    toast(`Sessão “${s.title}” apagada. Arquivos na Lixeira.`, { kind: "ok" });
+    toast(t("Sessão “{title}” apagada. Arquivos na Lixeira.", { title: s.title }), { kind: "ok" });
     window.dispatchEvent(new CustomEvent("vulcan-sessions-changed"));
     if (this.options.route().session === s.id) {
       this.options.navigate(s.site ? `#/sites/${encodeURIComponent(s.site)}/terminal` : "#/terminals/terminal");

@@ -28,6 +28,8 @@ CONTENT_TYPES = {
     ".md": "text/markdown; charset=utf-8",
     ".woff2": "font/woff2",
 }
+from vulcan_celox.core import i18n
+
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
        "connect-src 'self' ws://127.0.0.1:* ws://localhost:*; frame-ancestors 'none'")
 
@@ -244,11 +246,11 @@ class Handler(BaseHTTPRequestHandler):
                 raise HttpError(405, "método não permitido")
             self._static(path)
         except HttpError as err:
-            self._send_json(err.status, {**err.extra, "error": err.message})
+            self._send_json(err.status, {**err.extra, "error": i18n.tr(err.message)})
         except (BrokenPipeError, ConnectionResetError):
             pass
         except Exception as exc:  # noqa: BLE001
-            self._send_json(500, {"error": f"erro interno: {exc}"})
+            self._send_json(500, {"error": i18n.tr("erro interno: {exc}", exc=exc)})
 
     def _api(self, method: str, path: str, query) -> None:
         allowed = False

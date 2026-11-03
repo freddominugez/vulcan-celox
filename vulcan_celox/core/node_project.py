@@ -13,6 +13,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from vulcan_celox.core.i18n import tr
+
 MAX_FILE = 1024 * 1024
 SCRIPT_NAME = re.compile(r"^[A-Za-z0-9:_.-]{1,64}$")
 
@@ -132,7 +134,7 @@ def supabase(root: Path) -> Optional[Dict[str, Any]]:
     try:
         text = _read_text(path)
     except Unreadable as exc:
-        return {"estado": "ilegivel", "erro": str(exc)}
+        return {"estado": "ilegivel", "erro": tr(str(exc))}
     section = ""
     values: Dict[str, Dict[str, Any]] = {"": {}}
     for line in text.splitlines():
@@ -158,9 +160,9 @@ def vercel(root: Path) -> Optional[Dict[str, Any]]:
     try:
         data = json.loads(_read_text(path))
     except (Unreadable, ValueError) as exc:
-        return {"estado": "ilegivel", "erro": str(exc)}
+        return {"estado": "ilegivel", "erro": tr(str(exc))}
     if not isinstance(data, dict):
-        return {"estado": "ilegivel", "erro": "project.json não é um objeto"}
+        return {"estado": "ilegivel", "erro": tr("project.json não é um objeto")}
     # só identificadores; o arquivo não guarda token, mas nada além destes campos sai daqui
     return {"estado": "ok", "projectId": str(data.get("projectId") or "")[:80] or None,
             "orgId": str(data.get("orgId") or "")[:80] or None}
@@ -176,9 +178,9 @@ def read(root: Path) -> Dict[str, Any]:
         if not isinstance(pkg, dict):
             raise Unreadable("package.json não é um objeto")
     except ValueError as exc:
-        return {"estado": "ilegivel", "pasta": str(root), "erro": f"package.json: JSON inválido ({exc})"}
+        return {"estado": "ilegivel", "pasta": str(root), "erro": tr("package.json: JSON inválido ({exc})", exc=exc)}
     except Unreadable as exc:
-        return {"estado": "ilegivel", "pasta": str(root), "erro": str(exc)}
+        return {"estado": "ilegivel", "pasta": str(root), "erro": tr(str(exc))}
     raw_scripts = pkg.get("scripts") if isinstance(pkg.get("scripts"), dict) else {}
     scripts = {str(k): str(v) for k, v in raw_scripts.items() if SCRIPT_NAME.match(str(k)) and isinstance(v, str)}
     fw = framework(pkg)

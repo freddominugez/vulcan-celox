@@ -1,8 +1,9 @@
 // Árvore dos arquivos tocados pela sessão. Nome de arquivo é dado: sempre passa por esc.
 
 import { esc, icon } from "../../dom.mjs";
+import { t } from "../../i18n.mjs";
 
-const MARKS = { new: "novo", edit: "editado", read: "lido", delete: "apagado" };
+const MARKS = { new: t("novo"), edit: t("editado"), read: t("lido"), delete: t("apagado") };
 
 /** Monta a árvore a partir dos caminhos relativos. Pasta com uma só pasta dentro vira um nó só, como `a/b/c`. */
 export function buildTree(files) {
@@ -39,7 +40,7 @@ function fileRow(file, selected, depth) {
   return `<button type="button" class="code-file ${file.path === selected ? "is-on" : ""}" data-path="${esc(file.path)}"
       style="--depth:${depth}" title="${esc(file.path)}" aria-current="${file.path === selected}">
     <span class="code-file-name">${esc(file.name || file.rel)}</span>
-    ${file.sensitive ? `<span title="Nome sensível: o conteúdo não é exibido">${icon("lock")}</span>` : ""}
+    ${file.sensitive ? `<span title="${t("Nome sensível: o conteúdo não é exibido")}">${icon("lock")}</span>` : ""}
     ${file.edits > 1 ? `<span class="count">${file.edits}</span>` : ""}
     <span class="ag-kind k-${esc(file.kind)}">${esc(mark)}</span></button>`;
 }
@@ -52,6 +53,6 @@ function dirRows(node, selected, depth) {
 export function renderTree(files, selected) {
   const { tree, outside } = buildTree(files);
   return `<div class="code-tree">${dirRows(tree, selected, 0)}
-    ${outside.length ? `<div class="code-dir code-outside" title="O visor só abre arquivos dentro da pasta da sessão">${icon("lock")}<span>Fora da pasta da sessão</span></div>
+    ${outside.length ? `<div class="code-dir code-outside" title="${t("O visor só abre arquivos dentro da pasta da sessão")}">${icon("lock")}<span>${t("Fora da pasta da sessão")}</span></div>
       ${outside.map((f) => fileRow({ ...f, name: f.rel }, selected, 0)).join("")}` : ""}</div>`;
 }

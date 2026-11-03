@@ -2,9 +2,10 @@
 
 import { every, get, hasBridge, native } from "./api.mjs";
 import { esc, toast } from "./dom.mjs";
+import { currentLanguage, t } from "./i18n.mjs";
 
 export const AGENT_NAMES = { claude: "Claude Code", codex: "Codex" };
-const STEPS = ["Editou", "Commit", "Push", "PR"];
+const STEPS = [t("Editou"), "Commit", "Push", "PR"];
 const PUB = { none: 1, committed: 2, pushed: 3, pr_open: 4 };
 
 export function agentMark(agent) {
@@ -20,13 +21,13 @@ export function relTime(iso) {
   const then = Date.parse(iso);
   if (Number.isNaN(then)) return "";
   const s = Math.max(0, (Date.now() - then) / 1000);
-  if (s < 60) return "agora";
-  if (s < 3600) return `há ${Math.round(s / 60)} min`;
-  if (s < 86400) return `há ${Math.round(s / 3600)} h`;
+  if (s < 60) return t("agora");
+  if (s < 3600) return t("há {n} min", { n: Math.round(s / 60) });
+  if (s < 86400) return t("há {n} h", { n: Math.round(s / 3600) });
   const d = new Date(then);
   const days = Math.round(s / 86400);
-  if (days === 1) return "ontem";
-  if (days < 7) return `há ${days} dias`;
+  if (days === 1) return t("ontem");
+  if (days < 7) return t("há {n} dias", { n: days });
   return `${d.getDate()}/${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
@@ -35,21 +36,21 @@ export function clock(iso) {
   return Number.isNaN(d.getTime()) ? "" : `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-export function tokens(t) {
-  if (!t) return "";
-  const n = (t.input || 0) + (t.output || 0);
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1).replace(".", ",")} mi`;
-  if (n >= 1000) return `${Math.round(n / 1000)} mil`;
+export function tokens(usage) {
+  if (!usage) return "";
+  const n = (usage.input || 0) + (usage.output || 0);
+  if (n >= 1e6) return t("{n} mi", { n: currentLanguage() === "pt" ? (n / 1e6).toFixed(1).replace(".", ",") : (n / 1e6).toFixed(1) });
+  if (n >= 1000) return t("{n} mil", { n: Math.round(n / 1000) });
   return String(n);
 }
 
 /** Trilha em 4 etapas: editou, commit, push, PR. A etapa que falta depois da edição fica em alerta. */
 export function track(s) {
   const n = s.files_edited || PUB[s.published] > 1 ? PUB[s.published] : 0;
-  const label = n ? STEPS[n - 1] : "nada editado";
-  return `<div class="ag-track" role="img" aria-label="Publicação: ${label}">${STEPS.map((step, i) => {
+  const label = n ? STEPS[n - 1] : t("nada editado");
+  return `<div class="ag-track" role="img" aria-label="${t("Publicação: {label}", { label })}">${STEPS.map((step, i) => {
     const cls = i < n ? "is-done" : i === n && n >= 1 && n < 3 ? "is-stuck" : "";
-    const text = cls === "is-stuck" ? (i === 1 ? "sem commit" : "sem push") : step;
+    const text = cls === "is-stuck" ? (i === 1 ? t("sem commit") : t("sem push")) : step;
     return `<span class="ag-step ${cls}"><span class="ag-bar"></span><span>${text}</span></span>`;
   }).join("")}</div>`;
 }
@@ -101,16 +102,15 @@ export async function copy(text, message) {
       ok = false;
     }
   }
-  toast(ok ? message : "Não deu para copiar. Selecione o texto e use ⌘C.", { kind: ok ? "ok" : "error" });
+  toast(ok ? message : t("Não deu para copiar. Selecione o texto e use ⌘C."), { kind: ok ? "ok" : "error" });
   return ok;
 }
 
 export function emptyAgents(roots) {
-  const where = roots ? [...(roots.claude || []), ...(roots.codex || [])].map((r) => `<code>${esc(r)}</code>`).join(" e ") : "~/.claude e ~/.codex";
+  const where = roots ? [...(roots.claude || []), ...(roots.codex || [])].map((r) => `<code>${esc(r)}</code>`).join(` ${t("e")} `) : `~/.claude ${t("e")} ~/.codex`;
   return `<div class="empty-block">
-    <h3>Nenhuma sessão de agente ainda</h3>
-    <p>O Vulcan Celox lê as sessões que o Claude Code e o Codex gravam em ${where}, sem chave de API e sem alterar nada lá.
-      Abra o <code>claude</code> ou o <code>codex</code> num terminal: a sessão aparece aqui em poucos segundos.</p>
+    <h3>${t("Nenhuma sessão de agente ainda")}</h3>
+    <p>${t("O Vulcan Celox lê as sessões que o Claude Code e o Codex gravam em {where}, sem chave de API e sem alterar nada lá. Abra o {claude} ou o {codex} num terminal: a sessão aparece aqui em poucos segundos.", { where, claude: "<code>claude</code>", codex: "<code>codex</code>" })}</p>
   </div>`;
 }
 
@@ -155,8 +155,8 @@ export class RevisionWatch {
 }
 
 export function loopPrompt(s) {
-  return `Você rodou "${s.loop.command}" ${s.loop.count} vezes sem commit no branch ${s.branch || "atual"} (sessão ${s.id}). `
-    + "Pare agora. Em três linhas: a hipótese atual, o que já tentou e o próximo passo diferente. "
-    + "Não rode o teste de novo antes de me mostrar isso.";
+  return [t("Você rodou \"{command}\" {count} vezes sem commit no branch {branch} (sessão {id}).", { command: s.loop.command, count: s.loop.count, branch: s.branch || t("atual"), id: s.id }),
+    t("Pare agora. Em três linhas: a hipótese atual, o que já tentou e o próximo passo diferente."),
+    t("Não rode o teste de novo antes de me mostrar isso.")].join(" ");
 }
 

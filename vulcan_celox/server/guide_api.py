@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.server.local_http import HttpError, Request
 
 STORE_KEY = "guide"
@@ -34,16 +35,16 @@ def register_guide_api(app) -> None:
         opened = bool(app.terminals.list()) or bool(app.hub.sessions.list("*")) or bool(saved().get("first_terminal"))
         label = app.backend.label if app.backend.available else "Lerd"
         return [
-            {"id": "lerd", "ok": backend_ok, "title": f"Ligar o {label}",
-             "detail": status.summary if app.backend.available else "Lerd não encontrado. Instale para rodar sites PHP; projetos Node e agentes funcionam sem ele."},
-            {"id": "projetos", "ok": sites + node > 0, "title": "Encontrar seus projetos",
-             "detail": f"{sites} site(s) PHP e {node} projeto(s) Node" if sites + node else "Registre um site no Lerd ou adicione a pasta de um projeto Node."},
-            {"id": "agentes", "ok": agents > 0, "lendo": reading, "title": "Ler as sessões dos agentes",
-             "detail": f"{agents} sessão(ões) do Claude Code e do Codex, só leitura" if agents
-             else "Lendo as sessões do Claude Code e do Codex..." if reading
-             else "Nenhuma sessão ainda. Use o Claude Code ou o Codex numa pasta de projeto."},
-            {"id": "terminal", "ok": opened, "title": "Abrir o primeiro terminal num projeto",
-             "detail": "Feito. Cada terminal guarda tarefas e notas da sessão." if opened else "⌘T abre um terminal; as tarefas e notas dele viram memória em Markdown."},
+            {"id": "lerd", "ok": backend_ok, "title": tr("Ligar o {label}", label=label),
+             "detail": status.summary if app.backend.available else tr("Lerd não encontrado. Instale para rodar sites PHP; projetos Node e agentes funcionam sem ele.")},
+            {"id": "projetos", "ok": sites + node > 0, "title": tr("Encontrar seus projetos"),
+             "detail": tr("{sites} site(s) PHP e {node} projeto(s) Node", sites=sites, node=node) if sites + node else tr("Registre um site no Lerd ou adicione a pasta de um projeto Node.")},
+            {"id": "agentes", "ok": agents > 0, "lendo": reading, "title": tr("Ler as sessões dos agentes"),
+             "detail": tr("{agents} sessão(ões) do Claude Code e do Codex, só leitura", agents=agents) if agents
+             else tr("Lendo as sessões do Claude Code e do Codex...") if reading
+             else tr("Nenhuma sessão ainda. Use o Claude Code ou o Codex numa pasta de projeto.")},
+            {"id": "terminal", "ok": opened, "title": tr("Abrir o primeiro terminal num projeto"),
+             "detail": tr("Feito. Cada terminal guarda tarefas e notas da sessão.") if opened else tr("⌘T abre um terminal; as tarefas e notas dele viram memória em Markdown.")},
         ]
 
     def payload() -> Dict[str, Any]:

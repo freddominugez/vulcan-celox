@@ -2,12 +2,13 @@
 // docs/pt-BR/user-guide.md (scripts/manual_md.py). Aqui ficam só a carga e o desenho do texto.
 
 import { esc } from "./dom.mjs";
+import { currentLanguage } from "./i18n.mjs";
 
 let cache = null;
 
 export async function loadHelp() {
   if (!cache) {
-    const res = await fetch("help/conteudo.json", { cache: "no-store" });
+    const res = await fetch(currentLanguage() === "pt" ? "help/conteudo.json" : "help/conteudo.en.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`Ajuda: HTTP ${res.status}`);
     cache = await res.json();
   }

@@ -4,9 +4,10 @@
 import { every, get, post, put } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
 import { copy } from "../agents-ui.mjs";
+import { t } from "../i18n.mjs";
 
-const KINDS = [["", "Todos os tipos"], ["dump", "dump()"], ["query", "Queries"], ["log", "Logs e exceções"],
-  ["view", "Views"], ["request", "Requisições"]];
+const KINDS = [["", t("Todos os tipos")], ["dump", "dump()"], ["query", t("Queries")], ["log", t("Logs e exceções")],
+  ["view", t("Views")], ["request", t("Requisições")]];
 
 function shortFile(path) {
   return path.split("/").slice(-3).join("/");
@@ -22,15 +23,15 @@ export class DebugView {
     this.bridge = null;
     this.root.innerHTML = `<div class="debug">
       <div class="debug-bar">
-        <button class="btn btn-sm debug-bridge" data-dbg="bridge" aria-pressed="false">${icon("dot")}<span>Ponte</span></button>
-        ${this.site ? "" : `<select class="select" data-filter="site" aria-label="Site"><option value="">Todos os sites</option>
+        <button class="btn btn-sm debug-bridge" data-dbg="bridge" aria-pressed="false">${icon("dot")}<span>${t("Ponte")}</span></button>
+        ${this.site ? "" : `<select class="select" data-filter="site" aria-label="${t("Site")}"><option value="">${t("Todos os sites")}</option>
           ${this.sites.map((s) => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("")}</select>`}
-        <select class="select" data-filter="kind" aria-label="Tipo">${KINDS.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
-        <input class="input debug-minms" data-filter="min_ms" type="number" min="0" step="10" placeholder="ms mín." title="Só queries a partir deste tempo" aria-label="Tempo mínimo das queries em ms">
-        <input class="input debug-search" data-filter="q" placeholder="Buscar em dumps, SQL e mensagens" spellcheck="false" aria-label="Buscar">
+        <select class="select" data-filter="kind" aria-label="${t("Tipo")}">${KINDS.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
+        <input class="input debug-minms" data-filter="min_ms" type="number" min="0" step="10" placeholder="${t("ms mín.")}" title="${t("Só queries a partir deste tempo")}" aria-label="${t("Tempo mínimo das queries em ms")}">
+        <input class="input debug-search" data-filter="q" placeholder="${t("Buscar em dumps, SQL e mensagens")}" spellcheck="false" aria-label="${t("Buscar")}">
         <span class="spacer"></span>
         <span class="dim debug-count" data-count></span>
-        <button class="btn btn-sm" data-dbg="clear" title="Limpa os eventos guardados pelo Lerd">Limpar</button>
+        <button class="btn btn-sm" data-dbg="clear" title="${t("Limpa os eventos guardados pelo Lerd")}">${t("Limpar")}</button>
       </div>
       <p class="debug-note dim" data-note></p>
       <div class="debug-body" role="log" aria-live="polite"></div>
@@ -78,7 +79,7 @@ export class DebugView {
 
   unavailable(message) {
     this.stopTimer();
-    this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>Depuração indisponível</h3><p>${esc(message)}.</p></div></div>`;
+    this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>${t("Depuração indisponível")}</h3><p>${esc(message)}.</p></div></div>`;
   }
 
   draw() {
@@ -86,15 +87,15 @@ export class DebugView {
     const btn = this.root.querySelector("[data-dbg=bridge]");
     btn.setAttribute("aria-pressed", String(b.enabled));
     btn.classList.toggle("is-on", b.enabled);
-    btn.querySelector("span").textContent = b.enabled ? "Ponte ligada" : "Ponte desligada";
-    btn.title = "Liga e desliga a captura de dump(), queries e logs em todas as versões de PHP do Lerd";
+    btn.querySelector("span").textContent = b.enabled ? t("Ponte ligada") : t("Ponte desligada");
+    btn.title = t("Liga e desliga a captura de dump(), queries e logs em todas as versões de PHP do Lerd");
     this.root.querySelector("[data-note]").textContent = b.enabled
-      ? `Capturando em todas as versões de PHP. ${b.count} de ${b.capacity} eventos guardados pelo Lerd.`
-      : "A ponte está desligada: ligue para ver dump(), queries e logs aqui. Vale para todas as versões de PHP.";
+      ? t("Capturando em todas as versões de PHP. {count} de {capacity} eventos guardados pelo Lerd.", { count: b.count, capacity: b.capacity })
+      : t("A ponte está desligada: ligue para ver dump(), queries e logs aqui. Vale para todas as versões de PHP.");
     const total = this.groups.reduce((n, g) => n + g.events.length, 0);
-    this.root.querySelector("[data-count]").textContent = total ? `${total} eventos em ${this.groups.length} requisições` : "";
+    this.root.querySelector("[data-count]").textContent = total ? t("{events} eventos em {groups} requisições", { events: total, groups: this.groups.length }) : "";
     if (!this.groups.length) {
-      this.body.innerHTML = `<p class="dim debug-empty">${b.enabled ? "Nenhum evento com esse filtro." : ""}</p>`;
+      this.body.innerHTML = `<p class="dim debug-empty">${b.enabled ? t("Nenhum evento com esse filtro.") : ""}</p>`;
       return;
     }
     this.body.innerHTML = this.groups.map((g) => this.groupHtml(g)).join("");
@@ -104,12 +105,12 @@ export class DebugView {
     // SQL repetido na mesma requisição ganha marca com contagem e tempo somado
     this.repeated = new Map((g.queries || []).filter((q) => q.count > 1).map((q) => [q.sql, q]));
     const reps = [...this.repeated.values()].map((q) => `<div class="debug-repeat"><span class="badge badge-warn">${q.count}×</span>
-        <code class="debug-sql">${esc(q.sql)}</code><span class="dim">${q.total_ms} ms no total</span></div>`).join("");
+        <code class="debug-sql">${esc(q.sql)}</code><span class="dim">${t("{ms} ms no total", { ms: q.total_ms })}</span></div>`).join("");
     const where = g.branch ? `${g.site}@${g.branch}` : g.site;
     const counts = Object.entries(g.counts).map(([k, n]) => `<span class="badge">${esc(k)} ${n}</span>`).join("");
     return `<section class="debug-group">
       <header class="debug-group-head">${this.site ? "" : `<span class="debug-site">[${esc(where)}]</span>`}
-        <code class="debug-req">${esc(g.request || "(sem requisição)")}</code><span class="dim">${esc(g.ts.slice(11, 19))}</span>
+        <code class="debug-req">${esc(g.request || t("(sem requisição)"))}</code><span class="dim">${esc(g.ts.slice(11, 19))}</span>
         <span class="spacer"></span>${counts}</header>
       ${reps ? `<div class="debug-repeats">${reps}</div>` : ""}
       ${g.events.map((e) => this.eventHtml(e)).join("")}
@@ -118,8 +119,8 @@ export class DebugView {
 
   eventHtml(e) {
     const src = e.file ? `<span class="debug-src">
-        <button class="link-btn" data-open="${esc(e.file)}" title="Abrir ${esc(e.file)} no editor">${esc(shortFile(e.file))}:${e.line}</button>
-        <button class="icon-btn icon-btn-sm" data-copy="${esc(e.file)}" aria-label="Copiar caminho" title="Copiar caminho">${icon("copy")}</button></span>` : "";
+        <button class="link-btn" data-open="${esc(e.file)}" title="${t("Abrir {file} no editor", { file: esc(e.file) })}">${esc(shortFile(e.file))}:${e.line}</button>
+        <button class="icon-btn icon-btn-sm" data-copy="${esc(e.file)}" aria-label="${t("Copiar caminho")}" title="${t("Copiar caminho")}">${icon("copy")}</button></span>` : "";
     const tone = e.tone ? ` log-${esc(e.tone)}` : "";
     return `<div class="debug-event k-${esc(e.kind)}${tone}"><span class="debug-kind">${esc(e.kind)}</span>
       <div class="debug-main">${this.detail(e)}</div>${src}</div>`;
@@ -129,7 +130,7 @@ export class DebugView {
     const d = e.data || {};
     if (e.kind === "query") {
       const rep = this.repeated && this.repeated.get(d.sql || "");
-      return `<code class="debug-sql">${esc(d.sql || "")}</code> <span class="dim">${esc(String(d.time_ms ?? ""))} ms</span>${rep ? ` <span class="badge badge-warn" title="Mesma query ${rep.count} vezes nesta requisição">repetida ${rep.count}×</span>` : ""}`;
+      return `<code class="debug-sql">${esc(d.sql || "")}</code> <span class="dim">${esc(String(d.time_ms ?? ""))} ms</span>${rep ? ` <span class="badge badge-warn" title="${t("Mesma query {n} vezes nesta requisição", { n: rep.count })}">${t("repetida {n}×", { n: rep.count })}</span>` : ""}`;
     }
     if (e.kind === "log") return `<span class="debug-level log-level">${esc(d.level || "")}</span> <span class="log-msg">${esc(d.message || "")}</span>`;
     if (e.kind === "request") return `<span class="dim">${esc(String(d.time_ms ?? ""))} ms · ${Math.round((d.memory_peak || 0) / 1048576)} MB</span>`;
@@ -139,22 +140,22 @@ export class DebugView {
   }
 
   async onClick(event) {
-    const t = event.target.closest("[data-dbg], [data-open], [data-copy]");
-    if (!t) return;
+    const tg = event.target.closest("[data-dbg], [data-open], [data-copy]");
+    if (!tg) return;
     try {
-      if (t.dataset.dbg === "bridge") {
+      if (tg.dataset.dbg === "bridge") {
         this.bridge = await put("/api/debug/bridge", { enabled: !this.bridge.enabled });
         this.signature = null;
-        toast(this.bridge.enabled ? "Ponte de dumps ligada em todas as versões de PHP." : "Ponte de dumps desligada.", { kind: "ok" });
+        toast(this.bridge.enabled ? t("Ponte de dumps ligada em todas as versões de PHP.") : t("Ponte de dumps desligada."), { kind: "ok" });
         this.draw();
       }
-      if (t.dataset.dbg === "clear") {
+      if (tg.dataset.dbg === "clear") {
         await post("/api/debug/clear");
         this.signature = null;
         await this.load();
       }
-      if (t.dataset.open) await post("/api/open", { kind: "source", target: t.dataset.open });
-      if (t.dataset.copy) await copy(t.dataset.copy, "Caminho copiado.");
+      if (tg.dataset.open) await post("/api/open", { kind: "source", target: tg.dataset.open });
+      if (tg.dataset.copy) await copy(tg.dataset.copy, t("Caminho copiado."));
     } catch (err) {
       reportError(err);
     }

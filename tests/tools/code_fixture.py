@@ -50,13 +50,13 @@ if len(sys.argv) > 2 and sys.argv[2] == "crescer":
 else:
     project.mkdir(parents=True)
     jsonl.parent.mkdir(parents=True)
-    (project / "sub" / "pasta").mkdir(parents=True)
+    (project / "src" / "core").mkdir(parents=True)
     hostil = project / HOSTIL
     hostil.write_text("<?php\n// <script>window.__xss=1</script>\necho '<img src=x onerror=window.__xss=1>';\n", encoding="utf-8")
-    comum = project / "sub" / "pasta" / "app.py"
+    comum = project / "src" / "core" / "app.py"
     comum.write_text("def soma(a, b):\n    return a + b\n", encoding="utf-8")
     (project / ".env").write_text("SEGREDO=nao-mostrar\n", encoding="utf-8")
-    write({"type": "user", "timestamp": now(), "cwd": CWD, "gitBranch": "main", "message": {"role": "user", "content": "melhore o código"}},
+    write({"type": "user", "timestamp": now(), "cwd": CWD, "gitBranch": "main", "message": {"role": "user", "content": "improve the code"}},
           edit("t1", comum, "return a", "return a + b"), result("t1"),
           edit("t2", project / ".env", "SEGREDO=velho", "SEGREDO=nao-mostrar"), result("t2"),
           edit("t3", hostil, "// antes", "// <script>window.__xss=1</script>"), result("t3"))

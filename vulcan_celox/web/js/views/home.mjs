@@ -5,23 +5,24 @@
 import { brandLogo } from "../brand.mjs";
 import { get, put } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 
 // destaques sobre img/manual/visao-geral.png (porcentagens da captura gerada por scripts/manual_shots.sh)
 export const SPOTS = {
-  lerd: { box: [73.6, 1.0, 16.7, 3.0], text: "O estado do Lerd fica no alto, à direita: verde quando nginx, DNS .test e PHP respondem. O item Lerd da barra lateral leva à tela dele." },
-  projetos: { box: [19.1, 7.3, 49.6, 30.0], text: "Sites PHP do Lerd e projetos Node aparecem na Visão geral. Clique num deles para abrir a página do projeto." },
-  agentes: { box: [0.5, 35.4, 16.1, 19.0], text: "Sessões dos agentes, prompts, uso e custo, branches e histórico ficam no grupo Agentes da barra lateral." },
-  terminal: { box: [17.4, 69.0, 82.6, 31.0], text: "O painel de terminal fica embaixo (⌘J mostra ou esconde). ⌘T abre um terminal novo na pasta escolhida." },
-  organizar: { box: [70.0, 7.3, 28.3, 11.0], text: "Tarefas abertas aparecem na Visão geral. Tarefas, post-its, tags e índice ficam no grupo Organizar da barra lateral." },
+  lerd: { box: [73.6, 1.0, 16.7, 3.0], text: t("O estado do Lerd fica no alto, à direita: verde quando nginx, DNS .test e PHP respondem. O item Lerd da barra lateral leva à tela dele.") },
+  projetos: { box: [19.1, 7.3, 49.6, 30.0], text: t("Sites PHP do Lerd e projetos Node aparecem na Visão geral. Clique num deles para abrir a página do projeto.") },
+  agentes: { box: [0.5, 35.4, 16.1, 19.0], text: t("Sessões dos agentes, prompts, uso e custo, branches e histórico ficam no grupo Agentes da barra lateral.") },
+  terminal: { box: [17.4, 69.0, 82.6, 31.0], text: t("O painel de terminal fica embaixo (⌘J mostra ou esconde). ⌘T abre um terminal novo na pasta escolhida.") },
+  organizar: { box: [70.0, 7.3, 28.3, 11.0], text: t("Tarefas abertas aparecem na Visão geral. Tarefas, post-its, tags e índice ficam no grupo Organizar da barra lateral.") },
 };
 
 export const AREAS = [
-  { id: "projetos", icon: "globe", title: "Projetos", text: "Sites PHP do Lerd e projetos Node: abrir, ligar o servidor, ver logs e a depuração.", go: "#/overview" },
-  { id: "terminal", icon: "terminal", title: "Terminais", text: "Um terminal por projeto, com tarefas e notas que viram memória em Markdown.", go: "#/terminals" },
-  { id: "lerd", icon: "database", title: "Lerd", text: "PHP, nginx, banco e HTTPS local dos sites. Ligar, parar e ver o que está rodando.", go: "#/lerd" },
-  { id: "agentes", icon: "spark", title: "Agentes", text: "Sessões do Claude Code e do Codex lidas do disco, com custo estimado e branches.", go: "#/agentes" },
-  { id: "agentes", icon: "text", title: "Prompts", text: "Instruções prontas preenchidas com a sessão atual, para mandar ao agente.", go: "#/prompts" },
-  { id: "organizar", icon: "check-square", title: "Organizar", text: "Tarefas, post-its, tags e o índice de tudo o que foi feito em cada projeto.", go: "#/tasks" },
+  { id: "projetos", icon: "globe", title: t("Projetos"), text: t("Sites PHP do Lerd e projetos Node: abrir, ligar o servidor, ver logs e a depuração."), go: "#/overview" },
+  { id: "terminal", icon: "terminal", title: t("Terminais"), text: t("Um terminal por projeto, com tarefas e notas que viram memória em Markdown."), go: "#/terminals" },
+  { id: "lerd", icon: "database", title: "Lerd", text: t("PHP, nginx, banco e HTTPS local dos sites. Ligar, parar e ver o que está rodando."), go: "#/lerd" },
+  { id: "agentes", icon: "spark", title: t("Agentes"), text: t("Sessões do Claude Code e do Codex lidas do disco, com custo estimado e branches."), go: "#/agentes" },
+  { id: "agentes", icon: "text", title: "Prompts", text: t("Instruções prontas preenchidas com a sessão atual, para mandar ao agente."), go: "#/prompts" },
+  { id: "organizar", icon: "check-square", title: t("Organizar"), text: t("Tarefas, post-its, tags e o índice de tudo o que foi feito em cada projeto."), go: "#/tasks" },
 ];
 
 export class HomeView {
@@ -58,45 +59,45 @@ export class HomeView {
 
   greeting() {
     const h = new Date().getHours();
-    return h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+    return h < 12 ? t("Bom dia") : h < 18 ? t("Boa tarde") : t("Boa noite");
   }
 
   render() {
     const g = this.guide;
     const missing = g.steps.filter((s) => !s.ok).length;
-    const head = g.done ? "Tudo pronto. Os quatro passos estão feitos."
-      : `Falta${missing === 1 ? "" : "m"} ${missing} ${missing === 1 ? "passo" : "passos"} para tudo funcionar.`;
+    const head = g.done ? t("Tudo pronto. Os quatro passos estão feitos.")
+      : missing === 1 ? t("Falta 1 passo para tudo funcionar.") : t("Faltam {n} passos para tudo funcionar.", { n: missing });
     const spot = SPOTS[this.spot] || SPOTS.projetos;
     const [x, y, w, h] = spot.box;
     const action = {
-      lerd: `<button class="btn btn-sm" data-service="start">${icon("play")}<span>Ligar</span></button>`,
-      projetos: `<button class="btn btn-sm" data-go="#/node">${icon("plus")}<span>Adicionar</span></button>`,
-      agentes: `<button class="btn btn-sm" data-go="#/agentes">${icon("spark")}<span>Ver agentes</span></button>`,
-      terminal: `<button class="btn btn-primary btn-sm" data-home="terminal">${icon("terminal")}<span>Abrir terminal</span></button>`,
+      lerd: `<button class="btn btn-sm" data-service="start">${icon("play")}<span>${t("Ligar")}</span></button>`,
+      projetos: `<button class="btn btn-sm" data-go="#/node">${icon("plus")}<span>${t("Adicionar")}</span></button>`,
+      agentes: `<button class="btn btn-sm" data-go="#/agentes">${icon("spark")}<span>${t("Ver agentes")}</span></button>`,
+      terminal: `<button class="btn btn-primary btn-sm" data-home="terminal">${icon("terminal")}<span>${t("Abrir terminal")}</span></button>`,
     };
     this.root.innerHTML = `<div class="page in-page">
         ${brandLogo()}
       <div class="in-hello">
         <div class="in-left">
           <h1>${this.greeting()}. ${esc(head)}</h1>
-          <p class="dim">${g.done ? "O guia sai da abertura do app. Ele continua aqui e em Ajuda." : "O guia confere sozinho o que já está pronto e some da abertura quando terminar."}</p>
+          <p class="dim">${g.done ? t("O guia sai da abertura do app. Ele continua aqui e em Ajuda.") : t("O guia confere sozinho o que já está pronto e some da abertura quando terminar.")}</p>
           <label class="in-dismiss"><input type="checkbox" data-home="dismiss" ${g.skipped ? "checked" : ""}>
-            <span>Não mostrar mais o guia <span class="dim">(o app abre na Visão geral; o guia continua em Início e em Ajuda)</span></span></label>
+            <span>${t("Não mostrar mais o guia")} <span class="dim">${t("(o app abre na Visão geral; o guia continua em Início e em Ajuda)")}</span></span></label>
           <ol class="in-steps">${g.steps.map((s, i) => `<li class="in-step ${s.ok ? "is-done" : ""} ${s.id === this.spot ? "is-on" : ""}" data-spot="${s.id}" tabindex="0">
             <span class="in-ck" aria-hidden="true">${s.ok ? icon("check") : i + 1}</span>
             <span class="in-step-main"><b>${esc(s.title)}</b><span class="dim">${esc(s.detail)}</span></span>
-            ${s.ok ? `<span class="sr-only">feito</span>` : action[s.id] || ""}</li>`).join("")}</ol>
+            ${s.ok ? `<span class="sr-only">${t("feito")}</span>` : action[s.id] || ""}</li>`).join("")}</ol>
         </div>
         <figure class="in-shot">
-          <div class="in-shot-frame"><img src="img/manual/visao-geral.png" alt="Captura da Visão geral do Vulcan Celox com a área do passo escolhido destacada">
+          <div class="in-shot-frame"><img src="img/manual/visao-geral.png" alt="${t("Captura da Visão geral do Vulcan Celox com a área do passo escolhido destacada")}">
             <span class="in-hl" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></span></div>
           <figcaption>${esc(spot.text)}</figcaption>
         </figure>
       </div>
-      <h2 class="in-sub">O que cada parte faz</h2>
+      <h2 class="in-sub">${t("O que cada parte faz")}</h2>
       <div class="in-areas">${AREAS.map((a) => `<a class="in-area" href="${a.go}" data-spot-hover="${a.id}">
           <span class="in-ic">${icon(a.icon)}</span><b>${esc(a.title)}</b><span class="dim">${esc(a.text)}</span></a>`).join("")}</div>
-      <p class="dim in-help">Dúvidas? Abra <a href="#/ajuda" data-go="#/ajuda">Ajuda</a> (⌘?) ou use o botão ? no alto de cada tela.</p>
+      <p class="dim in-help">${t("Dúvidas? Abra {link} (⌘?) ou use o botão ? no alto de cada tela.", { link: `<a href="#/ajuda" data-go="#/ajuda">${t("Ajuda")}</a>` })}</p>
     </div>`;
   }
 

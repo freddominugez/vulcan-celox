@@ -3,12 +3,13 @@
 
 import { ApiError, get, isMac, post } from "../../api.mjs";
 import { esc, icon, reportError } from "../../dom.mjs";
+import { t } from "../../i18n.mjs";
 import { Follow } from "./code-follow.mjs";
-import { diffNotes, REASONS } from "./code-text.mjs";
+import { diffNotes, REASONS, searchPhrases } from "./code-text.mjs";
 import { loadCodeMirror, mountDiff, mountFile, openSearch } from "./code-editor.mjs";
 import { renderTree } from "./code-tree.mjs";
 
-const SCOPES = [["edit", "Edição"], ["turn", "Turno"], ["git", "Git"]];
+const SCOPES = [["edit", t("Edição")], ["turn", t("Turno")], ["git", "Git"]];
 const LAYOUT_KEY = "vulcan-code-layout";
 
 function savedLayout() {
@@ -26,8 +27,8 @@ export class CodeView {
     this.target = target;  // arquivo e linha pedidos pelo clique no terminal
     this.el = document.createElement("div");
     this.el.className = "code-shell";
-    this.el.innerHTML = `<nav class="code-side" aria-label="Arquivos da sessão"></nav>
-      <section class="code-main" aria-label="Visor de código"><div class="code-bar"></div><div class="code-follow"></div><div class="code-notes"></div><div class="code-body"></div></section>`;
+    this.el.innerHTML = `<nav class="code-side" aria-label="${t("Arquivos da sessão")}"></nav>
+      <section class="code-main" aria-label="${t("Visor de código")}"><div class="code-bar"></div><div class="code-follow"></div><div class="code-notes"></div><div class="code-body"></div></section>`;
     this.side = this.el.querySelector(".code-side");
     this.bar = this.el.querySelector(".code-bar");
     this.notes = this.el.querySelector(".code-notes");
@@ -100,7 +101,7 @@ export class CodeView {
       return undefined;
     }
     if (!files.length) {
-      return this.emptyText("Nenhum arquivo ainda", "Esta sessão ainda não tocou em nenhum arquivo. A árvore aparece aqui quando ela tocar.");
+      return this.emptyText(t("Nenhum arquivo ainda"), t("Esta sessão ainda não tocou em nenhum arquivo. A árvore aparece aqui quando ela tocar."));
     }
     await this.select((this.latest() || files[0]).path);
     return this.revealLatest();
@@ -177,10 +178,10 @@ export class CodeView {
   renderFollow() {
     const state = this.follow ? this.follow.state : "off";
     this.followEl.className = `code-follow is-${state}`;
-    if (state === "following") this.followEl.innerHTML = `<span class="code-follow-dot"></span><span>Seguindo o agente</span>`;
+    if (state === "following") this.followEl.innerHTML = `<span class="code-follow-dot"></span><span>${t("Seguindo o agente")}</span>`;
     else if (state === "paused") {
-      this.followEl.innerHTML = `<span>Pausado: o visor não muda enquanto você lê.</span>
-        <button type="button" class="btn btn-sm" data-code="resume">${icon("play")}<span>Voltar a seguir</span></button>`;
+      this.followEl.innerHTML = `<span>${t("Pausado: o visor não muda enquanto você lê.")}</span>
+        <button type="button" class="btn btn-sm" data-code="resume">${icon("play")}<span>${t("Voltar a seguir")}</span></button>`;
     } else this.followEl.innerHTML = "";
   }
 
@@ -225,16 +226,16 @@ export class CodeView {
     }
     const position = this.edits.findIndex((r) => r.seq === info.seq);
     const stepper = this.mode === "diff" && this.scope !== "git" && this.edits.length > 1 && position >= 0
-      ? `<span class="code-step"><button type="button" class="btn btn-ghost btn-sm" data-step="-1" ${position === 0 ? "disabled" : ""} aria-label="Edição anterior">${icon("chevron-left")}</button>
-         <span class="dim">Edição ${position + 1} de ${this.edits.length}</span>
-         <button type="button" class="btn btn-ghost btn-sm" data-step="1" ${position === this.edits.length - 1 ? "disabled" : ""} aria-label="Próxima edição">${icon("chevron-right")}</button></span>` : "";
+      ? `<span class="code-step"><button type="button" class="btn btn-ghost btn-sm" data-step="-1" ${position === 0 ? "disabled" : ""} aria-label="${t("Edição anterior")}">${icon("chevron-left")}</button>
+         <span class="dim">${t("Edição {n} de {total}", { n: position + 1, total: this.edits.length })}</span>
+         <button type="button" class="btn btn-ghost btn-sm" data-step="1" ${position === this.edits.length - 1 ? "disabled" : ""} aria-label="${t("Próxima edição")}">${icon("chevron-right")}</button></span>` : "";
     this.bar.innerHTML = `<span class="code-path mono" title="${esc(file.path)}">${esc(file.rel)}</span>
-      ${segmented("O que mostrar", [["file", "Arquivo"], ["diff", "Diff"]], this.mode, "data-mode")}
-      ${this.mode === "diff" ? segmented("Comparar com", SCOPES, this.scope, "data-scope") : ""}
+      ${segmented(t("O que mostrar"), [["file", t("Arquivo")], ["diff", "Diff"]], this.mode, "data-mode")}
+      ${this.mode === "diff" ? segmented(t("Comparar com"), SCOPES, this.scope, "data-scope") : ""}
       ${stepper}
-      ${this.mode === "diff" ? segmented("Disposição", [["split", "Lado a lado"], ["unified", "Unificado"]], this.layout, "data-layout") : ""}
+      ${this.mode === "diff" ? segmented(t("Disposição"), [["split", t("Lado a lado")], ["unified", t("Unificado")]], this.layout, "data-layout") : ""}
       <span class="spacer"></span>
-      ${file.inside && !file.sensitive && file.exists ? `<button type="button" class="btn btn-sm" data-code="open">${icon("external")}<span>Abrir no editor</span></button>` : ""}`;
+      ${file.inside && !file.sensitive && file.exists ? `<button type="button" class="btn btn-sm" data-code="open">${icon("external")}<span>${t("Abrir no editor")}</span></button>` : ""}`;
   }
 
   clearViewer() {
@@ -250,7 +251,7 @@ export class CodeView {
   }
 
   empty(reason, extra = "") {
-    const [title, text] = REASONS[reason] || ["Não foi possível mostrar", "Tente outro arquivo."];
+    const [title, text] = REASONS[reason] || [t("Não foi possível mostrar"), t("Tente outro arquivo.")];
     this.emptyText(title, text, extra);
   }
 
@@ -264,7 +265,7 @@ export class CodeView {
     try {
       CM = await loadCodeMirror();
     } catch (err) {
-      this.emptyText("Visor indisponível", err.message);
+      this.emptyText(t("Visor indisponível"), t("o visor de código não carregou"));
       return;
     }
     if (ticket !== this.ticket || this.destroyed) return;
@@ -282,13 +283,13 @@ export class CodeView {
       if (!(err instanceof ApiError)) return reportError(err);
       const hasEdits = err.data && err.data.reason === "missing" && this.file().edits;
       this.empty((err.data && err.data.reason) || "unreadable",
-        hasEdits ? `<button type="button" class="btn btn-sm" data-mode="diff">Ver a última edição</button>` : "");
+        hasEdits ? `<button type="button" class="btn btn-sm" data-mode="diff">${t("Ver a última edição")}</button>` : "");
       return;
     }
     if (ticket !== this.ticket || this.destroyed) return;
     this.clearViewer();
-    if (data.lossy) this.notes.innerHTML = `<p class="code-note">${icon("info")}<span>O arquivo não está em UTF-8; alguns caracteres aparecem trocados.</span></p>`;
-    this.viewer = mountFile(CM, this.bodyEl, data.text, data.language);
+    if (data.lossy) this.notes.innerHTML = `<p class="code-note">${icon("info")}<span>${t("O arquivo não está em UTF-8; alguns caracteres aparecem trocados.")}</span></p>`;
+    this.viewer = mountFile(CM, this.bodyEl, data.text, data.language, searchPhrases());
     this.viewer.kind = "file";
   }
 
@@ -307,11 +308,11 @@ export class CodeView {
     this.renderBar(data);
     if (!data.available) return this.empty(data.reason);
     if (data.old === data.new) {
-      return this.emptyText("Sem diferença", this.scope === "git" ? "O arquivo está igual ao último commit." : "Esta edição não mudou o texto.");
+      return this.emptyText(t("Sem diferença"), this.scope === "git" ? t("O arquivo está igual ao último commit.") : t("Esta edição não mudou o texto."));
     }
     this.clearViewer();
     this.notes.innerHTML = diffNotes(data, this.scope);
-    this.viewer = mountDiff(CM, this.bodyEl, { old: data.old, current: data.new, language: data.language, layout: this.layout });
+    this.viewer = mountDiff(CM, this.bodyEl, { old: data.old, current: data.new, language: data.language, layout: this.layout, phrases: searchPhrases() });
     this.viewer.kind = "diff";
   }
 

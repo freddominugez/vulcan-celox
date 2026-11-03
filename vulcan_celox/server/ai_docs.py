@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from vulcan_celox.core.doc_prompts import Prompt, SessionEntry, general_doc_prompt, relative_link, session_doc_prompt
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.session_memory import GENERAL_DOC_FILENAME, doc_path, extract_transcript
 from vulcan_celox.core.store import write_text_atomic
 from vulcan_celox.server.ai_jobs import AiJobs
@@ -24,8 +25,7 @@ def _now() -> str:
 
 def doc_header(kind: str, model: str, source: str) -> str:
     return (f"<!-- vulcan:documentacao {kind} modelo={model} gerado={_now()} -->\n"
-            f"> Gerado por IA ({model}) em {_now()} a partir de {source}. Confira antes de usar; "
-            f"segredos foram mascarados antes do envio.\n\n")
+            f"> {tr('Gerado por IA ({model}) em {when} a partir de {source}. Confira antes de usar; segredos foram mascarados antes do envio.', model=model, when=_now(), source=source)}\n\n")
 
 
 class AiDocs:
@@ -65,14 +65,14 @@ class AiDocs:
             prompt = self.session_prompt(record)
             result = client.complete(prompt.system, prompt.user, model=model, max_tokens=SESSION_MAX_TOKENS)
             target = doc_path(record.memory_file)
-            source = f"[memória da sessão]({Path(record.memory_file).name})"
+            source = tr("[memória da sessão]({file})", file=Path(record.memory_file).name)
             text = doc_header(f"sessao={record.id}", result.model, source) + result.text.strip() + "\n"
             if result.stop_reason == "max_tokens":
-                text += "\n> A resposta atingiu o limite de tamanho e pode estar incompleta.\n"
+                text += "\n> " + tr("A resposta atingiu o limite de tamanho e pode estar incompleta.") + "\n"
             write_text_atomic(target, text)
             self.app.hub.write_index()
-            note = f" ({prompt.redactions} segredos mascarados)" if prompt.redactions else ""
-            return str(target), f"documentação de “{record.title}” gerada{note}"
+            note = " " + tr("({n} segredos mascarados)", n=prompt.redactions) if prompt.redactions else ""
+            return str(target), tr("documentação de “{title}” gerada", title=record.title) + note
 
         return self.jobs.start("session", record.id, record.title, work)
 
@@ -104,15 +104,15 @@ class AiDocs:
         def work():
             prompt = self.general_prompt()
             result = client.complete(prompt.system, prompt.user, model=model, max_tokens=GENERAL_MAX_TOKENS)
-            text = doc_header("geral", result.model, "[índice geral](INDICE.md)") + result.text.strip() + "\n"
+            text = doc_header("geral", result.model, tr("[índice geral](INDICE.md)")) + result.text.strip() + "\n"
             if result.stop_reason == "max_tokens":
-                text += "\n> A resposta atingiu o limite de tamanho e pode estar incompleta.\n"
+                text += "\n> " + tr("A resposta atingiu o limite de tamanho e pode estar incompleta.") + "\n"
             write_text_atomic(self.general_path(), text)
             self.app.hub.write_index()
-            note = f" ({prompt.redactions} segredos mascarados)" if prompt.redactions else ""
-            return str(self.general_path()), f"documentação geral gerada{note}"
+            note = " " + tr("({n} segredos mascarados)", n=prompt.redactions) if prompt.redactions else ""
+            return str(self.general_path()), tr("documentação geral gerada") + note
 
-        return self.jobs.start("general", "all", "documentação geral", work)
+        return self.jobs.start("general", "all", tr("documentação geral"), work)
 
 
 def register_ai_docs_api(app) -> AiDocs:

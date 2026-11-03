@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 
 from vulcan_celox.core import procinfo, prompts
 from vulcan_celox.core.agents.model import AgentSession
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.server.agents_api import card
 from vulcan_celox.server.known_roots import known_root
 from vulcan_celox.server.local_http import HttpError, Request
@@ -70,7 +71,7 @@ class PromptsService:
         counts: Dict[str, int] = {}
         for p in loaded:
             counts[p.category] = counts.get(p.category, 0) + 1
-        names: List[str] = list(prompts.DEFAULT_CATEGORIES)
+        names: List[str] = prompts.default_categories()
         for name in [p.category for p in loaded] + prompts.categories(self.global_dir) + \
                 (prompts.categories(project) if project else []):
             if name not in names:
@@ -78,8 +79,8 @@ class PromptsService:
         chosen = self.app.agents.chosen_id()
         return {
             "prompts": items, "warnings": warnings, "context": context, "variables": list(prompts.VARIABLES),
-            "labels": dict(prompts.LABELS),
-            "categories": [{"name": n, "count": counts.get(n, 0), "user": n not in prompts.DEFAULT_CATEGORIES} for n in names],
+            "labels": prompts.label_names(),
+            "categories": [{"name": n, "count": counts.get(n, 0), "user": n not in prompts.default_categories()} for n in names],
             "session": card(session) if session else None,
             "automatic": not (session and session.id == chosen),
             "global_dir": str(self.global_dir),
@@ -152,7 +153,7 @@ def register_prompts_api(app) -> PromptsService:
             raise HttpError(404, "prompt não encontrado")
         data, missing = prompts.paste_bytes(prompt.body, agents.context(session), values)
         if missing:
-            raise HttpError(400, "preencha: " + ", ".join(prompts.LABELS.get(m, m) for m in missing), {"missing": missing})
+            raise HttpError(400, f"preencha: {', '.join(prompts.label_names().get(m, m) for m in missing)}", {"missing": missing})
         terminal = app.terminals.get(session.pairing_id) if session.pairing_id else None
         if terminal is None or not terminal.alive:
             raise HttpError(409, "a sessão não tem terminal aberto e pareado",

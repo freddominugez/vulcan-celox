@@ -8,7 +8,7 @@ A desktop panel for developers who work alone with code agents. Real terminals, 
 
 ![Overview screen with PHP sites, a Node project, tasks and the terminal panel](vulcan_celox/web/img/manual/visao-geral.png)
 
-**Status: 1.1.0 for macOS.** The Linux code is in the repository and its tests pass in CI, but it has not been accepted on a real desktop yet, so no Linux package is released. The interface is in Brazilian Portuguese.
+**Status: 1.1.0 for macOS.** The Linux code is in the repository and its tests pass in CI, but it has not been accepted on a real desktop yet, so no Linux package is released. The interface is in English by default, with Portuguese available from ⌘K.
 
 ## Why it exists
 

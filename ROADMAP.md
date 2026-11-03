@@ -21,7 +21,6 @@ Still waiting: the Linux release after the acceptance on Mint.
 
 ## Later, not decided
 
-- English interface. The interface is in Portuguese today.
 - Signed and notarized macOS build, and a bundled Python.
 - Other agents: Gemini CLI and Cursor CLI are suspended.
 - Exact pairing for Codex. It depends on a change in Codex itself.

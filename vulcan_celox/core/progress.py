@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Iterable, Optional
 
+from vulcan_celox.core.i18n import tr
+
 EMPTY_LABEL = "sem tarefas"
 BAR_WIDTH = 10
 
@@ -28,7 +30,7 @@ class Progress:
 
     @property
     def label(self) -> str:
-        return EMPTY_LABEL if self.total == 0 else f"{self.done}/{self.total} · {self.pct}%"
+        return tr(EMPTY_LABEL) if self.total == 0 else f"{self.done}/{self.total} · {self.pct}%"
 
     @property
     def short(self) -> str:

@@ -2,7 +2,7 @@
 
 [Português](../pt-BR/README.md)
 
-Describes version 1.0.0. Screens and many internal names are in Brazilian Portuguese; this documentation keeps those names in their original form when you need to find them.
+Describes version 1.1.0. The interface is in English by default, with Portuguese available from ⌘K.
 
 | To... | Read |
 |-------|------|

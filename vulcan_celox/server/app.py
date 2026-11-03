@@ -12,11 +12,13 @@ from typing import Any, Dict, List, Mapping, Optional
 from vulcan_celox import APP_NAME, __version__
 from vulcan_celox.core import paths, themes
 from vulcan_celox.core.backends import detect_backend
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.oscompat import open_argv
 from vulcan_celox.core.notebook import Notebook
 from vulcan_celox.core.progress import progress, progress_by_site
 from vulcan_celox.core.pty_session import TerminalManager
 from vulcan_celox.core.store import Store, migrate_legacy, secure_data_dir
+from vulcan_celox.core import i18n
 from vulcan_celox.server.local_http import HttpError, LocalServer, Request
 
 SERVICE_ACTIONS = ("start", "stop", "restart")
@@ -44,6 +46,7 @@ class VulcanApp:
         self.data_dir = paths.data_dir(self.env)
         secure_data_dir(self.data_dir)  # 0700/0600: memórias e eventos dos agentes só do usuário
         self.store = Store(self.data_dir)
+        i18n.set_language(i18n.resolve(self.store.load("preferences", {}), self.env))
         migrate_legacy(self.store, paths.legacy_dir(self.env))
         self.notebook = Notebook(self.store)
         self.notebook.migrate_legacy_notes()
@@ -219,6 +222,12 @@ class VulcanApp:
                     raise HttpError(400, "theme deve ser sistema, claro ou escuro")
                 prefs["theme"] = body["theme"]
                 self.store.save("preferences", prefs)
+            if "language" in body:
+                if body["language"] not in i18n.LANGUAGES:
+                    raise HttpError(400, "language deve ser en ou pt")
+                prefs["language"] = body["language"]
+                self.store.save("preferences", prefs)
+                i18n.set_language(i18n.resolve(prefs, self.env))
             if "pr_status" in body:
                 if not isinstance(body["pr_status"], bool):
                     raise HttpError(400, "pr_status deve ser verdadeiro ou falso")
@@ -226,7 +235,12 @@ class VulcanApp:
                 self.store.save("preferences", prefs)
             return {"autostart": self.autostart.state(), "new_terminal": self.new_terminal_prefs(),
                     "attention_notify": prefs.get("attention_notify", True), "pr_status": prefs.get("pr_status", False),
-                    "theme": prefs.get("theme", "sistema")}
+                    "theme": prefs.get("theme", "sistema"), "language": i18n.language()}
+
+        @srv.route("GET", "/api/i18n")
+        def _i18n(_req: Request):
+            lang = i18n.language()
+            return {"language": lang, "dictionary": i18n.dictionary() if lang != "pt" else {}}
 
         @srv.route("POST", "/api/open")
         def _open(req: Request):
@@ -290,7 +304,7 @@ class VulcanApp:
                 raise HttpError(400, "kind deve ser url, dashboard, finder, editor, file, prompt, source, session_file ou terminal_file")
             result = self.runner.run(argv, timeout=15)
             if not result.ok:
-                raise HttpError(500, (result.output or "falha ao abrir").strip())
+                raise HttpError(500, (result.output or tr("falha ao abrir")).strip())
             return {"ok": True}
 
     # ── execução ─────────────────────────────────────────────────────────

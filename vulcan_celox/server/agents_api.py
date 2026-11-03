@@ -314,7 +314,7 @@ def register_agents_api(app) -> AgentsService:
         """Tokens e custo estimado por grupo no período (dias locais), com o total."""
         group = req.arg("group") or default_group
         if group not in usage.GROUPS:
-            raise HttpError(400, "group deve ser " + ", ".join(usage.GROUPS))
+            raise HttpError(400, f"group deve ser {', '.join(usage.GROUPS)}")
         try:
             start, end = usage.period(req.arg("from"), req.arg("to"))
         except ValueError as exc:

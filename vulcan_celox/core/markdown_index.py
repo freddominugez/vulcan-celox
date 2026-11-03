@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.models import PRIORITY_LABELS, Tag, Task
 from vulcan_celox.core.progress import progress, text_bar
 from vulcan_celox.core.store import write_text_atomic
@@ -27,7 +28,7 @@ def anchor(text: str) -> str:
 
 
 def site_label(site: Optional[str]) -> str:
-    return GLOBAL_LABEL if site is None else site
+    return tr(GLOBAL_LABEL) if site is None else site
 
 
 def _cell(text: str) -> str:
@@ -46,7 +47,7 @@ def _ordered_sites(tasks: List[Task]) -> List[Optional[str]]:
 def _progress_line(prefix: str, tasks: List[Task]) -> str:
     p = progress(tasks)
     if p.total == 0:
-        return f"**{prefix}:** sem tarefas"
+        return tr("**{prefix}:** sem tarefas", prefix=prefix)
     return f"**{prefix}:** {p.label} `[{text_bar(p.pct)}]`"
 
 
@@ -56,15 +57,15 @@ def render_site_sections(tasks: List[Task], tags: Dict[str, Tag], heading_level:
     lines: List[str] = []
     for status, title in SECTIONS:
         group = sorted((t for t in tasks if t.status == status), key=_sort_key)
-        lines += [f"{hashes} {title} ({len(group)})", ""]
+        lines += [f"{hashes} {tr(title)} ({len(group)})", ""]
         if not group:
-            lines += ["_Nenhuma._", ""]
+            lines += [tr("_Nenhuma._"), ""]
             continue
-        lines.append(TABLE_HEAD)
+        lines.append(tr(TABLE_HEAD))
         for task in group:
             tag_text = " ".join(f"`{_cell(tags[t].name)}`" for t in task.tags if t in tags)
             done = (task.done_at or "")[:10] if status == "done" else ""
-            lines.append(f"| {PRIORITY_LABELS.get(task.priority, '')} | {_cell(task.title)} | "
+            lines.append(f"| {tr(PRIORITY_LABELS.get(task.priority, ''))} | {_cell(task.title)} | "
                          f"{tag_text} | {task.due or ''} | {done} |")
         lines.append("")
     return lines
@@ -72,11 +73,11 @@ def render_site_sections(tasks: List[Task], tags: Dict[str, Tag], heading_level:
 
 def render_global(tasks: Iterable[Task], tags: Dict[str, Tag]) -> str:
     tasks = list(tasks)
-    lines = ["# Tarefas", "", HEADER_NOTE, "", _progress_line("Progresso geral", tasks), "",
-             "## Índice", ""]
+    lines = [tr("# Tarefas"), "", tr(HEADER_NOTE), "", _progress_line(tr("Progresso geral"), tasks), "",
+             tr("## Índice"), ""]
     sites = _ordered_sites(tasks)
     if not sites:
-        lines += ["_Sem tarefas._", ""]
+        lines += [tr("_Sem tarefas._"), ""]
         return "\n".join(lines).rstrip("\n") + "\n"
     for site in sites:
         label = site_label(site)
@@ -84,7 +85,7 @@ def render_global(tasks: Iterable[Task], tags: Dict[str, Tag]) -> str:
     lines.append("")
     for site in sites:
         group = [t for t in tasks if t.site == site]
-        lines += [f"## {site_label(site)}", "", _progress_line("Progresso", group), ""]
+        lines += [f"## {site_label(site)}", "", _progress_line(tr("Progresso"), group), ""]
         lines += render_site_sections(group, tags)
     return "\n".join(lines).rstrip("\n") + "\n"
 
@@ -117,9 +118,9 @@ class ProjectPathMissing(Exception):
 
 def render_project_block(site: Optional[str], tasks: Iterable[Task], tags: Dict[str, Tag]) -> str:
     group = [t for t in tasks if t.site == site]
-    lines = [BLOCK_START, f"## Tarefas ({site_label(site)})", "",
-             "> Bloco mantido pelo Vulcan Celox. O texto fora dos marcadores é preservado.", "",
-             _progress_line("Progresso", group), ""]
+    lines = [BLOCK_START, tr("## Tarefas ({site})", site=site_label(site)), "",
+             tr("> Bloco mantido pelo Vulcan Celox. O texto fora dos marcadores é preservado."), "",
+             _progress_line(tr("Progresso"), group), ""]
     lines += render_site_sections(group, tags)
     return "\n".join(lines).rstrip("\n") + "\n" + BLOCK_END
 
@@ -186,5 +187,5 @@ def sync_project_indexes(settings: ProjectIndexSettings, site_paths: Dict[str, s
             write_project_index(path, site, tasks, tags)
         except ProjectPathMissing:
             settings.set(site, False)
-            warnings.append(f"pasta de '{site}' não existe mais: TAREFAS.md do projeto desligado")
+            warnings.append(tr("pasta de '{site}' não existe mais: TAREFAS.md do projeto desligado", site=site))
     return warnings

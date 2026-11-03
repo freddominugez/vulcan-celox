@@ -4,6 +4,7 @@ import { every, get, post } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
 import { terminals } from "../terminals.mjs";
 import { confirmDialog } from "../ai.mjs";
+import { t } from "../i18n.mjs";
 
 const REFRESH_MS = 15000;
 
@@ -35,15 +36,15 @@ export class EnvironmentView {
   render() {
     const d = this.data;
     if (!d.available || d.backend !== "lerd") {
-      this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>${d.available ? `${esc(d.label)} não tem esta tela` : "Sem Lerd ou Valet"}</h3>
-        <p>Esta tela mostra o que o Lerd mantém rodando. ${d.available ? "Com o Valet, use os comandos dele no terminal." : "Instale o Lerd para ver serviços, PHP e Node aqui."}</p></div></div>`;
+      this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>${d.available ? t("{label} não tem esta tela", { label: esc(d.label) }) : t("Sem Lerd ou Valet")}</h3>
+        <p>${t("Esta tela mostra o que o Lerd mantém rodando.")} ${d.available ? t("Com o Valet, use os comandos dele no terminal.") : t("Instale o Lerd para ver serviços, PHP e Node aqui.")}</p></div></div>`;
       return;
     }
     this.root.innerHTML = `<div class="page env-page">
-      <div class="env-head"><h1>Lerd</h1><span class="dim">${esc(d.label)} · PHP, nginx, banco e HTTPS dos sites locais</span><span class="spacer"></span>
-        <button class="btn btn-sm" data-service="start">${icon("play")}<span>Ligar</span></button>
-        <button class="btn btn-sm" data-service="stop">${icon("stop")}<span>Parar</span></button>
-        <button class="btn btn-sm" data-action="dashboard">${icon("gauge")}<span>Painel do Lerd</span></button></div>
+      <div class="env-head"><h1>Lerd</h1><span class="dim">${esc(d.label)} · ${t("PHP, nginx, banco e HTTPS dos sites locais")}</span><span class="spacer"></span>
+        <button class="btn btn-sm" data-service="start">${icon("play")}<span>${t("Ligar")}</span></button>
+        <button class="btn btn-sm" data-service="stop">${icon("stop")}<span>${t("Parar")}</span></button>
+        <button class="btn btn-sm" data-action="dashboard">${icon("gauge")}<span>${t("Painel do Lerd")}</span></button></div>
       ${this.servicesHtml()}
       ${this.phpHtml()}
       ${this.nodeHtml()}
@@ -54,26 +55,26 @@ export class EnvironmentView {
     const d = this.data;
     const comp = d.components.map((c) => `<li class="env-row">
         <span class="dot ${c.ok ? "dot-ok" : "dot-err"}"></span><span class="env-name">${esc(c.label)}</span>
-        ${c.default ? `<span class="badge">padrão</span>` : ""}${c.xdebug ? `<span class="badge">Xdebug</span>` : ""}
-        <span class="dim env-state">${c.ok ? "rodando" : "parado"}</span></li>`).join("");
+        ${c.default ? `<span class="badge">${t("padrão")}</span>` : ""}${c.xdebug ? `<span class="badge">Xdebug</span>` : ""}
+        <span class="dim env-state">${c.ok ? t("rodando") : t("parado")}</span></li>`).join("");
     const svc = d.services.map((s) => {
       const busy = this.busy.has(s.name);
       return `<li class="env-row">
         <span class="dot ${s.active ? "dot-ok" : "dot-idle"}"></span><span class="env-name">${esc(s.name)}</span>
-        ${s.version ? `<span class="badge">${esc(s.version)}</span>` : ""}${s.pinned ? `<span class="badge" title="Nunca parado sozinho">fixo</span>` : ""}
-        ${s.sites ? `<span class="dim">${s.sites} site${s.sites > 1 ? "s" : ""}</span>` : ""}
-        <span class="dim env-state">${busy ? "aguarde…" : s.active ? "rodando" : "parado"}</span>
+        ${s.version ? `<span class="badge">${esc(s.version)}</span>` : ""}${s.pinned ? `<span class="badge" title="${t("Nunca parado sozinho")}">${t("fixo")}</span>` : ""}
+        ${s.sites ? `<span class="dim">${s.sites > 1 ? t("{n} sites", { n: s.sites }) : t("1 site")}</span>` : ""}
+        <span class="dim env-state">${busy ? t("aguarde…") : s.active ? t("rodando") : t("parado")}</span>
         <span class="env-actions">
-          <button class="icon-btn icon-btn-sm" data-svc="${esc(s.name)}" data-op="start" title="Iniciar" aria-label="Iniciar ${esc(s.name)}" ${busy || s.active ? "disabled" : ""}>${icon("play")}</button>
-          <button class="icon-btn icon-btn-sm" data-svc="${esc(s.name)}" data-op="stop" title="Parar" aria-label="Parar ${esc(s.name)}" ${busy || !s.active ? "disabled" : ""}>${icon("stop")}</button>
-          <button class="icon-btn icon-btn-sm" data-svc="${esc(s.name)}" data-op="restart" title="Reiniciar" aria-label="Reiniciar ${esc(s.name)}" ${busy ? "disabled" : ""}>${icon("restart")}</button>
+          <button class="icon-btn icon-btn-sm" data-svc="${esc(s.name)}" data-op="start" title="${t("Iniciar")}" aria-label="${t("Iniciar {name}", { name: esc(s.name) })}" ${busy || s.active ? "disabled" : ""}>${icon("play")}</button>
+          <button class="icon-btn icon-btn-sm" data-svc="${esc(s.name)}" data-op="stop" title="${t("Parar")}" aria-label="${t("Parar {name}", { name: esc(s.name) })}" ${busy || !s.active ? "disabled" : ""}>${icon("stop")}</button>
+          <button class="icon-btn icon-btn-sm" data-svc="${esc(s.name)}" data-op="restart" title="${t("Reiniciar")}" aria-label="${t("Reiniciar {name}", { name: esc(s.name) })}" ${busy ? "disabled" : ""}>${icon("restart")}</button>
         </span></li>`;
     }).join("");
     return `<section class="panel env-panel">
-      <header class="panel-head"><h2>Serviços</h2></header>
+      <header class="panel-head"><h2>${t("Serviços")}</h2></header>
       <ul class="env-list">${comp}</ul>
-      ${d.services.length ? `<div class="env-sub">Serviços instalados</div><ul class="env-list">${svc}</ul>`
-        : `<p class="env-note dim">Nenhum serviço instalado (mysql, postgres, redis, mailpit...). Instale pelo painel do Lerd ou com <code>lerd service start &lt;nome&gt;</code>.</p>`}
+      ${d.services.length ? `<div class="env-sub">${t("Serviços instalados")}</div><ul class="env-list">${svc}</ul>`
+        : `<p class="env-note dim">${t("Nenhum serviço instalado (mysql, postgres, redis, mailpit...). Instale pelo painel do Lerd ou com <code>lerd service start &lt;nome&gt;</code>.")}</p>`}
     </section>`;
   }
 
@@ -87,23 +88,23 @@ export class EnvironmentView {
       return `<li class="env-row">
         <span class="dot ${c.ok ? "dot-ok" : "dot-idle"}"></span><span class="env-name">PHP ${esc(v.version)}</span>
         ${c.label ? `<span class="dim">${esc(c.label.replace("PHP-FPM ", ""))}</span>` : ""}
-        ${v.default ? `<span class="badge badge-ok">padrão</span>` : ""}
-        ${x.enabled ? `<span class="badge badge-warn" title="O editor precisa escutar na porta ${this.xdebugPort()}">Xdebug ${esc(x.mode || "ligado")}${x.on_demand ? " · sob demanda" : ""}</span>` : ""}
+        ${v.default ? `<span class="badge badge-ok">${t("padrão")}</span>` : ""}
+        ${x.enabled ? `<span class="badge badge-warn" title="${t("O editor precisa escutar na porta {port}", { port: this.xdebugPort() })}">Xdebug ${esc(x.mode || t("ligado"))}${x.on_demand ? t(" · sob demanda") : ""}</span>` : ""}
         <span class="env-actions env-actions-text">
-          <button class="btn btn-sm" data-xdebug="${esc(v.version)}" data-on="${x.enabled ? "1" : ""}" title="lerd xdebug ${x.enabled ? "off" : "on"} ${esc(v.version)}">${x.enabled ? "Desligar Xdebug" : "Xdebug"}</button>
-          ${v.default ? "" : `<button class="btn btn-sm" data-php="${esc(v.version)}" data-op="use">Tornar padrão</button>`}
-          <button class="btn btn-sm" data-ext="${esc(v.version)}" title="Extensões carregadas nesta versão">Extensões</button>
-          <button class="btn btn-sm" data-ini="${esc(v.version)}" title="Os ajustes comuns do php.ini desta versão">php.ini</button>
-          <button class="btn btn-sm" data-php="${esc(v.version)}" data-op="update" title="lerd php:update ${esc(v.version)}">Atualizar</button>
+          <button class="btn btn-sm" data-xdebug="${esc(v.version)}" data-on="${x.enabled ? "1" : ""}" title="lerd xdebug ${x.enabled ? "off" : "on"} ${esc(v.version)}">${x.enabled ? t("Desligar Xdebug") : "Xdebug"}</button>
+          ${v.default ? "" : `<button class="btn btn-sm" data-php="${esc(v.version)}" data-op="use">${t("Tornar padrão")}</button>`}
+          <button class="btn btn-sm" data-ext="${esc(v.version)}" title="${t("Extensões carregadas nesta versão")}">${t("Extensões")}</button>
+          <button class="btn btn-sm" data-ini="${esc(v.version)}" title="${t("Os ajustes comuns do php.ini desta versão")}">php.ini</button>
+          <button class="btn btn-sm" data-php="${esc(v.version)}" data-op="update" title="lerd php:update ${esc(v.version)}">${t("Atualizar")}</button>
         </span></li>`;
     }).join("");
     const install = this.php.installable.length ? `<div class="env-install">
         <select class="select" data-install>${this.php.installable.map((v) => `<option>${esc(v)}</option>`).join("")}</select>
-        <button class="btn btn-sm" data-action="install-php">${icon("plus")}<span>Instalar</span></button>
-        <span class="dim">Constrói a imagem da versão (<code>lerd fetch</code>) numa aba do terminal.</span></div>` : "";
+        <button class="btn btn-sm" data-action="install-php">${icon("plus")}<span>${t("Instalar")}</span></button>
+        <span class="dim">${t("Constrói a imagem da versão (<code>lerd fetch</code>) numa aba do terminal.")}</span></div>` : "";
     return `<section class="panel env-panel">
       <header class="panel-head"><h2>PHP</h2><span class="spacer"></span>
-        <button class="btn btn-sm" data-ini="shared" title="Ajustes que valem para todas as versões; o de uma versão vence">php.ini de todas as versões</button></header>
+        <button class="btn btn-sm" data-ini="shared" title="${t("Ajustes que valem para todas as versões; o de uma versão vence")}">${t("php.ini de todas as versões")}</button></header>
       <ul class="env-list">${rows}</ul>${install}
     </section>`;
   }
@@ -117,19 +118,19 @@ export class EnvironmentView {
     let choice = null;
     const port = this.xdebugPort();
     const yes = await confirmDialog(isOn ? {
-      title: `Desligar o Xdebug do PHP ${version}`,
-      body: "<p>O Lerd reconstrói a imagem do PHP-FPM desta versão numa aba do terminal; os sites dela param por alguns segundos.</p>",
-      confirmLabel: "Desligar",
+      title: t("Desligar o Xdebug do PHP {version}", { version }),
+      body: `<p>${t("O Lerd reconstrói a imagem do PHP-FPM desta versão numa aba do terminal; os sites dela param por alguns segundos.")}</p>`,
+      confirmLabel: t("Desligar"),
     } : {
-      title: `Xdebug no PHP ${version}`,
-      body: `<label class="field-label" for="xd-mode">Modo</label>
+      title: t("Xdebug no PHP {version}", { version }),
+      body: `<label class="field-label" for="xd-mode">${t("Modo")}</label>
         <select id="xd-mode" class="select" data-xd-mode>
-          <option value="debug">debug (passo a passo no editor)</option>
-          <option value="coverage">coverage (cobertura de testes)</option>
-          <option value="debug,coverage">debug e coverage</option></select>
-        <label class="dialog-check"><input type="checkbox" data-xd-demand><span>Sob demanda: só conecta com o cookie ou gatilho de depuração</span></label>
-        <p class="dim">O editor precisa escutar na porta <b>${port}</b>. O Lerd reconstrói a imagem do PHP-FPM numa aba do terminal.</p>`,
-      confirmLabel: "Ligar Xdebug",
+          <option value="debug">${t("debug (passo a passo no editor)")}</option>
+          <option value="coverage">${t("coverage (cobertura de testes)")}</option>
+          <option value="debug,coverage">${t("debug e coverage")}</option></select>
+        <label class="dialog-check"><input type="checkbox" data-xd-demand><span>${t("Sob demanda: só conecta com o cookie ou gatilho de depuração")}</span></label>
+        <p class="dim">${t("O editor precisa escutar na porta <b>{port}</b>.", { port })} ${t("O Lerd reconstrói a imagem do PHP-FPM numa aba do terminal.")}</p>`,
+      confirmLabel: t("Ligar Xdebug"),
       onDecide: (answer, root) => {
         choice = { mode: root.querySelector("[data-xd-mode]").value, on_demand: root.querySelector("[data-xd-demand]").checked };
       },
@@ -150,25 +151,25 @@ export class EnvironmentView {
       const installed = n.installed.includes(v);
       return `<li class="env-row">
         <span class="dot ${installed ? "dot-ok" : "dot-idle"}"></span><span class="env-name">Node ${esc(v)}</span>
-        ${isDefault ? `<span class="badge badge-ok">padrão</span>` : ""}${installed ? "" : `<span class="dim">não instalada</span>`}
+        ${isDefault ? `<span class="badge badge-ok">${t("padrão")}</span>` : ""}${installed ? "" : `<span class="dim">${t("não instalada")}</span>`}
         <span class="env-actions env-actions-text">
-          ${isDefault || !installed ? "" : `<button class="btn btn-sm" data-node="${esc(v)}" data-op="use">Tornar padrão</button>`}
-          ${installed && !isDefault ? `<button class="btn btn-sm" data-node="${esc(v)}" data-op="remove">Remover</button>` : ""}
+          ${isDefault || !installed ? "" : `<button class="btn btn-sm" data-node="${esc(v)}" data-op="use">${t("Tornar padrão")}</button>`}
+          ${installed && !isDefault ? `<button class="btn btn-sm" data-node="${esc(v)}" data-op="remove">${t("Remover")}</button>` : ""}
         </span></li>`;
     }).join("");
     return `<section class="panel env-panel">
-      <header class="panel-head"><h2>Node</h2><span class="dim">${n.manager ? `gerenciado pelo ${esc(n.manager)}` : ""}</span></header>
+      <header class="panel-head"><h2>Node</h2><span class="dim">${n.manager ? t("gerenciado pelo {manager}", { manager: esc(n.manager) }) : ""}</span></header>
       <ul class="env-list">${rows}</ul>
-      <div class="env-install"><input class="input env-node-input" data-node-new placeholder="22, 20.11 ou lts" spellcheck="false" aria-label="Versão de Node">
-        <button class="btn btn-sm" data-action="install-node">${icon("plus")}<span>Instalar</span></button>
-        <span class="dim">Por site, a versão fica no cabeçalho do site.</span></div>
+      <div class="env-install"><input class="input env-node-input" data-node-new placeholder="${t("22, 20.11 ou lts")}" spellcheck="false" aria-label="${t("Versão de Node")}">
+        <button class="btn btn-sm" data-action="install-node">${icon("plus")}<span>${t("Instalar")}</span></button>
+        <span class="dim">${t("Por site, a versão fica no cabeçalho do site.")}</span></div>
     </section>`;
   }
 
   async nodeAction(version, op) {
     if (op === "remove") {
-      const yes = await confirmDialog({ title: `Remover o Node ${version}`, body: "<p>Projetos fixados nesta versão deixam de achá-la.</p>",
-        confirmLabel: "Remover", danger: true });
+      const yes = await confirmDialog({ title: t("Remover o Node {version}", { version }), body: `<p>${t("Projetos fixados nesta versão deixam de achá-la.")}</p>`,
+        confirmLabel: t("Remover"), danger: true });
       if (!yes) return;
     }
     const result = await post(`/api/environment/node/${encodeURIComponent(version)}/${op}`, op === "remove" ? { confirm: true } : {});
@@ -177,8 +178,8 @@ export class EnvironmentView {
       this.options.navigate(`#/terminals/terminal/${result.id}`);
       return;
     }
-    if (result.ok) toast(op === "use" ? `Node ${version} agora é o padrão.` : `Node ${version} removido.`, { kind: "ok" });
-    else toast(`Node ${version}: ${(result.output || "").split("\n").pop()}`, { kind: "error", timeout: 8000 });
+    if (result.ok) toast(op === "use" ? t("Node {version} agora é o padrão.", { version }) : t("Node {version} removido.", { version }), { kind: "ok" });
+    else toast(t("Node {version}: {msg}", { version, msg: (result.output || "").split("\n").pop() }), { kind: "error", timeout: 8000 });
     await this.load();
   }
 
@@ -190,13 +191,13 @@ export class EnvironmentView {
     let values = null;
     let open = false;
     const pending = confirmDialog({
-      title: version === "shared" ? "php.ini de todas as versões" : `php.ini do PHP ${version}`,
+      title: version === "shared" ? t("php.ini de todas as versões") : t("php.ini do PHP {version}", { version }),
       body: `<div class="ini-grid">${info.keys.map((k) => `<label class="field-label" for="ini-${k}">${k}</label>
           <input id="ini-${k}" class="input" data-key="${k}" value="${esc(info.values[k] || "")}" placeholder="${esc(hints[k] || "")}" spellcheck="false">`).join("")}</div>
-        <p class="dim">Campo vazio volta ao padrão. O ${version === "shared" ? "ajuste de uma versão vence este" : "Lerd guarda uma cópia do arquivo antes e reaplica o PHP-FPM"}.
-          Arquivo: <code>${esc(info.path)}</code></p>
-        <button type="button" class="btn btn-sm" data-open-ini>Abrir no editor</button>`,
-      confirmLabel: "Gravar",
+        <p class="dim">${t("Campo vazio volta ao padrão.")} ${version === "shared" ? t("O ajuste de uma versão vence este.") : t("O Lerd guarda uma cópia do arquivo antes e reaplica o PHP-FPM.")}
+          ${t("Arquivo:")} <code>${esc(info.path)}</code></p>
+        <button type="button" class="btn btn-sm" data-open-ini>${t("Abrir no editor")}</button>`,
+      confirmLabel: t("Gravar"),
       onDecide: (answer, root) => {
         values = Object.fromEntries([...root.querySelectorAll("[data-key]")].map((i) => [i.dataset.key, i.value.trim()]));
       },
@@ -220,8 +221,8 @@ export class EnvironmentView {
     const changes = Object.fromEntries(Object.entries(values).filter(([k, v]) => v !== (before[k] || "")));
     if (!Object.keys(changes).length) return;
     const result = await post(`/api/environment/php/${version}/ini`, { values: changes });
-    if (result.ok) toast("php.ini gravado e PHP-FPM reaplicado.", { kind: "ok" });
-    else toast(`php.ini: ${(result.output || "").split("\n").pop()}`, { kind: "error", timeout: 8000 });
+    if (result.ok) toast(t("php.ini gravado e PHP-FPM reaplicado."), { kind: "ok" });
+    else toast(t("php.ini: {msg}", { msg: (result.output || "").split("\n").pop() }), { kind: "error", timeout: 8000 });
   }
 
   /** Extensões carregadas (php -m no contêiner da versão), só leitura; gerenciar fica no painel do Lerd. */
@@ -229,13 +230,13 @@ export class EnvironmentView {
     const info = await get(`/api/environment/php/${version}/extensions`);
     const chips = (list) => list.map((m) => `<span class="chip ext-chip" data-name="${esc(m.toLowerCase())}">${esc(m)}</span>`).join("");
     const pending = confirmDialog({
-      title: `Extensões do PHP ${version}`,
-      body: `<input class="input" data-ext-search placeholder="Buscar extensão" spellcheck="false" aria-label="Buscar extensão">
+      title: t("Extensões do PHP {version}", { version }),
+      body: `<input class="input" data-ext-search placeholder="${t("Buscar extensão")}" spellcheck="false" aria-label="${t("Buscar extensão")}">
         <div class="ext-list">${chips(info.php)}</div>
         ${info.zend.length ? `<div class="field-label">Zend</div><div class="ext-list">${chips(info.zend)}</div>` : ""}
-        <p class="dim">${info.php.length} módulos carregados.${info.declared.length ? ` Personalizadas: ${esc(info.declared.join(", "))}.` : ""}
-          ${info.note ? `Nesta versão: ${esc(info.note)}.` : ""}</p>`,
-      confirmLabel: "Gerenciar no painel do Lerd",
+        <p class="dim">${t("{n} módulos carregados.", { n: info.php.length })}${info.declared.length ? ` ${t("Personalizadas: {list}.", { list: esc(info.declared.join(", ")) })}` : ""}
+          ${info.note ? t("Nesta versão: {note}.", { note: esc(info.note) }) : ""}</p>`,
+      confirmLabel: t("Gerenciar no painel do Lerd"),
     });
     const search = [...document.querySelectorAll(".dialog [data-ext-search]")].pop();
     if (search) {
@@ -261,8 +262,8 @@ export class EnvironmentView {
       this.options.navigate(`#/terminals/terminal/${result.id}`);  // comando demorado: a aba mostra o andamento
       return;
     }
-    if (result.ok) toast(`PHP ${version} agora é o padrão.`, { kind: "ok" });
-    else toast(`PHP ${version}: ${(result.output || "").split("\n").pop()}`, { kind: "error", timeout: 8000 });
+    if (result.ok) toast(t("PHP {version} agora é o padrão.", { version }), { kind: "ok" });
+    else toast(t("PHP {version}: {msg}", { version, msg: (result.output || "").split("\n").pop() }), { kind: "error", timeout: 8000 });
     await this.load();
   }
 

@@ -1,5 +1,7 @@
 // Utilitários de DOM: escape, ícones, toasts, debounce e formatação.
 
+import { t } from "./i18n.mjs";
+
 const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
 
 export function esc(value) {
@@ -51,7 +53,7 @@ export function toast(message, { kind = "info", action = null, timeout = 4000 } 
 }
 
 export function reportError(err) {
-  toast(err && err.message ? err.message : String(err), { kind: "error", timeout: 6000 });
+  toast(err && err.message ? t(err.message) : String(err), { kind: "error", timeout: 6000 });
 }
 
 /** Rola até o item aberto pela árvore da barra lateral e o destaca por um instante (uma vez por abertura). */
@@ -75,7 +77,7 @@ export function todayISO() {
 export function formatDue(due) {
   if (!due) return "";
   const [y, m, d] = due.split("-");
-  const months = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+  const months = [t("jan"), t("fev"), t("mar"), t("abr"), t("mai"), t("jun"), t("jul"), t("ago"), t("set"), t("out"), t("nov"), t("dez")];
   const sameYear = Number(y) === new Date().getFullYear();
   return `${Number(d)} ${months[Number(m) - 1]}${sameYear ? "" : ` ${y}`}`;
 }

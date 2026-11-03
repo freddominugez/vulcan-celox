@@ -3,6 +3,7 @@
 
 import { every, get, post } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 
 const LIMIT = 2000;  // entradas na tela; as mais antigas saem
 const LEVELS = ["", "ERROR", "WARNING", "INFO", "DEBUG"];
@@ -20,11 +21,11 @@ export class LogsView {
     this.paused = false;
     this.root.innerHTML = `<div class="logs">
       <div class="logs-bar">
-        <select class="select logs-level" aria-label="Nível">${LEVELS.map((l) => `<option value="${l}">${l || "Todos os níveis"}</option>`).join("")}</select>
-        <input class="input logs-search" placeholder="Buscar no log" spellcheck="false" aria-label="Buscar no log">
-        <button class="btn btn-sm" data-logs="pause" aria-pressed="false">${icon("stop")}<span>Pausar</span></button>
-        <button class="btn btn-sm" data-logs="clear" title="Limpa a tela; o arquivo não muda">Limpar</button>
-        <button class="btn btn-sm" data-logs="folder">${icon("folder")}<span>Abrir pasta</span></button>
+        <select class="select logs-level" aria-label="${t("Nível")}">${LEVELS.map((l) => `<option value="${l}">${l || t("Todos os níveis")}</option>`).join("")}</select>
+        <input class="input logs-search" placeholder="${t("Buscar no log")}" spellcheck="false" aria-label="${t("Buscar no log")}">
+        <button class="btn btn-sm" data-logs="pause" aria-pressed="false">${icon("stop")}<span>${t("Pausar")}</span></button>
+        <button class="btn btn-sm" data-logs="clear" title="${t("Limpa a tela; o arquivo não muda")}">${t("Limpar")}</button>
+        <button class="btn btn-sm" data-logs="folder">${icon("folder")}<span>${t("Abrir pasta")}</span></button>
         <span class="spacer"></span>
         <span class="dim logs-lerd">Lerd:</span>
         <button class="btn btn-sm" data-lerd="php" title="lerd logs -f">PHP-FPM</button>
@@ -57,8 +58,8 @@ export class LogsView {
 
   draw() {
     if (!this.exists) {
-      this.body.innerHTML = `<div class="empty-block"><h3>Sem laravel.log</h3>
-        <p>Este site ainda não tem <code>${esc(this.path || "storage/logs/laravel.log")}</code>. Os logs do Lerd ficam nos botões acima.</p></div>`;
+      this.body.innerHTML = `<div class="empty-block"><h3>${t("Sem laravel.log")}</h3>
+        <p>${t("Este site ainda não tem <code>{path}</code>. Os logs do Lerd ficam nos botões acima.", { path: esc(this.path || "storage/logs/laravel.log") })}</p></div>`;
       return;
     }
     const stick = this.body.scrollHeight - this.body.scrollTop - this.body.clientHeight < 40;
@@ -67,7 +68,7 @@ export class LogsView {
     this.body.innerHTML = shown.length ? shown.map((e) => `<div class="log-entry log-${TONE[e.level] || "info"}">
         <span class="log-ts">${esc(e.ts)}</span><span class="log-level">${esc(e.level)}</span><span class="log-channel dim">${esc(e.channel)}</span>
         <pre class="log-msg">${esc(e.message)}</pre></div>`).join("")
-      : `<p class="dim logs-empty">Nada com esse filtro.</p>`;
+      : `<p class="dim logs-empty">${t("Nada com esse filtro.")}</p>`;
     if (stick) this.body.scrollTop = this.body.scrollHeight;
   }
 
@@ -78,7 +79,7 @@ export class LogsView {
       if (btn.dataset.logs === "pause") {
         this.paused = !this.paused;
         btn.setAttribute("aria-pressed", String(this.paused));
-        btn.innerHTML = this.paused ? `${icon("play")}<span>Continuar</span>` : `${icon("stop")}<span>Pausar</span>`;
+        btn.innerHTML = this.paused ? `${icon("play")}<span>${t("Continuar")}</span>` : `${icon("stop")}<span>${t("Pausar")}</span>`;
         if (!this.paused) this.load();
       }
       if (btn.dataset.logs === "clear") {

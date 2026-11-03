@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, List, Optional
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.textutil import normalize
 
 KIND_ORDER = ("site", "task", "note", "tag")
@@ -57,11 +58,11 @@ def search(query: str, sites: Iterable, notebook, limit: int = 60) -> List[Hit]:
     for task in notebook.tasks:
         s = _score(task.title, "", q)
         if s:
-            hits.append(Hit("task", task.id, task.site, task.title, task.site or "Global", s))
+            hits.append(Hit("task", task.id, task.site, task.title, task.site or tr("Global"), s))
     for note in notebook.notes:
         s = _score(note.title, note.text, q)
         if s:
-            hits.append(Hit("note", note.id, note.site, note.title or "(sem título)", _snippet(note.text, q), s))
+            hits.append(Hit("note", note.id, note.site, note.title or tr("(sem título)"), _snippet(note.text, q), s))
     for tag in notebook.tags.values():
         s = _score(tag.name, "", q)
         if s:

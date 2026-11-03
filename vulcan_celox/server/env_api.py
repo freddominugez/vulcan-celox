@@ -16,6 +16,7 @@ from vulcan_celox.core.environment import (SERVICE_ACTIONS, SUPPORTED_PHP, XDEBU
                                                lerd_services, parse_ext_list, parse_php_list, parse_php_m,
                                                parse_xdebug_status, xdebug_argv, xdebug_mode_ok)
 from vulcan_celox.core import paths
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.php_ini import ENV_CHANGES, KEYS, check, parse_directives
 from vulcan_celox.server.local_http import HttpError, Request
 
@@ -121,11 +122,11 @@ def register_env_api(app) -> None:
             raise HttpError(400, "versão de PHP que o Lerd não publica")
         have = {v["version"] for v in installed_php(b)}
         if op == "install":
-            return in_tab(b, f"PHP {version} · instalar", "fetch", version)
+            return in_tab(b, tr("PHP {version} · instalar", version=version), "fetch", version)
         if version not in have:
             raise HttpError(400, "versão não instalada")
         if op == "update":
-            return in_tab(b, f"PHP {version} · atualizar", "php:update", version)
+            return in_tab(b, tr("PHP {version} · atualizar", version=version), "php:update", version)
         return _result(b.runner.run(b.argv("use", version), timeout=120))
 
     # ── Xdebug por versão ─────────────────────────────────────
@@ -256,7 +257,7 @@ def register_env_api(app) -> None:
         if not NODE.match(version):
             raise HttpError(400, "versão de Node como 22, 20.11 ou lts")
         if op == "install":
-            return in_tab(b, f"Node {version} · instalar", "node:install", version)
+            return in_tab(b, tr("Node {version} · instalar", version=version), "node:install", version)
         if op == "remove":
             if req.json().get("confirm") is not True:
                 raise HttpError(400, "confirme a remoção da versão")

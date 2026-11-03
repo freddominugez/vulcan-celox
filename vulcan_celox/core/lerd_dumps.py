@@ -11,6 +11,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.redact import redact
 
 API_FILTERS = ("site", "branch", "kind", "limit")  # os que a API do Lerd aceita; busca de texto é feita no app
@@ -170,16 +171,16 @@ def site_for_path(sites: Iterable[Tuple[str, str]], path: str) -> Optional[str]:
 
 def session_summary(events: List[Dict[str, Any]], site: str) -> str:
     """Texto para colar no agente; passa pelo redact e para em SUMMARY_MAX eventos."""
-    lines = [f"Estas exceções e erros aconteceram no site {site} enquanto você trabalhava:"]
+    lines = [tr("Estas exceções e erros aconteceram no site {site} enquanto você trabalhava:", site=site)]
     for e in events[:SUMMARY_MAX]:
         data = e.get("data") or {}
         level = str(data.get("level") or e.get("kind") or "").upper()
         message = " ".join(str(data.get("message") or e.get("text") or "").split())[:300]
         where = f" ({'/'.join(e['file'].split('/')[-3:])}:{e['line']})" if e.get("file") else ""
-        request = f" em {e['request']}" if e.get("request") else ""
+        request = tr(" em {request}", request=e["request"]) if e.get("request") else ""
         lines.append(f"- {e.get('ts', '')[11:19]} {level} {message}{where}{request}")
     if len(events) > SUMMARY_MAX:
-        lines.append(f"(e mais {len(events) - SUMMARY_MAX} eventos no painel Depuração do Vulcan Celox)")
-    lines.append("Verifique se alguma delas vem das mudanças desta sessão.")
+        lines.append(tr("(e mais {n} eventos no painel Depuração do Vulcan Celox)", n=len(events) - SUMMARY_MAX))
+    lines.append(tr("Verifique se alguma delas vem das mudanças desta sessão."))
     return redact("\n".join(lines))[0]
 

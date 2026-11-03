@@ -1,20 +1,20 @@
 // Tarefas como mini gerenciador: responsável, prazo, resumo, filtros e visões Lista ou Quadro (arrastar muda o status).
-
 import { del, get, patch, post } from "../api.mjs";
 import { $, flashFocus, esc, formatDue, icon, progressBar, reportError, toast, todayISO } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 
-const PRIORITY = { 1: "Alta", 2: "Média", 3: "Baixa" };
-const STATUS_LABEL = { todo: "A fazer", doing: "Fazendo", done: "Feito" };
+const PRIORITY = { 1: t("Alta"), 2: t("Média"), 3: t("Baixa") };
+const STATUS_LABEL = { todo: t("A fazer"), doing: t("Fazendo"), done: t("Feito") };
 const FILTERS = [
-  { id: "open", label: "Abertas", status: "todo,doing" },
-  { id: "all", label: "Todas", status: "" },
-  { id: "done", label: "Concluídas", status: "done" },
+  { id: "open", label: t("Abertas"), status: "todo,doing" },
+  { id: "all", label: t("Todas"), status: "" },
+  { id: "done", label: t("Concluídas"), status: "done" },
 ];
 const DUE_FILTERS = [
-  { id: "", label: "Qualquer prazo" },
-  { id: "late", label: "Atrasadas" },
-  { id: "today", label: "Vencem hoje" },
-  { id: "week", label: "Próximos 7 dias" },
+  { id: "", label: t("Qualquer prazo") },
+  { id: "late", label: t("Atrasadas") },
+  { id: "today", label: t("Vencem hoje") },
+  { id: "week", label: t("Próximos 7 dias") },
 ];
 const NO_ASSIGNEE = "__sem__";
 const AVATAR_COLORS = ["#6ea8fe", "#a78bfa", "#f472b6", "#2dd4bf", "#c4a484", "#93c5fd", "#e879f9", "#a1a1aa"];
@@ -41,11 +41,11 @@ function dueInfo(due, status) {
   const today = new Date(`${todayISO()}T00:00:00`);
   const date = new Date(`${due}T00:00:00`);
   const days = Math.round((date - today) / 86400000);
-  if (status !== "done" && days < 0) return { text: `Atrasada ${-days} d`, tone: "is-late" };
-  if (days === 0) return { text: "Hoje", tone: status === "done" ? "" : "is-today" };
-  if (days === 1) return { text: "Amanhã", tone: status === "done" ? "" : "is-soon" };
+  if (status !== "done" && days < 0) return { text: t("Atrasada {n} d", { n: -days }), tone: "is-late" };
+  if (days === 0) return { text: t("Hoje"), tone: status === "done" ? "" : "is-today" };
+  if (days === 1) return { text: t("Amanhã"), tone: status === "done" ? "" : "is-soon" };
   if (days > 1 && days <= 6) {
-    const weekday = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"][date.getDay()];
+    const weekday = [t("dom"), t("seg"), t("ter"), t("qua"), t("qui"), t("sex"), t("sáb")][date.getDay()];
     return { text: `${weekday}, ${formatDue(due)}`, tone: status === "done" ? "" : "is-soon" };
   }
   return { text: formatDue(due), tone: "" };
@@ -135,8 +135,8 @@ export class TasksView {
   renderShell() {
     const global = this.options.site === "*";
     const siteSelect = global
-      ? `<select name="site" class="select" aria-label="Site da tarefa">
-          <option value="">Global</option>
+      ? `<select name="site" class="select" aria-label="${t("Site da tarefa")}">
+          <option value="">${t("Global")}</option>
           ${this.options.sites.map((s) => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("")}
         </select>`
       : "";
@@ -144,39 +144,39 @@ export class TasksView {
       <div class="tasks">
         <form class="task-add" autocomplete="off">
           <span class="task-add-icon">${icon("plus")}</span>
-          <input name="title" class="task-add-input" placeholder="Nova tarefa… (Enter para adicionar)" aria-label="Título da tarefa" required>
+          <input name="title" class="task-add-input" placeholder="${t("Nova tarefa… (Enter para adicionar)")}" aria-label="${t("Título da tarefa")}" required>
           ${siteSelect}
-          <label class="task-add-field">${icon("user")}<input name="assignee" class="input-bare" placeholder="Responsável" list="assignee-options" aria-label="Responsável" maxlength="60"></label>
-          <input name="due" type="date" class="input input-date" aria-label="Prazo" title="Prazo" min="2000-01-01">
-          <select name="priority" class="select" aria-label="Prioridade">
-            <option value="1">Alta</option><option value="2" selected>Média</option><option value="3">Baixa</option>
+          <label class="task-add-field">${icon("user")}<input name="assignee" class="input-bare" placeholder="${t("Responsável")}" list="assignee-options" aria-label="${t("Responsável")}" maxlength="60"></label>
+          <input name="due" type="date" class="input input-date" aria-label="${t("Prazo")}" title="${t("Prazo")}" min="2000-01-01">
+          <select name="priority" class="select" aria-label="${t("Prioridade")}">
+            <option value="1">${PRIORITY[1]}</option><option value="2" selected>${PRIORITY[2]}</option><option value="3">${PRIORITY[3]}</option>
           </select>
-          <input name="tags" class="input input-tags" placeholder="tags (vírgula)" list="tag-options" aria-label="Tags">
+          <input name="tags" class="input input-tags" placeholder="${t("tags (vírgula)")}" list="tag-options" aria-label="${t("Tags")}">
           <datalist id="tag-options"></datalist>
           <datalist id="assignee-options"></datalist>
-          <button class="btn btn-primary task-add-btn" type="submit" title="Adicionar (Enter)">Adicionar</button>
+          <button class="btn btn-primary task-add-btn" type="submit" title="${t("Adicionar (Enter)")}">${t("Adicionar")}</button>
         </form>
         <div class="task-summary" data-role="summary"></div>
         <div class="task-filters">
-          ${this.options.terminal ? `<div class="segmented" role="tablist" aria-label="Escopo">
-            <button type="button" class="seg ${this.scope === "session" ? "is-on" : ""}" data-scope="session" title="Só o que foi criado nesta sessão de terminal">${icon("terminal")}<span>Esta sessão</span></button>
-            <button type="button" class="seg ${this.scope === "site" ? "is-on" : ""}" data-scope="site">Todo o ${this.options.site ? "site" : "Global"}</button>
+          ${this.options.terminal ? `<div class="segmented" role="tablist" aria-label="${t("Escopo")}">
+            <button type="button" class="seg ${this.scope === "session" ? "is-on" : ""}" data-scope="session" title="${t("Só o que foi criado nesta sessão de terminal")}">${icon("terminal")}<span>${t("Esta sessão")}</span></button>
+            <button type="button" class="seg ${this.scope === "site" ? "is-on" : ""}" data-scope="site">${this.options.site ? t("Todo o site") : t("Todo o Global")}</button>
           </div>` : ""}
           <div class="segmented" role="tablist" data-role="status-filter" ${this.view === "board" ? "hidden" : ""}>
             ${FILTERS.map((f) => `<button type="button" class="seg ${f.id === this.filter ? "is-on" : ""}" data-filter="${f.id}">${f.label}</button>`).join("")}
           </div>
-          <select class="select select-sm" data-role="assignee" aria-label="Filtrar por responsável"></select>
-          <select class="select select-sm" data-role="due" aria-label="Filtrar por prazo">
+          <select class="select select-sm" data-role="assignee" aria-label="${t("Filtrar por responsável")}"></select>
+          <select class="select select-sm" data-role="due" aria-label="${t("Filtrar por prazo")}">
             ${DUE_FILTERS.map((d) => `<option value="${d.id}">${d.label}</option>`).join("")}
           </select>
-          <select class="select select-sm" data-role="tag" aria-label="Filtrar por tag"><option value="">Todas as tags</option></select>
-          <select class="select select-sm" data-role="sort" aria-label="Ordenar">
-            <option value="priority">Prioridade</option><option value="due">Prazo</option><option value="assignee">Responsável</option><option value="manual">Manual</option>
+          <select class="select select-sm" data-role="tag" aria-label="${t("Filtrar por tag")}"><option value="">${t("Todas as tags")}</option></select>
+          <select class="select select-sm" data-role="sort" aria-label="${t("Ordenar")}">
+            <option value="priority">${t("Prioridade")}</option><option value="due">${t("Prazo")}</option><option value="assignee">${t("Responsável")}</option><option value="manual">${t("Manual")}</option>
           </select>
           <div class="spacer"></div>
-          <div class="segmented" role="tablist" aria-label="Visão">
-            <button type="button" class="seg ${this.view === "list" ? "is-on" : ""}" data-view="list" title="Lista">${icon("list")}<span>Lista</span></button>
-            <button type="button" class="seg ${this.view === "board" ? "is-on" : ""}" data-view="board" title="Quadro">${icon("columns")}<span>Quadro</span></button>
+          <div class="segmented" role="tablist" aria-label="${t("Visão")}">
+            <button type="button" class="seg ${this.view === "list" ? "is-on" : ""}" data-view="list" title="${t("Lista")}">${icon("list")}<span>${t("Lista")}</span></button>
+            <button type="button" class="seg ${this.view === "board" ? "is-on" : ""}" data-view="board" title="${t("Quadro")}">${icon("columns")}<span>${t("Quadro")}</span></button>
           </div>
         </div>
         <div class="task-list" data-role="list" role="list"></div>
@@ -195,24 +195,24 @@ export class TasksView {
       <button type="button" class="summary-pill ${tone} ${active ? "is-on" : ""} ${value ? "" : "is-zero"}" data-quick="${id}" aria-pressed="${active}">
         <span class="summary-num">${value}</span><span>${label}</span></button>`;
     box.innerHTML = `
-      ${quick("late", s.late === 1 ? "atrasada" : "atrasadas", s.late, "tone-late", this.due === "late")}
-      ${quick("today", "vencem hoje", s.today, "tone-today", this.due === "today")}
-      ${quick("unassigned", "sem responsável", s.unassigned, "tone-none", this.assignee === NO_ASSIGNEE)}
-      <span class="summary-pill tone-open"><span class="summary-num">${s.open}</span><span>${s.open === 1 ? "aberta" : "abertas"}</span></span>
+      ${quick("late", s.late === 1 ? t("atrasada") : t("atrasadas"), s.late, "tone-late", this.due === "late")}
+      ${quick("today", t("vencem hoje"), s.today, "tone-today", this.due === "today")}
+      ${quick("unassigned", t("sem responsável"), s.unassigned, "tone-none", this.assignee === NO_ASSIGNEE)}
+      <span class="summary-pill tone-open"><span class="summary-num">${s.open}</span><span>${s.open === 1 ? t("aberta") : t("abertas")}</span></span>
       <div class="spacer"></div>
       ${p && p.total ? `<div class="task-progress"><span class="num">${p.done}/${p.total}</span>${progressBar(p, "bar-wide")}<span class="num dim">${p.pct}%</span></div>` : ""}`;
   }
 
   renderFilters() {
     const tagSelect = $("[data-role=tag]", this.root);
-    tagSelect.innerHTML = `<option value="">Todas as tags</option>` +
-      this.tags.map((t) => `<option value="${t.id}" ${t.id === this.tag ? "selected" : ""}>${esc(t.name)}</option>`).join("");
-    $("#tag-options", this.root).innerHTML = this.tags.map((t) => `<option value="${esc(t.name)}">`).join("");
+    tagSelect.innerHTML = `<option value="">${t("Todas as tags")}</option>` +
+      this.tags.map((tag) => `<option value="${tag.id}" ${tag.id === this.tag ? "selected" : ""}>${esc(tag.name)}</option>`).join("");
+    $("#tag-options", this.root).innerHTML = this.tags.map((tag) => `<option value="${esc(tag.name)}">`).join("");
     $("#assignee-options", this.root).innerHTML = this.assignees.map((a) => `<option value="${esc(a.name)}">`).join("");
     const known = this.assignees.some((a) => a.name.toLowerCase() === this.assignee.toLowerCase());
     $("[data-role=assignee]", this.root).innerHTML = `
-      <option value="">Todos os responsáveis</option>
-      <option value="${NO_ASSIGNEE}" ${this.assignee === NO_ASSIGNEE ? "selected" : ""}>Sem responsável</option>
+      <option value="">${t("Todos os responsáveis")}</option>
+      <option value="${NO_ASSIGNEE}" ${this.assignee === NO_ASSIGNEE ? "selected" : ""}>${t("Sem responsável")}</option>
       ${this.assignees.map((a) => `<option value="${esc(a.name)}" ${a.name.toLowerCase() === this.assignee.toLowerCase() ? "selected" : ""}>${esc(a.name)} (${a.open})</option>`).join("")}
       ${this.assignee && this.assignee !== NO_ASSIGNEE && !known ? `<option value="${esc(this.assignee)}" selected>${esc(this.assignee)}</option>` : ""}`;
     $("[data-role=due]", this.root).value = this.due;
@@ -229,69 +229,69 @@ export class TasksView {
       list.innerHTML = this.boardHtml();
     } else if (!this.data.tasks.length) {
       const filtered = this.assignee || this.due || this.tag;
-      const msg = filtered ? "Nenhuma tarefa com esses filtros." : this.filter === "done" ? "Nenhuma tarefa concluída ainda." :
-        this.filter === "open" ? "Nada em aberto. Escreva uma tarefa acima e tecle Enter." : "Nenhuma tarefa. Escreva uma acima e tecle Enter.";
-      const where = this.sessionScoped && !filtered ? ` Tarefas criadas aqui ficam na sessão “${this.options.sessionTitle}”.` : "";
+      const msg = filtered ? t("Nenhuma tarefa com esses filtros.") : this.filter === "done" ? t("Nenhuma tarefa concluída ainda.") :
+        this.filter === "open" ? t("Nada em aberto. Escreva uma tarefa acima e tecle Enter.") : t("Nenhuma tarefa. Escreva uma acima e tecle Enter.");
+      const where = this.sessionScoped && !filtered ? ` ${t("Tarefas criadas aqui ficam na sessão “{title}”.", { title: this.options.sessionTitle })}` : "";
       list.innerHTML = `<div class="empty-inline">${icon("check-square")}<span>${esc(msg + where)}</span></div>`;
       return;
     } else {
-      list.innerHTML = this.data.tasks.map((t) => this.rowHtml(t)).join("");
+      list.innerHTML = this.data.tasks.map((task) => this.rowHtml(task)).join("");
     }
     flashFocus(list, this.options, (id) => `[data-id="${id}"]`);
   }
 
-  assigneeHtml(t) {
-    return t.assignee
-      ? `<button class="task-assignee" data-action="assignee" title="Responsável: ${esc(t.assignee)} · clique para trocar">${avatar(t.assignee)}<span>${esc(t.assignee)}</span></button>`
-      : `<button class="task-assignee is-empty" data-action="assignee" title="Definir responsável">${icon("user")}<span>Responsável</span></button>`;
+  assigneeHtml(task) {
+    return task.assignee
+      ? `<button class="task-assignee" data-action="assignee" title="${t("Responsável: {name} · clique para trocar", { name: esc(task.assignee) })}">${avatar(task.assignee)}<span>${esc(task.assignee)}</span></button>`
+      : `<button class="task-assignee is-empty" data-action="assignee" title="${t("Definir responsável")}">${icon("user")}<span>${t("Responsável")}</span></button>`;
   }
 
-  dueHtml(t) {
-    const info = dueInfo(t.due, t.status);
+  dueHtml(task) {
+    const info = dueInfo(task.due, task.status);
     return info
-      ? `<button class="task-due ${info.tone}" data-action="due" title="Prazo ${esc(formatDue(t.due))} · clique para mudar">${icon("calendar")}<span>${esc(info.text)}</span></button>`
-      : `<button class="task-due is-empty" data-action="due" title="Definir prazo">${icon("calendar")}<span>Prazo</span></button>`;
+      ? `<button class="task-due ${info.tone}" data-action="due" title="${t("Prazo {date} · clique para mudar", { date: esc(formatDue(task.due)) })}">${icon("calendar")}<span>${esc(info.text)}</span></button>`
+      : `<button class="task-due is-empty" data-action="due" title="${t("Definir prazo")}">${icon("calendar")}<span>${t("Prazo")}</span></button>`;
   }
 
-  rowHtml(t) {
+  rowHtml(task) {
     const global = this.options.site === "*";
-    const chips = t.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}</span>`).join("");
+    const chips = task.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}</span>`).join("");
     return `
-      <div class="task status-${t.status}" role="listitem" data-id="${t.id}">
-        <button class="task-status" data-action="cycle" aria-label="Status: ${STATUS_LABEL[t.status]}" title="${STATUS_LABEL[t.status]} · clique para avançar">
-          ${icon(t.status === "done" ? "circle-check" : t.status === "doing" ? "circle-half" : "circle")}
+      <div class="task status-${task.status}" role="listitem" data-id="${task.id}">
+        <button class="task-status" data-action="cycle" aria-label="${t("Status: {status}", { status: STATUS_LABEL[task.status] })}" title="${t("{status} · clique para avançar", { status: STATUS_LABEL[task.status] })}">
+          ${icon(task.status === "done" ? "circle-check" : task.status === "doing" ? "circle-half" : "circle")}
         </button>
-        <span class="task-title" data-action="edit" tabindex="0" title="Duplo clique ou Enter para editar">${esc(t.title)}</span>
+        <span class="task-title" data-action="edit" tabindex="0" title="${t("Duplo clique ou Enter para editar")}">${esc(task.title)}</span>
         <span class="task-chips">${chips}</span>
-        ${t.terminal_title && !this.sessionScoped ? `<span class="task-session" title="Sessão de terminal">${icon("terminal")}${esc(t.terminal_title)}</span>` : ""}
-        ${global ? `<span class="task-site">${esc(t.site || "Global")}</span>` : ""}
-        ${this.assigneeHtml(t)}
-        ${this.dueHtml(t)}
-        <button class="task-priority p${t.priority}" data-action="priority" title="Prioridade: clique para trocar">${PRIORITY[t.priority]}</button>
-        <button class="icon-btn task-delete" data-action="delete" aria-label="Excluir tarefa">${icon("trash")}</button>
+        ${task.terminal_title && !this.sessionScoped ? `<span class="task-session" title="${t("Sessão de terminal")}">${icon("terminal")}${esc(task.terminal_title)}</span>` : ""}
+        ${global ? `<span class="task-site">${esc(task.site || t("Global"))}</span>` : ""}
+        ${this.assigneeHtml(task)}
+        ${this.dueHtml(task)}
+        <button class="task-priority p${task.priority}" data-action="priority" title="${t("Prioridade: clique para trocar")}">${PRIORITY[task.priority]}</button>
+        <button class="icon-btn task-delete" data-action="delete" aria-label="${t("Excluir tarefa")}">${icon("trash")}</button>
       </div>`;
   }
 
   boardHtml() {
     const columns = ["todo", "doing", "done"].map((status) => {
-      const tasks = this.data.tasks.filter((t) => t.status === status);
-      const cards = tasks.map((t) => {
-        const chips = t.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}</span>`).join("");
+      const tasks = this.data.tasks.filter((task) => task.status === status);
+      const cards = tasks.map((task) => {
+        const chips = task.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}</span>`).join("");
         return `
-          <article class="board-card status-${t.status} p${t.priority}" draggable="true" data-id="${t.id}">
+          <article class="board-card status-${task.status} p${task.priority}" draggable="true" data-id="${task.id}">
             <div class="board-card-top">
-              <span class="board-priority p${t.priority}" title="Prioridade ${PRIORITY[t.priority]}"></span>
-              <span class="task-title board-title" title="Duplo clique para editar">${esc(t.title)}</span>
-              <button class="icon-btn icon-btn-sm task-delete" data-action="delete" aria-label="Excluir tarefa">${icon("trash")}</button>
+              <span class="board-priority p${task.priority}" title="${t("Prioridade {priority}", { priority: PRIORITY[task.priority] })}"></span>
+              <span class="task-title board-title" title="${t("Duplo clique para editar")}">${esc(task.title)}</span>
+              <button class="icon-btn icon-btn-sm task-delete" data-action="delete" aria-label="${t("Excluir tarefa")}">${icon("trash")}</button>
             </div>
             ${chips ? `<div class="board-chips">${chips}</div>` : ""}
-            <div class="board-meta">${this.assigneeHtml(t)}${this.dueHtml(t)}</div>
+            <div class="board-meta">${this.assigneeHtml(task)}${this.dueHtml(task)}</div>
           </article>`;
       }).join("");
       return `
         <section class="board-col" data-status="${status}" aria-label="${STATUS_LABEL[status]}">
           <header class="board-col-head"><span class="board-dot status-${status}"></span><h3>${STATUS_LABEL[status]}</h3><span class="count">${tasks.length}</span></header>
-          <div class="board-cards">${cards || `<div class="board-empty">Arraste tarefas para cá</div>`}</div>
+          <div class="board-cards">${cards || `<div class="board-empty">${t("Arraste tarefas para cá")}</div>`}</div>
         </section>`;
     }).join("");
     return `<div class="board">${columns}</div>`;
@@ -381,8 +381,8 @@ export class TasksView {
         await patch(`/api/tasks/${id}`, { priority: (task.priority % 3) + 1 });
       } else if (action === "delete") {
         await del(`/api/tasks/${id}`);
-        toast(`Tarefa excluída: ${task.title}`, {
-          action: { label: "Desfazer", run: () => post("/api/tasks/undo").then(() => { this.load(); this.options.onChange(); }).catch(reportError) },
+        toast(t("Tarefa excluída: {title}", { title: task.title }), {
+          action: { label: t("Desfazer"), run: () => post("/api/tasks/undo").then(() => { this.load(); this.options.onChange(); }).catch(reportError) },
           timeout: 5000,
         });
       } else {
@@ -428,10 +428,10 @@ export class TasksView {
     const input = document.createElement("input");
     input.className = "input inline-edit inline-assignee";
     input.value = task.assignee || "";
-    input.placeholder = "Responsável";
+    input.placeholder = t("Responsável");
     input.maxLength = 60;
     input.setAttribute("list", "assignee-options");
-    input.setAttribute("aria-label", "Responsável");
+    input.setAttribute("aria-label", t("Responsável"));
     this.inlineEditor(button, input, (value) => {
       const next = value.trim();
       return next === (task.assignee || "") ? null : patch(`/api/tasks/${task.id}`, { assignee: next || null });
@@ -444,7 +444,7 @@ export class TasksView {
     input.type = "date";
     input.className = "input inline-edit inline-due";
     input.value = task.due || "";
-    input.setAttribute("aria-label", "Prazo");
+    input.setAttribute("aria-label", t("Prazo"));
     const finish = this.inlineEditor(button, input, (value) =>
       (value || null) === (task.due || null) ? null : patch(`/api/tasks/${task.id}`, { due: value || null }));
     input.addEventListener("change", () => finish(true));

@@ -34,7 +34,7 @@ Without a hook, a tab and a session are paired by folder and time. For an exact 
 python3 -m vulcan_celox --instalar-hook
 ```
 
-This is the only thing that writes to `~/.claude/settings.json`, and it keeps a backup next to the file. See [pairing-hook.md](pairing-hook.md) (Portuguese).
+This is the only thing that writes to `~/.claude/settings.json`, and it keeps a backup next to the file. See [pairing-hook.md](pairing-hook.md).
 
 ## Build from source on macOS
 

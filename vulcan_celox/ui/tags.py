@@ -26,9 +26,9 @@ class TagManager(tk.Toplevel):
         frame = ttk.Frame(self)
         frame.pack(fill="both", expand=True, padx=14)
         self.tree = ttk.Treeview(frame, columns=("uso", "progresso"), show="tree headings", selectmode="browse")
-        self.tree.heading("#0", text="Nome")
-        self.tree.heading("uso", text="Itens")
-        self.tree.heading("progresso", text="Tarefas")
+        self.tree.heading("#0", text="Name")
+        self.tree.heading("uso", text="Items")
+        self.tree.heading("progresso", text="Tasks")
         self.tree.column("uso", width=50, anchor="e", stretch=False)
         self.tree.column("progresso", width=110, anchor="e", stretch=False)
         self.tree.pack(fill="both", expand=True)
@@ -40,13 +40,13 @@ class TagManager(tk.Toplevel):
         entry = ttk.Entry(form, textvariable=self.var_name)
         entry.pack(side="left", fill="x", expand=True)
         entry.bind("<Return>", lambda _e: self.create())
-        ttk.Button(form, text="Nova", style="Accent.TButton", command=self.create).pack(side="left", padx=(6, 0))
+        ttk.Button(form, text="New", style="Accent.TButton", command=self.create).pack(side="left", padx=(6, 0))
 
         actions = ttk.Frame(self)
         actions.pack(fill="x", padx=14, pady=(0, 12))
-        ttk.Button(actions, text="Renomear", command=self.rename).pack(side="left")
-        ttk.Button(actions, text="Trocar cor", command=self.cycle_color).pack(side="left", padx=6)
-        ttk.Button(actions, text="Excluir", command=self.delete).pack(side="right")
+        ttk.Button(actions, text="Rename", command=self.rename).pack(side="left")
+        ttk.Button(actions, text="Change color", command=self.cycle_color).pack(side="left", padx=6)
+        ttk.Button(actions, text="Delete", command=self.delete).pack(side="right")
 
         self._unsubscribe = notebook.subscribe(lambda _k: self.refresh())
         self.bind("<Destroy>", self._on_destroy)
@@ -90,7 +90,7 @@ class TagManager(tk.Toplevel):
         try:
             tag = self.notebook.create_tag(self.var_name.get())
         except DuplicateTag:
-            messagebox.showwarning("Tags", "Já existe uma tag com esse nome.", parent=self)
+            messagebox.showwarning("Tags", "A tag with that name already exists.", parent=self)
             return
         except ValueError:
             return
@@ -104,7 +104,7 @@ class TagManager(tk.Toplevel):
         try:
             self.notebook.rename_tag(tag_id, self.var_name.get())
         except DuplicateTag:
-            messagebox.showwarning("Tags", "Já existe uma tag com esse nome.", parent=self)
+            messagebox.showwarning("Tags", "A tag with that name already exists.", parent=self)
         except ValueError:
             pass
 
@@ -121,7 +121,7 @@ class TagManager(tk.Toplevel):
         if not tag_id:
             return
         name = self.notebook.tags[tag_id].name
-        if messagebox.askyesno("Tags", f"Excluir a tag '{name}'?\nEla sai de todas as notas e tarefas.",
+        if messagebox.askyesno("Tags", f"Delete the tag '{name}'?\nIt is removed from all notes and tasks.",
                                parent=self):
             self.notebook.delete_tag(tag_id)
             self.var_name.set("")

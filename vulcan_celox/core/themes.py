@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
+from vulcan_celox.core.i18n import tr
+
 # cores ANSI comuns; cada tema troca fundo, texto, cursor e seleção
 _ANSI = {
     "black": "#1f1f23", "red": "#ff6b5e", "green": "#4fd08a", "yellow": "#f2c14e", "blue": "#6aa8ff",
@@ -48,7 +50,7 @@ def css() -> str:
 
 
 def public() -> List[Dict]:
-    return [{"id": tid, **THEMES[tid]} for tid in ROTATION]
+    return [{"id": tid, **THEMES[tid], "name": tr(THEMES[tid]["name"]), "desc": tr(THEMES[tid]["desc"])} for tid in ROTATION]
 
 
 class Rotation:

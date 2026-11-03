@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.models import PRIORITY_LABELS, Note, Tag, Task
 from vulcan_celox.core.textutil import normalize
 
@@ -107,7 +108,7 @@ def extract_transcript(markdown: str) -> Tuple[str, bool]:
     if start == -1 or end == -1:
         return "", False
     block = markdown[start + len(TRANSCRIPT_START):end]
-    truncated = "_Mostrando as últimas" in block
+    truncated = "_Mostrando as últimas" in block or "_Showing the last" in block
     fence = re.search(r"^(`{3,}|~{3,})text\n(.*?)\n\1$", block, re.S | re.M)
     return (fence.group(2) if fence else ""), truncated
 
@@ -130,7 +131,7 @@ def format_when(value: Optional[str]) -> str:
 def format_duration(start: Optional[str], end: Optional[str]) -> str:
     a, b = parse_iso(start), parse_iso(end)
     if not a or not b:
-        return "em andamento"
+        return tr("em andamento")
     seconds = max(0, int((b - a).total_seconds()))
     if seconds < 60:
         return f"{seconds} s"
@@ -176,7 +177,7 @@ def _tag_list(ids: Iterable[str], tags: Dict[str, Tag]) -> str:
 
 AGENT_LABELS = {"claude": "Claude Code", "codex": "Codex"}
 PUBLISH_LABELS = {"none": "sem commit", "committed": "commit feito, falta o push", "pushed": "push feito",
-                  "pr_open": "PR aberto"}
+                  "pr_open": "PR aberto"}  # a tr() entra na saída
 MAX_AGENT_FILES = 15
 
 
@@ -189,77 +190,77 @@ def agent_lines(agents) -> List[str]:
         tests = sum(1 for c in s.commands if c.kind == "test")
         lines += [f"### {AGENT_LABELS.get(s.agent, s.agent)} · `{s.id}`", ""]
         if s.first_user_message:
-            lines.append(f"- Pedido: {' '.join(s.first_user_message.split())[:300]}")
-        lines.append(f"- Branch: {s.git_branch or 'não informado'} · modelo {s.model or 'não informado'} · "
-                     f"{s.turns} {'pedido' if s.turns == 1 else 'pedidos'}")
-        lines.append(f"- Publicação: {PUBLISH_LABELS.get(s.published, s.published)}")
+            lines.append(tr("- Pedido: {request}", request=" ".join(s.first_user_message.split())[:300]))
+        lines.append(tr("- Branch: {branch} · modelo {model} · {turns}", branch=s.git_branch or tr("não informado"),
+                        model=s.model or tr("não informado"),
+                        turns=tr("{n} pedido", n=s.turns) if s.turns == 1 else tr("{n} pedidos", n=s.turns)))
+        lines.append(tr("- Publicação: {state}", state=tr(PUBLISH_LABELS.get(s.published, s.published))))
         if edited:
             shown = ", ".join(f"`{p}`" for p in edited[:MAX_AGENT_FILES])
-            lines.append(f"- Arquivos editados ({len(edited)}): {shown}{' e outros' if len(edited) > MAX_AGENT_FILES else ''}")
+            lines.append(tr("- Arquivos editados ({n}): {shown}", n=len(edited), shown=shown) + (tr(" e outros") if len(edited) > MAX_AGENT_FILES else ""))
         else:
-            lines.append("- Arquivos editados: nenhum")
-        lines.append(f"- Comandos: {s.commands_total}{f' (testes: {tests})' if tests else ''}")
+            lines.append(tr("- Arquivos editados: nenhum"))
+        lines.append(tr("- Comandos: {n}", n=s.commands_total) + (tr(" (testes: {tests})", tests=tests) if tests else ""))
         if s.loop_alert:
-            lines.append(f"- Possível loop: `{s.loop_alert['command']}` rodou {s.loop_alert['count']} vezes sem commit")
+            lines.append(tr("- Possível loop: `{command}` rodou {count} vezes sem commit", command=s.loop_alert["command"], count=s.loop_alert["count"]))
         lines.append("")
     return lines
 
 
 def render_session_md(record, tasks: List[Task], notes: List[Note], tags: Dict[str, Tag],
                       transcript: str, truncated: bool = False, agents=None) -> str:
-    status = ("aberta" if record.is_open else
-              f"encerrada{f' (código {record.exit_code})' if record.exit_code is not None else ''}")
+    status = (tr("aberta") if record.is_open else tr("encerrada")
+              + (tr(" (código {code})", code=record.exit_code) if record.exit_code is not None else ""))
     lines = [
-        f"# Sessão: {record.title or record.id}",
+        tr("# Sessão: {title}", title=record.title or record.id),
         "",
-        "> Memória gerada pelo Vulcan Celox. Tarefas, post-its e tags continuam editáveis no app; "
-        "este arquivo é regravado quando eles mudam.",
+        tr("> Memória gerada pelo Vulcan Celox. Tarefas, post-its e tags continuam editáveis no app; este arquivo é regravado quando eles mudam."),
         "",
-        "| Campo | Valor |",
+        tr("| Campo | Valor |"),
         "|---|---|",
-        f"| Site | {_cell(record.site or 'Global')} |",
-        f"| Pasta | `{_cell(record.cwd)}` |",
-        f"| Início | {format_when(record.created_at)} |",
-        f"| Fim | {format_when(record.closed_at) if record.closed_at else '-'} |",
-        f"| Duração | {format_duration(record.created_at, record.closed_at)} |",
-        f"| Estado | {status} |",
-        f"| Sessão | `{record.id}` |",
+        tr("| Site | {site} |", site=_cell(record.site or tr("Global"))),
+        tr("| Pasta | `{cwd}` |", cwd=_cell(record.cwd)),
+        tr("| Início | {when} |", when=format_when(record.created_at)),
+        tr("| Fim | {when} |", when=format_when(record.closed_at) if record.closed_at else "-"),
+        tr("| Duração | {duration} |", duration=format_duration(record.created_at, record.closed_at)),
+        tr("| Estado | {status} |", status=status),
+        tr("| Sessão | `{id}` |", id=record.id),
         "",
-        "## Tags",
+        tr("## Tags"),
         "",
-        _tag_list(record.tags, tags) or "_Nenhuma._",
+        _tag_list(record.tags, tags) or tr("_Nenhuma._"),
         "",
     ]
 
     done = sum(1 for t in tasks if t.status == "done")
-    lines += [f"## Tarefas ({done}/{len(tasks)})", ""]
+    lines += [tr("## Tarefas ({done}/{total})", done=done, total=len(tasks)), ""]
     if not tasks:
-        lines += ["_Nenhuma tarefa nesta sessão._", ""]
+        lines += [tr("_Nenhuma tarefa nesta sessão._"), ""]
     else:
         order = {"doing": 0, "todo": 1, "done": 2}
         for task in sorted(tasks, key=lambda t: (order.get(t.status, 1), t.priority, t.due or "9999", t.title.casefold())):
-            extra = [PRIORITY_LABELS.get(task.priority, "")]
+            extra = [tr(PRIORITY_LABELS.get(task.priority, ""))]
             if task.status == "doing":
-                extra.append("em andamento")
+                extra.append(tr("em andamento"))
             if task.assignee:
-                extra.append(f"responsável {task.assignee}")
+                extra.append(tr("responsável {name}", name=task.assignee))
             if task.due:
-                extra.append(f"prazo {task.due}")
+                extra.append(tr("prazo {date}", date=task.due))
             if task.done_at:
-                extra.append(f"concluída em {task.done_at[:10]}")
+                extra.append(tr("concluída em {date}", date=task.done_at[:10]))
             tag_text = _tag_list(task.tags, tags)
             lines.append(f"- [{'x' if task.status == 'done' else ' '}] {task.title} · {' · '.join(extra)}"
                          f"{f' · {tag_text}' if tag_text else ''}")
         lines.append("")
 
-    lines += [f"## Post-its ({len(notes)})", ""]
+    lines += [tr("## Post-its ({n})", n=len(notes)), ""]
     if not notes:
-        lines += ["_Nenhum post-it nesta sessão._", ""]
+        lines += [tr("_Nenhum post-it nesta sessão._"), ""]
     else:
         for note in sorted(notes, key=lambda n: (not n.pinned, n.order, n.created_at)):
-            title = note.title or "(sem título)"
+            title = note.title or tr("(sem título)")
             tag_text = _tag_list(note.tags, tags)
-            lines.append(f"### {title}{' (fixado)' if note.pinned else ''}")
+            lines.append(f"### {title}" + (tr(" (fixado)") if note.pinned else ""))
             lines.append("")
             body = note.text.strip().splitlines()[1:] if note.text.strip() else []
             for row in body:
@@ -267,16 +268,16 @@ def render_session_md(record, tasks: List[Task], notes: List[Note], tags: Dict[s
             if body:
                 lines.append("")
             if tag_text:
-                lines += [f"Tags: {tag_text}", ""]
+                lines += [tr("Tags: {tags}", tags=tag_text), ""]
 
     commands = record.commands
     if agents:
-        lines += [f"## Sessões de agente ({len(agents)})", ""] + agent_lines(agents)
-    lines += [f"## Comandos executados ({len(commands)})", ""]
+        lines += [tr("## Sessões de agente ({n})", n=len(agents)), ""] + agent_lines(agents)
+    lines += [tr("## Comandos executados ({n})", n=len(commands)), ""]
     if not commands:
-        lines += ["_Nenhum comando digitado registrado._", ""]
+        lines += [tr("_Nenhum comando digitado registrado._"), ""]
     else:
-        lines += ["| Hora (UTC) | Comando |", "|---|---|"]
+        lines += [tr("| Hora (UTC) | Comando |"), "|---|---|"]
         for item in commands:
             dt = parse_iso(item.get("ts"))
             cmd = _cell(item.get("cmd", ""))
@@ -284,14 +285,14 @@ def render_session_md(record, tasks: List[Task], notes: List[Note], tags: Dict[s
             lines.append(f"| {dt.strftime('%H:%M:%S') if dt else '-'} | {code} |")
         lines.append("")
 
-    lines += ["## Registro do terminal", "", TRANSCRIPT_START]
+    lines += [tr("## Registro do terminal"), "", TRANSCRIPT_START]
     if truncated:
-        lines += [f"_Mostrando as últimas {MAX_TRANSCRIPT_LINES} linhas._", ""]
+        lines += [tr("_Mostrando as últimas {n} linhas._", n=MAX_TRANSCRIPT_LINES), ""]
     if transcript:
         fence = _fence_for(transcript)
         lines += [f"{fence}text", transcript, fence]
     else:
-        lines.append("_Sem saída registrada._")
+        lines.append(tr("_Sem saída registrada._"))
     lines += [TRANSCRIPT_END, ""]
     return "\n".join(lines)
 
@@ -329,18 +330,18 @@ def render_general_index(records, tasks: List[Task], notes: List[Note], tags: Di
     open_count = sum(1 for r in records if r.is_open)
     linked_tasks = [t for t in tasks if t.terminal]
     lines = [
-        "# Índice geral",
+        tr("# Índice geral"),
         "",
-        "> Gerado automaticamente pelo Vulcan Celox. Reúne a memória de cada sessão de terminal "
-        "(o que foi executado, tarefas, post-its e tags) e o índice de tarefas dos projetos.",
+        tr("> Gerado automaticamente pelo Vulcan Celox. Reúne a memória de cada sessão de terminal (o que foi executado, tarefas, post-its e tags) e o índice de tarefas dos projetos."),
         "",
-        f"- [Tarefas de todos os projetos]({INDEX_FILENAME})",
-        *([f"- [Documentação dos projetos (gerada por IA)]({GENERAL_DOC_FILENAME})"]
+        tr("- [Tarefas de todos os projetos]({file})", file=INDEX_FILENAME),
+        *([tr("- [Documentação dos projetos (gerada por IA)]({file})", file=GENERAL_DOC_FILENAME)]
           if (Path(data_dir) / GENERAL_DOC_FILENAME).is_file() else []),
-        f"- Sessões: {len(records)} ({open_count} {'aberta' if open_count == 1 else 'abertas'}, "
-        f"{len(records) - open_count} {'encerrada' if len(records) - open_count == 1 else 'encerradas'})",
-        f"- Tarefas vinculadas a sessões: {progress(linked_tasks).label}",
-        f"- Post-its vinculados a sessões: {sum(by_session_notes.values())}",
+        tr("- Sessões: {total} ({open} {open_word}, {closed} {closed_word})", total=len(records), open=open_count,
+           open_word=tr("aberta") if open_count == 1 else tr("abertas"), closed=len(records) - open_count,
+           closed_word=tr("encerrada") if len(records) - open_count == 1 else tr("encerradas")),
+        tr("- Tarefas vinculadas a sessões: {progress}", progress=progress(linked_tasks).label),
+        tr("- Post-its vinculados a sessões: {n}", n=sum(by_session_notes.values())),
         "",
     ]
     groups: Dict[Optional[str], list] = {}
@@ -348,23 +349,23 @@ def render_general_index(records, tasks: List[Task], notes: List[Note], tags: Di
         groups.setdefault(record.site, []).append(record)
     order = sorted(groups, key=lambda k: (k is not None, (k or "").casefold()))
 
-    lines += ["## Sumário", ""]
+    lines += [tr("## Sumário"), ""]
     if not order:
-        lines += ["_Nenhuma sessão de terminal ainda._", ""]
+        lines += [tr("_Nenhuma sessão de terminal ainda._"), ""]
         return "\n".join(lines).rstrip("\n") + "\n"
     for key in order:
-        label = key or "Global"
+        label = key or tr("Global")
         count = len(groups[key])
-        lines.append(f"- [{label}](#{anchor(label)}) · {count} {'sessão' if count == 1 else 'sessões'}")
+        lines.append(f"- [{label}](#{anchor(label)}) · " + (tr("{n} sessão", n=count) if count == 1 else tr("{n} sessões", n=count)))
     lines.append("")
 
     for key in order:
-        lines += [f"## {key or 'Global'}", "",
-                  "| Data | Sessão | Duração | Comandos | Agente | Tarefas | Post-its | Tags | Documentação |",
+        lines += [f"## {key or tr('Global')}", "",
+                  tr("| Data | Sessão | Duração | Comandos | Agente | Tarefas | Post-its | Tags | Documentação |"),
                   "|---|---|---|---|---|---|---|---|---|"]
         for record in sorted(groups[key], key=lambda r: r.created_at, reverse=True):
             dt = parse_iso(record.created_at)
-            title = _cell(record.title or record.id) + (" (aberta)" if record.is_open else "")
+            title = _cell(record.title or record.id) + (tr(" (aberta)") if record.is_open else "")
             link = _relative_link(record.memory_file, data_dir)
             session_cell = f"[{title}]({link})" if link else title
             p = progress(by_session_tasks.get(record.id, []))
@@ -376,6 +377,6 @@ def render_general_index(records, tasks: List[Task], notes: List[Note], tags: Di
                 f"{format_duration(record.created_at, record.closed_at)} | {len(record.commands)} | "
                 f"{', '.join(sorted(set((agents_by_tab or {}).get(record.id, [])))) or '-'} | {task_cell} | "
                 f"{by_session_notes.get(record.id, 0)} | {_tag_list(record.tags, tags) or '-'} | "
-                f"{f'[documentação]({doc_link})' if doc_link else '-'} |")
+                f"{tr('[documentação]({link})', link=doc_link) if doc_link else '-'} |")
         lines.append("")
     return "\n".join(lines).rstrip("\n") + "\n"

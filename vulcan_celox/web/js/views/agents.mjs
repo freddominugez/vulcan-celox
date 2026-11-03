@@ -3,14 +3,15 @@
 import { sessionAttention } from "../attention-state.mjs";
 import { get } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 import { agentPill, emptyAgents, keepScroll, relTime, RevisionWatch, track } from "../agents-ui.mjs";
 
 const FILTERS = [
-  { id: "todas", label: "Todas", query: "" },
-  { id: "ativas", label: "Ativas", query: "active=1" },
+  { id: "todas", label: t("Todas"), query: "" },
+  { id: "ativas", label: t("Ativas"), query: "active=1" },
   { id: "claude", label: "Claude Code", query: "agent=claude" },
   { id: "codex", label: "Codex", query: "agent=codex" },
-  { id: "sem", label: "Sem publicar", query: "unpublished=1" },
+  { id: "sem", label: t("Sem publicar"), query: "unpublished=1" },
 ];
 
 function remembered(key, fallback) {
@@ -63,26 +64,26 @@ export class AgentsView {
     const k = d.kpis;
     const body = d.total === 0 ? emptyAgents(d.roots) : d.sessions.length
       ? `<div class="ag-cards">${d.sessions.map((s) => this.card(s)).join("")}</div>`
-      : `<div class="empty-inline">${icon("info")}<span>Nenhuma sessão neste filtro.</span></div>`;
+      : `<div class="empty-inline">${icon("info")}<span>${t("Nenhuma sessão neste filtro.")}</span></div>`;
     this.root.innerHTML = `
       <div class="page ag-page">
         <div class="ag-kpis">
-          <div class="ag-kpi"><span class="ag-kpi-v">${k.active}</span><span class="ag-kpi-l">ativas agora</span></div>
-          <div class="ag-kpi"><span class="ag-kpi-v">${k.files_edited_today}</span><span class="ag-kpi-l">arquivos editados hoje</span></div>
-          <div class="ag-kpi ${k.unpublished ? "is-warn" : ""}"><span class="ag-kpi-v">${k.unpublished}</span><span class="ag-kpi-l">sessões sem push</span></div>
-          <div class="ag-kpi"><span class="ag-kpi-v">${k.tokens_today >= 1000 ? `${Math.round(k.tokens_today / 1000)} mil` : k.tokens_today}</span><span class="ag-kpi-l">tokens nas sessões de hoje</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${k.active}</span><span class="ag-kpi-l">${t("ativas agora")}</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${k.files_edited_today}</span><span class="ag-kpi-l">${t("arquivos editados hoje")}</span></div>
+          <div class="ag-kpi ${k.unpublished ? "is-warn" : ""}"><span class="ag-kpi-v">${k.unpublished}</span><span class="ag-kpi-l">${t("sessões sem push")}</span></div>
+          <div class="ag-kpi"><span class="ag-kpi-v">${k.tokens_today >= 1000 ? t("{n} mil", { n: Math.round(k.tokens_today / 1000) }) : k.tokens_today}</span><span class="ag-kpi-l">${t("tokens nas sessões de hoje")}</span></div>
         </div>
         <div class="ag-bar-row">
-          <div class="segmented" role="tablist" aria-label="Filtro">
+          <div class="segmented" role="tablist" aria-label="${t("Filtro")}">
             ${FILTERS.map((f) => `<button type="button" class="seg ${f.id === this.filter ? "is-on" : ""}" data-filter="${f.id}" role="tab" aria-selected="${f.id === this.filter}">${f.label}</button>`).join("")}
           </div>
-          <select class="select select-sm" data-role="project" aria-label="Projeto">
-            <option value="">Todos os projetos</option>
+          <select class="select select-sm" data-role="project" aria-label="${t("Projeto")}">
+            <option value="">${t("Todos os projetos")}</option>
             ${d.projects.map((p) => `<option value="${esc(p.name)}" ${p.name === this.project ? "selected" : ""}>${esc(p.name)} (${p.count})</option>`).join("")}
           </select>
           <span class="spacer"></span>
-          <span class="dim hint">Lido de ~/.claude e ~/.codex, sem chave de API</span>
-          <button class="btn btn-sm" data-go-usage>${icon("gauge")}<span>Uso e custo</span></button>
+          <span class="dim hint">${t("Lido de ~/.claude e ~/.codex, sem chave de API")}</span>
+          <button class="btn btn-sm" data-go-usage>${icon("gauge")}<span>${t("Uso e custo")}</span></button>
         </div>
         ${body}
       </div>`;
@@ -90,15 +91,15 @@ export class AgentsView {
 
   card(s) {
     const theme = s.theme || "neutro";
-    const ask = s.headline || "Sessão sem pedido registrado";
+    const ask = s.headline || t("Sessão sem pedido registrado");
     return `<button type="button" class="ag-card t-${esc(theme)}" data-open="${esc(s.id)}">
-      <span class="ag-band"><span class="dot ${s.is_active ? "dot-ok" : ""}"></span><span class="ag-proj">${esc(s.project || "sem projeto")}</span>
-        <span class="ag-when">${s.pairing_id ? "pareada · " : ""}${esc(relTime(s.last_activity_at))}</span></span>
+      <span class="ag-band"><span class="dot ${s.is_active ? "dot-ok" : ""}"></span><span class="ag-proj">${esc(s.project || t("sem projeto"))}</span>
+        <span class="ag-when">${s.pairing_id ? `${t("pareada")} · ` : ""}${esc(relTime(s.last_activity_at))}</span></span>
       <span class="ag-body">
         <span class="ag-meta">${agentPill(s.agent)}${s.branch ? `<span class="ag-pill mono">${icon(s.worktree ? "tree" : "branch")}${esc(s.branch)}</span>` : ""}
-          ${s.is_active ? `<span class="ag-pill is-ok">ativa</span>` : ""}${sessionAttention(s.id) ? `<span class="ag-pill is-attention">${icon("info")}${esc(sessionAttention(s.id))}</span>` : ""}${s.loop ? `<span class="ag-pill is-warn">${icon("alert")}possível loop</span>` : ""}</span>
+          ${s.is_active ? `<span class="ag-pill is-ok">${t("ativa")}</span>` : ""}${sessionAttention(s.id) ? `<span class="ag-pill is-attention">${icon("info")}${esc(sessionAttention(s.id))}</span>` : ""}${s.loop ? `<span class="ag-pill is-warn">${icon("alert")}${t("possível loop")}</span>` : ""}</span>
         <span class="ag-ask">${esc(ask)}</span>
-        <span class="ag-stats">${s.files_edited} editados · ${s.files_read} lidos · ${s.commands} comandos${s.subagents ? ` · ${s.subagents} sub-agentes` : ""}</span>
+        <span class="ag-stats">${t("{edited} editados · {read} lidos · {commands} comandos", { edited: s.files_edited, read: s.files_read, commands: s.commands })}${s.subagents ? ` · ${t("{n} sub-agentes", { n: s.subagents })}` : ""}</span>
         ${track(s)}
       </span>
     </button>`;

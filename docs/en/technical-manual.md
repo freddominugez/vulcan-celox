@@ -1,6 +1,6 @@
 # Vulcan Celox: technical manual
 
-Reference for a developer who has never seen this project. It describes version 1.0.0. For a shorter tour, read [architecture.md](architecture.md). Screens, many identifiers and error messages are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
+Reference for a developer who has never seen this project. It describes version 1.1.0. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
 
 Paths written as `core/...`, `server/...`, `web/...` and `ui/...` are relative to `vulcan_celox/`.
 
@@ -250,6 +250,8 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 - `core/pr_status.py`, `server/pr_api.py`: PR state through the user's `gh`, only with the `pr_status` preference on, cached for 60 s.
 - Interface: `web/js/views/code/`, `web/js/terminal-watch.mjs` (attention, path links and request marks for each terminal), `web/js/terminal-ports.mjs`, `web/js/pr-status.mjs`, `web/js/theme.mjs`, `web/styles/tokens.css` (the only file with loose colors), and `web/vendor/codemirror.js`, loaded the first time the Code tab opens.
 
+- `core/i18n.py`, `web/js/i18n.mjs`: interface language. `web/i18n/en.json` is the dictionary, and `HttpError` passes through `tr()` when answering.
+
 ## 6. HTTP server and WebSocket
 
 `server/local_http.py` wraps `ThreadingHTTPServer` with one handler thread per connection. Routes, by group, are in [http-api.md](http-api.md). The threat model is in [security.md](security.md). The rules of the server itself:
@@ -264,7 +266,7 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 | Body | `Content-Length` is validated (400 if invalid), 1 MB limit (413), and it must be a JSON object. A body that a route did not read is discarded before answering, so it cannot corrupt the next request on the same connection. |
 | Static files | Served from a copy of `web/` made when the server starts, looked up by key, so path traversal has nothing to reach. Files and folders starting with `.` are left out. Only `GET`, otherwise 405. Static files need no token, because the page has no secret: the token reaches it from the shell. |
 | Headers | `X-Content-Type-Options: nosniff` everywhere, and `Cache-Control: no-store` on the API. HTML gets this CSP: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws://127.0.0.1:* ws://localhost:*; frame-ancestors 'none'`. |
-| Errors | JSON `{"error": "..."}` with messages in Portuguese. `HttpError` can carry extra fields, such as `needs_terminal` or `needs_confirmation`. |
+| Errors | JSON `{"error": "..."}` with messages in the interface language. `HttpError` can carry extra fields, such as `needs_terminal` or `needs_confirmation`. |
 
 Reading the interface once also means reinstalling the app while it is open does not mix a new interface with an old server. `GET /api/app/build` compares the SHA-256 of the loaded copy with the files on disk, and the interface offers to reopen when they differ.
 
@@ -657,7 +659,7 @@ Base classes: `tests/helpers.py` (`TempDirTestCase`) and `tests/server_helpers.p
 | Seven files above 400 lines: `web/js/terminals.mjs` (1126), `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Accepted for 1.0, because splitting terminal and window code with no browser test carries more risk than gain. `tests/test_tamanho_arquivos.py` stops them from growing and blocks new files above 400 |
 | macOS package has no embedded Python and is not notarized | It has only an ad hoc signature. `--verificar-dependencias` explains and offers to install. `packaging/LEIA-ME.md` explains how to open an app that is not signed with an Apple certificate |
 | Linux | Code and CI exist, with no release until acceptance on a real desktop |
-| Interface language | The interface and error messages are in Portuguese |
+| Interface language | English by default, Portuguese from ⌘K. The source text in the code is Portuguese, and `web/i18n/en.json` is the only dictionary, shared by the interface, the server and the macOS shell |
 | JSONL formats of Claude Code and Codex change without notice | Reading is tolerant: a strange line becomes `parse_errors` and reading continues. Fixtures come from real sessions |
 | Codex pairing | No exact link exists on Codex 0.166.0, and no stable hook. Pairing is by folder and time, so two Codex sessions started in the same folder less than 60 seconds apart can swap tabs |
 | `.jsonl.zst` rollouts | Read through the `zstd` command when present, always from the start. Otherwise they are ignored and counted in `--doctor` |

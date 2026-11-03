@@ -35,7 +35,7 @@ Bodies:
 Responses:
 
 - Success is JSON with `Cache-Control: no-store`. The only exception is `GET /api/agents/usage.csv`, which is a CSV download.
-- Errors are JSON: `{"error": "..."}`, with messages in Portuguese. Some errors add fields the interface needs, such as `needs_terminal`, `needs_confirmation`, `needs_parent`, `suggestion` or `missing`. Those fields are named in the tables below.
+- Errors are JSON: `{"error": "..."}`, with messages in the interface language. Some errors add fields the interface needs, such as `needs_terminal`, `needs_confirmation`, `needs_parent`, `suggestion` or `missing`. Those fields are named in the tables below.
 - Routes marked "command result" return `{"ok": bool, "code": int, "output": "..."}` with status 200, even when the command failed. Read `ok`, not the status. `output` holds the last lines of the output.
 - Routes marked "tab" run a long command in a new terminal tab and return 201 with the terminal's description (`id`, `title`, `site`, `cwd`, `alive`, `theme`, `command` and others).
 
@@ -136,6 +136,7 @@ Project scope works only for the folder of a site, a saved Node project or an in
 | GET | `/api/code/session/<sid>/diff` | Diff of a file, cut at 2 MB | query `path`, `scope` (`edit`, `turn`, `git`), `seq` | 400, 403, 404 |
 | POST | `/api/code/resolve` | Which paths printed in a tab exist in a known folder | `terminal`, `candidates` (up to 50) | 400, 404 |
 | GET | `/api/terminals/ports` | Ports opened by each tab's processes | | |
+| GET | `/api/i18n` | Interface language and its dictionary | | |
 | GET | `/api/terminals` | Open tabs | | |
 | POST | `/api/terminals` | Open a tab | `site`, `cwd`, `command`, `theme` (a name or `auto`), `agent` (`shell`, `claude` or `codex`), `title`, `rows`, `cols` (1 to 1000; default 24 by 80) | 201, 400, 404 |
 | PATCH | `/api/terminals/<tid>` | Rename the tab | `title` (up to 60 characters) | 404 |

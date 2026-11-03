@@ -12,6 +12,8 @@ import re
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
+from vulcan_celox.core.i18n import tr
+
 FILE_NAME = "precos.json"
 CURRENCY = "USD"
 CONFERIDO_EM = "2026-11-01"
@@ -116,14 +118,14 @@ def load(data_dir) -> Tuple[Dict[str, Dict], Optional[str]]:
         if not isinstance(models, dict):
             raise ValueError('falta o objeto "modelos"')
     except (OSError, ValueError, UnicodeDecodeError) as exc:
-        return table, f"{path}: JSON inválido ({exc}); valem os preços padrão"
+        return table, tr("{path}: JSON inválido ({exc}); valem os preços padrão", path=path, exc=exc)
     bad = []
     for name, entry in models.items():
         if _valid_entry(entry):
             table[normalize(name)] = {**entry, "fonte": entry.get("fonte") or "usuário"}
         else:
             bad.append(str(name))
-    return table, (f"{path}: preço inválido para {', '.join(sorted(bad))}; esses modelos ficam no padrão"
+    return table, (tr("{path}: preço inválido para {names}; esses modelos ficam no padrão", path=path, names=", ".join(sorted(bad)))
                    if bad else None)
 
 

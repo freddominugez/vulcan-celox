@@ -7,6 +7,8 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from vulcan_celox.core.i18n import tr
+
 MAX_SCRIPTS = 8
 ARTISAN = ("about", "route:list", "migrate:status", "test")
 
@@ -27,12 +29,12 @@ def project_commands(folder: str, lerd: bool = False, custom: Optional[List[Dict
     if (path / "artisan").is_file():
         out += [{"label": f"artisan {c}", "command": f"php artisan {c}"} for c in ARTISAN]
         if lerd:
-            out.append({"label": "banco de dados", "command": "lerd db:shell"})
+            out.append({"label": tr("banco de dados"), "command": "lerd db:shell"})
     if (path / "composer.json").is_file():
         out.append({"label": "composer install", "command": "composer install"})
     out += [{"label": f"npm run {s}", "command": f"npm run {s}"} for s in _scripts(path)]
     if lerd:
-        out += [{"label": "logs do PHP", "command": "lerd logs -f"}, {"label": "diagnóstico", "command": "lerd site:doctor"}]
+        out += [{"label": tr("logs do PHP"), "command": "lerd logs -f"}, {"label": tr("diagnóstico"), "command": "lerd site:doctor"}]
     for item in custom or []:
         if isinstance(item, dict) and item.get("command"):
             out.append({"label": str(item.get("label") or item["command"]), "command": str(item["command"]), "custom": True})

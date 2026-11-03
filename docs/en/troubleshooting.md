@@ -15,7 +15,7 @@ First step for almost everything: `python3 -m vulcan_celox --doctor`.
 | **Rodar** showed nothing | The script runs in a bottom panel tab. Press ⌘J |
 | Port already in use | Often an old `dev` process. Stop the script or close the old tab. The app never kills a process by port |
 | Prompt field is amber | That value is missing from the session. Fill it in or change session. Sending stays blocked |
-| **Enviar ao terminal** refused | The agent is not in the foreground of that tab, or a newer session owns it. Use the offered resume |
+| **Send to terminal** refused | The agent is not in the foreground of that tab, or a newer session owns it. Use the offered resume |
 | Sent a prompt, nothing happened | Nothing is sent by itself. The text is in the agent's input. Press Enter |
 | Cost is not what I paid | It is an estimate at API list prices. Subscriptions bill differently |
 | Model without a cost | No known price. Add it to `precos.json` |

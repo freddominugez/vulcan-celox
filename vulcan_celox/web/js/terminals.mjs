@@ -2,6 +2,7 @@
 
 import { del, get, isMac, isNative, native, patch, post, wsUrl } from "./api.mjs";
 import { $, $$, debounce, esc, icon, reportError, shortPath, toast } from "./dom.mjs";
+import { t } from "./i18n.mjs";
 import { confirmDialog, documentSession, onJobsChange } from "./ai.mjs";
 import { askFolder, suggestedFolder } from "./folder-dialog.mjs";
 import { renderMarkdown } from "./markdown.mjs";
@@ -133,7 +134,7 @@ class Session {
           const msg = JSON.parse(event.data);
           if (msg.type === "exit") {
             this.alive = false;
-            this.term.write(`\r\n\x1b[2m[processo encerrado${msg.code != null ? ` com código ${msg.code}` : ""}]\x1b[0m\r\n`);
+            this.term.write(`\r\n\x1b[2m[${msg.code != null ? t("processo encerrado com código {code}", { code: msg.code }) : t("processo encerrado")}]\x1b[0m\r\n`);
             this.hooks.onExit(this);
           }
         } catch {
@@ -151,7 +152,7 @@ class Session {
       } else if (this.alive && !this.disposed) {
         // desistiu de reconectar sozinho: a aba diz o que houve em vez de ficar muda
         this.disconnected = true;
-        this.term.write("\r\n\x1b[33m[conexão com o terminal perdida. Pressione Enter para reconectar.]\x1b[0m\r\n");
+        this.term.write(`\r\n\x1b[33m[${t("conexão com o terminal perdida. Pressione Enter para reconectar.")}]\x1b[0m\r\n`);
         this.hooks.onExit(this);
       }
     };
@@ -348,11 +349,11 @@ export class TerminalWorkspace {
     this.memoryView = "memory";
     this.root.innerHTML = `<div class="term-workspace"><div class="tabstrip" role="tablist"></div>
       <div class="term-search" hidden>${icon("search")}
-        <input class="term-search-input" placeholder="Buscar no terminal" aria-label="Buscar no terminal" spellcheck="false" autocomplete="off">
+        <input class="term-search-input" placeholder="${t("Buscar no terminal")}" aria-label="${t("Buscar no terminal")}" spellcheck="false" autocomplete="off">
         <span class="term-search-count" aria-live="polite"></span>
-        <button class="icon-btn icon-btn-sm" data-search="prev" aria-label="Anterior" title="Anterior (⇧Enter)">${icon("chevron-up")}</button>
-        <button class="icon-btn icon-btn-sm" data-search="next" aria-label="Próximo" title="Próximo (Enter)">${icon("chevron-down")}</button>
-        <button class="icon-btn icon-btn-sm" data-search="close" aria-label="Fechar busca" title="Fechar (Esc)">${icon("x")}</button>
+        <button class="icon-btn icon-btn-sm" data-search="prev" aria-label="${t("Anterior")}" title="${t("Anterior (⇧Enter)")}">${icon("chevron-up")}</button>
+        <button class="icon-btn icon-btn-sm" data-search="next" aria-label="${t("Próximo")}" title="${t("Próximo (Enter)")}">${icon("chevron-down")}</button>
+        <button class="icon-btn icon-btn-sm" data-search="close" aria-label="${t("Fechar busca")}" title="${t("Fechar (Esc)")}">${icon("x")}</button>
       </div>
       <div class="prompt-bar" hidden></div><div class="ws-body"></div></div>`;
     this.searchBar = $(".term-search", this.root);
@@ -523,16 +524,16 @@ export class TerminalWorkspace {
         const busy = await get(`/api/terminals/${id}/busy`).catch(() => ({ busy: false, processes: [] }));
         if (busy.long_running && live.alive) {
           // Diz o que para, em vez do aviso genérico de processo rodando
-          toast(`Fechar a aba para “${busy.command}”.`, {
+          toast(t("Fechar a aba para “{command}”.", { command: busy.command }), {
             kind: "error", timeout: 8000,
-            action: { label: "Fechar e parar", run: () => this.closeTerminal(id, true) },
+            action: { label: t("Fechar e parar"), run: () => this.closeTerminal(id, true) },
           });
           return;
         }
         if (busy.busy) {
-          toast(`“${live.info.title}” ainda está rodando ${busy.processes.slice(0, 2).join(", ")}.`, {
+          toast(t("“{title}” ainda está rodando {processes}.", { title: live.info.title, processes: busy.processes.slice(0, 2).join(", ") }), {
             kind: "error", timeout: 8000,
-            action: { label: "Fechar mesmo assim", run: () => this.closeTerminal(id, true) },
+            action: { label: t("Fechar mesmo assim"), run: () => this.closeTerminal(id, true) },
           });
           return;
         }
@@ -545,9 +546,9 @@ export class TerminalWorkspace {
       this.render();
       if (result && result.memory_file) {
         const name = result.memory_file.split("/").slice(-2).join("/");
-        toast(`Sessão guardada no Histórico · memória em ${name}`, {
+        toast(t("Sessão guardada no Histórico · memória em {name}", { name }), {
           kind: "ok", timeout: 7000,
-          action: { label: "Abrir", run: () => post("/api/open", { kind: "file", target: result.memory_file }).catch(reportError) },
+          action: { label: t("Abrir"), run: () => post("/api/open", { kind: "file", target: result.memory_file }).catch(reportError) },
         });
       }
     } catch (err) {
@@ -601,7 +602,7 @@ export class TerminalWorkspace {
     if (action === "add-cmd") this.addCommand();
     if (action === "copy-cmd") {
       event.stopPropagation();
-      copy(target.dataset.command, "Comando copiado.");
+      copy(target.dataset.command, t("Comando copiado."));
     }
     if (action === "del-cmd") {
       event.stopPropagation();
@@ -718,15 +719,15 @@ export class TerminalWorkspace {
       const cls = [active && "is-active", shown && "is-shown", popped && "is-popped", !live && "is-closed",
         live && !live.alive && "is-dead", live && live.disconnected && "is-disconnected",
         theme && `has-theme t-${theme}`].filter(Boolean).join(" ");
-      const tip = live ? shortPath(live.info.cwd) : `Encerrada ${formatStamp(record && record.closed_at)}`;
-      const state = live && live.disconnected ? " · desconectado: Enter no terminal reconecta" : "";
+      const tip = live ? shortPath(live.info.cwd) : t("Encerrada {when}", { when: formatStamp(record && record.closed_at) });
+      const state = live && live.disconnected ? ` · ${t("desconectado: Enter no terminal reconecta")}` : "";
       return `<div class="tab ${cls}" role="tab" tabindex="${active ? 0 : -1}" aria-selected="${active}" data-action="select" data-id="${id}" title="${esc(tip + state)}">
           ${icon(!live ? "clock" : popped ? "external" : "terminal")}
           <span class="tab-label">${esc(title)}</span>${where}
-          ${live && live.alive && live.info.long_running ? `<span class="tab-long" title="Processo longo: ${esc(live.info.command)}">longo</span>` : ""}
+          ${live && live.alive && live.info.long_running ? `<span class="tab-long" title="${t("Processo longo: {command}", { command: esc(live.info.command) })}">${t("longo")}</span>` : ""}
           ${live && i < 9 && !isNative ? `<kbd class="tab-kbd">${isMac ? "⌘" : "Ctrl+⇧+"}${i + 1}</kbd>` : ""}
-          <button class="tab-close" data-action="close" data-id="${id}" aria-label="${live ? "Fechar terminal" : "Tirar da barra"}"
-            title="${live ? "Fechar terminal e salvar a memória" : "Tirar da barra (a memória continua salva)"}">${icon("x")}</button>
+          <button class="tab-close" data-action="close" data-id="${id}" aria-label="${live ? t("Fechar terminal") : t("Tirar da barra")}"
+            title="${live ? t("Fechar terminal e salvar a memória") : t("Tirar da barra (a memória continua salva)")}">${icon("x")}</button>
         </div>`;
     }).join("");
 
@@ -734,23 +735,23 @@ export class TerminalWorkspace {
 
 
     const terminalTools = this.mode === "terminal" && this.isLive(this.activeId) ? `
-      <button class="icon-btn ${this.splitId ? "is-on" : ""}" data-action="split" title="Dividir" aria-label="Dividir">${icon("split")}</button>
-      <button class="icon-btn" data-action="find" title="Buscar no terminal (${isMac ? "⌘F" : "Ctrl+⇧+F"})" aria-label="Buscar no terminal">${icon("search")}</button>
-      <button class="icon-btn" data-action="copy-output" title="Copiar a saída do terminal" aria-label="Copiar a saída do terminal">${icon("copy")}</button>
-      <button class="icon-btn" data-action="popout" title="Destacar em janela (⇧⌘D)" aria-label="Destacar em janela">${icon("external")}</button>
-      <button class="icon-btn" data-action="document" data-id="${this.activeId}" title="Documentar esta sessão com IA" aria-label="Documentar com IA">${icon("book")}</button>` : "";
+      <button class="icon-btn ${this.splitId ? "is-on" : ""}" data-action="split" title="${t("Dividir")}" aria-label="${t("Dividir")}">${icon("split")}</button>
+      <button class="icon-btn" data-action="find" title="${t("Buscar no terminal ({key})", { key: isMac ? "⌘F" : "Ctrl+⇧+F" })}" aria-label="${t("Buscar no terminal")}">${icon("search")}</button>
+      <button class="icon-btn" data-action="copy-output" title="${t("Copiar a saída do terminal")}" aria-label="${t("Copiar a saída do terminal")}">${icon("copy")}</button>
+      <button class="icon-btn" data-action="popout" title="${t("Destacar em janela (⇧⌘D)")}" aria-label="${t("Destacar em janela")}">${icon("external")}</button>
+      <button class="icon-btn" data-action="document" data-id="${this.activeId}" title="${t("Documentar esta sessão com IA")}" aria-label="${t("Documentar com IA")}">${icon("book")}</button>` : "";
 
     const viewing = this.isHistory() ? this.records.get(this.activeId) : null;
     const historyChip = viewing ? `
-      <div class="history-chip" title="Sessão encerrada, aberta pela pasta Histórico">
-        ${icon("clock")}<span>Histórico · ${esc(viewing.title)}</span>
-        <button class="tab-close" data-action="leave-history" aria-label="Voltar aos terminais" title="Voltar aos terminais">${icon("x")}</button>
+      <div class="history-chip" title="${t("Sessão encerrada, aberta pela pasta Histórico")}">
+        ${icon("clock")}<span>${t("Histórico · {title}", { title: esc(viewing.title) })}</span>
+        <button class="tab-close" data-action="leave-history" aria-label="${t("Voltar aos terminais")}" title="${t("Voltar aos terminais")}">${icon("x")}</button>
       </div>` : "";
     this.strip.innerHTML = `
       <div class="tabs">${tabs}</div>${historyChip}
-      <button class="icon-btn" data-action="new" title="Novo terminal (${isMac ? "⌘T" : "Ctrl+⇧+T"})" aria-label="Novo terminal">${icon("plus")}</button>
+      <button class="icon-btn" data-action="new" title="${t("Novo terminal ({key})", { key: isMac ? "⌘T" : "Ctrl+⇧+T" })}" aria-label="${t("Novo terminal")}">${icon("plus")}</button>
       <div class="tabstrip-spacer"></div>
-      ${this.options.scope === "site" && this.commands ? `<button class="btn btn-sm cmd-btn" data-action="commands" aria-haspopup="menu" title="Comandos do projeto">${icon("play")}<span>Comandos</span></button>` : ""}
+      ${this.options.scope === "site" && this.commands ? `<button class="btn btn-sm cmd-btn" data-action="commands" aria-haspopup="menu" title="${t("Comandos do projeto")}">${icon("play")}<span>${t("Comandos")}</span></button>` : ""}
       ${this.runtimeChip()}
       ${terminalTools}`;
     $$(".tab.is-active", this.strip).forEach((t) => t.scrollIntoView({ block: "nearest", inline: "nearest" }));
@@ -790,12 +791,12 @@ export class TerminalWorkspace {
     menu.innerHTML = this.commands.map((c) => `<div class="cmd-row">
         <button class="cmd-item" role="menuitem" data-action="quick" data-command="${esc(c.command)}" data-label="${esc(c.label)}">
           ${icon("play")}<span class="cmd-label">${esc(c.label)}</span><code>${esc(c.command)}</code></button>
-        ${c.custom ? `<button class="icon-btn icon-btn-sm" data-action="del-cmd" data-command="${esc(c.command)}" aria-label="Tirar ${esc(c.label)}" title="Tirar da lista">${icon("x")}</button>` : ""}
-      </div>`).join("") + `<button class="cmd-item cmd-add" role="menuitem" data-action="add-cmd">${icon("plus")}<span>Adicionar comando…</span></button>`
-      + (recent.length ? `<div class="cmd-group">${icon("history")}Últimos comandos</div>` + recent.map((c) => `<div class="cmd-row">
+        ${c.custom ? `<button class="icon-btn icon-btn-sm" data-action="del-cmd" data-command="${esc(c.command)}" aria-label="${t("Tirar {label}", { label: esc(c.label) })}" title="${t("Tirar da lista")}">${icon("x")}</button>` : ""}
+      </div>`).join("") + `<button class="cmd-item cmd-add" role="menuitem" data-action="add-cmd">${icon("plus")}<span>${t("Adicionar comando…")}</span></button>`
+      + (recent.length ? `<div class="cmd-group">${icon("history")}${t("Últimos comandos")}</div>` + recent.map((c) => `<div class="cmd-row">
         <button class="cmd-item" role="menuitem" data-action="quick" data-command="${esc(c.command)}" data-label="${esc(c.command.slice(0, 40))}"
-          title="Rodar de novo numa aba nova"><code class="cmd-recent">${esc(c.command)}</code></button>
-        <button class="icon-btn icon-btn-sm" data-action="copy-cmd" data-command="${esc(c.command)}" aria-label="Copiar" title="Copiar">${icon("copy")}</button>
+          title="${t("Rodar de novo numa aba nova")}"><code class="cmd-recent">${esc(c.command)}</code></button>
+        <button class="icon-btn icon-btn-sm" data-action="copy-cmd" data-command="${esc(c.command)}" aria-label="${t("Copiar")}" title="${t("Copiar")}">${icon("copy")}</button>
       </div>`).join("") : "");
     this.strip.appendChild(menu);
     const box = anchor.getBoundingClientRect();
@@ -821,12 +822,12 @@ export class TerminalWorkspace {
     let label = "";
     let command = "";
     const yes = await confirmDialog({
-      title: "Adicionar comando ao projeto",
-      body: `<label class="field-label" for="cmd-command">Comando</label>
+      title: t("Adicionar comando ao projeto"),
+      body: `<label class="field-label" for="cmd-command">${t("Comando")}</label>
         <input id="cmd-command" class="input" data-command spellcheck="false" placeholder="php artisan queue:work">
-        <label class="field-label" for="cmd-label">Nome no menu (opcional)</label>
+        <label class="field-label" for="cmd-label">${t("Nome no menu (opcional)")}</label>
         <input id="cmd-label" class="input" data-label maxlength="60">`,
-      confirmLabel: "Adicionar",
+      confirmLabel: t("Adicionar"),
       onDecide: (answer, root) => {
         command = root.querySelector("[data-command]").value.trim();
         label = root.querySelector("[data-label]").value.trim();
@@ -867,7 +868,7 @@ export class TerminalWorkspace {
     if (!r || !(r.php || r.node)) return "";
     const warn = r.shim && !r.shim.ok ? r.shim.warning : "";
     const text = [r.php && `PHP ${r.php}`, r.node && `Node ${r.node}`].filter(Boolean).join(" · ");
-    const tip = warn || `Versões que o backend usa neste site${r.docroot ? `; raiz ${r.docroot}` : ""}`;
+    const tip = warn || (r.docroot ? t("Versões que o backend usa neste site; raiz {path}", { path: r.docroot }) : t("Versões que o backend usa neste site"));
     return `<span class="runtime-chip ${warn ? "is-warn" : ""}" title="${esc(tip)}">${warn ? icon("alert") : ""}${esc(text)}</span>`;
   }
 
@@ -921,7 +922,7 @@ export class TerminalWorkspace {
     if (this.mode === "notes") this.child = new NotesView(host, common);
     if (this.mode === "tags") {
       if (id) this.child = new SessionTagsView(host, { ...common, sessionId: id });
-      else this.body.innerHTML = this.emptyHtml("As tags pertencem a uma sessão de terminal. Abra um terminal para começar.");
+      else this.body.innerHTML = this.emptyHtml(t("As tags pertencem a uma sessão de terminal. Abra um terminal para começar."));
     }
     this.childKey = key;
     return null;
@@ -944,9 +945,9 @@ export class TerminalWorkspace {
         pane.innerHTML = `
           <div class="term-empty is-compact"><div class="term-empty-inner">
             ${icon("external", "i-lg")}
-            <h3>${esc(session.info.title)} está numa janela própria</h3>
-            <p>A sessão continua a mesma; feche a janela para trazê-la de volta.</p>
-            <button class="btn" data-action="focus-popout" data-id="${id}">Mostrar janela</button>
+            <h3>${t("{title} está numa janela própria", { title: esc(session.info.title) })}</h3>
+            <p>${t("A sessão continua a mesma; feche a janela para trazê-la de volta.")}</p>
+            <button class="btn" data-action="focus-popout" data-id="${id}">${t("Mostrar janela")}</button>
           </div></div>`;
       } else {
         session.mount(pane);
@@ -963,15 +964,15 @@ export class TerminalWorkspace {
         <div class="memory-bar">
           ${icon("clock")}
           <span class="memory-title">${esc(record.title)}</span>
-          <span class="dim">encerrada ${esc(formatStamp(record.closed_at))} · ${record.commands} ${record.commands === 1 ? "comando" : "comandos"}</span>
-          ${record.has_doc ? `<div class="segmented" role="tablist" aria-label="Conteúdo">
-            <button class="seg ${view === "memory" ? "is-on" : ""}" data-action="memory-view" data-view="memory" role="tab" aria-selected="${view === "memory"}">Memória</button>
-            <button class="seg ${view === "doc" ? "is-on" : ""}" data-action="memory-view" data-view="doc" role="tab" aria-selected="${view === "doc"}">${icon("book")}<span>Documentação</span></button>
+          <span class="dim">${t("encerrada {when}", { when: esc(formatStamp(record.closed_at)) })} · ${record.commands === 1 ? t("1 comando") : t("{n} comandos", { n: record.commands })}</span>
+          ${record.has_doc ? `<div class="segmented" role="tablist" aria-label="${t("Conteúdo")}">
+            <button class="seg ${view === "memory" ? "is-on" : ""}" data-action="memory-view" data-view="memory" role="tab" aria-selected="${view === "memory"}">${t("Memória")}</button>
+            <button class="seg ${view === "doc" ? "is-on" : ""}" data-action="memory-view" data-view="doc" role="tab" aria-selected="${view === "doc"}">${icon("book")}<span>${t("Documentação")}</span></button>
           </div>` : ""}
           <div class="spacer"></div>
-          ${record.memory_file ? `<button class="btn btn-ghost btn-sm" data-action="open-memory" data-id="${id}" data-file="${view}">${icon("external")}<span>Abrir arquivo</span></button>` : ""}
-          <button class="btn btn-ghost btn-sm" data-action="document" data-id="${id}">${icon("book")}<span>${record.has_doc ? "Refazer documentação" : "Documentar com IA"}</span></button>
-          <button class="btn btn-sm" data-action="new">${icon("plus")}<span>Novo terminal</span></button>
+          ${record.memory_file ? `<button class="btn btn-ghost btn-sm" data-action="open-memory" data-id="${id}" data-file="${view}">${icon("external")}<span>${t("Abrir arquivo")}</span></button>` : ""}
+          <button class="btn btn-ghost btn-sm" data-action="document" data-id="${id}">${icon("book")}<span>${record.has_doc ? t("Refazer documentação") : t("Documentar com IA")}</span></button>
+          <button class="btn btn-sm" data-action="new">${icon("plus")}<span>${t("Novo terminal")}</span></button>
         </div>
         <article class="memory-doc md"><div class="loading"><span class="skeleton w-40"></span><span class="skeleton w-70"></span></div></article>
       </div>`;
@@ -980,7 +981,7 @@ export class TerminalWorkspace {
       if (this.activeId !== id || this.mode !== "terminal") return;
       const doc = $(".memory-doc", this.body);
       const text = view === "doc" ? data.markdown : data.memory;
-      if (doc) doc.innerHTML = text ? renderMarkdown(text) : `<p class="dim">A memória desta sessão ainda não foi gravada.</p>`;
+      if (doc) doc.innerHTML = text ? renderMarkdown(text) : `<p class="dim">${t("A memória desta sessão ainda não foi gravada.")}</p>`;
     } catch (err) {
       reportError(err);
     }
@@ -1000,10 +1001,10 @@ export class TerminalWorkspace {
       <div class="term-empty">
         <div class="term-empty-inner">
           <div class="term-empty-prompt"><span class="prompt-path">${esc(where)}</span> <span class="prompt-caret"></span></div>
-          <h3>${site ? `Nenhum terminal aberto em ${esc(site.name)}` : "Nenhum terminal aberto"}</h3>
-          <p>${esc(message || "Cada terminal é uma sessão: as tarefas, post-its e tags que você criar nela viram a memória em Markdown quando ele for fechado.")}</p>
+          <h3>${site ? t("Nenhum terminal aberto em {site}", { site: esc(site.name) }) : t("Nenhum terminal aberto")}</h3>
+          <p>${esc(message || t("Cada terminal é uma sessão: as tarefas, post-its e tags que você criar nela viram a memória em Markdown quando ele for fechado."))}</p>
           <div class="term-empty-actions">
-            <button class="btn btn-primary" data-action="new">${icon("plus")}<span>Novo terminal</span><kbd>${isMac ? "⌘T" : "Ctrl+⇧+T"}</kbd></button>
+            <button class="btn btn-primary" data-action="new">${icon("plus")}<span>${t("Novo terminal")}</span><kbd>${isMac ? "⌘T" : "Ctrl+⇧+T"}</kbd></button>
             ${quick}
           </div>
         </div>
@@ -1064,7 +1065,7 @@ export class TerminalWorkspace {
     if (this.searchSub !== session) {
       if (this.searchListener) this.searchListener.dispose();
       this.searchListener = session.search.onDidChangeResults(({ resultIndex, resultCount }) => {
-        count.textContent = resultCount ? `${resultIndex >= 0 ? resultIndex + 1 : "?"} de ${resultCount}` : "0 de 0";
+        count.textContent = resultCount ? t("{index} de {count}", { index: resultIndex >= 0 ? resultIndex + 1 : "?", count: resultCount }) : t("0 de 0");
       });
       this.searchSub = session;
     }
@@ -1084,7 +1085,7 @@ export class TerminalWorkspace {
     if (!session) return;
     const raw = session.serializer ? session.serializer.serialize({ excludeModes: true, excludeAltBuffer: true }) : "";
     const text = raw.replace(ANSI, "").replace(/\r\n/g, "\n").replace(/[ \t]+$/gm, "").trimEnd();
-    copy(text, "Saída do terminal copiada.");
+    copy(text, t("Saída do terminal copiada."));
   }
 
   destroy() {
@@ -1107,8 +1108,8 @@ export function mountPopout(root, id) {
     const session = terminals.get(id);
     const title = $(".popout-title", root);
     if (!session) {
-      $(".popout-pane", root).innerHTML = `<div class="term-empty"><div class="term-empty-inner"><h3>Terminal encerrado</h3>
-        <p>Esta sessão não existe mais.</p><button class="btn" data-close>Fechar janela</button></div></div>`;
+      $(".popout-pane", root).innerHTML = `<div class="term-empty"><div class="term-empty-inner"><h3>${t("Terminal encerrado")}</h3>
+        <p>${t("Esta sessão não existe mais.")}</p><button class="btn" data-close>${t("Fechar janela")}</button></div></div>`;
       root.querySelector("[data-close]").addEventListener("click", () => native({ type: "close" }) || window.close());
       return;
     }

@@ -2,23 +2,24 @@
 
 import { get } from "../api.mjs";
 import { debounce, esc, icon, reportError } from "../dom.mjs";
+import { t } from "../i18n.mjs";
 import { AGENT_NAMES, agentMark, clock, RevisionWatch } from "../agents-ui.mjs";
 
 const KINDS = [
-  { id: "", label: "Tudo" }, { id: "pedidos", label: "Pedidos" }, { id: "respostas", label: "Respostas" },
-  { id: "comandos", label: "Comandos" }, { id: "arquivos", label: "Arquivos" },
+  { id: "", label: t("Tudo") }, { id: "pedidos", label: t("Pedidos") }, { id: "respostas", label: t("Respostas") },
+  { id: "comandos", label: t("Comandos") }, { id: "arquivos", label: t("Arquivos") },
 ];
-const AGENTS = [{ id: "", label: "Os dois agentes" }, { id: "claude", label: "Claude Code" }, { id: "codex", label: "Codex" }];
-const KIND_LABEL = { user: "pedido", assistant: "resposta", command: "comando", file: "arquivo" };
+const AGENTS = [{ id: "", label: t("Os dois agentes") }, { id: "claude", label: "Claude Code" }, { id: "codex", label: "Codex" }];
+const KIND_LABEL = { user: t("pedido"), assistant: t("resposta"), command: t("comando"), file: t("arquivo") };
 
 function dayLabel(iso) {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "Sem data";
+  if (Number.isNaN(d.getTime())) return t("Sem data");
   const today = new Date();
   const start = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
   const diff = Math.round((start(today) - start(d)) / 86400000);
-  if (diff === 0) return "Hoje";
-  if (diff === 1) return "Ontem";
+  if (diff === 0) return t("Hoje");
+  if (diff === 1) return t("Ontem");
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}${d.getFullYear() === today.getFullYear() ? "" : `/${d.getFullYear()}`}`;
 }
 
@@ -37,11 +38,11 @@ export class AgentsHistoryView {
     this.root.innerHTML = `
       <div class="page ag-page">
         <label class="ag-search">${icon("search")}
-          <input id="ag-q" placeholder="Buscar em pedidos, respostas, comandos e arquivos" autocomplete="off" spellcheck="false" aria-label="Buscar no histórico de agentes">
+          <input id="ag-q" placeholder="${t("Buscar em pedidos, respostas, comandos e arquivos")}" autocomplete="off" spellcheck="false" aria-label="${t("Buscar no histórico de agentes")}">
           <span class="dim hint" data-role="count"></span></label>
         <div class="ag-bar-row">
-          <div class="segmented" role="tablist" aria-label="Tipo">${KINDS.map((k) => `<button type="button" class="seg ${k.id === this.kind ? "is-on" : ""}" data-kind="${k.id}">${k.label}</button>`).join("")}</div>
-          <div class="segmented" role="tablist" aria-label="Agente">${AGENTS.map((a) => `<button type="button" class="seg ${a.id === this.agent ? "is-on" : ""}" data-agent="${a.id}">${a.label}</button>`).join("")}</div>
+          <div class="segmented" role="tablist" aria-label="${t("Tipo")}">${KINDS.map((k) => `<button type="button" class="seg ${k.id === this.kind ? "is-on" : ""}" data-kind="${k.id}">${k.label}</button>`).join("")}</div>
+          <div class="segmented" role="tablist" aria-label="${t("Agente")}">${AGENTS.map((a) => `<button type="button" class="seg ${a.id === this.agent ? "is-on" : ""}" data-agent="${a.id}">${a.label}</button>`).join("")}</div>
         </div>
         <div data-role="hits"></div>
         <div data-role="note"></div>
@@ -76,7 +77,7 @@ export class AgentsHistoryView {
 
   render(data) {
     const hits = data.hits;
-    this.root.querySelector("[data-role=count]").textContent = this.q.trim() ? `${hits.length}${hits.length === 200 ? "+" : ""} resultados` : "";
+    this.root.querySelector("[data-role=count]").textContent = this.q.trim() ? t("{n} resultados", { n: `${hits.length}${hits.length === 200 ? "+" : ""}` }) : "";
     const groups = [];
     for (const h of hits) {
       const label = dayLabel(h.at);
@@ -90,15 +91,15 @@ export class AgentsHistoryView {
           <button type="button" class="ag-hit" data-open="${esc(h.session_id)}">
             <span class="ag-time">${esc(clock(h.at))}</span>
             <span class="ag-hit-main"><span class="ag-hit-text ${h.kind === "command" || h.kind === "file" ? "mono" : ""}">${marked(h.text)}</span>
-              <span class="ag-hit-src">${agentMark(h.agent)}<span>${esc(h.project || "sem projeto")}</span>${h.branch ? `<span class="mono">${esc(h.branch)}</span>` : ""}<span>${KIND_LABEL[h.kind] || h.kind}</span></span></span>
+              <span class="ag-hit-src">${agentMark(h.agent)}<span>${esc(h.project || t("sem projeto"))}</span>${h.branch ? `<span class="mono">${esc(h.branch)}</span>` : ""}<span>${KIND_LABEL[h.kind] || h.kind}</span></span></span>
             ${icon("chevron-right")}
           </button>`).join("")}</div></section>`).join("")
-      : `<div class="empty-inline">${icon("info")}<span>${this.q.trim() ? `Nada encontrado para “${esc(this.q.trim())}”. Tente outra palavra ou limpe os filtros.` : "Nenhum evento no histórico ainda."}</span></div>`;
+      : `<div class="empty-inline">${icon("info")}<span>${this.q.trim() ? t("Nada encontrado para “{query}”. Tente outra palavra ou limpe os filtros.", { query: esc(this.q.trim()) }) : t("Nenhum evento no histórico ainda.")}</span></div>`;
     const cleanup = data.claude_cleanup;
     this.root.querySelector("[data-role=note]").innerHTML = `
-      <div class="ag-note">${icon("info")}<div><b>Sessões antigas</b>
-        <p>O ${AGENT_NAMES.claude} apaga sessões com mais de ${cleanup.days} dias (<code>cleanupPeriodDays</code> em <code>~/.claude/settings.json</code>${cleanup.configured ? "" : ", valor padrão"}).
-          O Vulcan Celox guarda o resumo e o texto pesquisável dessas sessões no próprio índice, sem alterar a configuração do Claude.${data.fts ? "" : " Este SQLite não tem FTS5: a busca não ignora acentos."}</p></div></div>`;
+      <div class="ag-note">${icon("info")}<div><b>${t("Sessões antigas")}</b>
+        <p>${t("O {agent} apaga sessões com mais de {days} dias ({setting} em {file}{default}).", { agent: AGENT_NAMES.claude, days: cleanup.days, setting: "<code>cleanupPeriodDays</code>", file: "<code>~/.claude/settings.json</code>", default: cleanup.configured ? "" : `, ${t("valor padrão")}` })}
+          ${t("O Vulcan Celox guarda o resumo e o texto pesquisável dessas sessões no próprio índice, sem alterar a configuração do Claude.")}${data.fts ? "" : ` ${t("Este SQLite não tem FTS5: a busca não ignora acentos.")}`}</p></div></div>`;
   }
 
   onClick(event) {

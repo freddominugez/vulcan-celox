@@ -15,6 +15,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 from vulcan_celox.core.agents import pricing
 from vulcan_celox.core.agents.model import local_day
+from vulcan_celox.core.i18n import tr
 
 GROUPS = ("day", "project", "model", "agent", "session")
 TOKEN_FIELDS = ("input", "output", "cache_read", "cache_write_5m", "cache_write_1h", "reasoning")
@@ -92,9 +93,9 @@ def _key(row: Dict, group: str, day: str) -> str:
     if group == "day":
         return day
     if group == "project":
-        return row.get("project") or "(sem projeto)"
+        return row.get("project") or tr("(sem projeto)")
     if group == "model":
-        return pricing.normalize(row.get("model") or "") or "(sem modelo)"
+        return pricing.normalize(row.get("model") or "") or tr("(sem modelo)")
     if group == "agent":
         return row.get("agent") or ""
     return row.get("session_id") or ""
@@ -130,7 +131,7 @@ def aggregate(rows: Iterable[Dict], table: Dict[str, Dict], group: str, start: d
         ordered = sorted(groups.values(), key=lambda g: (-g["total_tokens"], g["key"]))
     return {"group": group, "from": lo, "to": hi, "currency": pricing.CURRENCY,
             "groups": [_finish(g) for g in ordered[:limit]], "truncated": len(ordered) > limit,
-            "total": _finish(total), "estimate_note": NOTE}
+            "total": _finish(total), "estimate_note": tr(NOTE)}
 
 
 NOTE = ("Estimativa no preço da API. Assinatura (Claude Max, ChatGPT) cobra de outro jeito; "
@@ -187,4 +188,4 @@ def doctor_summary(data_dir, days: int = DEFAULT_DAYS) -> Dict:
     t = report["total"]
     return {"dias": days, "agentes": agents,
             "total": {"tokens": t["total_tokens"], "custo_usd": t["cost"], "parcial": t["cost_partial"]},
-            "nota": "estimativa no preço da API; assinatura cobra de outro jeito"}
+            "nota": tr("estimativa no preço da API; assinatura cobra de outro jeito")}

@@ -1,8 +1,8 @@
 #!/bin/sh
-# Instala o Vulcan Celox para o usuário atual, sem sudo (padrão ~/.local). PREFIX=/outro/lugar muda o destino.
-#   sh install.sh                    instala e pergunta antes de instalar as bibliotecas que faltarem
-#   sh install.sh -y                 instala e autoriza a instalação das bibliotecas
-#   sh install.sh --sem-dependencias só copia o programa
+# Installs Vulcan Celox for the current user, without sudo (default ~/.local). PREFIX=/other/place changes the destination.
+#   sh install.sh                    installs and asks before installing any missing libraries
+#   sh install.sh -y                 installs and authorizes installing the libraries
+#   sh install.sh --skip-deps        only copies the program
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PREFIX="${PREFIX:-$HOME/.local}"
@@ -10,14 +10,14 @@ DEST="$PREFIX/opt/vulcan-celox"
 DEPS_MODE=""
 for arg in "$@"; do
   case "$arg" in
-    -y|--sim) DEPS_MODE="-y" ;;
-    --sem-dependencias) DEPS_MODE="skip" ;;
-    *) echo "opção desconhecida: $arg" >&2; exit 2 ;;
+    -y|--sim|--yes) DEPS_MODE="-y" ;;
+    --sem-dependencias|--skip-deps) DEPS_MODE="skip" ;;
+    *) echo "unknown option: $arg" >&2; exit 2 ;;
   esac
 done
 
 if [ -d "$DEST" ]; then
-  # versão anterior guardada ao lado; o uninstall.sh ou o usuário decide apagar
+  # previous version kept alongside; uninstall.sh or the user decides to delete it
   OLD="$DEST.anterior"
   [ -e "$OLD" ] && mv "$OLD" "$OLD.$(date +%Y%m%d%H%M%S)"
   mv "$DEST" "$OLD"
@@ -34,14 +34,14 @@ cp -R "$HERE/share/icons/hicolor" "$PREFIX/share/icons/"
 command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$PREFIX/share/applications" 2>/dev/null || true
 command -v gtk-update-icon-cache >/dev/null 2>&1 && gtk-update-icon-cache -q -t "$PREFIX/share/icons/hicolor" 2>/dev/null || true
 
-echo "Vulcan Celox instalado em $DEST"
-echo "Abra pelo menu de aplicativos ou rode: $PREFIX/bin/vulcan-celox"
-case ":$PATH:" in *":$PREFIX/bin:"*) ;; *) echo "Dica: adicione $PREFIX/bin ao PATH." ;; esac
+echo "Vulcan Celox installed at $DEST"
+echo "Open it from the applications menu or run: $PREFIX/bin/vulcan-celox"
+case ":$PATH:" in *":$PREFIX/bin:"*) ;; *) echo "Tip: add $PREFIX/bin to your PATH." ;; esac
 
 if [ "$DEPS_MODE" = "skip" ]; then
-  echo "Bibliotecas não verificadas. Depois rode: vulcan-celox --instalar-dependencias"
+  echo "Libraries not checked. Later, run: vulcan-celox --install-deps"
 else
   echo
   # shellcheck disable=SC2086
-  sh "$DEST/bin/vulcan-celox-deps" $DEPS_MODE || echo "Quando quiser: $PREFIX/bin/vulcan-celox --instalar-dependencias"
+  sh "$DEST/bin/vulcan-celox-deps" $DEPS_MODE || echo "Whenever you want: $PREFIX/bin/vulcan-celox --install-deps"
 fi
