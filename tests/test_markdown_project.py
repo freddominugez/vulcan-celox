@@ -1,9 +1,9 @@
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.markdown_index import (BLOCK_END, BLOCK_START, ProjectIndexSettings,
+from vulcan_celox.core.markdown_index import (BLOCK_END, BLOCK_START, ProjectIndexSettings,
                                                  ProjectPathMissing, apply_block, render_project_block,
                                                  sync_project_indexes, write_project_index)
-from vulcan_terminal.core.models import Task
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.models import Task
+from vulcan_celox.core.store import Store
 
 PREFACIO = "# Meu projeto\n\nAnotações escritas à mão.\n\n"
 POSFACIO = "\n\n## Rodapé manual\n\nNão mexer.\n"

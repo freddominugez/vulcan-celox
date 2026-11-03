@@ -1,6 +1,6 @@
 # Manual do Vulcan Celox
 
-> Gerado por `scripts/manual_md.py` a partir de `vulcan_terminal/web/help/conteudo.json`, o mesmo conteúdo da tela Ajuda do app (⌘?). Não edite este arquivo à mão.
+> Gerado por `scripts/manual_md.py` a partir de `vulcan_celox/web/help/conteudo.json`, o mesmo conteúdo da tela Ajuda do app (⌘?). Não edite este arquivo à mão.
 
 ## Sumário
 
@@ -29,7 +29,7 @@ O app tem tema claro e escuro. Em ⌘K, busque "Tema" e escolha Sistema, Claro o
 
 O Vulcan Celox é um painel para quem programa sozinho com agentes de código. Ele junta num lugar só os sites PHP que o **Lerd** roda no seu Mac, os projetos Node (Next.js, Vite e afins), os terminais de cada projeto e as sessões do **Claude Code** e do **Codex**.
 
-![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](../../vulcan_terminal/web/img/manual/visao-geral.png)
+![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](../../vulcan_celox/web/img/manual/visao-geral.png)
 
 1. **Ligue o Lerd.** O ponto verde no alto, à direita, e no item Lerd da barra lateral mostra que nginx, DNS `.test` e PHP respondem. Sem o Lerd, projetos Node e agentes funcionam do mesmo jeito.
 2. **Encontre seus projetos.** Sites registrados no Lerd aparecem sozinhos. Projetos Node entram pelo + da seção Projetos Node, ou pelas sugestões tiradas das pastas onde seus agentes trabalharam.
@@ -61,7 +61,7 @@ Os sites são do Lerd. O app só chama a CLI e a API do próprio Lerd e nunca ed
 
 O **Lerd** é um ambiente de desenvolvimento PHP de código aberto (licença MIT). Ele roda nginx, PHP-FPM, DNS para `.test`, banco de dados e certificados HTTPS em contêineres, sem você configurar servidor web na mão. O Vulcan Celox é o painel por cima dele.
 
-![Tela Lerd com componentes, serviços e versões de PHP](../../vulcan_terminal/web/img/manual/lerd.png)
+![Tela Lerd com componentes, serviços e versões de PHP](../../vulcan_celox/web/img/manual/lerd.png)
 
 - **Item Lerd na barra lateral:** o ponto mostra o estado (verde rodando, rosa parado, cinza ausente). A tela tem Ligar, Parar e Painel do Lerd.
 - **Serviços:** banco, Redis e outros, com ligar e parar.
@@ -79,7 +79,7 @@ O Laravel Valet também funciona como alternativa. O Herd é comercial e não é
 
 Projetos Node não usam o Lerd. O app lê o `package.json`, descobre o gerenciador pelo lockfile (pnpm, npm, yarn ou bun), o framework pelas dependências e a porta provável, e mostra o Supabase local e o vínculo com a Vercel.
 
-![Página de um projeto Next.js com scripts, Supabase local e dados do projeto](../../vulcan_terminal/web/img/manual/node-projeto.png)
+![Página de um projeto Next.js com scripts, Supabase local e dados do projeto](../../vulcan_celox/web/img/manual/node-projeto.png)
 
 1. Clique no + da seção **Projetos Node** e escolha a pasta raiz, onde fica o `package.json`. Nada é gravado nela.
 2. Na página do projeto, **Rodar** abre uma aba de terminal e digita `pnpm run dev` (ou o gerenciador do projeto). A aba aparece no painel de baixo.
@@ -122,7 +122,7 @@ Na sessão de um agente, o painel **Depuração no período** mostra só o que a
 
 A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, com projeto, branch, último pedido, arquivos tocados e estado (ativa, parada, em loop). Clicar numa sessão abre a linha do tempo dela.
 
-![Lista de sessões de agentes com projeto, branch e atividade](../../vulcan_terminal/web/img/manual/agentes.png)
+![Lista de sessões de agentes com projeto, branch e atividade](../../vulcan_celox/web/img/manual/agentes.png)
 
 - **Quem espera por você:** a aba ganha um anel e a barra lateral mostra quantas sessões terminaram o turno ou podem estar esperando. O aviso some ao focar a aba ou abrir a sessão, e ⌘⇧U vai para o mais recente. "Talvez esperando" é uma suposição: a ferramenta pode só estar demorando. Programas que avisam pelo terminal (OSC 9, 99 e 777, ou o sino) também acendem o anel. Com a janela sem foco, o app manda um aviso do sistema só com agente, projeto e estado, e mostra o número no ícone do Dock; para ligar ou desligar, use ⌘K e busque "Aviso do sistema".
 - **Histórico de agentes:** busca em tudo o que os agentes fizeram, por texto, arquivo ou comando.
@@ -138,7 +138,7 @@ A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, c
 
 **Aba Código.** Dentro de uma sessão, a aba **Código** mostra os arquivos que o agente tocou, com a marca de novo, editado, lido ou apagado. Você vê o arquivo com realce de sintaxe ou o diff: de uma edição, de um pedido inteiro ou contra o último commit, lado a lado ou unificado. ⌘F busca no arquivo. Numa sessão ativa o visor segue o agente, abrindo cada arquivo editado e rolando até o trecho. Rolar, clicar ou selecionar texto pausa, e **Voltar a seguir** retoma. Nas abas pareadas, o botão **Código** da barra acima do terminal leva direto para cá.
 
-![Aba Código com a árvore de arquivos e o diff de uma edição lado a lado](../../vulcan_terminal/web/img/manual/codigo.png)
+![Aba Código com a árvore de arquivos e o diff de uma edição lado a lado](../../vulcan_celox/web/img/manual/codigo.png)
 
 O visor só lê: nada é editado no app. Ele abre arquivos dentro da pasta da sessão, até 1 MB, e não mostra binários nem nomes sensíveis como `.env`, chaves e credenciais. O conteúdo das edições vem do registro do agente, então some quando o agente apaga a sessão antiga.
 
@@ -152,7 +152,7 @@ O app só lê esses arquivos, linha por linha. Ele nunca escreve em `~/.claude` 
 
 A tela **Uso e custo** soma os tokens que cada turno dos agentes gastou e estima o custo pelo preço público da API de cada modelo, por dia, projeto, modelo e sessão. O botão Copiar CSV leva os números para uma planilha.
 
-![Uso e custo com barras por dia separadas por agente e tabelas por projeto](../../vulcan_terminal/web/img/manual/uso-e-custo.png)
+![Uso e custo com barras por dia separadas por agente e tabelas por projeto](../../vulcan_celox/web/img/manual/uso-e-custo.png)
 
 O valor é uma **estimativa no preço da API**. Quem usa plano de assinatura paga outro valor. Modelo sem preço conhecido aparece sem custo, nunca como zero. Os preços podem ser trocados no arquivo `precos.json` da pasta de dados do app.
 
@@ -169,7 +169,7 @@ Prompts são instruções que você manda sempre para o agente: trabalhar em pas
 3. **Clique em Enviar ao terminal** (ou ⌘Enter). O texto entra no campo do agente como colagem, **sem apertar Enter**: confira no terminal e envie você.
 4. **Sem terminal pareado, ou com o agente já fechado naquela aba,** o texto não é colado: assim ele não cai no shell. O compositor oferece retomar a sessão num terminal. Copiar continua disponível para colar em outro lugar com ⌘V.
 
-![Tela Prompts com cartões e o compositor aberto](../../vulcan_terminal/web/img/manual/prompts.png)
+![Tela Prompts com cartões e o compositor aberto](../../vulcan_celox/web/img/manual/prompts.png)
 
 - Prompts globais ficam na pasta de dados do app; os do projeto ficam em `.vulcan/prompts` dentro do projeto e sobrescrevem o global de mesmo id. Os caminhos aparecem no diálogo Novo prompt.
 - No cabeçalho do arquivo, `descricao` define o texto do cartão e `icone` o ícone. Sem `descricao`, o cartão usa a primeira frase do prompt.
@@ -183,7 +183,7 @@ Prompts são instruções que você manda sempre para o agente: trabalhar em pas
 
 O harness é o contrato com itens verificáveis, o estado da execução e o handoff que os agentes leem para retomar o trabalho. A aba **Harness** de cada site mostra o contrato ativo, a barra de itens (feito, em andamento, bloqueado, pendente), o próximo item e o último commit verde.
 
-![Aba Harness com barra de itens, item bloqueado e handoff](../../vulcan_terminal/web/img/manual/harness.png)
+![Aba Harness com barra de itens, item bloqueado e handoff](../../vulcan_celox/web/img/manual/harness.png)
 
 - **Copiar prompt de retomada:** texto pronto para o agente continuar do item certo.
 - **Instalar harness:** num projeto sem harness, cria o formato mínimo depois de mostrar a lista exata de arquivos. Nada é sobrescrito; em `CLAUDE.md` ou `AGENTS.md` existente entra só um bloco marcado.
@@ -270,7 +270,7 @@ Não. É uma estimativa pelo preço público da API de cada modelo. Quem usa pla
 
 **Como mudo o preço de um modelo?**
 
-Edite o `precos.json` na pasta de dados do app (`~/Library/Application Support/VulcanTerminal/`). O valor do arquivo vale mais que a tabela embutida.
+Edite o `precos.json` na pasta de dados do app (`~/Library/Application Support/VulcanCelox/`). O valor do arquivo vale mais que a tabela embutida.
 
 **Um agente não aparece na lista.**
 

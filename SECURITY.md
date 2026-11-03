@@ -12,7 +12,7 @@ Portuguese version: [SECURITY.pt-BR.md](SECURITY.pt-BR.md).
 
 ## Reporting a vulnerability
 
-Do not open a public issue. Use GitHub's private reporting: **Security > Report a vulnerability** on this repository, or write to carlosdominguez@byvulcan.com. Include the version, the steps to reproduce and the impact.
+Do not open a public issue. Use GitHub's private reporting: **Security > Report a vulnerability** on this repository, or write to manager@byvulcan.com. Include the version, the steps to reproduce and the impact.
 
 This is a project maintained by one person, so there is no guaranteed response time. Reports are read as soon as possible, and fixes are credited in the changelog if you wish.
 

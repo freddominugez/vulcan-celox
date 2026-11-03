@@ -6,7 +6,7 @@
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 PREFIX="${PREFIX:-$HOME/.local}"
-DEST="$PREFIX/opt/vulcan-terminal"
+DEST="$PREFIX/opt/vulcan-celox"
 DEPS_MODE=""
 for arg in "$@"; do
   case "$arg" in
@@ -24,24 +24,24 @@ if [ -d "$DEST" ]; then
 fi
 mkdir -p "$DEST" "$PREFIX/bin" "$PREFIX/share/applications"
 cp -R "$HERE/bin" "$HERE/lib" "$DEST/"
-chmod +x "$DEST/bin/vulcan-terminal"
-ln -sf "$DEST/bin/vulcan-terminal" "$PREFIX/bin/vulcan-terminal"
+chmod +x "$DEST/bin/vulcan-celox"
+ln -sf "$DEST/bin/vulcan-celox" "$PREFIX/bin/vulcan-celox"
 
-sed "s|@EXEC@|$PREFIX/bin/vulcan-terminal|" "$HERE/share/applications/vulcan-terminal.desktop" \
-  > "$PREFIX/share/applications/vulcan-terminal.desktop"
+sed "s|@EXEC@|$PREFIX/bin/vulcan-celox|" "$HERE/share/applications/vulcan-celox.desktop" \
+  > "$PREFIX/share/applications/vulcan-celox.desktop"
 mkdir -p "$PREFIX/share/icons"
 cp -R "$HERE/share/icons/hicolor" "$PREFIX/share/icons/"
 command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$PREFIX/share/applications" 2>/dev/null || true
 command -v gtk-update-icon-cache >/dev/null 2>&1 && gtk-update-icon-cache -q -t "$PREFIX/share/icons/hicolor" 2>/dev/null || true
 
 echo "Vulcan Celox instalado em $DEST"
-echo "Abra pelo menu de aplicativos ou rode: $PREFIX/bin/vulcan-terminal"
+echo "Abra pelo menu de aplicativos ou rode: $PREFIX/bin/vulcan-celox"
 case ":$PATH:" in *":$PREFIX/bin:"*) ;; *) echo "Dica: adicione $PREFIX/bin ao PATH." ;; esac
 
 if [ "$DEPS_MODE" = "skip" ]; then
-  echo "Bibliotecas não verificadas. Depois rode: vulcan-terminal --instalar-dependencias"
+  echo "Bibliotecas não verificadas. Depois rode: vulcan-celox --instalar-dependencias"
 else
   echo
   # shellcheck disable=SC2086
-  sh "$DEST/bin/vulcan-terminal-deps" $DEPS_MODE || echo "Quando quiser: $PREFIX/bin/vulcan-terminal --instalar-dependencias"
+  sh "$DEST/bin/vulcan-celox-deps" $DEPS_MODE || echo "Quando quiser: $PREFIX/bin/vulcan-celox --instalar-dependencias"
 fi

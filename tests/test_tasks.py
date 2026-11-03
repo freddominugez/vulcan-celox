@@ -1,6 +1,6 @@
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.notebook import ALL, InvalidDue, Notebook
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.notebook import ALL, InvalidDue, Notebook
+from vulcan_celox.core.store import Store
 
 
 class FakeClock:

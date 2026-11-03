@@ -33,7 +33,7 @@ class ServerSecurityTest(ServerTestCase):
         self.assertEqual((status, resp.getheader("Content-Type")), (200, "text/javascript; charset=utf-8"))
 
     def test_interface_lida_na_abertura(self):
-        from vulcan_terminal.server.local_http import LocalServer
+        from vulcan_celox.server.local_http import LocalServer
         web = self.tmp / "web"
         (web / "js").mkdir(parents=True)
         (web / "index.html").write_text("<html>v1", encoding="utf-8")
@@ -75,7 +75,7 @@ class ServerRoutesTest(ServerTestCase):
         self.assertEqual(self.request("POST", "/api/services/explodir", body={})[0], 404)
 
     def test_servico_com_backend(self):
-        from vulcan_terminal.core.backends.lerd import LerdBackend
+        from vulcan_celox.core.backends.lerd import LerdBackend
         self.app.backend = LerdBackend(self.tmp / "lerd", runner=self.fake, api_base="http://127.0.0.1:1")
         status, data, _ = self.request("POST", "/api/services/restart", body={})
         self.assertEqual((status, data["ok"]), (200, True))
@@ -86,7 +86,7 @@ class ServerRoutesTest(ServerTestCase):
         self.assertEqual(self.request("POST", "/api/open", body={"kind": "finder", "target": "/nao/existe"})[0], 400)
         status, _, _ = self.request("POST", "/api/open", body={"kind": "url", "target": "http://loja.test"})
         self.assertEqual(status, 200)
-        from vulcan_terminal.core.oscompat import open_argv
+        from vulcan_celox.core.oscompat import open_argv
         self.assertEqual(list(self.fake.calls[-1].argv), open_argv("url", "http://loja.test", self.app.env))
         self.assertEqual(self.request("POST", "/api/open", body={"kind": "dashboard"})[0], 409)
 

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Vulcan Celox
+GenericName=Painel de desenvolvimento PHP
+Comment=Sites locais do Lerd, terminais, tarefas, post-its e documentação das sessões
+Exec=@EXEC@
+Icon=vulcan-celox
+Terminal=false
+Categories=Development;TerminalEmulator;
+Keywords=php;laravel;lerd;terminal;tarefas;
+StartupWMClass=VulcanCelox

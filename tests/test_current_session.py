@@ -1,7 +1,7 @@
 """Sessão atual pela API, lembrada entre aberturas do app."""
 
 from tests import test_agents_api
-from vulcan_terminal.server.app import VulcanApp
+from vulcan_celox.server.app import VulcanApp
 
 CLAUDE_SID = "11111111-2222-4333-8444-555555555555"
 CODEX_SID = "019a0000-1111-7222-8333-444444444444"

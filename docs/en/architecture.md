@@ -19,7 +19,7 @@ Python server on 127.0.0.1  <-- JSON + WebSocket --> Web interface (no build, xt
         +-- writes only to its own data folder
 ```
 
-Startup: the Swift executable generates a random token, starts `python3 -m vulcan_terminal --serve` from the bundle's resources with the token in the environment, reads `VULCAN_PORT=<n>` from stdout, and loads `http://127.0.0.1:<n>/` in a WKWebView, with the token available only for that origin. Closing the app ends the server and the PTYs. If the parent dies, the server writes memories within 3 seconds and exits.
+Startup: the Swift executable generates a random token, starts `python3 -m vulcan_celox --serve` from the bundle's resources with the token in the environment, reads `VULCAN_PORT=<n>` from stdout, and loads `http://127.0.0.1:<n>/` in a WKWebView, with the token available only for that origin. Closing the app ends the server and the PTYs. If the parent dies, the server writes memories within 3 seconds and exits.
 
 ## Stack and why
 
@@ -51,12 +51,12 @@ Startup: the Swift executable generates a random token, starts `python3 -m vulca
 | Path | What it is |
 |------|------------|
 | `packaging/macos/` | macOS shell: windows, menus, menu bar item, `--snapshot`, `--eval` |
-| `vulcan_terminal/core/` | Store, runner, PTY, backends, sites, notebook, memory, redaction, prompts, themes, harness, Node |
-| `vulcan_terminal/core/agents/` | Discovery, JSONL stream, Claude and Codex readers, builder, index, history, watcher, loops, repos, pairing, pricing, usage |
-| `vulcan_terminal/server/` | HTTP and WebSocket server and one `*_api.py` per area |
-| `vulcan_terminal/web/` | `index.html`, `styles/`, `js/`, `js/views/`, `help/`, `vendor/` |
-| `vulcan_terminal/desktop_linux.py` | Linux shell |
-| `vulcan_terminal/ui/` | Old tkinter interface, fallback only |
+| `vulcan_celox/core/` | Store, runner, PTY, backends, sites, notebook, memory, redaction, prompts, themes, harness, Node |
+| `vulcan_celox/core/agents/` | Discovery, JSONL stream, Claude and Codex readers, builder, index, history, watcher, loops, repos, pairing, pricing, usage |
+| `vulcan_celox/server/` | HTTP and WebSocket server and one `*_api.py` per area |
+| `vulcan_celox/web/` | `index.html`, `styles/`, `js/`, `js/views/`, `help/`, `vendor/` |
+| `vulcan_celox/desktop_linux.py` | Linux shell |
+| `vulcan_celox/ui/` | Old tkinter interface, fallback only |
 | `scripts/` | `validate.sh`, `test_linux.sh`, `build_app.sh`, `install_app.sh`, `package.sh` |
 | `packaging/linux/` | Launcher, menu entry, icons, `.deb` control |
 | `tests/` | `unittest` suite, fixtures, fake Lerd |

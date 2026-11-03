@@ -6,7 +6,7 @@ from unittest import mock
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.quick_commands import project_commands
+from vulcan_celox.core.quick_commands import project_commands
 
 
 class ListaTest(TempDirTestCase):

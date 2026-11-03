@@ -4,7 +4,7 @@
 
 Requirements: macOS 13 or newer, Apple Silicon or Intel, Python 3.9 or newer.
 
-1. Download `Vulcan-Celox-<version>-macos.dmg` from [Releases](https://github.com/freddominugez/vulcan-hub-painel/releases).
+1. Download `Vulcan-Celox-<version>-macos.dmg` from [Releases](https://github.com/freddominugez/vulcan-celox/releases).
 2. Check it, with `SHA256SUMS` in the same folder: `shasum -a 256 -c SHA256SUMS`. A missing `.zip` will be reported if you downloaded only the `.dmg`; that is fine.
 3. Open the `.dmg` and drag **Vulcan Celox** to Applications.
 4. The app has no Apple certificate and is not notarized. The first time, right click it, choose **Open** and confirm. If macOS says the app is damaged:
@@ -15,7 +15,7 @@ Requirements: macOS 13 or newer, Apple Silicon or Intel, Python 3.9 or newer.
 
 If Python is missing, the app says so when it opens and offers **Instalar ferramentas da Apple** (`xcode-select --install`) or **Instalar com Homebrew**. Nothing is installed without your confirmation.
 
-User data lives in `~/Library/Application Support/VulcanTerminal/`. Removing the app keeps that folder.
+User data lives in `~/Library/Application Support/VulcanCelox/`. Removing the app keeps that folder.
 
 ### Optional tools
 
@@ -31,7 +31,7 @@ User data lives in `~/Library/Application Support/VulcanTerminal/`. Removing the
 Without a hook, a tab and a session are paired by folder and time. For an exact link:
 
 ```bash
-python3 -m vulcan_terminal --instalar-hook
+python3 -m vulcan_celox --instalar-hook
 ```
 
 This is the only thing that writes to `~/.claude/settings.json`, and it keeps a backup next to the file. See [pairing-hook.md](pairing-hook.md) (Portuguese).
@@ -54,10 +54,10 @@ The code is in the repository and its tests run in a container and in CI, includ
 python3 scripts/package_linux.py
 cd executaveis/linux
 sha256sum -c SHA256SUMS
-sudo apt install ./vulcan-terminal_<version>_all.deb
-vulcan-terminal --check
+sudo apt install ./vulcan-celox_<version>_all.deb
+vulcan-celox --check
 ```
 
-Python 3.9+ is the only build requirement. The window uses GTK and WebKit, or Chromium/Chrome in app mode, or the browser. Shortcuts use Ctrl+Shift. Libraries can be installed with `vulcan-terminal --instalar-dependencias` (apt, dnf or pacman), with your permission.
+Python 3.9+ is the only build requirement. The window uses GTK and WebKit, or Chromium/Chrome in app mode, or the browser. Shortcuts use Ctrl+Shift. Libraries can be installed with `vulcan-celox --instalar-dependencias` (apt, dnf or pacman), with your permission.
 
 Windows is not supported: Python's `pty` module does not exist there.

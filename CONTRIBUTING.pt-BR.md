@@ -15,8 +15,8 @@ Obrigado pelo interesse. Relatos de defeito, testes em outras máquinas (princip
 São conferidas por teste ou na revisão. Pull request que as quebra não entra.
 
 - Só biblioteca padrão do Python 3.9. Nada de dependência pip.
-- Sem etapa de build em `vulcan_terminal/web/` e sem recurso externo na interface. Só o xterm.js e seus addons oficiais MIT são vendorizados.
-- `vulcan_terminal/core/` não importa tkinter. Subprocess só por `core/runner.py`; `shell=True` só em `run_shell`.
+- Sem etapa de build em `vulcan_celox/web/` e sem recurso externo na interface. Só o xterm.js e seus addons oficiais MIT são vendorizados.
+- `vulcan_celox/core/` não importa tkinter. Subprocess só por `core/runner.py`; `shell=True` só em `run_shell`.
 - O servidor só atende em `127.0.0.1`, com token obrigatório.
 - Nunca escrever em `~/.claude`, `~/.codex`, `~/.claude.json` ou `~/.codex/config.toml`. Arquivos de sessão só em stream, linha por linha. A única exceção é o `--instalar-hook`, rodado pelo usuário.
 - Sem exclusão definitiva (`shutil.rmtree`, `rm -rf`). Pastas vão para a Lixeira.
@@ -30,7 +30,7 @@ São conferidas por teste ou na revisão. Pull request que as quebra não entra.
 1. Escreva primeiro um teste que falha, depois a correção.
 2. Rode `bash scripts/validate.sh`. No Linux, ou para testar o Linux a partir do Mac, rode `bash scripts/test_linux.sh`.
 3. Uma mudança lógica por commit. Mensagens no formato `tipo(escopo): resumo`, por exemplo `fix(terminal): ...`.
-4. Atualize a documentação atingida, nas duas línguas quando a página existir nas duas. Não edite `docs/pt-BR/user-guide.md` à mão: ele é gerado de `vulcan_terminal/web/help/conteudo.json` por `scripts/manual_md.py`.
+4. Atualize a documentação atingida, nas duas línguas quando a página existir nas duas. Não edite `docs/pt-BR/user-guide.md` à mão: ele é gerado de `vulcan_celox/web/help/conteudo.json` por `scripts/manual_md.py`.
 5. Nunca enfraqueça um teste para passar. Se o comportamento mudou de propósito, explique no pull request.
 
 ## Usando ferramentas de IA

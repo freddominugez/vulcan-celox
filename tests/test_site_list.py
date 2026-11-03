@@ -3,7 +3,7 @@
 from types import SimpleNamespace
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.site_list import arrange_sidebar
+from vulcan_celox.core.site_list import arrange_sidebar
 
 
 def site(name, domain=None):

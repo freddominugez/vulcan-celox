@@ -2,7 +2,7 @@ import os
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.desktop_linux import bootstrap_script, choose_mode, is_app_uri, main, should_exit_idle
+from vulcan_celox.desktop_linux import bootstrap_script, choose_mode, is_app_uri, main, should_exit_idle
 
 
 class ChooseModeTest(unittest.TestCase):
@@ -50,9 +50,9 @@ class OrigemTest(unittest.TestCase):
 
 class CheckTest(TempDirTestCase):
     def test_check_sobe_servidor_e_sai(self):
-        keys = ("VULCAN_TERMINAL_HOME", "VULCAN_LERD_BIN", "VULCAN_VALET_BIN", "VULCAN_KEYSTORE", "VULCAN_LERD_API")
+        keys = ("VULCAN_CELOX_HOME", "VULCAN_LERD_BIN", "VULCAN_VALET_BIN", "VULCAN_KEYSTORE", "VULCAN_LERD_API")
         saved = {k: os.environ.get(k) for k in keys}
-        os.environ.update({"VULCAN_TERMINAL_HOME": str(self.tmp / "h"), "VULCAN_LERD_BIN": str(self.tmp / "x"),
+        os.environ.update({"VULCAN_CELOX_HOME": str(self.tmp / "h"), "VULCAN_LERD_BIN": str(self.tmp / "x"),
                            "VULCAN_VALET_BIN": str(self.tmp / "y"), "VULCAN_KEYSTORE": "memory",
                            "VULCAN_LERD_API": "http://127.0.0.1:1"})
         try:

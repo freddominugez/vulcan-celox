@@ -125,7 +125,7 @@ class EditAndTurnScopeTest(CodeDiffCase):
 
 class SemGitTest(CodeDiffCase):
     def test_sem_o_comando_git_diz_o_motivo(self):
-        with mock.patch("vulcan_terminal.core.code_diff.open_pipe", side_effect=OSError("sem git")):
+        with mock.patch("vulcan_celox.core.code_diff.open_pipe", side_effect=OSError("sem git")):
             status, data = self.diff("a.py", "git")
         self.assertEqual((status, data["available"], data["reason"]), (200, False, "no_git"))
 
@@ -185,7 +185,7 @@ class GitScopeTest(CodeDiffCase):
 
 class EntradaEDocumentosTest(unittest.TestCase):
     def test_botao_do_terminal_so_na_aba_pareada(self):
-        bar = (ROOT / "vulcan_terminal" / "web" / "js" / "prompt-bar.mjs").read_text(encoding="utf-8")
+        bar = (ROOT / "vulcan_celox" / "web" / "js" / "prompt-bar.mjs").read_text(encoding="utf-8")
         self.assertIn("s.pairing_id === this.terminal", bar)
         self.assertRegex(bar, r'paired \? `<a class="pb-chip pb-code" href="#/agentes/\$\{encodeURIComponent\(s\.id\)\}/codigo"')
 

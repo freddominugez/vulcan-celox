@@ -4,8 +4,8 @@ import os
 import stat
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core import prompts
-from vulcan_terminal.core.store import secure_data_dir
+from vulcan_celox.core import prompts
+from vulcan_celox.core.store import secure_data_dir
 
 
 def mode(path):

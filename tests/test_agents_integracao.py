@@ -4,10 +4,10 @@ from pathlib import Path
 
 from tests import test_agents_api
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents.model import AgentSession, CommandRun, FileTouch
-from vulcan_terminal.core.doc_prompts import session_doc_prompt
-from vulcan_terminal.core.session_memory import render_general_index, render_session_md
-from vulcan_terminal.core.sessions import SessionRecord
+from vulcan_celox.core.agents.model import AgentSession, CommandRun, FileTouch
+from vulcan_celox.core.doc_prompts import session_doc_prompt
+from vulcan_celox.core.session_memory import render_general_index, render_session_md
+from vulcan_celox.core.sessions import SessionRecord
 
 CLAUDE_SID = "11111111-2222-4333-8444-555555555555"
 SECRET = "sk-ant-api03-" + "A" * 40

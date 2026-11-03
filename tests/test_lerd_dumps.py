@@ -12,7 +12,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.lerd_dumps import parse_event, parse_events
+from vulcan_celox.core.lerd_dumps import parse_event, parse_events
 
 EVENTS = json.loads((FIXTURES / "lerd-api-dumps.json").read_text(encoding="utf-8"))
 

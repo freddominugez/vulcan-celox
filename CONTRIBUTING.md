@@ -15,8 +15,8 @@ Thanks for your interest. Bug reports, tests on other machines (especially **Lin
 These are checked by tests or reviewed by hand, and a pull request that breaks them will not be merged.
 
 - Python 3.9 standard library only. No pip dependencies.
-- No build step in `vulcan_terminal/web/` and no external resource loaded by the interface. Only xterm.js and its official MIT addons are vendored.
-- `vulcan_terminal/core/` does not import tkinter. Subprocesses go only through `core/runner.py`; `shell=True` only in `run_shell`.
+- No build step in `vulcan_celox/web/` and no external resource loaded by the interface. Only xterm.js and its official MIT addons are vendored.
+- `vulcan_celox/core/` does not import tkinter. Subprocesses go only through `core/runner.py`; `shell=True` only in `run_shell`.
 - The server listens only on `127.0.0.1`, with a mandatory token.
 - Never write to `~/.claude`, `~/.codex`, `~/.claude.json` or `~/.codex/config.toml`. Read session files only as a stream, line by line. The one exception is `--instalar-hook`, run by the user.
 - No permanent deletion (`shutil.rmtree`, `rm -rf`). Folders go to the Trash.
@@ -30,7 +30,7 @@ These are checked by tests or reviewed by hand, and a pull request that breaks t
 1. Write a test that fails first, then the fix.
 2. Run `bash scripts/validate.sh`. On Linux, or to test Linux from a Mac, run `bash scripts/test_linux.sh`.
 3. One logical change per commit. Commit messages follow `type(scope): summary`, for example `fix(terminal): ...`.
-4. Update the docs affected by the change, in both languages when the page exists in both. Do not edit `docs/pt-BR/user-guide.md` by hand: it is generated from `vulcan_terminal/web/help/conteudo.json` by `scripts/manual_md.py`.
+4. Update the docs affected by the change, in both languages when the page exists in both. Do not edit `docs/pt-BR/user-guide.md` by hand: it is generated from `vulcan_celox/web/help/conteudo.json` by `scripts/manual_md.py`.
 5. Never weaken a test to make it pass. If a behavior changed on purpose, explain it in the pull request.
 
 ## Using AI tools

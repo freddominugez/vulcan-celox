@@ -6,7 +6,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/scripts/codemirror"
-VENDOR="$ROOT/vulcan_terminal/web/vendor"
+VENDOR="$ROOT/vulcan_celox/web/vendor"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/vulcan-codemirror.XXXXXX")"
 trap 'find "$WORK" -depth -delete 2>/dev/null || true' EXIT
 

@@ -4,7 +4,7 @@ import hashlib
 import shutil
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core import harness
+from vulcan_celox.core import harness
 
 H = FIXTURES / "harness"
 

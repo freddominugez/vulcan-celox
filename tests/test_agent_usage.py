@@ -4,8 +4,8 @@ import shutil
 import sqlite3
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core.agents.index import SCHEMA_VERSION, USAGE_FIELDS, AgentIndex
-from vulcan_terminal.core.agents.reading import read_session
+from vulcan_celox.core.agents.index import SCHEMA_VERSION, USAGE_FIELDS, AgentIndex
+from vulcan_celox.core.agents.reading import read_session
 
 USO = FIXTURES / "agents" / "usage"
 CLAUDE = USO / "claude-uso.jsonl"

@@ -5,8 +5,8 @@ from unittest import mock
 
 from tests.helpers import FIXTURES
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.runner import Result
-from vulcan_terminal.core.site_runtime import parse_php_version, parse_which, shim_status
+from vulcan_celox.core.runner import Result
+from vulcan_celox.core.site_runtime import parse_php_version, parse_which, shim_status
 
 
 class ParserTest(ServerTestCase):

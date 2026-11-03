@@ -22,7 +22,7 @@ CM_JS="(function () { var tag = 'CodeMirror não montou'; window.__vtErrors.push
     box.remove(); };
   document.head.appendChild(s); })();"
 shot="$TMP_ROOT/snapshot-codemirror.png"
-isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$shot" --route "#/overview" --wait 3 --eval "$CM_JS"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "#/overview" --wait 3 --eval "$CM_JS"
 
 step "aba Código: árvore, arquivo, diff e nome de arquivo como texto"
 CODE_SID="cccccccc-dddd-4eee-8fff-000000000001"
@@ -47,9 +47,9 @@ CODE_JS="(function () { var tag = 'aba Código incompleta'; window.__vtErrors.pu
       window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
     }
   }, 150); })();"
-isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-codigo.png" --route "#/agentes/$CODE_SID/codigo" --wait 7 --eval "$CODE_JS"
+isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-codigo.png" --route "#/agentes/$CODE_SID/codigo" --wait 7 --eval "$CODE_JS"
 # sessão cujos arquivos não existem nesta máquina: estados vazios, sem erro de console
-isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-codigo-vazio.png" --route "#/agentes/11111111-2222-4333-8444-555555555555/codigo" --wait 4 --eval "$(expect "'.code-shell', '.code-tree', '.code-empty'")"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-codigo-vazio.png" --route "#/agentes/11111111-2222-4333-8444-555555555555/codigo" --wait 4 --eval "$(expect "'.code-shell', '.code-tree', '.code-empty'")"
 
 step "aba Código segue o agente, pausa ao rolar e retoma"
 "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code2"
@@ -81,7 +81,7 @@ FOLLOW_JS="$UNHIDE_JS(function () {
       clearInterval(t); window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
     }
   }, 100); })();"
-isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code2/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-seguir.png" --route "#/agentes/$CODE_SID/codigo" --wait 30 --eval "$FOLLOW_JS"
+isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code2/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-seguir.png" --route "#/agentes/$CODE_SID/codigo" --wait 30 --eval "$FOLLOW_JS"
 wait "$GROW_PID"
 
 step "⌘-clique em caminho: reconhece no xterm de verdade, resolve no servidor e abre na linha"
@@ -111,7 +111,7 @@ PATH_JS="(function () { var tag = 'caminho no terminal incompleto'; window.__vtE
       });
     });
   }).catch(function (e) { fail('caminho: ' + (e.message || e)); }); })();"
-isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code3/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-caminho.png" --route "#/overview" --wait 7 --eval "$PATH_JS"
+isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code3/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-caminho.png" --route "#/overview" --wait 7 --eval "$PATH_JS"
 
 step "Linha do tempo por pedido: atalho e ida para o diff do turno"
 TURN_JS="(function () { var tag = 'linha do tempo por pedido incompleta'; window.__vtErrors.push(tag); var fase = 0;
@@ -126,7 +126,7 @@ TURN_JS="(function () { var tag = 'linha do tempo por pedido incompleta'; window
       clearInterval(t); window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
     }
   }, 150); })();"
-isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-turnos.png" --route "#/agentes/$CODE_SID" --wait 6 --eval "$TURN_JS"
+isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-turnos.png" --route "#/agentes/$CODE_SID" --wait 6 --eval "$TURN_JS"
 
 step "selo de porta na aba de um servidor de verdade"
 PORT_JS="$UNHIDE_JS(function () { var tag = 'selo de porta não apareceu'; window.__vtErrors.push(tag);
@@ -136,7 +136,7 @@ PORT_JS="$UNHIDE_JS(function () { var tag = 'selo de porta não apareceu'; windo
         if (location.protocol !== 'http:' || location.hostname !== '127.0.0.1') window.__vtErrors.push('janela saiu da origem');
         window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); } }, 200);
   }).catch(function (e) { window.__vtErrors.push('porta: ' + (e.message || e)); }); })();"
-isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-porta.png" --route "#/terminals" --wait 16 --eval "$PORT_JS"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-porta.png" --route "#/terminals" --wait 16 --eval "$PORT_JS"
 
 step "temas claro e escuro: telas principais sem estouro e com os tokens aplicados"
 "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code4"
@@ -147,7 +147,7 @@ for tema in claro escuro; do
     if (document.documentElement.scrollWidth > window.innerWidth) window.__vtErrors.push('tema $tema: estourou a largura'); }, 1500);"
   for route in "#/overview" "#/agentes" "#/agentes/$CODE_SID/codigo" "#/agentes/$CODE_SID" "#/tasks" "#/notes" "#/ajuda"; do
     shot="$TMP_ROOT/tema-$tema-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
-    isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$shot" --route "$route" --wait 3 --eval "$THEME_JS $CLIP_JS"
+    isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 3 --eval "$THEME_JS $CLIP_JS"
   done
 done
 
@@ -165,6 +165,6 @@ for tema in claro escuro; do
     document.fonts.load('14px Inter').then(function (f) { if (!f.length || !document.fonts.check('14px Inter')) window.__vtErrors.push('Inter não carregou'); });
     if (getComputedStyle(document.body).fontFamily.indexOf('Inter') < 0) window.__vtErrors.push('Inter não é a fonte do app');
   }, 1200);"
-  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/marca-$tema.png" --route "#/overview" --wait 3 --eval "$BRAND_JS"
+  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/marca-$tema.png" --route "#/overview" --wait 3 --eval "$BRAND_JS"
 done
 

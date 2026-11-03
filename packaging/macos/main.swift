@@ -86,7 +86,7 @@ final class BackendServer {
         let resources = Bundle.main.resourceURL?.path ?? FileManager.default.currentDirectoryPath
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: pythonPath())
-        proc.arguments = ["-m", "vulcan_terminal", "--serve"]
+        proc.arguments = ["-m", "vulcan_celox", "--serve"]
         // com -m a pasta atual vai para o começo do sys.path: roda dentro dos recursos do bundle
         proc.currentDirectoryURL = URL(fileURLWithPath: resources)
         var env = ProcessInfo.processInfo.environment
@@ -121,7 +121,7 @@ final class BackendServer {
         _ = found.wait(timeout: .now() + 20)
         guard let value = parsed else {
             proc.terminate()
-            throw NSError(domain: "VulcanTerminal", code: 1,
+            throw NSError(domain: "VulcanCelox", code: 1,
                           userInfo: [NSLocalizedDescriptionKey: "O servidor local não iniciou (\(pythonPath()))."])
         }
         port = value
@@ -409,7 +409,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         let controller = WebWindowController(app: self, route: options.route, size: NSSize(width: 1320, height: 840),
                                              kind: "main", title: "Vulcan Celox")
-        controller.window.setFrameAutosaveName("VulcanTerminalMain")
+        controller.window.setFrameAutosaveName("VulcanCeloxMain")
         if controller.window.frame.origin == .zero { controller.window.center() }
         controller.window.makeKeyAndOrderFront(nil)
         main = controller
@@ -666,7 +666,7 @@ func offerPythonInstall() {
     }
 }
 
-/// `vulcan-terminal --verificar-dependencias`: diz qual Python será usado (0) ou o que falta (1).
+/// `vulcan-celox --verificar-dependencias`: diz qual Python será usado (0) ou o que falta (1).
 func checkDependenciesAndExit() -> Never {
     if let python = BackendServer.usablePython() {
         print("Vulcan Celox: dependências ok (Python: \(python))")

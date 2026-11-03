@@ -26,7 +26,7 @@
 - **Fail first.** A fix starts with a test that reproduces the defect and fails.
 - **Do not weaken tests.**
 - **Real fixtures.** `tests/fixtures/agents/` holds anonymized real sessions from Claude Code and Codex, plus synthetic cases marked as such.
-- **Never touch the real world.** Tests use `VULCAN_TERMINAL_HOME`, `tests/tools/fake_lerd_api.py` and `tests/tools/fake-lerd`. They never read the real `~/.claude` or `~/.codex`, and they never touch the real Lerd.
+- **Never touch the real world.** Tests use `VULCAN_CELOX_HOME`, `tests/tools/fake_lerd_api.py` and `tests/tools/fake-lerd`. They never read the real `~/.claude` or `~/.codex`, and they never touch the real Lerd.
 - **Guard the guards.** A sensor that passes without verifying anything is a defect. Snapshot scripts carry a mark that fails if the script did not run.
 
 ## End-to-end acceptance

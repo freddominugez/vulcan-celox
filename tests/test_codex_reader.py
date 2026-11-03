@@ -4,8 +4,8 @@ import json
 import unittest
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core.agents import discovery
-from vulcan_terminal.core.agents.reading import read_session
+from vulcan_celox.core.agents import discovery
+from vulcan_celox.core.agents.reading import read_session
 
 CODEX = FIXTURES / "agents" / "codex"
 SID = "019a0000-1111-7222-8333-444444444444"

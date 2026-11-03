@@ -11,7 +11,7 @@ from unittest import mock
 
 from tests.helpers import FIXTURES
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.environment import lerd_components, lerd_services
+from vulcan_celox.core.environment import lerd_components, lerd_services
 
 
 def fixture(name):
@@ -82,7 +82,7 @@ class CacheTest(ApiTest):
         return sum(1 for c in self.fake.calls if list(c.argv)[1:1 + len(args)] == list(args))
 
     def test_dois_gets_um_subprocesso(self):
-        from vulcan_terminal.core.runner import Result
+        from vulcan_celox.core.runner import Result
         self.fake.default = Result(0, "Installed PHP versions:\n* 8.5\n")
         for _ in range(3):
             self.assertEqual(self.request("GET", "/api/environment/php")[0], 200)
@@ -91,7 +91,7 @@ class CacheTest(ApiTest):
         self.assertEqual(self.cli("xdebug", "status"), 1)
 
     def test_post_forca_releitura(self):
-        from vulcan_terminal.core.runner import Result
+        from vulcan_celox.core.runner import Result
         self.fake.default = Result(0, "Installed PHP versions:\n* 8.5\n")
         self.request("GET", "/api/environment/php")
         self.request("GET", "/api/environment/xdebug")
@@ -104,9 +104,9 @@ class CacheTest(ApiTest):
         self.assertEqual(self.cli("xdebug", "status"), before_xd + 1)
 
     def test_prazo_de_60_s(self):
-        from vulcan_terminal.core.runner import Result
+        from vulcan_celox.core.runner import Result
         self.fake.default = Result(0, "Installed PHP versions:\n* 8.5\n")
-        with mock.patch("vulcan_terminal.server.env_api._now", side_effect=[1000.0, 1061.0]):
+        with mock.patch("vulcan_celox.server.env_api._now", side_effect=[1000.0, 1061.0]):
             self.request("GET", "/api/environment/php")
             self.request("GET", "/api/environment/php")
         self.assertEqual(self.cli("php:list"), 2)

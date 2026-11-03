@@ -4,7 +4,7 @@ import os
 
 from tests.helpers import TempDirTestCase
 from tests.test_pty import wait_for
-from vulcan_terminal.core.pty_session import TerminalManager
+from vulcan_celox.core.pty_session import TerminalManager
 
 PROBE = 'printf "id=[%s] tema=[%s]" "$VULCAN_SESSION_ID" "$VULCAN_THEME"'
 

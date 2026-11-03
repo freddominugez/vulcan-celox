@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MODULE = ROOT / "vulcan_terminal" / "web" / "js" / "terminal-turns.mjs"
+MODULE = ROOT / "vulcan_celox" / "web" / "js" / "terminal-turns.mjs"
 
 SCRIPT = """
 import { TurnMarks } from %s;

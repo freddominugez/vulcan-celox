@@ -5,8 +5,8 @@ from unittest import mock
 
 from tests.helpers import FIXTURES
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.environment import parse_xdebug_status, xdebug_argv, xdebug_mode_ok
-from vulcan_terminal.core.runner import Result
+from vulcan_celox.core.environment import parse_xdebug_status, xdebug_argv, xdebug_mode_ok
+from vulcan_celox.core.runner import Result
 
 
 class ParserTest(ServerTestCase):

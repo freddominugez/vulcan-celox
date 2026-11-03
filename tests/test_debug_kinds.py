@@ -3,7 +3,7 @@
 import json
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core.lerd_dumps import filter_min_ms, group_queries, log_tone, parse_events
+from vulcan_celox.core.lerd_dumps import filter_min_ms, group_queries, log_tone, parse_events
 
 EVENTS = parse_events(json.loads((FIXTURES / "lerd-api-dumps.json").read_text(encoding="utf-8")))
 

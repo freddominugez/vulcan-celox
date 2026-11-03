@@ -2,7 +2,7 @@
 
 Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.0.0. Para um passeio mais curto, leia [architecture.md](architecture.md).
 
-Caminhos escritos como `core/...`, `server/...`, `web/...` e `ui/...` são relativos a `vulcan_terminal/`.
+Caminhos escritos como `core/...`, `server/...`, `web/...` e `ui/...` são relativos a `vulcan_celox/`.
 
 ## 1. Visão geral e objetivos
 
@@ -50,7 +50,7 @@ packaging/macos/main.swift   casca macOS: WKWebView, janelas, menus, item na bar
 packaging/macos/AppIcon.icns   ícone do app, do kit da marca; o build só copia
 packaging/linux/             lançador, script de dependências, entrada .desktop, ícones, controle do .deb, instalar e desinstalar
 packaging/LEIA-ME.md         instruções de instalação que vão dentro dos pacotes
-vulcan_terminal/
+vulcan_celox/
   __main__.py                linha de comando do pacote Python
   desktop_linux.py           casca Linux: GTK 3 + WebKit2GTK, Chromium --app ou navegador
   core/                      lógica sem interface
@@ -76,7 +76,7 @@ No macOS o app são dois processos: a casca Swift e um servidor Python filho. No
 Casca Swift (AppKit + WKWebView)
    | inicia com VULCAN_TOKEN no ambiente, lê VULCAN_PORT=<n> do stdout
    v
-python3 -m vulcan_terminal --serve   <--- JSON + WebSocket --->   interface web dentro da WKWebView
+python3 -m vulcan_celox --serve   <--- JSON + WebSocket --->   interface web dentro da WKWebView
    |
    +-- threads: HTTP por conexão, uma leitora por PTY, uma de envio por cliente WebSocket,
    |            observador de agentes, gravação de memórias, início do ambiente, tarefas de IA
@@ -86,7 +86,7 @@ python3 -m vulcan_terminal --serve   <--- JSON + WebSocket --->   interface web 
 ### Início no macOS
 
 1. `applicationDidFinishLaunching` procura um Python utilizável: `VULCAN_PYTHON` se definido, depois (a menos que `VULCAN_PYTHON_ONLY=1`) `/opt/homebrew/bin/python3`, `/usr/local/bin/python3` e `/usr/bin/python3`. O candidato precisa ser 3.9 ou mais novo. `/usr/bin/python3` só é tentado se `xcode-select -p` der certo, porque sem as Command Line Tools ele é um atalho que abre o instalador da Apple. Sem Python, o app explica, oferece instalar e sai com 1.
-2. `BackendServer.start` gera o token (32 bytes aleatórios de `SecRandomCopyBytes`, em 64 caracteres hexadecimais) e roda `python -m vulcan_terminal --serve` com a pasta de trabalho em `Resources` do bundle. Com `-m`, a pasta atual vai para o começo do `sys.path`, então essa pasta fixa impede uma pasta hostil de plantar um módulo. O ambiente recebe `PYTHONPATH=<Resources>`, `PYTHONDONTWRITEBYTECODE=1`, `VULCAN_TOKEN`, `VULCAN_WATCH_PARENT=1`, e `SHELL` e `LANG` quando faltam.
+2. `BackendServer.start` gera o token (32 bytes aleatórios de `SecRandomCopyBytes`, em 64 caracteres hexadecimais) e roda `python -m vulcan_celox --serve` com a pasta de trabalho em `Resources` do bundle. Com `-m`, a pasta atual vai para o começo do `sys.path`, então essa pasta fixa impede uma pasta hostil de plantar um módulo. O ambiente recebe `PYTHONPATH=<Resources>`, `PYTHONDONTWRITEBYTECODE=1`, `VULCAN_TOKEN`, `VULCAN_WATCH_PARENT=1`, e `SHELL` e `LANG` quando faltam.
 3. O Python roda `serve()` em `server/app.py`:
    - `VulcanApp.__init__` aplica `secure_data_dir`, abre o `Store`, migra uma vez os dados do protótipo antigo, carrega o `Notebook`, detecta o backend, escolhe o guarda-chaves, cria o `LocalServer` (porta 0 significa que o sistema escolhe, e o token vem de `VULCAN_TOKEN`, que precisa ter ao menos 32 caracteres), o `TerminalManager` e o `SessionHub`, e registra cada módulo da API.
    - `SIGTERM` é mapeado para `KeyboardInterrupt`, para o encerramento normal rodar.
@@ -278,7 +278,7 @@ Despacho: `LocalServer.route(method, pattern)` compila uma expressão regular an
 
 Cada aba é um PTY real criado por `os.forkpty` em `runner.spawn_pty`. `TerminalManager.argv_for` roda o shell do usuário em modo login (`<shell> -l`). Com um comando inicial, roda `<shell> -l -i -c "<comando>; exec <shell> -l"`, para a aba continuar como shell interativo depois.
 
-`terminal_env` põe os shims do Lerd, `~/.local/bin`, `/opt/homebrew/bin` e `/usr/local/bin` no começo do `PATH`. Define `TERM=xterm-256color`, `COLORTERM=truecolor` e `TERM_PROGRAM=VulcanTerminal`, e remove `VULCAN_TOKEN` e `VULCAN_WATCH_PARENT`, para o token do servidor nunca chegar ao shell do usuário. Cada aba recebe `VULCAN_SESSION_ID`, e `VULCAN_THEME` quando tem tema.
+`terminal_env` põe os shims do Lerd, `~/.local/bin`, `/opt/homebrew/bin` e `/usr/local/bin` no começo do `PATH`. Define `TERM=xterm-256color`, `COLORTERM=truecolor` e `TERM_PROGRAM=VulcanCelox`, e remove `VULCAN_TOKEN` e `VULCAN_WATCH_PARENT`, para o token do servidor nunca chegar ao shell do usuário. Cada aba recebe `VULCAN_SESSION_ID`, e `VULCAN_THEME` quando tem tema.
 
 `PtySession`:
 
@@ -531,7 +531,7 @@ Roda **só por clique**, e o fluxo sempre mostra um diálogo antes. O app não t
 | Etapa | Código |
 |-------|--------|
 | Chave | `PUT /api/ai/key` confere o formato (`sk-ant-...`), valida listando os modelos na API e só então guarda. A API devolve só a forma mascarada |
-| Guarda | `core/keychain.py`: Keychain do macOS, serviço `com.byvulcan.terminal.anthropic`, gravado com `security -i` e o comando pelo stdin, nunca por argv. No Linux, Secret Service por `secret-tool`, valor pelo stdin. `VULCAN_KEYSTORE=memory` guarda em memória, para testes e capturas |
+| Guarda | `core/keychain.py`: Keychain do macOS, serviço `com.byvulcan.celox.anthropic`, gravado com `security -i` e o comando pelo stdin, nunca por argv. No Linux, Secret Service por `secret-tool`, valor pelo stdin. `VULCAN_KEYSTORE=memory` guarda em memória, para testes e capturas |
 | Prévia | `GET /api/ai/preview/session/<id>` ou `/general` devolve tamanho, segredos mascarados, se houve corte e o modelo. Nada sai da máquina ainda |
 | Montagem | `core/doc_prompts.py`. Sessão: os últimos 60 mil caracteres da transcrição e os últimos 300 comandos. Geral: orçamento de 120 mil caracteres, usando a documentação de cada sessão quando existe, da mais nova para trás; as demais ficam com uma linha cada. O texto instrui o modelo a se basear só no material dado |
 | Máscara | `core/redact.py` roda **antes** do corte, porque um segredo cortado ao meio perderia o prefixo que a máscara reconhece, e de novo no texto final. Cobre formatos de chave de API, JWT, `Bearer`, senhas em URLs, pares `CHAVE=valor` sensíveis, `--password` e `mysql -p` |
@@ -544,7 +544,7 @@ Roda **só por clique**, e o fluxo sempre mostra um diálogo antes. O app não t
 
 Todos os caminhos, opções e variáveis estão em [configuration.md](configuration.md).
 
-A pasta de dados é `~/Library/Application Support/VulcanTerminal/` no macOS e `$XDG_DATA_HOME/vulcan-terminal` no Linux, e `VULCAN_TERMINAL_HOME` a substitui. `secure_data_dir` põe a pasta e as subpastas em 0700 e os arquivos em 0600 a cada abertura, sem seguir links simbólicos. Scripts continuam executáveis, só para o usuário.
+A pasta de dados é `~/Library/Application Support/VulcanCelox/` no macOS e `$XDG_DATA_HOME/vulcan-celox` no Linux, e `VULCAN_CELOX_HOME` a substitui. `secure_data_dir` põe a pasta e as subpastas em 0700 e os arquivos em 0600 a cada abertura, sem seguir links simbólicos. Scripts continuam executáveis, só para o usuário.
 
 | Arquivo ou pasta | Guarda |
 |------------------|--------|
@@ -572,7 +572,7 @@ Fora da pasta de dados o app só escreve: `<projeto>/TAREFAS.md` (opt-in, bloco 
 
 ### Pacote Python
 
-`python3 -m vulcan_terminal <opção>`, de `vulcan_terminal/__main__.py`. Conferidas nesta ordem: `--instalar-hook`, `--reindexar-agentes`, `--podar-agentes`, `--serve`, `--doctor`, depois a interface tkinter.
+`python3 -m vulcan_celox <opção>`, de `vulcan_celox/__main__.py`. Conferidas nesta ordem: `--instalar-hook`, `--reindexar-agentes`, `--podar-agentes`, `--serve`, `--doctor`, depois a interface tkinter.
 
 | Opção | Faz |
 |-------|-----|
@@ -586,11 +586,11 @@ Fora da pasta de dados o app só escreve: `<projeto>/TAREFAS.md` (opt-in, bloco 
 | `--tk` | Aceita, mas não muda nada: sem outra opção, o ponto de entrada já abre o tkinter |
 | `--version` | Versão |
 
-`python3 -m vulcan_terminal` sem opção abre a reserva em **tkinter**, não a interface web. A interface web precisa de uma casca ou do `--serve`.
+`python3 -m vulcan_celox` sem opção abre a reserva em **tkinter**, não a interface web. A interface web precisa de uma casca ou do `--serve`.
 
 ### Casca macOS
 
-`dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal`. Não repassa as opções do Python.
+`dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox`. Não repassa as opções do Python.
 
 | Opção | Faz |
 |-------|-----|
@@ -605,7 +605,7 @@ Códigos de saída do `--snapshot`: 0 sucesso, 1 falha, 2 tempo esgotado, 3 erro
 
 ### Linux
 
-`vulcan-terminal` (`packaging/linux/vulcan-terminal` e depois `desktop_linux.py`): `--check` sobe o servidor sem janela, verifica e sai; `--mode gtk|app|browser`; `--doctor`; `--version`. O lançador trata `--instalar-dependencias` (`--install-deps`), com `-y` opcional, e `--verificar-dependencias` (`--check-deps`).
+`vulcan-celox` (`packaging/linux/vulcan-celox` e depois `desktop_linux.py`): `--check` sobe o servidor sem janela, verifica e sai; `--mode gtk|app|browser`; `--doctor`; `--version`. O lançador trata `--instalar-dependencias` (`--install-deps`), com `-y` opcional, e `--verificar-dependencias` (`--check-deps`).
 
 ## 15. Build e empacotamento
 
@@ -613,16 +613,16 @@ Requisitos: no macOS, as Command Line Tools. Não há `pip install` nem `npm ins
 
 | Script | Faz |
 |--------|-----|
-| `scripts/build_app.sh` | Cria `dist/Vulcan Celox.app`: copia `vulcan_terminal/` para `Contents/Resources` com `rsync`, grava o `Info.plist` (id `com.byvulcan.terminal`, macOS mínimo 13.0, versão de `vulcan_terminal/__init__.py`), compila `packaging/macos/main.swift` com `swiftc` para a arquitetura atual, ou arm64 e x86_64 unidos por `lipo` com `VULCAN_UNIVERSAL=1`, roda `packaging/macos/icon.swift` para desenhar o ícone, e `iconutil` gera o `AppIcon.icns`. Os PNGs vão para `build/icon/` |
+| `scripts/build_app.sh` | Cria `dist/Vulcan Celox.app`: copia `vulcan_celox/` para `Contents/Resources` com `rsync`, grava o `Info.plist` (id `com.byvulcan.celox`, macOS mínimo 13.0, versão de `vulcan_celox/__init__.py`), compila `packaging/macos/main.swift` com `swiftc` para a arquitetura atual, ou arm64 e x86_64 unidos por `lipo` com `VULCAN_UNIVERSAL=1`, roda `packaging/macos/icon.swift` para desenhar o ícone, e `iconutil` gera o `AppIcon.icns`. Os PNGs vão para `build/icon/` |
 | `scripts/install_app.sh` | Instala em `~/Applications` e cria um atalho na Mesa. A versão anterior vai para a Lixeira. `VULCAN_INSTALL_DEST` e `VULCAN_DESKTOP` redirecionam |
 | `scripts/package.sh` | No macOS, gera tudo em `executaveis/`: app universal, assinatura ad hoc (`codesign --sign -`), `.zip` e `.dmg`, `.tar.gz` e `.deb` de Linux, e `SHA256SUMS` |
 | `scripts/package_linux.py` | Gera os instaladores de Linux só com Python 3.9+, sem Swift nem ferramentas do macOS. Saída em `executaveis/linux` por padrão (`--output`), com `SOURCE-MANIFEST.json` trazendo um SHA-256 por arquivo. Usado pelo CI |
 | `scripts/make_deb.py` | Monta um `.deb` só com a biblioteca padrão, sem `dpkg-deb` |
 | `scripts/manual_md.py`, `scripts/manual_shots.sh`, `scripts/help_json.py` | Manual do usuário a partir do conteúdo da Ajuda, as capturas dele e o layout do JSON |
 
-`packaging/` guarda os fontes: `macos/main.swift`, `macos/AppIcon.icns`, `linux/vulcan-terminal` (lançador: roda de dentro da pasta da biblioteca para um `json.py` do repositório atual não ser importado), `linux/vulcan-terminal-deps` (verifica e instala bibliotecas com permissão, usando apt, dnf ou pacman), `linux/install.sh` e `linux/uninstall.sh` (sem sudo, em `~/.local` por padrão), `linux/vulcan-terminal.desktop`, `linux/icons/`, `linux/deb/control` e `linux/deb/postinst`, e `LEIA-ME.md`, que vai nos pacotes.
+`packaging/` guarda os fontes: `macos/main.swift`, `macos/AppIcon.icns`, `linux/vulcan-celox` (lançador: roda de dentro da pasta da biblioteca para um `json.py` do repositório atual não ser importado), `linux/vulcan-celox-deps` (verifica e instala bibliotecas com permissão, usando apt, dnf ou pacman), `linux/install.sh` e `linux/uninstall.sh` (sem sudo, em `~/.local` por padrão), `linux/vulcan-celox.desktop`, `linux/icons/`, `linux/deb/control` e `linux/deb/postinst`, e `LEIA-ME.md`, que vai nos pacotes.
 
-Os pacotes de Linux deixam `ui/` de fora, e o `.deb` instala em `/opt/vulcan-terminal` com um link em `/usr/bin`.
+Os pacotes de Linux deixam `ui/` de fora, e o `.deb` instala em `/opt/vulcan-celox` com um link em `/usr/bin`.
 
 `.github/workflows/linux-mint.yml` roda no Ubuntu 22.04: `scripts/test_linux.sh`, `scripts/package_linux.py`, conferência das somas, instalação do `.deb`, `--check` e `--doctor`, e instalação pelo `.tar.gz`.
 
@@ -668,7 +668,7 @@ Classes base: `tests/helpers.py` (`TempDirTestCase`) e `tests/server_helpers.py`
 | Token do servidor | Outro processo do mesmo usuário pode ler a memória do app. Fora do modelo de ameaça |
 | Chave criada por `/usr/bin/security` | Outros processos do mesmo usuário podem conseguir lê-la pelo `security`. Limitação do macOS |
 | `core/tables.py` | Coberto por testes, sem quem o chame em produção hoje |
-| Ponto de entrada de reserva | `python3 -m vulcan_terminal` sem opção abre a interface tkinter antiga, e `--tk` não tem efeito próprio |
+| Ponto de entrada de reserva | `python3 -m vulcan_celox` sem opção abre a interface tkinter antiga, e `--tk` não tem efeito próprio |
 | Custo | Estimativa no preço da API. A tabela padrão envelhece, e o `precos.json` a sobrescreve |
 
 ## 18. Como estender

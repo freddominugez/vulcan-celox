@@ -29,7 +29,7 @@ The app comes in light and dark. ⌘K, "Tema", picks System, Light or Dark. The 
 
 Vulcan Celox is a panel for people who program alone with code agents. It brings together in one place the PHP sites that **Lerd** runs on your Mac, your Node projects (Next.js, Vite and the like), the terminals of each project and the sessions of **Claude Code** and **Codex**.
 
-![Visão geral (Overview) with PHP sites, a Node project, tasks and the terminal panel](../../vulcan_terminal/web/img/manual/visao-geral.png)
+![Visão geral (Overview) with PHP sites, a Node project, tasks and the terminal panel](../../vulcan_celox/web/img/manual/visao-geral.png)
 
 1. **Start Lerd.** The green dot at the top right, and on the Lerd item in the sidebar, shows that nginx, `.test` DNS and PHP are responding. Without Lerd, Node projects and agents work just the same.
 2. **Find your projects.** Sites registered in Lerd appear on their own. Node projects come in through the + of the Projetos Node (Node projects) section, or through suggestions taken from the folders where your agents worked.
@@ -61,7 +61,7 @@ The sites belong to Lerd. The app only calls Lerd's own CLI and API and never ed
 
 **Lerd** is an open source PHP development environment (MIT license). It runs nginx, PHP-FPM, DNS for `.test`, a database and HTTPS certificates in containers, without you configuring a web server by hand. Vulcan Celox is the panel on top of it.
 
-![Lerd screen with components, services and PHP versions](../../vulcan_terminal/web/img/manual/lerd.png)
+![Lerd screen with components, services and PHP versions](../../vulcan_celox/web/img/manual/lerd.png)
 
 - **Lerd item in the sidebar:** the dot shows the state (green running, pink stopped, gray absent). The screen has Ligar (Start), Parar (Stop) and Painel do Lerd (Lerd panel).
 - **Services:** database, Redis and others, with start and stop.
@@ -79,7 +79,7 @@ Laravel Valet also works as an alternative. Herd is commercial and is not used.
 
 Node projects do not use Lerd. The app reads `package.json`, finds the package manager from the lockfile (pnpm, npm, yarn or bun), the framework from the dependencies and the likely port, and shows local Supabase and the Vercel link.
 
-![Page of a Next.js project with scripts, local Supabase and project data](../../vulcan_terminal/web/img/manual/node-projeto.png)
+![Page of a Next.js project with scripts, local Supabase and project data](../../vulcan_celox/web/img/manual/node-projeto.png)
 
 1. Click the + of the **Projetos Node** (Node projects) section and choose the root folder, where `package.json` is. Nothing is written to it.
 2. On the project page, **Rodar** (Run) opens a terminal tab and types `pnpm run dev` (or the project's package manager). The tab appears in the bottom panel.
@@ -123,7 +123,7 @@ In an agent's session, the **Depuração no período** (Debugging in the period)
 
 The **Agentes** (Agents) screen lists the Claude Code and Codex sessions on this machine, with project, branch, last request, files touched and state (active, stopped, in a loop). Clicking a session opens its timeline.
 
-![List of agent sessions with project, branch and activity](../../vulcan_terminal/web/img/manual/agentes.png)
+![List of agent sessions with project, branch and activity](../../vulcan_celox/web/img/manual/agentes.png)
 
 - **Histórico de agentes (Agent history):** searches everything the agents did, by text, file or command.
 - **Branches e worktrees (Branches and worktrees):** which branch each agent is working on, so work does not get mixed up.
@@ -144,7 +144,7 @@ The app only reads these files, line by line. It never writes to `~/.claude` or 
 
 The **Uso e custo** (Usage and cost) screen adds up the tokens each agent turn spent and estimates the cost at each model's public API price, by day, project, model and session. The Copiar CSV (Copy CSV) button takes the numbers to a spreadsheet.
 
-![Uso e custo with bars per day split by agent and tables by project](../../vulcan_terminal/web/img/manual/uso-e-custo.png)
+![Uso e custo with bars per day split by agent and tables by project](../../vulcan_celox/web/img/manual/uso-e-custo.png)
 
 The value is an **estimate at the API price**. People on a subscription plan pay a different amount. A model with no known price appears with no cost, never as zero. Prices can be changed in the `precos.json` file in the app's data folder.
 
@@ -161,7 +161,7 @@ Prompts are instructions you always send to the agent: working in small steps, r
 3. **Click Enviar ao terminal** (Send to terminal), or press ⌘Enter. The text enters the agent's field as a paste, **without pressing Enter**: check it in the terminal and send it yourself.
 4. **With no paired terminal, or with the agent already closed in that tab,** the text is not pasted, so it does not land in the shell. The composer offers to resume the session in a terminal. Copiar (Copy) remains available for pasting elsewhere with ⌘V.
 
-![Prompts screen with cards and the composer open](../../vulcan_terminal/web/img/manual/prompts.png)
+![Prompts screen with cards and the composer open](../../vulcan_celox/web/img/manual/prompts.png)
 
 - Global prompts live in the app's data folder; project prompts live in `.vulcan/prompts` inside the project and override the global one with the same id. The paths appear in the Novo prompt (New prompt) dialog.
 - In the file header, `descricao` sets the card text and `icone` the icon. Without `descricao`, the card uses the first sentence of the prompt.
@@ -175,7 +175,7 @@ Prompts are instructions you always send to the agent: working in small steps, r
 
 The harness is the contract with verifiable items, the execution state and the handoff that agents read to resume work. Each site's **Harness** tab shows the active contract, the item bar (done, in progress, blocked, pending), the next item and the last green commit.
 
-![Harness tab with the item bar, a blocked item and the handoff](../../vulcan_terminal/web/img/manual/harness.png)
+![Harness tab with the item bar, a blocked item and the handoff](../../vulcan_celox/web/img/manual/harness.png)
 
 - **Copiar prompt de retomada (Copy resume prompt):** ready-made text for the agent to continue from the right item.
 - **Instalar harness (Install harness):** in a project with no harness, creates the minimal format after showing the exact list of files. Nothing is overwritten; an existing `CLAUDE.md` or `AGENTS.md` only gets a marked block.
@@ -261,7 +261,7 @@ No. It is an estimate at each model's public API price. People on a subscription
 
 **How do I change a model's price?**
 
-Edit `precos.json` in the app's data folder (`~/Library/Application Support/VulcanTerminal/`). The value in the file takes precedence over the built-in table.
+Edit `precos.json` in the app's data folder (`~/Library/Application Support/VulcanCelox/`). The value in the file takes precedence over the built-in table.
 
 **An agent does not appear in the list.**
 

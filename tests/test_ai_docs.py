@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
 from tests.test_ai_config import KEY, MODELS, FakeTransport
-from vulcan_terminal.core.keychain import MemoryKeyStore
+from vulcan_celox.core.keychain import MemoryKeyStore
 
 
 def wait_job(test, target, timeout=5.0):

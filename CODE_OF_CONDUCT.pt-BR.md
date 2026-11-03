@@ -6,4 +6,4 @@ Este projeto adota o [Contributor Covenant, versão 2.1](https://www.contributor
 
 Em resumo: respeite as pessoas, parta da boa-fé e critique o código, não quem escreveu. Assédio, discriminação e ataques pessoais não são aceitos em issues, pull requests ou qualquer outro espaço do projeto.
 
-Para relatar um problema, escreva para carlosdominguez@byvulcan.com. Os relatos são tratados em particular.
+Para relatar um problema, escreva para manager@byvulcan.com. Os relatos são tratados em particular.

@@ -3,7 +3,7 @@
 import os
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.quick_commands import is_long_running
+from vulcan_celox.core.quick_commands import is_long_running
 
 LONGOS = ["npm run dev", "php artisan serve", "php artisan queue:work --tries=3", "php artisan reverb:start",
           "php artisan horizon", "lerd logs -f", "/opt/homebrew/bin/lerd share loja --cloudflare", "pnpm dev",

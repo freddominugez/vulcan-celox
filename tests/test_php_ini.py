@@ -13,7 +13,7 @@ from pathlib import Path
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.php_ini import KEYS, parse_directives, set_directive
+from vulcan_celox.core.php_ini import KEYS, parse_directives, set_directive
 
 REAL = (FIXTURES / "lerd-98-user.ini").read_text(encoding="utf-8")
 
@@ -47,7 +47,7 @@ class AjudanteTest(TempDirTestCase):
         target.write_text(REAL, encoding="utf-8")
         env = dict(os.environ, VULCAN_PHP_INI_SET=json.dumps({"memory_limit": "256M", "display_errors": "On"}),
                    PYTHONPATH=str(Path(__file__).resolve().parent.parent))
-        proc = subprocess.run([sys.executable, "-m", "vulcan_terminal.core.php_ini", str(target)], env=env,
+        proc = subprocess.run([sys.executable, "-m", "vulcan_celox.core.php_ini", str(target)], env=env,
                               capture_output=True, text=True, timeout=30)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(parse_directives(target.read_text(encoding="utf-8")),
@@ -112,7 +112,7 @@ class ApiTest(ServerTestCase):
         hostile = self.tmp / "hostil"
         hostile.mkdir()
         marker = self.tmp / "importou"
-        for name in ("re.py", "json.py", "runpy.py", "vulcan_terminal.py"):
+        for name in ("re.py", "json.py", "runpy.py", "vulcan_celox.py"):
             (hostile / name).write_text(f"open({str(marker)!r}, 'w').write('x')\n", encoding="utf-8")
         target = self.tmp / "98-user.ini"
         target.write_text("memory_limit = 128M\n", encoding="utf-8")

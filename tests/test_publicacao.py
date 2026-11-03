@@ -3,8 +3,8 @@
 import json
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import rules
-from vulcan_terminal.core.agents.reading import read_session
+from vulcan_celox.core.agents import rules
+from vulcan_celox.core.agents.reading import read_session
 
 CID = "019a0000-0000-7000-8000-00000000c3c3"
 

@@ -9,11 +9,11 @@ import sys
 from pathlib import Path
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents.index import AgentIndex
-from vulcan_terminal.core.doc_prompts import session_doc_prompt
-from vulcan_terminal.core.sessions import SessionRecord
-from vulcan_terminal.core.store import Store, secure_data_dir, write_text_atomic
-from vulcan_terminal.desktop_linux import app_window_argv, write_launcher
+from vulcan_celox.core.agents.index import AgentIndex
+from vulcan_celox.core.doc_prompts import session_doc_prompt
+from vulcan_celox.core.sessions import SessionRecord
+from vulcan_celox.core.store import Store, secure_data_dir, write_text_atomic
+from vulcan_celox.desktop_linux import app_window_argv, write_launcher
 
 ROOT = Path(__file__).resolve().parent.parent
 TOKEN = "t" * 43
@@ -125,11 +125,11 @@ class PastaDeTrabalhoTest(TempDirTestCase):
         bin_dir, lib = self.tmp / "inst" / "bin", self.tmp / "inst" / "lib"
         bin_dir.mkdir(parents=True)
         lib.mkdir()
-        os.symlink(ROOT / "vulcan_terminal", lib / "vulcan_terminal")
-        shutil.copy(ROOT / "packaging" / "linux" / "vulcan-terminal", bin_dir / "vulcan-terminal")
+        os.symlink(ROOT / "vulcan_celox", lib / "vulcan_celox")
+        shutil.copy(ROOT / "packaging" / "linux" / "vulcan-celox", bin_dir / "vulcan-celox")
         env = {"PATH": os.environ.get("PATH", ""), "VULCAN_PYTHON": sys.executable,
-               "HOME": str(self.tmp), "VULCAN_TERMINAL_HOME": str(self.tmp / "h")}
-        proc = subprocess.run(["sh", str(bin_dir / "vulcan-terminal"), "--version"], cwd=str(hostil), env=env,
+               "HOME": str(self.tmp), "VULCAN_CELOX_HOME": str(self.tmp / "h")}
+        proc = subprocess.run(["sh", str(bin_dir / "vulcan-celox"), "--version"], cwd=str(hostil), env=env,
                               capture_output=True, text=True, timeout=60)
         self.assertFalse(marker.exists(), "o lançador importou secrets.py da pasta atual")
         self.assertEqual(proc.returncode, 0, proc.stderr)

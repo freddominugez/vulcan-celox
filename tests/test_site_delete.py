@@ -77,7 +77,7 @@ class LerdTest(ServerTestCase):
         self.assertFalse(self.pasta.exists())
 
     def test_falha_do_backend_nao_libera_a_lixeira(self):
-        from vulcan_terminal.core.runner import Result
+        from vulcan_celox.core.runner import Result
         self.fake.default = Result(1, "", "site em uso")
         data = self.request("POST", "/api/sites/loja/remove", body={"level": "backend"})[1]
         self.assertFalse(data["ok"])

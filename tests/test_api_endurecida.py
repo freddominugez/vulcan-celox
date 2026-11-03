@@ -9,8 +9,8 @@ from tests import test_agents_api
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
 from tests.test_websocket import RawClient
-from vulcan_terminal.server.app import VulcanApp
-from vulcan_terminal.server.websocket import OP_TEXT
+from vulcan_celox.server.app import VulcanApp
+from vulcan_celox.server.websocket import OP_TEXT
 
 
 class TokenEOrigemTest(ServerTestCase):

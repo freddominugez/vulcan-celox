@@ -1,4 +1,6 @@
-Package: vulcan-terminal
+Package: vulcan-celox
+Replaces: vulcan-terminal
+Conflicts: vulcan-terminal
 Version: @VERSION@
 Section: devel
 Priority: optional
@@ -6,8 +8,8 @@ Architecture: all
 Installed-Size: @SIZE@
 Depends: python3 (>= 3.9)
 Recommends: python3-gi, gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0, libsecret-tools, xdg-utils
-Maintainer: Carlos Frederico Dominguez <carlosdominguez@byvulcan.com>
-Homepage: https://github.com/freddominugez/vulcan-hub-painel
+Maintainer: Carlos Frederico Dominguez <manager@byvulcan.com>
+Homepage: https://github.com/freddominugez/vulcan-celox
 Description: Painel de desenvolvimento PHP/Laravel com terminais e memória das sessões
  Sites locais do Lerd ou do Valet, terminais reais por projeto, tarefas, post-its e tags
  ligados a cada sessão de terminal, memória em Markdown, índice geral e documentação

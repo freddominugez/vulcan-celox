@@ -1,8 +1,8 @@
 import os
 
 from tests.helpers import GOLDEN, TempDirTestCase
-from vulcan_terminal.core.markdown_index import anchor, render_global, write_if_changed
-from vulcan_terminal.core.models import Tag, Task
+from vulcan_celox.core.markdown_index import anchor, render_global, write_if_changed
+from vulcan_celox.core.models import Tag, Task
 
 TAGS = {t.id: t for t in (Tag(id="t-infra", name="infra"), Tag(id="t-bug", name="bug"),
                           Tag(id="t-loja", name="loja"), Tag(id="t-conteudo", name="conteúdo"))}

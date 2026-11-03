@@ -7,7 +7,7 @@ from unittest import mock
 
 from tests.helpers import FIXTURES
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.backends.lerd import site_from_row
+from vulcan_celox.core.backends.lerd import site_from_row
 
 
 class LeituraTest(ServerTestCase):

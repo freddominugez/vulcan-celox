@@ -6,7 +6,7 @@ import shutil
 
 from tests.helpers import FIXTURES
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core import harness
+from vulcan_celox.core import harness
 
 H = FIXTURES / "harness"
 ESPERADOS = {".vulcan/tasks/primeira-tarefa.md", ".vulcan/state/execution.json", ".vulcan/handoff.md",

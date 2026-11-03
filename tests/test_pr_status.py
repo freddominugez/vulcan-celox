@@ -5,8 +5,8 @@ import unittest
 from pathlib import Path
 
 from tests.test_agents_api import AgentsServerCase
-from vulcan_terminal.core.pr_status import FIELDS, PrStatus, checks_summary, gh_bin
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core.pr_status import FIELDS, PrStatus, checks_summary, gh_bin
+from vulcan_celox.core.runner import FakeRunner, Result
 
 GH = "/bin/gh-falso"
 ARGV = [GH, "pr", "view", "--json", FIELDS]

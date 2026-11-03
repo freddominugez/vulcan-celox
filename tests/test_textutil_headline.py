@@ -1,7 +1,7 @@
 """Título curto a partir do pedido colado."""
 import unittest
 
-from vulcan_terminal.core.textutil import HEADLINE_MAX, headline
+from vulcan_celox.core.textutil import HEADLINE_MAX, headline
 
 
 class HeadlineTest(unittest.TestCase):

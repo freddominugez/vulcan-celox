@@ -10,7 +10,7 @@ from unittest import mock
 from tests.server_helpers import ServerTestCase
 
 ROOT = Path(__file__).resolve().parent.parent
-MODULE = (ROOT / "vulcan_terminal" / "web" / "js" / "attention-notify.mjs").read_text(encoding="utf-8")
+MODULE = (ROOT / "vulcan_celox" / "web" / "js" / "attention-notify.mjs").read_text(encoding="utf-8")
 
 
 class PreferenciaTest(ServerTestCase):
@@ -25,8 +25,8 @@ class PreferenciaTest(ServerTestCase):
 
 class RotaTest(ServerTestCase):
     def post_notice(self, body, platform="linux", which="/usr/bin/notify-send"):
-        with mock.patch("vulcan_terminal.server.agents_api.sys.platform", platform), \
-                mock.patch("vulcan_terminal.server.agents_api.shutil.which", return_value=which):
+        with mock.patch("vulcan_celox.server.agents_api.sys.platform", platform), \
+                mock.patch("vulcan_celox.server.agents_api.shutil.which", return_value=which):
             return self.request("POST", "/api/agents/notice", body)
 
     def notify_calls(self):

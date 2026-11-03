@@ -2,9 +2,9 @@ import json
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from tests.lerd_api_stub import LerdApiStub, closed_port_url
-from vulcan_terminal.core.backends import NullBackend, ValetBackend
-from vulcan_terminal.core.backends.lerd import LerdBackend, summarize_status
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core.backends import NullBackend, ValetBackend
+from vulcan_celox.core.backends.lerd import LerdBackend, summarize_status
+from vulcan_celox.core.runner import FakeRunner, Result
 
 
 class LerdStatusTest(TempDirTestCase):

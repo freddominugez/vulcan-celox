@@ -1,8 +1,8 @@
 import os
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.backends import LerdBackend, NullBackend, ValetBackend, detect_backend
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core.backends import LerdBackend, NullBackend, ValetBackend, detect_backend
+from vulcan_celox.core.runner import FakeRunner, Result
 
 VERSAO_REAL = ("lerd version 1.34.3 (commit 9631ef3b6b6565dd4295ba6a7afbcb68e2b04030, "
                "built 2026-09-07T18:31:49Z)\n")

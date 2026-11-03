@@ -26,7 +26,7 @@ RUN_ID=0
 isolated_env() {
   # cada execução ganha um diretório de dados próprio
   RUN_ID=$((RUN_ID + 1))
-  env VULCAN_TERMINAL_HOME="$TMP_ROOT/home-$RUN_ID" \
+  env VULCAN_CELOX_HOME="$TMP_ROOT/home-$RUN_ID" \
       VULCAN_LEGACY_HOME="$TMP_ROOT/legacy" \
       VULCAN_VALET_HOME="$TMP_ROOT/valet" \
       VULCAN_VALET_BIN="$TMP_ROOT/sem-valet" \
@@ -43,7 +43,7 @@ isolated_env() {
 step() { printf '\n==> %s\n' "$*"; }
 
 step "compileall"
-"$PY" -m compileall -q vulcan_terminal tests
+"$PY" -m compileall -q vulcan_celox tests
 
 step "manual em Markdown igual à Ajuda"
 "$PY" scripts/manual_md.py "$TMP_ROOT/MANUAL.md" > /dev/null
@@ -57,14 +57,14 @@ if [ "$PY" != /usr/bin/python3 ] && [ -x /usr/bin/python3 ]; then
   /usr/bin/python3 -m unittest discover -s tests -t .
 fi
 
-if [ -f vulcan_terminal/ui/app.py ]; then
+if [ -f vulcan_celox/ui/app.py ]; then
   step "selftest (fonte)"
-  isolated_env "$PY" -m vulcan_terminal --selftest
+  isolated_env "$PY" -m vulcan_celox --selftest
 
   step "selftest (fonte, backend Lerd simulado e painel fora do ar)"
   printf '#!/bin/sh\necho "lerd version 0.0.0-selftest"\n' > "$TMP_ROOT/fake-lerd"
   chmod +x "$TMP_ROOT/fake-lerd"
-  isolated_env VULCAN_LERD_BIN="$TMP_ROOT/fake-lerd" "$PY" -m vulcan_terminal --selftest
+  isolated_env VULCAN_LERD_BIN="$TMP_ROOT/fake-lerd" "$PY" -m vulcan_celox --selftest
 fi
 
 if [ -f scripts/build_app.sh ]; then
@@ -73,7 +73,7 @@ if [ -f scripts/build_app.sh ]; then
   plutil -lint "dist/Vulcan Celox.app/Contents/Info.plist"
   icns="dist/Vulcan Celox.app/Contents/Resources/AppIcon.icns"
   [ "$(/usr/libexec/PlistBuddy -c "Print :CFBundleIconFile" "dist/Vulcan Celox.app/Contents/Info.plist")" = "AppIcon" ] || { echo "Info.plist sem CFBundleIconFile"; exit 1; }
-  shot_png="dist/Vulcan Celox.app/Contents/Resources/vulcan_terminal/web/img/manual/visao-geral.png"
+  shot_png="dist/Vulcan Celox.app/Contents/Resources/vulcan_celox/web/img/manual/visao-geral.png"
   [ -f "$shot_png" ] && [ "$(stat -f %z "$shot_png")" -gt 20000 ] || { echo "captura do guia ausente no pacote: $shot_png"; exit 1; }
   [ "$(sips -g pixelWidth "$icns" 2>/dev/null | awk '/pixelWidth/ {print $2}')" = "1024" ] || { echo "AppIcon.icns ausente ou sem 1024 px"; exit 1; }
 
@@ -91,7 +91,7 @@ if [ -f scripts/build_app.sh ]; then
   # as fixtures de agentes (CLAUDE_CONFIG_DIR, CODEX_HOME) entram pelo isolated_env; o snapshot falha com erro de JS
   for route in "#/overview" "#/terminals" "#/tasks" "#/agentes" "#/agentes/11111111-2222-4333-8444-555555555555" "#/agentes/historico" "#/agentes/branches" "#/prompts" "#/ambiente" "#/depuracao"; do
     shot="$TMP_ROOT/snapshot-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
-    isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$shot" --route "$route" --wait 3 \
+    isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 3 \
       --eval "$CLIP_JS"
     [ "$(stat -f %z "$shot")" -gt 20000 ] || { echo "snapshot vazio: $shot"; exit 1; }
   done
@@ -181,14 +181,14 @@ if [ -f scripts/build_app.sh ]; then
       var spot = alvo.dataset.spot; alvo.focus(); alvo.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       var on = document.querySelector('.in-step.is-on'); if (!on || on.dataset.spot !== spot) window.__vtErrors.push('Enter no passo do guia não selecionou');
       else if (document.activeElement !== on) window.__vtErrors.push('foco saiu do passo do guia'); }, 3000);"; fi
-    lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$shot" --route "$route" --wait "$wait_s" \
+    lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \
       --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
   done
   # Projeto Node registrado pela própria API da página (fixture só leitura) e aberto na tela dele
   if [ "$lerd_ok" -eq 0 ]; then
     NODE_JS="import('./js/api.mjs').then(function (m) { return m.post('/api/node-projects', { path: '$ROOT/tests/fixtures/node/painel', name: 'painel' }); })
       .then(function () { window.dispatchEvent(new CustomEvent('vulcan-node-changed')); location.hash = '#/node/painel'; }, function (e) { window.__vtErrors.push('node: ' + e.message); });"
-    lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/lerd-node.png" --route "#/node" --wait 5 \
+    lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/lerd-node.png" --route "#/node" --wait 5 \
       --eval "$NODE_JS $(expect "'.np-scripts', '.np-supabase', '.np-vercel', '#node-list .site-item'") $CLIP_JS" \
       || { lerd_ok=1; echo "falhou com Lerd simulado: #/node/painel"; }
   fi
@@ -210,7 +210,7 @@ if [ -f scripts/build_app.sh ]; then
       if (j && j.value === 'digitado-pelo-usuario') window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 12000); }, 2500);"
   alt_ok=0
   isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-alterna.port")" \
-    "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/lerd-alterna.png" --route "#/prompts" \
+    "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/lerd-alterna.png" --route "#/prompts" \
     --wait 16 --eval "$KEEP_JS" || alt_ok=1
   kill "$ALT_PID" 2>/dev/null || true
   wait "$ALT_PID" 2>/dev/null || true
@@ -227,7 +227,7 @@ s = http.server.HTTPServer(("127.0.0.1", 0), h); print(s.server_port, flush=True
   for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$TMP_ROOT/fora.port" ] && break; sleep 0.3; done
   fora="http://127.0.0.1:$(cat "$TMP_ROOT/fora.port")/"
   nav_ok=0
-  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-fora.png" \
+  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-fora.png" \
     --route "#/overview" --wait 3 --eval "location.href = '$fora'" || nav_ok=$?
   kill "$FORA_PID" 2>/dev/null || true
   wait "$FORA_PID" 2>/dev/null || true
@@ -236,7 +236,7 @@ s = http.server.HTTPServer(("127.0.0.1", 0), h); print(s.server_port, flush=True
   step "servidor não importa módulo da pasta atual"
   mkdir -p "$TMP_ROOT/hostil"
   printf "open(%s, 'w').write('x')\n" "'$TMP_ROOT/importou'" > "$TMP_ROOT/hostil/secrets.py"
-  app_bin="$ROOT/dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal"
+  app_bin="$ROOT/dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox"
   (cd "$TMP_ROOT/hostil" && isolated_env "$app_bin" --snapshot "$TMP_ROOT/snapshot-hostil.png" --wait 2)
   [ ! -e "$TMP_ROOT/importou" ] || { echo "o servidor importou secrets.py da pasta atual"; exit 1; }
 
@@ -252,7 +252,7 @@ s = http.server.HTTPServer(("127.0.0.1", 0), h); print(s.server_port, flush=True
     [ ! -L "$TMP_ROOT/Desktop/Vulcan Terminal" ] || { echo "o atalho antigo continuou na Mesa"; exit 1; }
     target="$(readlink "$TMP_ROOT/Desktop/Vulcan Celox")"
     [ "$target" = "$TMP_ROOT/Applications/Vulcan Celox.app" ] || { echo "atalho aponta para $target"; exit 1; }
-    isolated_env "$TMP_ROOT/Desktop/Vulcan Celox/Contents/MacOS/vulcan-terminal" --snapshot "$TMP_ROOT/snapshot-atalho.png" --wait 2
+    isolated_env "$TMP_ROOT/Desktop/Vulcan Celox/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-atalho.png" --wait 2
     [ "$(stat -f %z "$TMP_ROOT/snapshot-atalho.png")" -gt 20000 ] || { echo "snapshot pelo atalho falhou"; exit 1; }
   fi
 fi

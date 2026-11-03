@@ -26,7 +26,7 @@
 - **Falha primeiro.** A correção começa por um teste que reproduz o defeito e falha.
 - **Não enfraquecer teste.**
 - **Fixtures reais.** `tests/fixtures/agents/` tem sessões reais anonimizadas do Claude Code e do Codex, e casos sintéticos marcados.
-- **Nunca tocar no mundo real.** Os testes usam `VULCAN_TERMINAL_HOME`, `tests/tools/fake_lerd_api.py` e `tests/tools/fake-lerd`. Nunca leem o `~/.claude` nem o `~/.codex` reais e nunca tocam no Lerd real.
+- **Nunca tocar no mundo real.** Os testes usam `VULCAN_CELOX_HOME`, `tests/tools/fake_lerd_api.py` e `tests/tools/fake-lerd`. Nunca leem o `~/.claude` nem o `~/.codex` reais e nunca tocam no Lerd real.
 - **Vigiar o vigia.** Sensor que passa sem verificar nada é defeito. Os roteiros de snapshot levam uma marca que falha se o roteiro não rodou.
 
 ## Aceite de ponta a ponta

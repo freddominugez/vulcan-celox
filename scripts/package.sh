@@ -5,7 +5,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-VERSION="$(/usr/bin/python3 -c 'import vulcan_terminal as v; print(v.__version__)')"
+VERSION="$(/usr/bin/python3 -c 'import vulcan_celox as v; print(v.__version__)')"
 OUT="$ROOT/executaveis"
 WORK="$(mktemp -d)"
 trap 'find "$WORK" -depth -delete 2>/dev/null || true' EXIT
@@ -19,7 +19,7 @@ rm -f "$OUT/SHA256SUMS"
 step "macOS: app universal (arm64 + x86_64)"
 VULCAN_UNIVERSAL=1 bash scripts/build_app.sh
 APP="dist/Vulcan Celox.app"
-lipo -archs "$APP/Contents/MacOS/vulcan-terminal"
+lipo -archs "$APP/Contents/MacOS/vulcan-celox"
 codesign --force --deep --sign - "$APP"
 codesign --verify --deep --strict "$APP"
 
@@ -37,31 +37,31 @@ hdiutil create -quiet -volname "Vulcan Celox $VERSION" -srcfolder "$DMG_DIR" -ov
 hdiutil verify -quiet "$OUT/macos/$MAC_BASE.dmg"
 
 # ── Linux ─────────────────────────────────────────────────────────────────
-LNX="vulcan-terminal-$VERSION"
+LNX="vulcan-celox-$VERSION"
 STAGE="$WORK/linux/$LNX"
 step "Linux: árvore do pacote"
 mkdir -p "$STAGE/bin" "$STAGE/lib" "$STAGE/share/applications"
-cp packaging/linux/vulcan-terminal packaging/linux/vulcan-terminal-deps "$STAGE/bin/"
-rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' --exclude 'ui/' vulcan_terminal "$STAGE/lib/"
-cp packaging/linux/vulcan-terminal.desktop "$STAGE/share/applications/"
+cp packaging/linux/vulcan-celox packaging/linux/vulcan-celox-deps "$STAGE/bin/"
+rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' --exclude 'ui/' vulcan_celox "$STAGE/lib/"
+cp packaging/linux/vulcan-celox.desktop "$STAGE/share/applications/"
 mkdir -p "$STAGE/share/icons"
 cp -R packaging/linux/icons/hicolor "$STAGE/share/icons/"
 cp packaging/linux/install.sh packaging/linux/uninstall.sh "$STAGE/"
 cp packaging/LEIA-ME.md "$STAGE/LEIA-ME.md"
-chmod +x "$STAGE/bin/vulcan-terminal" "$STAGE/bin/vulcan-terminal-deps" "$STAGE/install.sh" "$STAGE/uninstall.sh"
+chmod +x "$STAGE/bin/vulcan-celox" "$STAGE/bin/vulcan-celox-deps" "$STAGE/install.sh" "$STAGE/uninstall.sh"
 
 step "Linux: $LNX-linux.tar.gz"
 COPYFILE_DISABLE=1 tar --no-mac-metadata -czf "$OUT/linux/$LNX-linux.tar.gz" -C "$WORK/linux" "$LNX"
 
-step "Linux: vulcan-terminal_${VERSION}_all.deb"
+step "Linux: vulcan-celox_${VERSION}_all.deb"
 DEB="$WORK/deb"
-mkdir -p "$DEB/opt/vulcan-terminal" "$DEB/usr/bin" "$DEB/usr/share/applications" "$DEB/usr/share/icons"
-cp -R "$STAGE/bin" "$STAGE/lib" "$DEB/opt/vulcan-terminal/"
-ln -s /opt/vulcan-terminal/bin/vulcan-terminal "$DEB/usr/bin/vulcan-terminal"
-sed "s|@EXEC@|/usr/bin/vulcan-terminal|" packaging/linux/vulcan-terminal.desktop > "$DEB/usr/share/applications/vulcan-terminal.desktop"
+mkdir -p "$DEB/opt/vulcan-celox" "$DEB/usr/bin" "$DEB/usr/share/applications" "$DEB/usr/share/icons"
+cp -R "$STAGE/bin" "$STAGE/lib" "$DEB/opt/vulcan-celox/"
+ln -s /opt/vulcan-celox/bin/vulcan-celox "$DEB/usr/bin/vulcan-celox"
+sed "s|@EXEC@|/usr/bin/vulcan-celox|" packaging/linux/vulcan-celox.desktop > "$DEB/usr/share/applications/vulcan-celox.desktop"
 cp -R "$STAGE/share/icons/hicolor" "$DEB/usr/share/icons/"
 sed "s|@VERSION@|$VERSION|" packaging/linux/deb/control > "$WORK/control"
-/usr/bin/python3 scripts/make_deb.py "$DEB" "$WORK/control" packaging/linux/deb/postinst "$OUT/linux/vulcan-terminal_${VERSION}_all.deb"
+/usr/bin/python3 scripts/make_deb.py "$DEB" "$WORK/control" packaging/linux/deb/postinst "$OUT/linux/vulcan-celox_${VERSION}_all.deb"
 
 # ── somas ─────────────────────────────────────────────────────────────────
 step "SHA256SUMS"

@@ -1,6 +1,6 @@
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.server.local_http import LocalServer
+from vulcan_celox.server.local_http import LocalServer
 
 
 class BuildIdTest(TempDirTestCase):

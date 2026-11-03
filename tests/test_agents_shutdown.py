@@ -4,8 +4,8 @@ from unittest import mock
 
 from tests import test_agents_api
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents.index import AgentIndex
-from vulcan_terminal.core.agents.watcher import AgentWatcher
+from vulcan_celox.core.agents.index import AgentIndex
+from vulcan_celox.core.agents.watcher import AgentWatcher
 
 
 class ShutdownOrderTest(test_agents_api.AgentsServerCase):

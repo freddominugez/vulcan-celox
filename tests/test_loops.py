@@ -4,8 +4,8 @@ import json
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents.loops import LoopTracker
-from vulcan_terminal.core.agents.reading import read_session
+from vulcan_celox.core.agents.loops import LoopTracker
+from vulcan_celox.core.agents.reading import read_session
 
 
 class LoopTrackerTest(unittest.TestCase):

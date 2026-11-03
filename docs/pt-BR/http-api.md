@@ -1,6 +1,6 @@
 # API HTTP interna
 
-Esta API existe para a própria interface do app. **Não é um contrato público** e pode mudar em qualquer versão. Está documentada para ajudar a depurar e estender o app. A fonte da verdade são as declarações `@srv.route` em `vulcan_terminal/server/`, e o `tests/test_docs_api.py` falha quando uma rota falta nesta página ou aparece aqui sem existir.
+Esta API existe para a própria interface do app. **Não é um contrato público** e pode mudar em qualquer versão. Está documentada para ajudar a depurar e estender o app. A fonte da verdade são as declarações `@srv.route` em `vulcan_celox/server/`, e o `tests/test_docs_api.py` falha quando uma rota falta nesta página ou aparece aqui sem existir.
 
 Veja [security.md](security.md) para o modelo de ameaças e [configuration.md](configuration.md) para as variáveis de ambiente.
 
@@ -8,7 +8,7 @@ Veja [security.md](security.md) para o modelo de ameaças e [configuration.md](c
 
 ```bash
 export VULCAN_TOKEN=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-python3 -m vulcan_terminal --serve     # imprime VULCAN_PORT=<n>
+python3 -m vulcan_celox --serve     # imprime VULCAN_PORT=<n>
 curl -H "X-Vulcan-Token: $VULCAN_TOKEN" http://127.0.0.1:<n>/api/state
 
 curl -X POST -H "X-Vulcan-Token: $VULCAN_TOKEN" -H "Content-Type: application/json" \

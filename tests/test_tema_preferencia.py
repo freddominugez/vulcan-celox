@@ -4,7 +4,7 @@ from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
 
-WEB = Path(__file__).resolve().parent.parent / "vulcan_terminal" / "web"
+WEB = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web"
 
 
 class TemaPreferenciaTest(ServerTestCase):

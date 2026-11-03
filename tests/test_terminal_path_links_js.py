@@ -6,7 +6,7 @@ import subprocess
 import unittest
 from pathlib import Path
 
-MODULE = Path(__file__).resolve().parent.parent / "vulcan_terminal" / "web" / "js" / "terminal-path-links.mjs"
+MODULE = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web" / "js" / "terminal-path-links.mjs"
 
 SCRIPT = """
 import { buildLinks, findPaths, logicalLine, pathLinkProvider } from %s;

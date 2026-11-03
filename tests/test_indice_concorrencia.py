@@ -8,11 +8,11 @@ from unittest import mock
 
 from tests import test_agents_api
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import index as index_mod
-from vulcan_terminal.core.agents import status
-from vulcan_terminal.core.agents.index import AgentIndex
-from vulcan_terminal.core.agents.watcher import AgentWatcher
-from vulcan_terminal.server.agents_api import BoundedCache
+from vulcan_celox.core.agents import index as index_mod
+from vulcan_celox.core.agents import status
+from vulcan_celox.core.agents.index import AgentIndex
+from vulcan_celox.core.agents.watcher import AgentWatcher
+from vulcan_celox.server.agents_api import BoundedCache
 
 SID = "aaaaaaaa-1111-4222-8333-444444444444"
 

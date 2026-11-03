@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timezone
 
 from tests.test_agents_api import AgentsServerCase
-from vulcan_terminal.core.agents import attention_hook
+from vulcan_celox.core.agents import attention_hook
 
 SID = "33333333-4444-4555-8666-777777777777"
 

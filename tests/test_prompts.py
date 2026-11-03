@@ -1,7 +1,7 @@
 """Prompts em Markdown com cabeçalho, globais e por projeto, renderizados com as variáveis da sessão."""
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core import prompts
+from vulcan_celox.core import prompts
 
 
 def write(path, text):

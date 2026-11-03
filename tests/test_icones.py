@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-WEB = ROOT / "vulcan_terminal" / "web"
+WEB = ROOT / "vulcan_celox" / "web"
 INDEX = (WEB / "index.html").read_text(encoding="utf-8")
 JS = {p: p.read_text(encoding="utf-8") for p in (WEB / "js").rglob("*.mjs")}
 SPRITE = set(re.findall(r'<symbol id="i-([a-z-]+)"', INDEX))

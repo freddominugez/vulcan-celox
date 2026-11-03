@@ -3,8 +3,8 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from vulcan_terminal.core.agents.model import AgentSession, FileTouch
-from vulcan_terminal.server.agents_api import kpis, local_day
+from vulcan_celox.core.agents.model import AgentSession, FileTouch
+from vulcan_celox.server.agents_api import kpis, local_day
 
 
 def iso(dt):

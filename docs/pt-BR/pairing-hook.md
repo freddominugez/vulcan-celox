@@ -7,7 +7,7 @@ O Vulcan Celox liga cada aba de terminal à sessão do Claude Code iniciada nela
 - Cada aba do Vulcan Celox tem no ambiente `VULCAN_SESSION_ID` (o id da aba) e, quando há tema, `VULCAN_THEME`.
 - Quando o Claude Code inicia uma sessão, ele roda os hooks `SessionStart` e passa no stdin um JSON com o `session_id`.
 - O script do Vulcan lê o id da aba no ambiente e grava `<dados>/pairings/<session_id>.json`, com a sessão, a aba, o tema, a pasta e a origem. Fora de uma aba do Vulcan, não faz nada. Ele nunca falha: qualquer problema termina com código 0, para não atrapalhar o Claude Code.
-- `<dados>` é `~/Library/Application Support/VulcanTerminal/` no macOS e `~/.local/share/vulcan-terminal/` no Linux (ou `$XDG_DATA_HOME/vulcan-terminal/`). `VULCAN_TERMINAL_HOME` troca a pasta nos dois.
+- `<dados>` é `~/Library/Application Support/VulcanCelox/` no macOS e `~/.local/share/vulcan-celox/` no Linux (ou `$XDG_DATA_HOME/vulcan-celox/`). `VULCAN_CELOX_HOME` troca a pasta nos dois.
 
 O arquivo do hook vence o pareamento por pasta e horário.
 
@@ -15,9 +15,9 @@ O arquivo do hook vence o pareamento por pasta e horário.
 
 ```bash
 # a partir do repositório:
-python3 -m vulcan_terminal --instalar-hook
+python3 -m vulcan_celox --instalar-hook
 # ou com o código do app instalado no macOS (a casca nativa não repassa esta opção):
-cd ~ && PYTHONPATH="$HOME/Applications/Vulcan Celox.app/Contents/Resources" python3 -m vulcan_terminal --instalar-hook
+cd ~ && PYTHONPATH="$HOME/Applications/Vulcan Celox.app/Contents/Resources" python3 -m vulcan_celox --instalar-hook
 ```
 
 O comando:
@@ -28,7 +28,7 @@ O comando:
 4. imprime um JSON com `script`, `settings`, `backup` e `already_installed`.
 
 ```json
-{ "hooks": [ { "type": "command", "command": "'/Users/<você>/Library/Application Support/VulcanTerminal/hooks/vulcan-pareamento.py'" } ] }
+{ "hooks": [ { "type": "command", "command": "'/Users/<você>/Library/Application Support/VulcanCelox/hooks/vulcan-pareamento.py'" } ] }
 ```
 
 O caminho vai entre aspas simples porque o Claude Code roda o comando pelo shell e, no macOS, o espaço de `Application Support` quebraria o caminho. Até a versão 0.3.0 o comando era gravado sem aspas; rodar o comando de novo corrige a entrada antiga em vez de duplicá-la.

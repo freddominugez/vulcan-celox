@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MODULE = ROOT / "vulcan_terminal" / "web" / "js" / "terminal-attention.mjs"
+MODULE = ROOT / "vulcan_celox" / "web" / "js" / "terminal-attention.mjs"
 
 SCRIPT = """
 import { cleanText, oscMessage, rateLimiter, watchTerminal } from %s;

@@ -4,7 +4,7 @@ import json
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents.jsonl_stream import LineStream, iter_lines
+from vulcan_celox.core.agents.jsonl_stream import LineStream, iter_lines
 
 
 def line(obj) -> bytes:

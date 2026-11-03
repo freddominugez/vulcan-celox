@@ -1,7 +1,7 @@
 import unittest
 
 from tests.helpers import FIXTURES
-from vulcan_terminal.core.miniyaml import MiniYamlError, loads
+from vulcan_celox.core.miniyaml import MiniYamlError, loads
 
 
 class MiniYamlTest(unittest.TestCase):

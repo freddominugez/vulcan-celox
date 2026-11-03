@@ -5,7 +5,7 @@ from unittest import mock
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.laravel_log import filter_entries, parse_entries, parse_laravel_line, read_log
+from vulcan_celox.core.laravel_log import filter_entries, parse_entries, parse_laravel_line, read_log
 
 LOG = """[2026-10-31 10:00:00] local.INFO: Usuário entrou {"id":1}
 [2026-10-31 10:00:05] local.ERROR: SQLSTATE[42S02]: Base table not found {"exception":"[object] (PDOException(code: 42S02)"}

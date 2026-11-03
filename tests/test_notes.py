@@ -1,7 +1,7 @@
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.debounce import Debouncer
-from vulcan_terminal.core.notebook import Notebook
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.debounce import Debouncer
+from vulcan_celox.core.notebook import Notebook
+from vulcan_celox.core.store import Store
 
 
 class FakeClock:

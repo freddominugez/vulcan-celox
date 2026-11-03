@@ -3,7 +3,7 @@ import unittest
 
 from tests import test_agents_api
 from tests.test_node_api import FakePty, FakeTerminals
-from vulcan_terminal.core import prompts
+from vulcan_celox.core import prompts
 
 CLAUDE_SID = "11111111-2222-4333-8444-555555555555"
 TAB = "0000abcd"

@@ -1,4 +1,4 @@
-"""A referência da API (docs/en e docs/pt-BR) lista exatamente as rotas declaradas em vulcan_terminal/server/."""
+"""A referência da API (docs/en e docs/pt-BR) lista exatamente as rotas declaradas em vulcan_celox/server/."""
 import re
 import unittest
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 from tests.server_helpers import ServerTestCase
 
 ROOT = Path(__file__).resolve().parent.parent
-SERVER = ROOT / "vulcan_terminal" / "server"
+SERVER = ROOT / "vulcan_celox" / "server"
 DOCS = (ROOT / "docs" / "en" / "http-api.md", ROOT / "docs" / "pt-BR" / "http-api.md")
 
 # @srv.route("GET", r"/api/...") e o @route(...) local do caderno; srv.route(method, pattern) não casa

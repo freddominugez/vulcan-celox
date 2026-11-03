@@ -4,9 +4,9 @@ import unittest
 from tests.helpers import TempDirTestCase
 from tests.lerd_api_stub import LerdApiStub, closed_port_url
 from tests import test_doctor
-from vulcan_terminal.core import lerd_quirks
-from vulcan_terminal.core.doctor import collect
-from vulcan_terminal.core.lerd_quirks import Quirk
+from vulcan_celox.core import lerd_quirks
+from vulcan_celox.core.doctor import collect
+from vulcan_celox.core.lerd_quirks import Quirk
 
 
 class QuirksTest(unittest.TestCase):

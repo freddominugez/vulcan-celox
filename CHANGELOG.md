@@ -150,4 +150,4 @@ First stable release, **macOS only** (`.dmg`, `.zip`, `SHA256SUMS`). The Linux c
 - Foundation: Python standard library core, Valet and Null backends, site discovery, tkinter interface.
 - Notebook: tags, sticky notes, tasks, progress, `TAREFAS.md`, global search, export and import.
 
-[1.0.0]: https://github.com/freddominugez/vulcan-hub-painel/releases/tag/v1.0.0
+[1.0.0]: https://github.com/freddominugez/vulcan-celox/releases/tag/v1.0.0

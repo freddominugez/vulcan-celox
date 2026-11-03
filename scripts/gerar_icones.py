@@ -13,7 +13,7 @@ from pathlib import Path
 
 VERSAO = "2.1.1"
 ROOT = Path(__file__).resolve().parent.parent
-INDEX = ROOT / "vulcan_terminal" / "web" / "index.html"
+INDEX = ROOT / "vulcan_celox" / "web" / "index.html"
 # nome no app -> arquivo em assets/regular; o sufixo -fill vem de assets/fill
 ICONES = {
     "grid": "squares-four", "terminal": "terminal-window", "check-square": "check-square", "note": "note", "tag": "tag",

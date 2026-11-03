@@ -3,7 +3,7 @@
 import json
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import pricing
+from vulcan_celox.core.agents import pricing
 
 
 def row(model, **kw):

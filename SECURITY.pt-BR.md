@@ -12,7 +12,7 @@ Versão em inglês: [SECURITY.md](SECURITY.md).
 
 ## Como relatar uma vulnerabilidade
 
-Não abra issue pública. Use o relato privado do GitHub: **Security > Report a vulnerability** neste repositório, ou escreva para carlosdominguez@byvulcan.com. Informe a versão, os passos para reproduzir e o impacto.
+Não abra issue pública. Use o relato privado do GitHub: **Security > Report a vulnerability** neste repositório, ou escreva para manager@byvulcan.com. Informe a versão, os passos para reproduzir e o impacto.
 
 O projeto é mantido por uma pessoa, então não há prazo garantido de resposta. Os relatos são lidos assim que possível, e as correções dão crédito no registro de mudanças, se você quiser.
 

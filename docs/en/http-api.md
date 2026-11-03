@@ -1,6 +1,6 @@
 # Internal HTTP API
 
-This API exists for the app's own interface. It is **not a public contract** and can change in any version. It is documented so you can debug and extend the app. The source of truth is the `@srv.route` declarations in `vulcan_terminal/server/`, and `tests/test_docs_api.py` fails when a route is missing from this page or listed here without existing.
+This API exists for the app's own interface. It is **not a public contract** and can change in any version. It is documented so you can debug and extend the app. The source of truth is the `@srv.route` declarations in `vulcan_celox/server/`, and `tests/test_docs_api.py` fails when a route is missing from this page or listed here without existing.
 
 See [security.md](security.md) for the threat model and [configuration.md](configuration.md) for environment variables.
 
@@ -8,7 +8,7 @@ See [security.md](security.md) for the threat model and [configuration.md](confi
 
 ```bash
 export VULCAN_TOKEN=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-python3 -m vulcan_terminal --serve     # prints VULCAN_PORT=<n>
+python3 -m vulcan_celox --serve     # prints VULCAN_PORT=<n>
 curl -H "X-Vulcan-Token: $VULCAN_TOKEN" http://127.0.0.1:<n>/api/state
 
 curl -X POST -H "X-Vulcan-Token: $VULCAN_TOKEN" -H "Content-Type: application/json" \

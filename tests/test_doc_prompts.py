@@ -2,10 +2,10 @@ import os
 import unittest
 from pathlib import Path
 
-from vulcan_terminal.core.doc_prompts import (GENERAL_SYSTEM, SESSION_SYSTEM, SessionEntry, general_doc_prompt,
+from vulcan_celox.core.doc_prompts import (GENERAL_SYSTEM, SESSION_SYSTEM, SessionEntry, general_doc_prompt,
                                               relative_link, session_doc_prompt)
-from vulcan_terminal.core.models import Note, Tag, Task
-from vulcan_terminal.core.sessions import SessionRecord
+from vulcan_celox.core.models import Note, Tag, Task
+from vulcan_celox.core.sessions import SessionRecord
 
 TAGS = {"t1": Tag(id="t1", name="deploy", color="#6ea8fe")}
 

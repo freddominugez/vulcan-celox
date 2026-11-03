@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from tests import test_agents_api
-from vulcan_terminal.core import prompts
+from vulcan_celox.core import prompts
 
 CLAUDE_SID = "11111111-2222-4333-8444-555555555555"
 
@@ -73,7 +73,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
         claude.mkdir(exist_ok=True)
         self.app.store.save("node_projects", {"claude": str(claude)})
         from unittest import mock
-        from vulcan_terminal.core.agents import discovery
+        from vulcan_celox.core.agents import discovery
         with mock.patch.object(discovery, "claude_root", return_value=claude):
             for root in (stranger, claude):
                 for path in ("/api/prompts", "/api/prompts/categories"):

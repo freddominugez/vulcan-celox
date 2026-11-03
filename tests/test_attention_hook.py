@@ -7,8 +7,8 @@ import sys
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import attention, attention_hook, pairing
-from vulcan_terminal.core.agents.model import epoch
+from vulcan_celox.core.agents import attention, attention_hook, pairing
+from vulcan_celox.core.agents.model import epoch
 
 T0 = "2026-11-02T10:00:00Z"
 NOW = epoch(T0) + 100

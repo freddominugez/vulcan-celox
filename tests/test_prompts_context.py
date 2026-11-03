@@ -2,10 +2,10 @@
 
 import unittest
 
-from vulcan_terminal.core import prompts
-from vulcan_terminal.core.agents.model import AgentSession
-from vulcan_terminal.core.agents.repos import SAFE_GIT
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core import prompts
+from vulcan_celox.core.agents.model import AgentSession
+from vulcan_celox.core.agents.repos import SAFE_GIT
+from vulcan_celox.core.runner import FakeRunner, Result
 
 
 def git(path, *args):

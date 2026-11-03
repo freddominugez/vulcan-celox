@@ -1,6 +1,6 @@
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.sessions import InputTracker, SessionRecord, SessionStore
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.sessions import InputTracker, SessionRecord, SessionStore
+from vulcan_celox.core.store import Store
 
 
 class InputTrackerTest(TempDirTestCase):

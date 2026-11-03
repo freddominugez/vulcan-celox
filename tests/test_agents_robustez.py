@@ -7,12 +7,12 @@ from contextlib import redirect_stdout
 from unittest import mock
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.__main__ import main
-from vulcan_terminal.core.agents import claude_reader
-from vulcan_terminal.core.agents.index import AgentIndex
-from vulcan_terminal.core.agents.model import parse_iso
-from vulcan_terminal.core.agents.reading import read_session
-from vulcan_terminal.core.agents.watcher import AgentWatcher
+from vulcan_celox.__main__ import main
+from vulcan_celox.core.agents import claude_reader
+from vulcan_celox.core.agents.index import AgentIndex
+from vulcan_celox.core.agents.model import parse_iso
+from vulcan_celox.core.agents.reading import read_session
+from vulcan_celox.core.agents.watcher import AgentWatcher
 
 GOOD = {"type": "user", "timestamp": "2026-10-31T10:00:00Z", "cwd": "/r", "message": {"role": "user", "content": "oi"}}
 HOSTIS_CLAUDE = [
@@ -101,7 +101,7 @@ class RobustezTest(TempDirTestCase):
     def test_reindexar_agentes_nao_aborta(self):
         write(self.tmp / "claude" / "projects" / "-r" / "aaaa.jsonl", [GOOD] + HOSTIS_CLAUDE)
         env = {"CLAUDE_CONFIG_DIR": str(self.tmp / "claude"), "CODEX_HOME": str(self.tmp / "nada"),
-               "HOME": str(self.tmp), "VULCAN_TERMINAL_HOME": str(self.tmp / "home")}
+               "HOME": str(self.tmp), "VULCAN_CELOX_HOME": str(self.tmp / "home")}
         out = io.StringIO()
         with mock.patch.dict(os.environ, env), redirect_stdout(out):
             self.assertEqual(main(["--reindexar-agentes"]), 0)

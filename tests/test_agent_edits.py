@@ -7,8 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from vulcan_terminal.core.agents import edits
-from vulcan_terminal.core.agents.index import AgentIndex
+from vulcan_celox.core.agents import edits
+from vulcan_celox.core.agents.index import AgentIndex
 
 SID = "77777777-8888-4999-8aaa-bbbbbbbbbbbb"
 

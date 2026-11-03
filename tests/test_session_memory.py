@@ -4,10 +4,10 @@ from pathlib import Path
 
 from tests.helpers import GOLDEN, TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.models import Note, Tag, Task
-from vulcan_terminal.core.session_memory import (MAX_TRANSCRIPT_LINES, extract_transcript, format_duration,
+from vulcan_celox.core.models import Note, Tag, Task
+from vulcan_celox.core.session_memory import (MAX_TRANSCRIPT_LINES, extract_transcript, format_duration,
                                                  memory_path, render_session_md, strip_terminal)
-from vulcan_terminal.core.sessions import SessionRecord
+from vulcan_celox.core.sessions import SessionRecord
 
 RAW = b"\x1b[32m$\x1b[0m php artisan migrate\r\n  INFO  Running migrations.\r\n\r\n\r\nfeito```\r\n"
 

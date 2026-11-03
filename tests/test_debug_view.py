@@ -6,7 +6,7 @@ from unittest import mock
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.lerd_dumps import filter_events, group_by_request, parse_events
+from vulcan_celox.core.lerd_dumps import filter_events, group_by_request, parse_events
 
 EVENTS = parse_events(json.loads((FIXTURES / "lerd-api-dumps.json").read_text(encoding="utf-8")))
 

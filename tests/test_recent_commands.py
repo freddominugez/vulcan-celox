@@ -1,8 +1,8 @@
 """Últimos comandos do site, das sessões registradas, para reexecutar."""
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.quick_commands import recent_commands
-from vulcan_terminal.core.sessions import SessionRecord
+from vulcan_celox.core.quick_commands import recent_commands
+from vulcan_celox.core.sessions import SessionRecord
 
 
 def rec(rid, site, cmds):

@@ -10,7 +10,7 @@ from unittest import mock
 
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
-from vulcan_terminal.server.sites_api import extract_public_url
+from vulcan_celox.server.sites_api import extract_public_url
 
 NGROK = """\x1b[1mngrok\x1b[0m                                                       (Ctrl+C to quit)
 Session Status                online

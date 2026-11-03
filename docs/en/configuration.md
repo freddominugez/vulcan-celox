@@ -2,7 +2,7 @@
 
 ## Command line
 
-Run from source with `python3 -m vulcan_terminal <flag>`.
+Run from source with `python3 -m vulcan_celox <flag>`.
 
 | Flag | Does |
 |------|------|
@@ -19,17 +19,17 @@ Run from source with `python3 -m vulcan_terminal <flag>`.
 Native shell, as a sensor:
 
 ```bash
-"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/overview"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot out.png --route "#/overview"
 ```
 
-Linux launcher: `vulcan-terminal --check`, `vulcan-terminal --instalar-dependencias`.
+Linux launcher: `vulcan-celox --check`, `vulcan-celox --instalar-dependencias`.
 
 ## Files
 
 | Path | Holds |
 |------|-------|
-| `~/Library/Application Support/VulcanTerminal/` | macOS data folder (0700; files 0600) |
-| `$XDG_DATA_HOME/vulcan-terminal` | Linux data folder |
+| `~/Library/Application Support/VulcanCelox/` | macOS data folder (0700; files 0600) |
+| `$XDG_DATA_HOME/vulcan-celox` | Linux data folder |
 | `<data>/agentes.db` | Disposable SQLite index of agent sessions |
 | `<data>/precos.json` | Your price overrides; beats the built-in table |
 | `<data>/prompts/` | Global prompts |
@@ -45,7 +45,7 @@ A corrupted JSON file or database is renamed to `*.corrupt-<timestamp>` and the 
 
 | Variable | Effect |
 |----------|--------|
-| `VULCAN_TERMINAL_HOME` | Data folder (used in tests) |
+| `VULCAN_CELOX_HOME` | Data folder (used in tests) |
 | `CLAUDE_CONFIG_DIR` | Claude Code folder |
 | `CODEX_HOME` | Codex folder or folders, comma separated |
 | `VULCAN_AUTOSTART=0` | Do not start Lerd with the app |

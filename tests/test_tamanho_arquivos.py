@@ -7,15 +7,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LIMIT = 400
 SUFFIXES = {".py", ".mjs", ".swift", ".sh"}
-FOLDERS = ("vulcan_terminal", "scripts", "tests", "packaging")
+FOLDERS = ("vulcan_celox", "scripts", "tests", "packaging")
 LEGACY = {
-    "vulcan_terminal/web/js/terminals.mjs": 1126,
+    "vulcan_celox/web/js/terminals.mjs": 1126,
     "packaging/macos/main.swift": 687,
-    "vulcan_terminal/ui/app.py": 594,
-    "vulcan_terminal/web/js/views/tasks.mjs": 523,
-    "vulcan_terminal/core/notebook.py": 493,
-    "vulcan_terminal/core/harness.py": 462,
-    "vulcan_terminal/web/js/views/site.mjs": 440,
+    "vulcan_celox/ui/app.py": 594,
+    "vulcan_celox/web/js/views/tasks.mjs": 523,
+    "vulcan_celox/core/notebook.py": 493,
+    "vulcan_celox/core/harness.py": 462,
+    "vulcan_celox/web/js/views/site.mjs": 440,
 }
 
 

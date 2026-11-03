@@ -1,6 +1,6 @@
 import unittest
 
-from vulcan_terminal.core.redact import MASK, redact
+from vulcan_celox.core.redact import MASK, redact
 
 # valores sintéticos, montados por partes para nenhum scanner confundir com segredos reais
 ANT = "sk-ant-" + "api03-" + "Ab1" * 12

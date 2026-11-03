@@ -1,13 +1,13 @@
 #!/bin/bash
 # Capturas do manual: telas do app com as fixtures e o Lerd simulado, nunca com dado real.
-# Gera vulcan_terminal/web/img/manual/*.png a partir do bundle em dist/ (rode scripts/build_app.sh antes).
+# Gera vulcan_celox/web/img/manual/*.png a partir do bundle em dist/ (rode scripts/build_app.sh antes).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-OUT="${1:-$ROOT/vulcan_terminal/web/img/manual}"
+OUT="${1:-$ROOT/vulcan_celox/web/img/manual}"
 TEMA="${2:-escuro}"  # a Ajuda usa o escuro; as capturas do claro ficam em docs/capturas-claro
 THEME_JS="document.documentElement.dataset.theme = '$TEMA'; document.head.insertAdjacentHTML('beforeend', '<style>*{transition:none!important}</style>');"
-APP="dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal"
+APP="dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox"
 [ -x "$APP" ] || { echo "rode scripts/build_app.sh antes"; exit 1; }
 mkdir -p "$OUT"
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/vulcan-shots.XXXXXX")"
@@ -20,7 +20,7 @@ for _ in $(seq 1 20); do [ -s "$TMP/port" ] && break; sleep 0.3; done
 N=0
 shot() {  # shot <nome> <rota> [js extra]
   N=$((N + 1))
-  env VULCAN_TERMINAL_HOME="$TMP/home-$N" VULCAN_LEGACY_HOME="$TMP/legacy" VULCAN_VALET_HOME="$TMP/valet" \
+  env VULCAN_CELOX_HOME="$TMP/home-$N" VULCAN_LEGACY_HOME="$TMP/legacy" VULCAN_VALET_HOME="$TMP/valet" \
     VULCAN_VALET_BIN="$TMP/sem-valet" VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_DATA="$TMP/lerd-data" \
     VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP/port")" VULCAN_KEYSTORE=memory VULCAN_AUTOSTART=0 \
     CLAUDE_CONFIG_DIR="${SHOT_CLAUDE:-$ROOT/tests/fixtures/agents/claude}" CODEX_HOME="$ROOT/tests/fixtures/agents/codex" \

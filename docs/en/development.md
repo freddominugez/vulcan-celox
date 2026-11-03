@@ -5,8 +5,8 @@
 Requirements on macOS: Command Line Tools (`xcode-select --install`). For the Linux suite: podman or docker. There is nothing else to install: no `pip install`, no `npm install`.
 
 ```bash
-git clone https://github.com/freddominugez/vulcan-hub-painel.git
-cd vulcan-hub-painel
+git clone https://github.com/freddominugez/vulcan-celox.git
+cd vulcan-celox
 bash scripts/build_app.sh
 open "dist/Vulcan Celox.app"
 ```
@@ -14,7 +14,7 @@ open "dist/Vulcan Celox.app"
 ## Daily commands
 
 ```bash
-python3 -m vulcan_terminal --serve           # server, prints VULCAN_PORT
+python3 -m vulcan_celox --serve           # server, prints VULCAN_PORT
 python3 -m unittest discover -s tests -t .   # tests
 python3 -m unittest tests.test_agents_api    # one file
 bash scripts/validate.sh                     # all sensors
@@ -24,7 +24,7 @@ bash scripts/install_app.sh                  # ~/Applications and Desktop shortc
 bash scripts/package.sh                      # packages in executaveis/
 ```
 
-Use `VULCAN_TERMINAL_HOME=$(mktemp -d)` to keep your real data away from experiments, and `VULCAN_KEYSTORE=memory` to keep the Keychain out of it.
+Use `VULCAN_CELOX_HOME=$(mktemp -d)` to keep your real data away from experiments, and `VULCAN_KEYSTORE=memory` to keep the Keychain out of it.
 
 ## Code rules
 
@@ -46,14 +46,14 @@ The list is in [CONTRIBUTING.md](../../CONTRIBUTING.md). Python must stay compat
 ## Seeing the interface without a person
 
 ```bash
-"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/agentes"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot out.png --route "#/agentes"
 ```
 
 `--snapshot` renders a route to PNG and fails on a JavaScript error, and `--eval` runs a script in the page. `validate.sh` uses them as sensors.
 
 ## Releasing
 
-1. Update `vulcan_terminal/__init__.py`, the workflow in `.github/workflows/`, `README` files, `CHANGELOG` in both languages.
+1. Update `vulcan_celox/__init__.py`, the workflow in `.github/workflows/`, `README` files, `CHANGELOG` in both languages.
 2. `bash scripts/validate.sh` and `bash scripts/test_linux.sh`.
 3. `bash scripts/package.sh`, `bash scripts/install_app.sh`.
 4. Tag, push, create the release with the packages and `SHA256SUMS`, then download and check the sums.

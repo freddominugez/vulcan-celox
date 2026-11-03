@@ -5,11 +5,11 @@ import shutil
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from tests import test_agents_api
-from vulcan_terminal.core.agents import status
-from vulcan_terminal.core.agents.history import MARK_CLOSE, MARK_OPEN
-from vulcan_terminal.core.agents.index import SCHEMA_VERSION, AgentIndex
-from vulcan_terminal.core.agents.watcher import AgentWatcher
-from vulcan_terminal.core.doctor import collect
+from vulcan_celox.core.agents import status
+from vulcan_celox.core.agents.history import MARK_CLOSE, MARK_OPEN
+from vulcan_celox.core.agents.index import SCHEMA_VERSION, AgentIndex
+from vulcan_celox.core.agents.watcher import AgentWatcher
+from vulcan_celox.core.doctor import collect
 
 CODEX_SID = "019a0000-1111-7222-8333-444444444444"
 FRETE_SID = "33333333-4444-4555-8666-777777777777"
@@ -107,7 +107,7 @@ class HistoryTest(TempDirTestCase):
         self.assertEqual((info["claude_session_files"], info["codex_session_files"], info["codex_zst_ignored"]), (2, 1, 1))
         self.assertEqual(info["indexed"]["claude"], 2)
         self.assertTrue(info["fts5"])
-        env = {**self.env, "VULCAN_TERMINAL_HOME": str(self.tmp / "dados"), "VULCAN_VALET_BIN": str(self.tmp / "x"),
+        env = {**self.env, "VULCAN_CELOX_HOME": str(self.tmp / "dados"), "VULCAN_VALET_BIN": str(self.tmp / "x"),
                "VULCAN_LERD_BIN": str(self.tmp / "x"), "VULCAN_LERD_API": "http://127.0.0.1:1"}
         self.assertIn("agents", collect(env))
 

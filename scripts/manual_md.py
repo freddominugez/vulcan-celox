@@ -1,4 +1,4 @@
-"""Gera docs/pt-BR/user-guide.md a partir de vulcan_terminal/web/help/conteudo.json.
+"""Gera docs/pt-BR/user-guide.md a partir de vulcan_celox/web/help/conteudo.json.
 
 Uso: python3 scripts/manual_md.py [saida.md]   (padrão: docs/pt-BR/user-guide.md)
 O conteúdo da Ajuda do app e o manual em Markdown saem do mesmo arquivo; o validate.sh compara os dois.
@@ -9,8 +9,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "vulcan_terminal" / "web" / "help" / "conteudo.json"
-IMG = "../../vulcan_terminal/web/img/manual"
+SRC = ROOT / "vulcan_celox" / "web" / "help" / "conteudo.json"
+IMG = "../../vulcan_celox/web/img/manual"
 
 
 def block(b):
@@ -30,7 +30,7 @@ def block(b):
 
 def render(data):
     out = ["# Manual do Vulcan Celox", "",
-           "> Gerado por `scripts/manual_md.py` a partir de `vulcan_terminal/web/help/conteudo.json`, o mesmo conteúdo da tela Ajuda do app (⌘?). Não edite este arquivo à mão.",
+           "> Gerado por `scripts/manual_md.py` a partir de `vulcan_celox/web/help/conteudo.json`, o mesmo conteúdo da tela Ajuda do app (⌘?). Não edite este arquivo à mão.",
            "", "## Sumário", ""]
     out += [f"- [{s['titulo']}](#{s['id']}): {s['resumo']}" for s in data["secoes"]]
     out += ["- [Perguntas frequentes](#perguntas-frequentes)", ""]

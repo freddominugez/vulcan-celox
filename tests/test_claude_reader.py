@@ -6,8 +6,8 @@ import unittest
 from pathlib import Path
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core.agents import discovery, rules
-from vulcan_terminal.core.agents.reading import read_session
+from vulcan_celox.core.agents import discovery, rules
+from vulcan_celox.core.agents.reading import read_session
 
 CLAUDE = FIXTURES / "agents" / "claude"
 SID = "11111111-2222-4333-8444-555555555555"

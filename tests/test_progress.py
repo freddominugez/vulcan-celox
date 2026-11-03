@@ -1,10 +1,10 @@
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.models import Task
-from vulcan_terminal.core.notebook import Notebook
-from vulcan_terminal.core.progress import Progress, progress, progress_by_site, progress_by_tag, text_bar
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.models import Task
+from vulcan_celox.core.notebook import Notebook
+from vulcan_celox.core.progress import Progress, progress, progress_by_site, progress_by_tag, text_bar
+from vulcan_celox.core.store import Store
 
 
 def tasks(done, total, site=None, tags=()):

@@ -9,11 +9,11 @@ from unittest import mock
 
 from tests import test_agents_api
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.__main__ import main
-from vulcan_terminal.core.agents import repos
-from vulcan_terminal.core.agents.index import AgentIndex, SCHEMA_VERSION
-from vulcan_terminal.core.agents.model import AgentSession, CommandRun, FileTouch, SessionEvent
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.__main__ import main
+from vulcan_celox.core.agents import repos
+from vulcan_celox.core.agents.index import AgentIndex, SCHEMA_VERSION
+from vulcan_celox.core.agents.model import AgentSession, CommandRun, FileTouch, SessionEvent
+from vulcan_celox.core.runner import FakeRunner, Result
 
 HEAVY_FILES, HEAVY_COMMANDS = 150, 200
 
@@ -112,7 +112,7 @@ class CargaTest(TempDirTestCase):
         index.close()
 
     def test_opcao_podar_agentes(self):
-        env = {"VULCAN_TERMINAL_HOME": str(self.tmp / "home")}
+        env = {"VULCAN_CELOX_HOME": str(self.tmp / "home")}
         out = io.StringIO()
         with mock.patch.dict(os.environ, env), redirect_stdout(out):
             self.assertEqual(main(["--podar-agentes", "30"]), 0)

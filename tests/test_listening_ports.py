@@ -6,9 +6,9 @@ from pathlib import Path
 from unittest import mock
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core import listening_ports
-from vulcan_terminal.core.listening_ports import PortWatcher, descendants, parse_lsof
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core import listening_ports
+from vulcan_celox.core.listening_ports import PortWatcher, descendants, parse_lsof
+from vulcan_celox.core.runner import FakeRunner, Result
 
 LSOF_REAL = "p705\ncrapportd\nf11\nn*:49157\nf12\nn*:49157\np808\ncControlCe\nf9\nn127.0.0.1:7000\nf10\nn[::1]:7001\n"
 PS = "  1     0\n 100     1\n 200   100\n 201   200\n 300     1\n 705   200\n 808   300\n"

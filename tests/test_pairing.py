@@ -7,9 +7,9 @@ import sys
 
 from tests import test_agents_api
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import pairing
-from vulcan_terminal.core.agents.model import AgentSession
-from vulcan_terminal.core.sessions import SessionRecord
+from vulcan_celox.core.agents import pairing
+from vulcan_celox.core.agents.model import AgentSession
+from vulcan_celox.core.sessions import SessionRecord
 
 CLAUDE_SID = "11111111-2222-4333-8444-555555555555"
 
@@ -172,8 +172,8 @@ class InstallCommandTest(TempDirTestCase):
         import io
         from contextlib import redirect_stdout
         from unittest import mock
-        from vulcan_terminal.__main__ import main
-        env = {"CLAUDE_CONFIG_DIR": str(self.tmp / "claude"), "VULCAN_TERMINAL_HOME": str(self.tmp / "dados")}
+        from vulcan_celox.__main__ import main
+        env = {"CLAUDE_CONFIG_DIR": str(self.tmp / "claude"), "VULCAN_CELOX_HOME": str(self.tmp / "dados")}
         out = io.StringIO()
         with mock.patch.dict(os.environ, env), redirect_stdout(out):
             self.assertEqual(main(["--instalar-hook"]), 0)
@@ -190,7 +190,7 @@ class HookComEspacoTest(TempDirTestCase):
     def setUp(self):
         super().setUp()
         self.claude = self.tmp / "claude"
-        self.data = self.tmp / "Application Support" / "VulcanTerminal"
+        self.data = self.tmp / "Application Support" / "VulcanCelox"
 
     def command(self):
         settings = json.loads((self.claude / "settings.json").read_text())

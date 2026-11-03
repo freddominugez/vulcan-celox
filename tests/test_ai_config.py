@@ -5,10 +5,10 @@ import unittest
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.ai import AiError, AnthropicClient
-from vulcan_terminal.core.keychain import KeychainStore, MemoryKeyStore, mask, valid_key
-from vulcan_terminal.core.runner import FakeRunner, Result
-from vulcan_terminal.server.app import VulcanApp
+from vulcan_celox.core.ai import AiError, AnthropicClient
+from vulcan_celox.core.keychain import KeychainStore, MemoryKeyStore, mask, valid_key
+from vulcan_celox.core.runner import FakeRunner, Result
+from vulcan_celox.server.app import VulcanApp
 
 KEY = "sk-ant-api03-" + "x1Y2z3" * 8  # sintética
 MODELS = {"data": [{"id": "claude-sonnet-5-5", "display_name": "Claude Sonnet 5"},
@@ -129,7 +129,7 @@ class AiConfigApiTest(ServerTestCase):
 class DefaultKeystoreTest(TempDirTestCase):
     def test_app_usa_runner_do_app(self):
         runner = FakeRunner()
-        app = VulcanApp(env={"VULCAN_TERMINAL_HOME": str(self.tmp / "h"), "VULCAN_LERD_BIN": str(self.tmp / "x"),
+        app = VulcanApp(env={"VULCAN_CELOX_HOME": str(self.tmp / "h"), "VULCAN_LERD_BIN": str(self.tmp / "x"),
                              "VULCAN_VALET_BIN": str(self.tmp / "y"), "HOME": str(self.tmp)}, runner=runner).start()
         try:
             self.assertIs(app.keystore.runner, runner)  # testes nunca tocam o Keychain real

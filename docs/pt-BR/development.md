@@ -5,8 +5,8 @@
 No macOS: Command Line Tools (`xcode-select --install`). Para a suíte em Linux: podman ou docker. Não há mais nada a instalar: nem `pip install`, nem `npm install`.
 
 ```bash
-git clone https://github.com/freddominugez/vulcan-hub-painel.git
-cd vulcan-hub-painel
+git clone https://github.com/freddominugez/vulcan-celox.git
+cd vulcan-celox
 bash scripts/build_app.sh
 open "dist/Vulcan Celox.app"
 ```
@@ -14,7 +14,7 @@ open "dist/Vulcan Celox.app"
 ## Comandos do dia a dia
 
 ```bash
-python3 -m vulcan_terminal --serve           # servidor, imprime VULCAN_PORT
+python3 -m vulcan_celox --serve           # servidor, imprime VULCAN_PORT
 python3 -m unittest discover -s tests -t .   # testes
 python3 -m unittest tests.test_agents_api    # um arquivo
 bash scripts/validate.sh                     # todos os sensores
@@ -24,7 +24,7 @@ bash scripts/install_app.sh                  # ~/Applications e atalho na Mesa
 bash scripts/package.sh                      # pacotes em executaveis/
 ```
 
-Use `VULCAN_TERMINAL_HOME=$(mktemp -d)` para manter seus dados reais longe dos experimentos e `VULCAN_KEYSTORE=memory` para deixar o Keychain de fora.
+Use `VULCAN_CELOX_HOME=$(mktemp -d)` para manter seus dados reais longe dos experimentos e `VULCAN_KEYSTORE=memory` para deixar o Keychain de fora.
 
 ## Regras de código
 
@@ -46,14 +46,14 @@ A lista está em [CONTRIBUTING.pt-BR.md](../../CONTRIBUTING.pt-BR.md). O Python 
 ## Ver a interface sem uma pessoa
 
 ```bash
-"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/agentes"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot out.png --route "#/agentes"
 ```
 
 O `--snapshot` desenha uma rota em PNG e falha com erro de JavaScript, e o `--eval` roda um script na página. O `validate.sh` os usa como sensores.
 
 ## Lançar versão
 
-1. Atualize `vulcan_terminal/__init__.py`, o workflow em `.github/workflows/`, os `README` e o registro de mudanças nas duas línguas.
+1. Atualize `vulcan_celox/__init__.py`, o workflow em `.github/workflows/`, os `README` e o registro de mudanças nas duas línguas.
 2. `bash scripts/validate.sh` e `bash scripts/test_linux.sh`.
 3. `bash scripts/package.sh`, `bash scripts/install_app.sh`.
 4. Tag, push, Release com os pacotes e o `SHA256SUMS`; depois baixe e confira as somas.

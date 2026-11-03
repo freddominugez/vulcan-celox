@@ -2,13 +2,13 @@ import json
 from pathlib import Path
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core import paths
-from vulcan_terminal.core.store import Store, migrate_legacy, read_json, write_json_atomic
+from vulcan_celox.core import paths
+from vulcan_celox.core.store import Store, migrate_legacy, read_json, write_json_atomic
 
 
 class PathsTest(TempDirTestCase):
     def test_overrides(self):
-        env = {"VULCAN_TERMINAL_HOME": str(self.tmp / "h"), "VULCAN_LEGACY_HOME": str(self.tmp / "l"),
+        env = {"VULCAN_CELOX_HOME": str(self.tmp / "h"), "VULCAN_LEGACY_HOME": str(self.tmp / "l"),
                "VULCAN_VALET_HOME": str(self.tmp / "v"), "VULCAN_VALET_BIN": str(self.tmp / "b")}
         self.assertEqual(paths.data_dir(env), self.tmp / "h")
         self.assertEqual(paths.legacy_dir(env), self.tmp / "l")
@@ -17,7 +17,7 @@ class PathsTest(TempDirTestCase):
 
     def test_defaults(self):
         import sys
-        expected = "Library/Application Support/VulcanTerminal" if sys.platform == "darwin" else "vulcan-terminal"
+        expected = "Library/Application Support/VulcanCelox" if sys.platform == "darwin" else "vulcan-celox"
         self.assertTrue(str(paths.data_dir({})).endswith(expected))
         self.assertTrue(str(paths.valet_home({})).endswith(".config/valet"))
         self.assertEqual(len(paths.valet_bin_candidates({})), 4)

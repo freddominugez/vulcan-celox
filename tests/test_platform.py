@@ -1,9 +1,9 @@
 import unittest
 from pathlib import Path
 
-from vulcan_terminal.core.keychain import SecretToolStore, default_keystore, KeychainStore
-from vulcan_terminal.core.oscompat import default_data_dir, default_shell, is_macos, open_argv
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core.keychain import SecretToolStore, default_keystore, KeychainStore
+from vulcan_celox.core.oscompat import default_data_dir, default_shell, is_macos, open_argv
+from vulcan_celox.core.runner import FakeRunner, Result
 
 KEY = "sk-ant-api03-" + "q1W2e3" * 8  # sintética
 
@@ -17,10 +17,10 @@ class PlatformTest(unittest.TestCase):
 
     def test_pasta_de_dados(self):
         self.assertEqual(default_data_dir({"HOME": "/Users/dev"}, "darwin"),
-                         Path("/Users/dev/Library/Application Support/VulcanTerminal"))
-        self.assertEqual(default_data_dir({"HOME": "/home/dev"}, "linux"), Path("/home/dev/.local/share/vulcan-terminal"))
+                         Path("/Users/dev/Library/Application Support/VulcanCelox"))
+        self.assertEqual(default_data_dir({"HOME": "/home/dev"}, "linux"), Path("/home/dev/.local/share/vulcan-celox"))
         self.assertEqual(default_data_dir({"HOME": "/home/dev", "XDG_DATA_HOME": "/dados"}, "linux"),
-                         Path("/dados/vulcan-terminal"))
+                         Path("/dados/vulcan-celox"))
 
     def test_abrir(self):
         which = lambda name: {"xdg-open": "/usr/bin/xdg-open", "code": "/usr/bin/code"}.get(name)

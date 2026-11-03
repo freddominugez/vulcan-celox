@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.session_memory import doc_path
+from vulcan_celox.core.session_memory import doc_path
 
 
 class SessionDeleteTest(ServerTestCase):

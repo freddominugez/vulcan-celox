@@ -6,7 +6,7 @@
 
 Um painel desktop para quem programa sozinho com agentes de código. Terminais reais, as sessões do Claude Code e do Codex lidas direto do disco, prompts enviados com um clique, projetos locais PHP e Node e um caderno por projeto, num app nativo só.
 
-![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](vulcan_terminal/web/img/manual/visao-geral.png)
+![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](vulcan_celox/web/img/manual/visao-geral.png)
 
 **Situação: 1.1.0 para macOS.** O código do Linux está no repositório e os testes passam no CI, mas ele ainda não foi aceito numa área de trabalho real, então nenhum pacote de Linux é distribuído. A interface é em português do Brasil.
 
@@ -31,7 +31,7 @@ Agentes escrevem código mais rápido do que uma pessoa consegue acompanhar. Dep
 
 ## Instalar
 
-1. Baixe o `.dmg` em [Releases](https://github.com/freddominugez/vulcan-hub-painel/releases).
+1. Baixe o `.dmg` em [Releases](https://github.com/freddominugez/vulcan-celox/releases).
 2. Arraste o **Vulcan Celox** para Aplicativos.
 3. O app não é assinado pela Apple. Na primeira vez, clique com o botão direito, escolha **Abrir** e confirme.
 
@@ -69,7 +69,7 @@ Também: [Registro de mudanças](CHANGELOG.pt-BR.md), [Como contribuir](CONTRIBU
 
 | Pasta | O que tem |
 |-------|-----------|
-| `vulcan_terminal/` | O app: núcleo e servidor em Python, interface web |
+| `vulcan_celox/` | O app: núcleo e servidor em Python, interface web |
 | `packaging/` | Casca Swift do macOS, inicializador e pacotes do Linux |
 | `scripts/` | Build, pacotes e o script de validação |
 | `tests/` | Testes automatizados e fixtures anonimizadas |
@@ -79,7 +79,7 @@ Também: [Registro de mudanças](CHANGELOG.pt-BR.md), [Como contribuir](CONTRIBU
 
 ```bash
 bash scripts/build_app.sh && open "dist/Vulcan Celox.app"   # compila e abre o app
-python3 -m vulcan_terminal --serve     # só o servidor local, imprime a porta
+python3 -m vulcan_celox --serve     # só o servidor local, imprime a porta
 python3 -m unittest discover -s tests -t .   # só os testes
 bash scripts/validate.sh               # todos os sensores (macOS, precisa das Command Line Tools)
 ```
@@ -90,10 +90,10 @@ A criação do código foi assistida por IA. Toda mudança passa pelos testes e 
 
 ## Licença
 
-[MIT](LICENSE). O código de terceiros em `vulcan_terminal/web/vendor` também é MIT: veja [LICENSES.md](vulcan_terminal/web/vendor/LICENSES.md).
+[MIT](LICENSE). O código de terceiros em `vulcan_celox/web/vendor` também é MIT: veja [LICENSES.md](vulcan_celox/web/vendor/LICENSES.md).
 
 O Vulcan Celox é independente e não tem vínculo com Anthropic, OpenAI, Laravel, Lerd, Supabase ou Vercel. Os nomes de produtos pertencem aos seus donos.
 
 ## Contato
 
-[carlosdominguez@byvulcan.com](mailto:carlosdominguez@byvulcan.com)
+[manager@byvulcan.com](mailto:manager@byvulcan.com)

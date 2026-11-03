@@ -4,9 +4,9 @@ import shutil
 
 from tests.helpers import TempDirTestCase
 from tests.test_pty import wait_for
-from vulcan_terminal.core import procinfo
-from vulcan_terminal.core.pty_session import PtySession, terminal_env
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core import procinfo
+from vulcan_celox.core.pty_session import PtySession, terminal_env
+from vulcan_celox.core.runner import FakeRunner, Result
 
 
 class AgentRunningTest(TempDirTestCase):

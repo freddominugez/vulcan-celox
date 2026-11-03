@@ -4,15 +4,15 @@ import http.client
 import json
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.runner import FakeRunner
-from vulcan_terminal.server.app import VulcanApp
+from vulcan_celox.core.runner import FakeRunner
+from vulcan_celox.server.app import VulcanApp
 
 
 class ServerTestCase(TempDirTestCase):
     token = "token-de-teste-123"
 
     def env(self):
-        return {"VULCAN_TERMINAL_HOME": str(self.tmp / "home"), "VULCAN_LEGACY_HOME": str(self.tmp / "legacy"),
+        return {"VULCAN_CELOX_HOME": str(self.tmp / "home"), "VULCAN_LEGACY_HOME": str(self.tmp / "legacy"),
                 "VULCAN_VALET_HOME": str(self.tmp / "valet"), "VULCAN_VALET_BIN": str(self.tmp / "sem-valet"),
                 "VULCAN_LERD_BIN": str(self.tmp / "sem-lerd"), "VULCAN_LERD_DATA": str(self.tmp / "lerd"),
                 "VULCAN_LERD_API": "http://127.0.0.1:1", "HOME": str(self.tmp)}

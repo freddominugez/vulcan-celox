@@ -3,7 +3,7 @@
 import os
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.server.sites_api import suggest_domain, validate_domain
+from vulcan_celox.server.sites_api import suggest_domain, validate_domain
 
 
 class DominioTest(ServerTestCase):
@@ -72,7 +72,7 @@ class AdicionarComLerdTest(ServerTestCase):
         self.assertEqual(data["suggestion"], "loja")
 
     def test_falha_do_lerd_volta_com_a_saida(self):
-        from vulcan_terminal.core.runner import Result
+        from vulcan_celox.core.runner import Result
         self.fake.default = Result(1, "", "a pasta não parece um projeto PHP")
         status, data, _ = self.request("POST", "/api/sites", body={"kind": "link", "path": str(self.pasta), "domain": "loja"})
         self.assertEqual(status, 200)

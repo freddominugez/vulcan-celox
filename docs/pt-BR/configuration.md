@@ -2,7 +2,7 @@
 
 ## Linha de comando
 
-Do código-fonte, com `python3 -m vulcan_terminal <opção>`.
+Do código-fonte, com `python3 -m vulcan_celox <opção>`.
 
 | Opção | Faz |
 |-------|-----|
@@ -19,17 +19,17 @@ Do código-fonte, com `python3 -m vulcan_terminal <opção>`.
 Casca nativa, como sensor:
 
 ```bash
-"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/overview"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot out.png --route "#/overview"
 ```
 
-Lançador do Linux: `vulcan-terminal --check`, `vulcan-terminal --instalar-dependencias`.
+Lançador do Linux: `vulcan-celox --check`, `vulcan-celox --instalar-dependencias`.
 
 ## Arquivos
 
 | Caminho | Guarda |
 |---------|--------|
-| `~/Library/Application Support/VulcanTerminal/` | Pasta de dados no macOS (0700; arquivos 0600) |
-| `$XDG_DATA_HOME/vulcan-terminal` | Pasta de dados no Linux |
+| `~/Library/Application Support/VulcanCelox/` | Pasta de dados no macOS (0700; arquivos 0600) |
+| `$XDG_DATA_HOME/vulcan-celox` | Pasta de dados no Linux |
 | `<dados>/agentes.db` | Índice SQLite descartável das sessões de agentes |
 | `<dados>/precos.json` | Seus preços; valem mais que a tabela embutida |
 | `<dados>/prompts/` | Prompts globais |
@@ -45,7 +45,7 @@ JSON ou banco corrompido vira `*.corrupt-<data>` e o app sobe com o padrão.
 
 | Variável | Efeito |
 |----------|--------|
-| `VULCAN_TERMINAL_HOME` | Pasta de dados (usada em teste) |
+| `VULCAN_CELOX_HOME` | Pasta de dados (usada em teste) |
 | `CLAUDE_CONFIG_DIR` | Pasta do Claude Code |
 | `CODEX_HOME` | Pasta ou pastas do Codex, separadas por vírgula |
 | `VULCAN_AUTOSTART=0` | Não inicia o Lerd junto com o app |

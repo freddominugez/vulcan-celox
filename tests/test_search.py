@@ -1,10 +1,10 @@
 import json
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.notebook import Notebook
-from vulcan_terminal.core.search import search
-from vulcan_terminal.core.sites import Site
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.notebook import Notebook
+from vulcan_celox.core.search import search
+from vulcan_celox.core.sites import Site
+from vulcan_celox.core.store import Store
 
 
 class SearchTest(TempDirTestCase):

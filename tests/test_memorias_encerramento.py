@@ -6,8 +6,8 @@ import time
 from unittest import mock
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core import doctor
-from vulcan_terminal.server import app as app_mod
+from vulcan_celox.core import doctor
+from vulcan_celox.server import app as app_mod
 
 
 class FlushTest(ServerTestCase):

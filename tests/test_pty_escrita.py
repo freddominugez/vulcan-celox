@@ -5,7 +5,7 @@ import threading
 import time
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.pty_session import PtySession, terminal_env
+from vulcan_celox.core.pty_session import PtySession, terminal_env
 from tests.test_pty import wait_for
 
 

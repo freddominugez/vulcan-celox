@@ -1,7 +1,7 @@
 import unittest
 
 from tests.helpers import FIXTURES
-from vulcan_terminal.core.tables import parse_table
+from vulcan_celox.core.tables import parse_table
 
 CHAVES = ["Site", "SSL", "URL", "Path", "PHP Version"]
 

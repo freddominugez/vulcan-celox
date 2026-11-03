@@ -2,7 +2,7 @@ import threading
 import time
 import unittest
 
-from vulcan_terminal.core.runner import FakeRunner, Result, Runner
+from vulcan_celox.core.runner import FakeRunner, Result, Runner
 
 
 class RunnerTest(unittest.TestCase):
@@ -27,7 +27,7 @@ class RunnerTest(unittest.TestCase):
         self.assertLess(time.monotonic() - start, 4)
 
     def test_run_shell_usa_shell_padrao(self):
-        from vulcan_terminal.core.runner import SHELL
+        from vulcan_celox.core.runner import SHELL
         r = self.runner.run_shell("echo $0")
         self.assertEqual(r.code, 0)
         self.assertIn(SHELL.rsplit("/", 1)[-1], r.stdout)

@@ -6,7 +6,7 @@ import subprocess
 import unittest
 from pathlib import Path
 
-CODE = Path(__file__).resolve().parent.parent / "vulcan_terminal" / "web" / "js" / "views" / "code"
+CODE = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web" / "js" / "views" / "code"
 
 SCRIPT = """
 import { Follow } from %s;

@@ -8,9 +8,9 @@ import time
 from datetime import datetime, timezone
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.__main__ import main
-from vulcan_terminal.core.agents.index import AgentIndex, is_active
-from vulcan_terminal.core.agents.watcher import AgentWatcher
+from vulcan_celox.__main__ import main
+from vulcan_celox.core.agents.index import AgentIndex, is_active
+from vulcan_celox.core.agents.watcher import AgentWatcher
 
 CLAUDE_SID = "11111111-2222-4333-8444-555555555555"
 CODEX_SID = "019a0000-1111-7222-8333-444444444444"
@@ -202,7 +202,7 @@ class AgentIndexTest(TempDirTestCase):
         import io
         from contextlib import redirect_stdout
         from unittest import mock
-        env = {**self.env, "VULCAN_TERMINAL_HOME": str(self.tmp / "home")}
+        env = {**self.env, "VULCAN_CELOX_HOME": str(self.tmp / "home")}
         out = io.StringIO()
         with mock.patch.dict(os.environ, env), redirect_stdout(out):
             self.assertEqual(main(["--reindexar-agentes"]), 0)

@@ -2,9 +2,9 @@ from datetime import date
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.models import Task
-from vulcan_terminal.core.notebook import NO_ASSIGNEE, Notebook, task_summary
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.models import Task
+from vulcan_celox.core.notebook import NO_ASSIGNEE, Notebook, task_summary
+from vulcan_celox.core.store import Store
 
 HOJE = date(2026, 9, 14)
 

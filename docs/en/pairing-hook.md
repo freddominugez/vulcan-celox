@@ -7,7 +7,7 @@ Vulcan Celox links each terminal tab to the Claude Code session started in it, s
 - Each Vulcan Celox tab has `VULCAN_SESSION_ID` (the tab id) in its environment and, when it has a theme, `VULCAN_THEME`.
 - When Claude Code starts a session, it runs the `SessionStart` hooks and passes a JSON with the `session_id` on stdin.
 - The Vulcan script reads the tab id from the environment and writes `<data>/pairings/<session_id>.json`, with the session, tab, theme, folder and source. Outside a Vulcan tab, it does nothing. It never fails: any problem ends with exit code 0, so it does not get in Claude Code's way.
-- `<data>` is `~/Library/Application Support/VulcanTerminal/` on macOS and `~/.local/share/vulcan-terminal/` on Linux (or `$XDG_DATA_HOME/vulcan-terminal/`). `VULCAN_TERMINAL_HOME` changes the folder on both.
+- `<data>` is `~/Library/Application Support/VulcanCelox/` on macOS and `~/.local/share/vulcan-celox/` on Linux (or `$XDG_DATA_HOME/vulcan-celox/`). `VULCAN_CELOX_HOME` changes the folder on both.
 
 The hook's file wins over pairing by folder and time.
 
@@ -15,9 +15,9 @@ The hook's file wins over pairing by folder and time.
 
 ```bash
 # from the repository:
-python3 -m vulcan_terminal --instalar-hook
+python3 -m vulcan_celox --instalar-hook
 # or with the code of the installed app on macOS (the native shell does not pass this option on):
-cd ~ && PYTHONPATH="$HOME/Applications/Vulcan Celox.app/Contents/Resources" python3 -m vulcan_terminal --instalar-hook
+cd ~ && PYTHONPATH="$HOME/Applications/Vulcan Celox.app/Contents/Resources" python3 -m vulcan_celox --instalar-hook
 ```
 
 The command:
@@ -28,7 +28,7 @@ The command:
 4. prints a JSON with `script`, `settings`, `backup` and `already_installed`.
 
 ```json
-{ "hooks": [ { "type": "command", "command": "'/Users/<you>/Library/Application Support/VulcanTerminal/hooks/vulcan-pareamento.py'" } ] }
+{ "hooks": [ { "type": "command", "command": "'/Users/<you>/Library/Application Support/VulcanCelox/hooks/vulcan-pareamento.py'" } ] }
 ```
 
 The path goes in single quotes because Claude Code runs the command through the shell and, on macOS, the space in `Application Support` would break the path. Up to version 0.3.0 the command was written without quotes; running the command again fixes the old entry instead of duplicating it.

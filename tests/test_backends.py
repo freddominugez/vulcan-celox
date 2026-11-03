@@ -4,10 +4,10 @@ import re
 from pathlib import Path
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.backends import NullBackend, ValetBackend, detect_backend
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core.backends import NullBackend, ValetBackend, detect_backend
+from vulcan_celox.core.runner import FakeRunner, Result
 
-PKG = Path(__file__).resolve().parent.parent / "vulcan_terminal"
+PKG = Path(__file__).resolve().parent.parent / "vulcan_celox"
 
 
 class DetectTest(TempDirTestCase):

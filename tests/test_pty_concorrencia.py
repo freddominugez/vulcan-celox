@@ -9,8 +9,8 @@ from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
 from tests.test_websocket import RawClient
-from vulcan_terminal.core.pty_session import PtySession, TerminalManager
-from vulcan_terminal.server.websocket import OP_BINARY, read_frame
+from vulcan_celox.core.pty_session import PtySession, TerminalManager
+from vulcan_celox.server.websocket import OP_BINARY, read_frame
 
 ENV = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": "/tmp", "TERM": "xterm-256color"}
 

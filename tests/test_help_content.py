@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-WEB = Path(__file__).resolve().parents[1] / "vulcan_terminal" / "web"
+WEB = Path(__file__).resolve().parents[1] / "vulcan_celox" / "web"
 DATA = json.loads((WEB / "help" / "conteudo.json").read_text(encoding="utf-8"))
 
 

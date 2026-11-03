@@ -2,10 +2,10 @@ import threading
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.backends.base import EnvStatus
-from vulcan_terminal.core.runner import Result
-from vulcan_terminal.core.store import Store
-from vulcan_terminal.server.autostart import EnvAutostart
+from vulcan_celox.core.backends.base import EnvStatus
+from vulcan_celox.core.runner import Result
+from vulcan_celox.core.store import Store
+from vulcan_celox.server.autostart import EnvAutostart
 
 
 class FakeBackend:

@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-STYLES = ROOT / "vulcan_terminal" / "web" / "styles"
+STYLES = ROOT / "vulcan_celox" / "web" / "styles"
 TOKENS = (STYLES / "tokens.css").read_text(encoding="utf-8")
 LOOSE = re.compile(r"#[0-9a-fA-F]{3,8}\b|rgba?\(")
 
@@ -122,7 +122,7 @@ class TokensTest(unittest.TestCase):
         known |= set(re.findall(r"(--[\w-]+)\s*:", (STYLES / "agents.css").read_text(encoding="utf-8")))
         known |= set(re.findall(r"(--[\w-]+)\s*:", (STYLES / "code.css").read_text(encoding="utf-8")))
         known |= {"--t", "--t-bg", "--t-ink", "--depth"}
-        js = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "vulcan_terminal" / "web" / "js").rglob("*.mjs"))
+        js = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "vulcan_celox" / "web" / "js").rglob("*.mjs"))
         known |= set(re.findall(r"(--[\w-]+)\s*:", js))
         missing = {}
         for path in STYLES.glob("*.css"):
@@ -132,7 +132,7 @@ class TokensTest(unittest.TestCase):
         self.assertEqual(missing, {})
 
     def test_laranja_saiu(self):
-        for path in [*(ROOT / "vulcan_terminal" / "web" / "styles").glob("*.css"), *(ROOT / "vulcan_terminal" / "web" / "js").glob("*.mjs")]:
+        for path in [*(ROOT / "vulcan_celox" / "web" / "styles").glob("*.css"), *(ROOT / "vulcan_celox" / "web" / "js").glob("*.mjs")]:
             self.assertNotRegex(path.read_text(encoding="utf-8").lower(), r"#ff4f2b|#ff6a4a|255, ?79, ?43", path.name)
 
 

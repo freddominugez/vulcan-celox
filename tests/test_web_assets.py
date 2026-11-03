@@ -8,7 +8,7 @@ from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
 
-WEB = Path(__file__).resolve().parent.parent / "vulcan_terminal" / "web"
+WEB = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web"
 REF = re.compile(r'(?:src|href)="([^"#]+)"')
 IMPORT = re.compile(r'from\s+"(\.{1,2}/[^"]+)"')
 JSC = Path("/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc")

@@ -4,7 +4,7 @@ import ast
 import unittest
 from pathlib import Path
 
-PKG = Path(__file__).resolve().parent.parent / "vulcan_terminal"
+PKG = Path(__file__).resolve().parent.parent / "vulcan_celox"
 RUNNER = PKG / "core" / "runner.py"
 
 

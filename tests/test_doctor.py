@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tests.helpers import TempDirTestCase
 from tests.lerd_api_stub import LerdApiStub, closed_port_url
-from vulcan_terminal.core.doctor import collect
+from vulcan_celox.core.doctor import collect
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -19,7 +19,7 @@ class DoctorTest(TempDirTestCase):
         return str(path)
 
     def _env(self, api, lerd=None):
-        return {"VULCAN_TERMINAL_HOME": str(self.tmp / "home"), "VULCAN_LERD_BIN": lerd or str(self.tmp / "nada"),
+        return {"VULCAN_CELOX_HOME": str(self.tmp / "home"), "VULCAN_LERD_BIN": lerd or str(self.tmp / "nada"),
                 "VULCAN_LERD_DATA": str(self.tmp / "lerd-data"), "VULCAN_LERD_API": api,
                 "VULCAN_VALET_BIN": str(self.tmp / "sem-valet"), "VULCAN_VALET_HOME": str(self.tmp / "valet")}
 
@@ -45,7 +45,7 @@ class DoctorTest(TempDirTestCase):
 
     def test_cli_imprime_json_e_sai_zero(self):
         env = dict(os.environ, **self._env(closed_port_url(), self._fake_lerd()), PYTHONPATH=str(ROOT))
-        proc = subprocess.run([sys.executable, "-m", "vulcan_terminal", "--doctor"], env=env,
+        proc = subprocess.run([sys.executable, "-m", "vulcan_celox", "--doctor"], env=env,
                               capture_output=True, text=True, timeout=30)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         data = json.loads(proc.stdout)

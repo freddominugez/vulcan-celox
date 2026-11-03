@@ -9,8 +9,8 @@ import os
 
 from tests.helpers import FIXTURES
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.environment import parse_ext_list, parse_php_m
-from vulcan_terminal.core.runner import Result
+from vulcan_celox.core.environment import parse_ext_list, parse_php_m
+from vulcan_celox.core.runner import Result
 
 
 def read(name):

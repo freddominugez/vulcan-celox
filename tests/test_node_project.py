@@ -6,7 +6,7 @@ import shutil
 from unittest import mock
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core import node_project
+from vulcan_celox.core import node_project
 
 N = FIXTURES / "node"
 

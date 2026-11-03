@@ -6,9 +6,9 @@ from datetime import datetime, timezone
 
 from tests import test_agents_api
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import repos
-from vulcan_terminal.core.agents.model import AgentSession, FileTouch
-from vulcan_terminal.core.runner import FakeRunner, Result, Runner
+from vulcan_celox.core.agents import repos
+from vulcan_celox.core.agents.model import AgentSession, FileTouch
+from vulcan_celox.core.runner import FakeRunner, Result, Runner
 
 NOW = datetime(2026, 10, 30, 12, 0, tzinfo=timezone.utc)
 WRITE_VERBS = ("commit", "push", "add", "remove", "prune", "checkout", "reset", "stash")

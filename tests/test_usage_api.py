@@ -6,7 +6,7 @@ import shutil
 
 from tests.helpers import FIXTURES
 from tests.test_agents_api import AgentsServerCase
-from vulcan_terminal.core.agents import usage
+from vulcan_celox.core.agents import usage
 
 USO = FIXTURES / "agents" / "usage"
 USO_SID = "33333333-4444-4555-8666-777777777777"

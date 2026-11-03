@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def package(root, output):
     root, output = Path(root), Path(output)
-    version_text = (root / "vulcan_terminal/__init__.py").read_text()
+    version_text = (root / "vulcan_celox/__init__.py").read_text()
     match = re.search(r'__version__\s*=\s*[\"\x27]([^\"\x27]+)', version_text)
     if not match or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", match.group(1)):
         raise ValueError("Invalid application version")
@@ -27,19 +27,19 @@ def package(root, output):
     spec.loader.exec_module(make_deb)
     with tempfile.TemporaryDirectory(prefix="vulcan-linux-") as temp:
         work = Path(temp)
-        stage = work / ("vulcan-terminal-" + version)
+        stage = work / ("vulcan-celox-" + version)
         (stage / "bin").mkdir(parents=True)
         (stage / "lib").mkdir()
         (stage / "share/applications").mkdir(parents=True)
-        for name in ("vulcan-terminal", "vulcan-terminal-deps"):
+        for name in ("vulcan-celox", "vulcan-celox-deps"):
             shutil.copy2(root / "packaging/linux" / name, stage / "bin" / name)
             (stage / "bin" / name).chmod(0o755)
-        shutil.copytree(root / "vulcan_terminal", stage / "lib/vulcan_terminal",
+        shutil.copytree(root / "vulcan_celox", stage / "lib/vulcan_celox",
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", "ui"))
-        shutil.copy2(root / "packaging/linux/vulcan-terminal.desktop",
-                     stage / "share/applications/vulcan-terminal.desktop")
+        shutil.copy2(root / "packaging/linux/vulcan-celox.desktop",
+                     stage / "share/applications/vulcan-celox.desktop")
         icons = root / "packaging/linux/icons/hicolor"
-        if not icons.is_dir() or not list(icons.rglob("vulcan-terminal.png")):
+        if not icons.is_dir() or not list(icons.rglob("vulcan-celox.png")):
             raise ValueError("Linux product icons are missing")
         shutil.copytree(icons, stage / "share/icons/hicolor")
         for name in ("install.sh", "uninstall.sh"):
@@ -47,7 +47,7 @@ def package(root, output):
             (stage / name).chmod(0o755)
         shutil.copy2(root / "packaging/LEIA-ME.md", stage / "LEIA-ME.md")
         source_files = {}
-        for path in sorted((stage / "lib/vulcan_terminal").rglob("*")):
+        for path in sorted((stage / "lib/vulcan_celox").rglob("*")):
             if path.is_file():
                 source_files[str(path.relative_to(stage / "lib"))] = hashlib.sha256(path.read_bytes()).hexdigest()
         manifest = {"application": "Vulcan Celox", "version": version, "files": source_files}
@@ -56,15 +56,15 @@ def package(root, output):
         with tarfile.open(portable, "w:gz", format=tarfile.GNU_FORMAT) as archive:
             archive.add(stage, arcname=stage.name)
         debroot = work / "deb"
-        (debroot / "opt/vulcan-terminal").mkdir(parents=True)
+        (debroot / "opt/vulcan-celox").mkdir(parents=True)
         for name in ("bin", "lib"):
-            shutil.copytree(stage / name, debroot / "opt/vulcan-terminal" / name)
-        shutil.copy2(stage / "SOURCE-MANIFEST.json", debroot / "opt/vulcan-terminal/SOURCE-MANIFEST.json")
+            shutil.copytree(stage / name, debroot / "opt/vulcan-celox" / name)
+        shutil.copy2(stage / "SOURCE-MANIFEST.json", debroot / "opt/vulcan-celox/SOURCE-MANIFEST.json")
         (debroot / "usr/bin").mkdir(parents=True)
-        (debroot / "usr/bin/vulcan-terminal").symlink_to("/opt/vulcan-terminal/bin/vulcan-terminal")
+        (debroot / "usr/bin/vulcan-celox").symlink_to("/opt/vulcan-celox/bin/vulcan-celox")
         (debroot / "usr/share/applications").mkdir(parents=True)
-        desktop = (root / "packaging/linux/vulcan-terminal.desktop").read_text().replace("@EXEC@", "/usr/bin/vulcan-terminal")
-        (debroot / "usr/share/applications/vulcan-terminal.desktop").write_text(desktop)
+        desktop = (root / "packaging/linux/vulcan-celox.desktop").read_text().replace("@EXEC@", "/usr/bin/vulcan-celox")
+        (debroot / "usr/share/applications/vulcan-celox.desktop").write_text(desktop)
         shutil.copytree(stage / "share/icons", debroot / "usr/share/icons")
         control = work / "control"
         control.write_text((root / "packaging/linux/deb/control").read_text().replace("@VERSION@", version))

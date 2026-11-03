@@ -4,7 +4,7 @@ import time
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.pty_session import HISTORY_LIMIT, PtySession, TerminalManager, terminal_env
+from vulcan_celox.core.pty_session import HISTORY_LIMIT, PtySession, TerminalManager, terminal_env
 
 
 def wait_for(fn, timeout=5.0):

@@ -5,7 +5,7 @@ import re
 import unittest
 from pathlib import Path
 
-VENDOR = Path(__file__).resolve().parent.parent / "vulcan_terminal" / "web" / "vendor"
+VENDOR = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web" / "vendor"
 SCRIPTS = VENDOR.parents[2] / "scripts" / "codemirror"
 PACKAGE = {"xterm.js": "@xterm/xterm", "xterm.css": "@xterm/xterm", "codemirror.js": "@codemirror/view", "InterVariable.woff2": "Inter"}
 LICENSE_OF = {"Inter": "OFL-1.1"}  # só a fonte tem outra licença; todo o resto precisa ser MIT

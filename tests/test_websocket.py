@@ -7,7 +7,7 @@ import time
 import unittest
 
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.server.websocket import (OP_BINARY, OP_CLOSE, OP_TEXT, accept_key, encode_frame,
+from vulcan_celox.server.websocket import (OP_BINARY, OP_CLOSE, OP_TEXT, accept_key, encode_frame,
                                               read_frame)
 
 

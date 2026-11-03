@@ -150,4 +150,4 @@ Primeira versão estável, **só para macOS** (`.dmg`, `.zip`, `SHA256SUMS`). O 
 - Fundação: núcleo em Python stdlib, backends Valet e Null, descoberta de sites, interface tkinter.
 - Caderno: tags, post-its, tarefas, progresso, `TAREFAS.md`, busca global, exportar e importar.
 
-[1.0.0]: https://github.com/freddominugez/vulcan-hub-painel/releases/tag/v1.0.0
+[1.0.0]: https://github.com/freddominugez/vulcan-celox/releases/tag/v1.0.0

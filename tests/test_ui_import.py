@@ -1,4 +1,4 @@
-"""A camada ui só pode depender de vulcan_terminal e da biblioteca padrão."""
+"""A camada ui só pode depender de vulcan_celox e da biblioteca padrão."""
 
 import ast
 import importlib.util
@@ -7,7 +7,7 @@ import sysconfig
 import unittest
 from pathlib import Path
 
-UI = Path(__file__).resolve().parent.parent / "vulcan_terminal" / "ui"
+UI = Path(__file__).resolve().parent.parent / "vulcan_celox" / "ui"
 STDLIB = os.path.realpath(sysconfig.get_paths()["stdlib"])
 
 
@@ -38,5 +38,5 @@ class UiImportTest(unittest.TestCase):
                 else:
                     continue
                 for root in roots:
-                    self.assertTrue(root == "vulcan_terminal" or _is_stdlib(root),
+                    self.assertTrue(root == "vulcan_celox" or _is_stdlib(root),
                                     f"{path.name} importa {root}")

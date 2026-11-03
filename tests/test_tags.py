@@ -1,6 +1,6 @@
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.notebook import DuplicateTag, Notebook, chip_specs
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.notebook import DuplicateTag, Notebook, chip_specs
+from vulcan_celox.core.store import Store
 
 
 class TagsTest(TempDirTestCase):

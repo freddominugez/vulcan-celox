@@ -2,9 +2,9 @@ from pathlib import Path
 
 from tests.helpers import GOLDEN, TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core.models import Note, Tag, Task
-from vulcan_terminal.core.session_memory import memory_path, render_general_index
-from vulcan_terminal.core.sessions import SessionRecord
+from vulcan_celox.core.models import Note, Tag, Task
+from vulcan_celox.core.session_memory import memory_path, render_general_index
+from vulcan_celox.core.sessions import SessionRecord
 
 
 def records(data_dir):
@@ -58,5 +58,5 @@ class GeneralIndexApiTest(ServerTestCase):
 
         self.assertEqual(self.request("POST", "/api/open", body={"kind": "file", "target": "/etc/hosts"})[0], 400)
         self.assertEqual(self.request("POST", "/api/open", body={"kind": "file", "target": data["path"]})[0], 200)
-        from vulcan_terminal.core.oscompat import open_argv
+        from vulcan_celox.core.oscompat import open_argv
         self.assertEqual(list(self.fake.calls[-1].argv), open_argv("file", str(Path(data["path"]).resolve()), self.app.env))

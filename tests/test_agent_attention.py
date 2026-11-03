@@ -5,12 +5,12 @@ import json
 import unittest
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import attention
-from vulcan_terminal.core.agents.claude_reader import ClaudeReader, new_session as new_claude
-from vulcan_terminal.core.agents.codex_reader import CodexReader, new_session as new_codex
-from vulcan_terminal.core.agents.index import AgentIndex
-from vulcan_terminal.core.agents.model import epoch
-from vulcan_terminal.server.agents_api import card
+from vulcan_celox.core.agents import attention
+from vulcan_celox.core.agents.claude_reader import ClaudeReader, new_session as new_claude
+from vulcan_celox.core.agents.codex_reader import CodexReader, new_session as new_codex
+from vulcan_celox.core.agents.index import AgentIndex
+from vulcan_celox.core.agents.model import epoch
+from vulcan_celox.server.agents_api import card
 
 T0 = "2026-11-02T10:00:00Z"
 T1 = "2026-11-02T10:00:30Z"

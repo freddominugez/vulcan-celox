@@ -5,8 +5,8 @@ from pathlib import Path
 from unittest import mock
 
 from tests.helpers import FIXTURES, TempDirTestCase
-from vulcan_terminal.core.backends import LerdBackend, NullBackend, ValetBackend
-from vulcan_terminal.core.runner import FakeRunner, Result
+from vulcan_celox.core.backends import LerdBackend, NullBackend, ValetBackend
+from vulcan_celox.core.runner import FakeRunner, Result
 
 LERD = "/opt/homebrew/bin/lerd"
 VALET = "/Users/dev/.composer/vendor/bin/valet"

@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 APP="dist/Vulcan Celox.app"
-VERSION="$(/usr/bin/python3 -c 'import vulcan_terminal as v; print(v.__version__)')"
+VERSION="$(/usr/bin/python3 -c 'import vulcan_celox as v; print(v.__version__)')"
 
 if [ -d "$APP" ]; then
   # dist/ é artefato de build nosso e ignorado pelo git; recriado a cada build
@@ -13,7 +13,7 @@ if [ -d "$APP" ]; then
 fi
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' vulcan_terminal "$APP/Contents/Resources/"
+rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' vulcan_celox "$APP/Contents/Resources/"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -25,7 +25,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 	<key>CFBundleDisplayName</key>
 	<string>Vulcan Celox</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.byvulcan.terminal</string>
+	<string>com.byvulcan.celox</string>
 	<key>CFBundleVersion</key>
 	<string>${VERSION}</string>
 	<key>CFBundleShortVersionString</key>
@@ -33,7 +33,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleExecutable</key>
-	<string>vulcan-terminal</string>
+	<string>vulcan-celox</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>LSMinimumSystemVersion</key>
@@ -59,14 +59,14 @@ if [ "${VULCAN_UNIVERSAL:-0}" = "1" ]; then
   # binário universal (Apple Silicon + Intel) para distribuição
   UNI_TMP="$(mktemp -d)"
   for arch in arm64 x86_64; do
-    swiftc -O -target "${arch}-apple-macos13.0" -o "$UNI_TMP/vulcan-terminal-$arch" packaging/macos/main.swift packaging/macos/notify.swift \
+    swiftc -O -target "${arch}-apple-macos13.0" -o "$UNI_TMP/vulcan-celox-$arch" packaging/macos/main.swift packaging/macos/notify.swift \
       -framework AppKit -framework WebKit -framework Security
   done
-  lipo -create -output "$APP/Contents/MacOS/vulcan-terminal" "$UNI_TMP/vulcan-terminal-arm64" "$UNI_TMP/vulcan-terminal-x86_64"
+  lipo -create -output "$APP/Contents/MacOS/vulcan-celox" "$UNI_TMP/vulcan-celox-arm64" "$UNI_TMP/vulcan-celox-x86_64"
   find "$UNI_TMP" -depth -delete
 else
   swiftc -O -target "${ARCH}-apple-macos13.0" \
-    -o "$APP/Contents/MacOS/vulcan-terminal" packaging/macos/main.swift packaging/macos/notify.swift \
+    -o "$APP/Contents/MacOS/vulcan-celox" packaging/macos/main.swift packaging/macos/notify.swift \
     -framework AppKit -framework WebKit -framework Security
 fi
 

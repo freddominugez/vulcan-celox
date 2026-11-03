@@ -2,7 +2,7 @@ import json
 import os
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.sites import discover_sites
+from vulcan_celox.core.sites import discover_sites
 
 
 class SitesTest(TempDirTestCase):

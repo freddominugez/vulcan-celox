@@ -2,7 +2,7 @@ import shutil
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from tests.lerd_api_stub import LerdApiStub, closed_port_url
-from vulcan_terminal.core.backends.lerd import LerdBackend, site_from_row
+from vulcan_celox.core.backends.lerd import LerdBackend, site_from_row
 
 
 class LerdSitesTest(TempDirTestCase):

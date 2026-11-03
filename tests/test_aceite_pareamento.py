@@ -13,7 +13,7 @@ import time
 
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
-from vulcan_terminal.core import procinfo, prompts
+from vulcan_celox.core import procinfo, prompts
 
 SID = "aaaaaaaa-1111-4222-8333-444444444444"
 

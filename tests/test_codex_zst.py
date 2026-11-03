@@ -8,10 +8,10 @@ import unittest
 from unittest import mock
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.agents import discovery, status
-from vulcan_terminal.core.agents.index import AgentIndex
-from vulcan_terminal.core.agents.reading import read_session
-from vulcan_terminal.core.agents.watcher import AgentWatcher
+from vulcan_celox.core.agents import discovery, status
+from vulcan_celox.core.agents.index import AgentIndex
+from vulcan_celox.core.agents.reading import read_session
+from vulcan_celox.core.agents.watcher import AgentWatcher
 
 SID = "019b0000-1111-7222-8333-444444444444"
 

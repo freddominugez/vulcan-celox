@@ -2,8 +2,8 @@
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
-from vulcan_terminal.core import themes
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core import themes
+from vulcan_celox.core.store import Store
 
 XTERM_KEYS = {"background", "foreground", "cursor", "selectionBackground", "black", "red", "green", "yellow", "blue",
               "magenta", "cyan", "white", "brightBlack", "brightWhite"}

@@ -1,6 +1,6 @@
 # Claude Code and Codex JSONL formats
 
-Reference for the parser in `vulcan_terminal/core/agents/`. Basis: reading real files on 2026-10-30 (Claude Code with `api-request-blob`, Codex CLI 0.166.0). These formats are private to each tool and change without notice, which is why reading is tolerant. **When the real file differs from this document, the real file wins**, and the parser and this document change in the same commit.
+Reference for the parser in `vulcan_celox/core/agents/`. Basis: reading real files on 2026-10-30 (Claude Code with `api-request-blob`, Codex CLI 0.166.0). These formats are private to each tool and change without notice, which is why reading is tolerant. **When the real file differs from this document, the real file wins**, and the parser and this document change in the same commit.
 
 General rule: the app only reads. It never writes to `~/.claude`, `~/.codex`, `~/.claude.json` or `~/.codex/config.toml`. The only exception is the command described in [pairing-hook.md](pairing-hook.md), run by the user.
 

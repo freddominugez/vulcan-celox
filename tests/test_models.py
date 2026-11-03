@@ -1,9 +1,9 @@
 import re
 
 from tests.helpers import TempDirTestCase
-from vulcan_terminal.core.models import Note, Tag, Task, now_iso
-from vulcan_terminal.core.notebook import Notebook
-from vulcan_terminal.core.store import Store
+from vulcan_celox.core.models import Note, Tag, Task, now_iso
+from vulcan_celox.core.notebook import Notebook
+from vulcan_celox.core.store import Store
 
 
 class ModelsTest(TempDirTestCase):
@@ -26,7 +26,7 @@ class ModelsTest(TempDirTestCase):
         self.assertEqual(Note.from_dict({"color": "preto"}).color, "amarelo")
 
     def test_cor_de_tag_antiga_migra(self):
-        from vulcan_terminal.core.models import LEGACY_TAG_COLORS, TAG_COLORS
+        from vulcan_celox.core.models import LEGACY_TAG_COLORS, TAG_COLORS
         self.assertEqual(Tag.from_dict({"name": "x", "color": LEGACY_TAG_COLORS[2]}).color, TAG_COLORS[2])
         self.assertEqual(Tag.from_dict({"name": "x", "color": "#123456"}).color, "#123456")
 

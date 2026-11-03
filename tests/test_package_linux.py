@@ -42,22 +42,22 @@ class LinuxPackageTest(unittest.TestCase):
                 names = archive.getnames()
                 prefix = names[0] + "/"
                 checked = 0
-                for source in (ROOT / "vulcan_terminal").rglob("*"):
-                    relative = source.relative_to(ROOT / "vulcan_terminal")
+                for source in (ROOT / "vulcan_celox").rglob("*"):
+                    relative = source.relative_to(ROOT / "vulcan_celox")
                     if not source.is_file() or "ui" in relative.parts or "__pycache__" in relative.parts or source.suffix == ".pyc":
                         continue
                     current = source.read_bytes()
-                    self.assertEqual(data.extractfile("./opt/vulcan-terminal/lib/vulcan_terminal/" + str(relative)).read(), current)
-                    self.assertEqual(archive.extractfile(prefix + "lib/vulcan_terminal/" + str(relative)).read(), current)
+                    self.assertEqual(data.extractfile("./opt/vulcan-celox/lib/vulcan_celox/" + str(relative)).read(), current)
+                    self.assertEqual(archive.extractfile(prefix + "lib/vulcan_celox/" + str(relative)).read(), current)
                     checked += 1
                 self.assertGreater(checked, 60)
-                launcher = data.getmember("./usr/bin/vulcan-terminal")
+                launcher = data.getmember("./usr/bin/vulcan-celox")
                 self.assertTrue(launcher.issym())
-                self.assertEqual(launcher.linkname, "/opt/vulcan-terminal/bin/vulcan-terminal")
-                for name in ("vulcan-terminal", "vulcan-terminal-deps"):
-                    self.assertEqual(data.getmember("./opt/vulcan-terminal/bin/" + name).mode, 0o755)
-                desktop = data.extractfile("./usr/share/applications/vulcan-terminal.desktop").read()
-                self.assertIn(b"/usr/bin/vulcan-terminal", desktop)
+                self.assertEqual(launcher.linkname, "/opt/vulcan-celox/bin/vulcan-celox")
+                for name in ("vulcan-celox", "vulcan-celox-deps"):
+                    self.assertEqual(data.getmember("./opt/vulcan-celox/bin/" + name).mode, 0o755)
+                desktop = data.extractfile("./usr/share/applications/vulcan-celox.desktop").read()
+                self.assertIn(b"/usr/bin/vulcan-celox", desktop)
                 self.assertNotIn(b"@EXEC@", desktop)
                 self.assertFalse(any("__pycache__" in name or name.endswith(".pyc") for name in names))
             for line in (output / "SHA256SUMS").read_text().splitlines():
