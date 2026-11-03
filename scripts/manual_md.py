@@ -29,7 +29,7 @@ def block(b):
 
 
 def render(data):
-    out = ["# Manual do Vulcan Terminal", "",
+    out = ["# Manual do Vulcan Celox", "",
            "> Gerado por `scripts/manual_md.py` a partir de `vulcan_terminal/web/help/conteudo.json`, o mesmo conteúdo da tela Ajuda do app (⌘?). Não edite este arquivo à mão.",
            "", "## Sumário", ""]
     out += [f"- [{s['titulo']}](#{s['id']}): {s['resumo']}" for s in data["secoes"]]

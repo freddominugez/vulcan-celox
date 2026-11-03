@@ -1,13 +1,20 @@
 // Barra lateral.
 
+import { attentionCount } from "./attention-state.mjs";
 import { AGENT_NAV, HELP_NAV, NAV, NAV_GROUPS, app } from "./app-state.mjs";
 import { $, esc, icon } from "./dom.mjs";
 import { terminals } from "./terminals.mjs";
+
+window.addEventListener("vulcan-attention", () => {
+  const badge = document.querySelector("[data-attention-count]");
+  if (!badge || Number(badge.dataset.attentionCount) !== attentionCount()) renderSidebar();
+});
 
 export function renderSidebar() {
   const state = app.state;
   const counts = {
     terminals: terminals.list().length,
+    agentes: attentionCount(),
     tasks: state ? state.progress.overall.total - state.progress.overall.done : 0,
   };
   const navItem = (n) => {
@@ -22,7 +29,7 @@ export function renderSidebar() {
       dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
     }
     return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" ${active ? 'aria-current="page"' : ""}>
-      ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count">${count}</span>` : ""}${dot}</a>`;
+      ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${count} aguardando você"` : ""}>${count}</span>` : ""}${dot}</a>`;
   };
   const byId = Object.fromEntries([...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => [n.id, n]));
   // O redesenho troca os elementos do #nav; guarda o que tinha o foco (grupo ou link) para devolver

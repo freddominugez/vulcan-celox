@@ -7,25 +7,15 @@ import { askFolder, suggestedFolder } from "./folder-dialog.mjs";
 import { renderMarkdown } from "./markdown.mjs";
 import { PromptBar } from "./prompt-bar.mjs";
 import { copy } from "./agents-ui.mjs";
-import { loadThemes, themes as themeState, xtermTheme } from "./themes.mjs";
+import { clearTab } from "./attention-state.mjs";
+import { syncTabs, watchTerminal } from "./terminal-watch.mjs";
+import { loadThemes, TERMINAL_THEME, themes as themeState, xtermTheme } from "./themes.mjs";
 import { DebugView } from "./views/debug.mjs";
 import { LogsView } from "./views/logs.mjs";
 import { HarnessView } from "./views/harness.mjs";
 import { NotesView } from "./views/notes.mjs";
 import { SessionTagsView } from "./views/session-tags.mjs";
 import { TasksView } from "./views/tasks.mjs";
-
-const THEME = {
-  background: "#0f0f11",
-  foreground: "#e6e6e9",
-  cursor: "#ff6a4a",
-  cursorAccent: "#0f0f11",
-  selectionBackground: "rgba(255, 106, 74, 0.28)",
-  black: "#1f1f23", red: "#ff6b5e", green: "#4fd08a", yellow: "#f2c14e",
-  blue: "#6aa8ff", magenta: "#d38cff", cyan: "#4fcfd6", white: "#d4d4da",
-  brightBlack: "#6b6b75", brightRed: "#ff8a7f", brightGreen: "#74e0a5", brightYellow: "#f7d67c",
-  brightBlue: "#92c0ff", brightMagenta: "#e2adff", brightCyan: "#7fe0e6", brightWhite: "#f5f5f7",
-};
 
 window.addEventListener("vulcan-themes-loaded", () => {
   terminals.list().forEach((s) => {
@@ -47,7 +37,7 @@ function addon(name) {
 
 const SEARCH_DECORATIONS = {
   matchBackground: "#6b5420", matchBorder: "#f2c14e", matchOverviewRuler: "#f2c14e",
-  activeMatchBackground: "#ff6a4a", activeMatchBorder: "#ffb4a3", activeMatchColorOverviewRuler: "#ff6a4a",
+  activeMatchBackground: "#7C3AED", activeMatchBorder: "#B89AFF", activeMatchColorOverviewRuler: "#B89AFF",
 };
 // sequências de controle que o serialize grava para restaurar cores e cursor; para copiar texto, saem
 const ANSI = /\x1b\[[0-9;?]*[ -\/]*[@-~]|\x1b\][^\x07]*(?:\x07|\x1b\\)|\x1b[()][0-9A-Za-z]|\x1b[=>78]/g;
@@ -70,7 +60,7 @@ class Session {
       allowProposedApi: true,  // a API de unicode (addon-unicode11) é marcada como proposta no xterm 6
       scrollback: 10000,
       macOptionIsMeta: true,
-      theme: xtermTheme(info.theme) || THEME,
+      theme: xtermTheme(info.theme) || TERMINAL_THEME,
     });
     this.fit = new window.FitAddon.FitAddon();
     this.term.loadAddon(this.fit);
@@ -99,6 +89,8 @@ class Session {
     });
     this.term.onBinary((data) => this.send(Uint8Array.from(data, (c) => c.charCodeAt(0))));
     this.term.onTitleChange((title) => hooks.onTitle(this, title));
+    watchTerminal(this.term, info.id);
+    this.el.dataset.tabId = info.id;
   }
 
   mount(container) {
@@ -298,7 +290,7 @@ export const terminals = {
   popout(id) {
     const session = this.sessions.get(id);
     if (!session) return;
-    const title = `${session.info.title} · Vulcan Terminal`;
+    const title = `${session.info.title} · Vulcan Celox`;
     if (!native({ type: "popout", id, title })) {
       window.open(`${location.pathname}#/popout/${id}`, `vulcan-${id}`, "width=900,height=560");
     }
@@ -514,6 +506,7 @@ export class TerminalWorkspace {
 
   select(id) {
     this.activeId = id;
+    clearTab(id);
     if (this.splitId === id) this.splitId = null;
     this.render();
     if (this.options.onSelect) this.options.onSelect(id);
@@ -764,6 +757,7 @@ export class TerminalWorkspace {
     const activeLive = this.mode === "terminal" ? terminals.get(this.activeId) : null;
     this.promptBar.update(activeLive ? activeLive.info.cwd : null, activeLive ? activeLive.info.id : null);
     if (this.options.onChange) this.options.onChange(this.sessions().length);
+    syncTabs();
   }
 
   // ── comandos do projeto ─────────────────────────────────────

@@ -1,10 +1,10 @@
-# Manual do Vulcan Terminal
+# Manual do Vulcan Celox
 
 > Gerado por `scripts/manual_md.py` a partir de `vulcan_terminal/web/help/conteudo.json`, o mesmo conteúdo da tela Ajuda do app (⌘?). Não edite este arquivo à mão.
 
 ## Sumário
 
-- [Primeiros passos](#primeiros-passos): O que o Vulcan Terminal faz e como começar em quatro passos.
+- [Primeiros passos](#primeiros-passos): O que o Vulcan Celox faz e como começar em quatro passos.
 - [Sites PHP](#projetos-php): Sites do Lerd: abrir, trocar PHP, HTTPS, logs e terminal.
 - [Lerd](#lerd): O ambiente que roda PHP, nginx, banco e HTTPS dos sites.
 - [Projetos Node](#node): Next.js, Vite, Supabase local e vínculo com a Vercel.
@@ -23,9 +23,11 @@
 
 ## Primeiros passos
 
-*O que o Vulcan Terminal faz e como começar em quatro passos.*
+*O que o Vulcan Celox faz e como começar em quatro passos.*
 
-O Vulcan Terminal é um painel para quem programa sozinho com agentes de código. Ele junta num lugar só os sites PHP que o **Lerd** roda no seu Mac, os projetos Node (Next.js, Vite e afins), os terminais de cada projeto e as sessões do **Claude Code** e do **Codex**.
+O app tem tema claro e escuro. Em ⌘K, busque "Tema" e escolha Sistema, Claro ou Escuro. A área do terminal fica escura nos dois, com a cor de cada aba.
+
+O Vulcan Celox é um painel para quem programa sozinho com agentes de código. Ele junta num lugar só os sites PHP que o **Lerd** roda no seu Mac, os projetos Node (Next.js, Vite e afins), os terminais de cada projeto e as sessões do **Claude Code** e do **Codex**.
 
 ![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](../../vulcan_terminal/web/img/manual/visao-geral.png)
 
@@ -57,7 +59,7 @@ Os sites são do Lerd. O app só chama a CLI e a API do próprio Lerd e nunca ed
 
 *O ambiente que roda PHP, nginx, banco e HTTPS dos sites.*
 
-O **Lerd** é um ambiente de desenvolvimento PHP de código aberto (licença MIT). Ele roda nginx, PHP-FPM, DNS para `.test`, banco de dados e certificados HTTPS em contêineres, sem você configurar servidor web na mão. O Vulcan Terminal é o painel por cima dele.
+O **Lerd** é um ambiente de desenvolvimento PHP de código aberto (licença MIT). Ele roda nginx, PHP-FPM, DNS para `.test`, banco de dados e certificados HTTPS em contêineres, sem você configurar servidor web na mão. O Vulcan Celox é o painel por cima dele.
 
 ![Tela Lerd com componentes, serviços e versões de PHP](../../vulcan_terminal/web/img/manual/lerd.png)
 
@@ -65,7 +67,7 @@ O **Lerd** é um ambiente de desenvolvimento PHP de código aberto (licença MIT
 - **Serviços:** banco, Redis e outros, com ligar e parar.
 - **PHP:** versões instaladas, extensões, Xdebug e seis ajustes comuns do php.ini, gravados pelo próprio `lerd php:ini`.
 - **Node do Lerd:** versões que o Lerd gerencia para os sites PHP com front em JavaScript.
-- **Iniciar com o app:** o botão de raio, no alto, liga o Lerd junto com o Vulcan Terminal.
+- **Iniciar com o app:** o botão de raio, no alto, liga o Lerd junto com o Vulcan Celox.
 
 O Laravel Valet também funciona como alternativa. O Herd é comercial e não é usado.
 
@@ -96,6 +98,7 @@ Projetos Node não usam o Lerd. O app lê o `package.json`, descobre o gerenciad
 
 Cada terminal é uma sessão. Ele abre na pasta escolhida, com um tema de cor que identifica a sessão, e pode já começar com o Claude Code ou o Codex rodando.
 
+- **Portas:** a aba mostra as portas que os processos dela abriram, como `:5173 +2`, na barra de abas e na lista de sessões. O clique abre `http://localhost:<porta>` no navegador. Só os processos da própria aba contam.
 - **⌘T** abre um terminal novo; **⌘J** mostra ou esconde o painel de terminal de baixo, que acompanha todas as telas.
 - **Comandos rápidos** do projeto (composer, artisan, npm) ficam na barra do terminal.
 - **Memória:** ao fechar um terminal, os comandos, tarefas, post-its e tags dele viram um arquivo Markdown, que aparece em Sessões recentes e no Índice.
@@ -121,10 +124,23 @@ A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, c
 
 ![Lista de sessões de agentes com projeto, branch e atividade](../../vulcan_terminal/web/img/manual/agentes.png)
 
+- **Quem espera por você:** a aba ganha um anel e a barra lateral mostra quantas sessões terminaram o turno ou podem estar esperando. O aviso some ao focar a aba ou abrir a sessão, e ⌘⇧U vai para o mais recente. "Talvez esperando" é uma suposição: a ferramenta pode só estar demorando. Programas que avisam pelo terminal (OSC 9, 99 e 777, ou o sino) também acendem o anel. Com a janela sem foco, o app manda um aviso do sistema só com agente, projeto e estado, e mostra o número no ícone do Dock; para ligar ou desligar, use ⌘K e busque "Aviso do sistema".
 - **Histórico de agentes:** busca em tudo o que os agentes fizeram, por texto, arquivo ou comando.
 - **Branches e worktrees:** em que branch cada agente está trabalhando, para não misturar trabalho.
 - **Retomar:** abre um terminal na pasta da sessão já com o comando de retomada do agente.
 - **Pareamento:** o terminal que abriu um agente fica ligado à sessão dele, para os prompts saírem preenchidos. No Codex a ligação é por pasta e horário: duas sessões abertas quase juntas na mesma pasta ainda podem trocar de aba. Subagentes e o app desktop do Codex não se ligam a abas.
+
+**⌘-clique em caminho.** No terminal, com ⌘ pressionado, caminhos como `a/b.py`, `/abs/b.py`, `b.py:12` e `b.py(12)` viram links, se o arquivo existir dentro de uma pasta conhecida. Com sessão pareada, abre na aba Código, na linha. Sem sessão, abre no editor. Pasta abre no Finder. Caminho relativo conta a partir da pasta da sessão ou da pasta em que a aba abriu: depois de um `cd`, ele pode não ser encontrado.
+
+**Navegar por pedido.** ⌘⇧↑ e ⌘⇧↓ saltam entre os pedidos. No terminal, cada Enter numa aba com agente vivo vira uma marca, sem desenhar nada na tela. Se o agente usar a tela inteira do terminal, não há histórico para navegar, e o app avisa uma vez. Na sessão, a **Linha do tempo** agrupa por pedido, com arquivos e comandos, e cada arquivo editado leva ao diff daquele pedido.
+
+**Estado do PR.** Por padrão o app estima pelos comandos da sessão e diz isso na tela. Ligue "Estado do PR pelo GitHub" no ⌘K para ver número, rascunho, estado e checagens pelo seu próprio `gh`. Só essa opção usa a rede.
+
+**Aba Código.** Dentro de uma sessão, a aba **Código** mostra os arquivos que o agente tocou, com a marca de novo, editado, lido ou apagado. Você vê o arquivo com realce de sintaxe ou o diff: de uma edição, de um pedido inteiro ou contra o último commit, lado a lado ou unificado. ⌘F busca no arquivo. Numa sessão ativa o visor segue o agente, abrindo cada arquivo editado e rolando até o trecho. Rolar, clicar ou selecionar texto pausa, e **Voltar a seguir** retoma. Nas abas pareadas, o botão **Código** da barra acima do terminal leva direto para cá.
+
+![Aba Código com a árvore de arquivos e o diff de uma edição lado a lado](../../vulcan_terminal/web/img/manual/codigo.png)
+
+O visor só lê: nada é editado no app. Ele abre arquivos dentro da pasta da sessão, até 1 MB, e não mostra binários nem nomes sensíveis como `.env`, chaves e credenciais. O conteúdo das edições vem do registro do agente, então some quando o agente apaga a sessão antiga.
 
 O app só lê esses arquivos, linha por linha. Ele nunca escreve em `~/.claude` nem em `~/.codex`. A única exceção é o hook de pareamento, que você instala de propósito com `--instalar-hook`, e que guarda um backup.
 
@@ -196,6 +212,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 | `⌘T` | Terminal novo |
 | `⇧⌘T` | Terminal novo perguntando a pasta |
 | `⌘J` | Mostrar ou esconder o painel de terminal |
+| `⌘⇧U` | Ir para o aviso de agente mais recente |
 | `⌘F` | Buscar no terminal |
 | `⇧⌘P` | Prompts |
 | `⇧⌘E` | Depuração |
@@ -221,7 +238,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 
 **Para que serve o Lerd?**
 
-É o ambiente que roda seus sites PHP e Laravel no Mac: domínio `.test`, versão de PHP por projeto, banco e HTTPS local, sem configurar servidor na mão. O Vulcan Terminal é o painel por cima dele.
+É o ambiente que roda seus sites PHP e Laravel no Mac: domínio `.test`, versão de PHP por projeto, banco e HTTPS local, sem configurar servidor na mão. O Vulcan Celox é o painel por cima dele.
 
 **Preciso do Lerd para usar o app?**
 
@@ -289,7 +306,7 @@ Clique em Início na barra lateral. Para ele voltar a abrir junto com o app, des
 
 **Abri pelo navegador e pede token.**
 
-A interface precisa do token que o app nativo cria a cada execução. Abra pelo Vulcan Terminal, no atalho da Mesa ou em Aplicativos.
+A interface precisa do token que o app nativo cria a cada execução. Abra pelo Vulcan Celox, no atalho da Mesa ou em Aplicativos.
 
 **O prompt enviado ao terminal já executa?**
 

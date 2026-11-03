@@ -19,7 +19,7 @@ Run from source with `python3 -m vulcan_terminal <flag>`.
 Native shell, as a sensor:
 
 ```bash
-"dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/overview"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/overview"
 ```
 
 Linux launcher: `vulcan-terminal --check`, `vulcan-terminal --instalar-dependencias`.

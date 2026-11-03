@@ -1,5 +1,5 @@
 """Nada é apagado de forma definitiva: arquivos vão para a Lixeira do sistema ou, se não der, para `lixeira/`
-dentro da pasta de dados do Vulcan Terminal."""
+dentro da pasta de dados do Vulcan Celox."""
 
 from __future__ import annotations
 

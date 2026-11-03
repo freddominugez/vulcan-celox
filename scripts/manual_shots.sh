@@ -5,7 +5,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 OUT="${1:-$ROOT/vulcan_terminal/web/img/manual}"
-APP="dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal"
+TEMA="${2:-escuro}"  # a Ajuda usa o escuro; as capturas do claro ficam em docs/capturas-claro
+THEME_JS="document.documentElement.dataset.theme = '$TEMA'; document.head.insertAdjacentHTML('beforeend', '<style>*{transition:none!important}</style>');"
+APP="dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal"
 [ -x "$APP" ] || { echo "rode scripts/build_app.sh antes"; exit 1; }
 mkdir -p "$OUT"
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/vulcan-shots.XXXXXX")"
@@ -21,8 +23,8 @@ shot() {  # shot <nome> <rota> [js extra]
   env VULCAN_TERMINAL_HOME="$TMP/home-$N" VULCAN_LEGACY_HOME="$TMP/legacy" VULCAN_VALET_HOME="$TMP/valet" \
     VULCAN_VALET_BIN="$TMP/sem-valet" VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_DATA="$TMP/lerd-data" \
     VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP/port")" VULCAN_KEYSTORE=memory VULCAN_AUTOSTART=0 \
-    CLAUDE_CONFIG_DIR="$ROOT/tests/fixtures/agents/claude" CODEX_HOME="$ROOT/tests/fixtures/agents/codex" \
-    "$APP" --snapshot "$TMP/$1.png" --route "$2" --wait 5 --eval "${3:-}" > /dev/null
+    CLAUDE_CONFIG_DIR="${SHOT_CLAUDE:-$ROOT/tests/fixtures/agents/claude}" CODEX_HOME="$ROOT/tests/fixtures/agents/codex" \
+    "$APP" --snapshot "$TMP/$1.png" --route "$2" --wait 5 --eval "$THEME_JS ${3:-}" > /dev/null
   sips -Z 1600 "$TMP/$1.png" --out "$OUT/$1.png" > /dev/null
   echo "$OUT/$1.png"
 }
@@ -33,6 +35,11 @@ shot visao-geral "#/inicio" "${NODE//__ROTA__/overview}"
 shot node-projeto "#/node" "${NODE//__ROTA__/node\/painel}"
 shot lerd "#/lerd"
 shot agentes "#/agentes"
+# aba Código com uma sessão sintética: o diff da edição em app.py
+python3 -I "$ROOT/tests/tools/code_fixture.py" "$TMP/codigo"
+SHOT_CLAUDE="$TMP/codigo/claude" shot codigo "#/agentes/cccccccc-dddd-4eee-8fff-000000000001/codigo" "setTimeout(function () {
+  var b = Array.prototype.find.call(document.querySelectorAll('.code-file'), function (x) { return x.textContent.indexOf('app.py') >= 0; });
+  if (b) b.click(); setTimeout(function () { var d = document.querySelector('[data-mode=diff]'); if (d) d.click(); }, 800); }, 2000);"
 shot uso-e-custo "#/agentes/uso/2026-10-31"
 shot harness "#/sites/vulcan-demo/harness"
 # Compositor aberto no prompt de segurança, com os campos preenchidos pela sessão das fixtures

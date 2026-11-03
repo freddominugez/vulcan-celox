@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
+from vulcan_terminal.core.agents import attention_hook
 from vulcan_terminal.core.agents.model import AgentSession, epoch
 
 WINDOW_SECONDS = 60
@@ -25,9 +26,9 @@ _SAFE_ID = re.compile(r"^[A-Za-z0-9._-]{1,120}$")
 _AGENT_COMMAND = {"claude": re.compile(r"^\s*(?:\S*/)?claude(?:\s|$)"), "codex": re.compile(r"^\s*(?:\S*/)?codex(?:\s|$)")}
 
 HOOK_SCRIPT = '''#!/usr/bin/env python3
-"""Hook SessionStart do Claude Code instalado pelo Vulcan Terminal (--instalar-hook).
+"""Hook SessionStart do Claude Code instalado pelo Vulcan Celox (--instalar-hook).
 
-Grava qual aba do Vulcan Terminal abriu esta sessão. Fora de uma aba do Vulcan, não faz nada.
+Grava qual aba do Vulcan Celox abriu esta sessão. Fora de uma aba do Vulcan, não faz nada.
 Nunca falha: qualquer problema termina com código 0 para não atrapalhar o Claude Code.
 """
 import json, os, re, sys, tempfile
@@ -186,6 +187,7 @@ def install_hook(claude_root, data_dir, now: Optional[float] = None) -> Dict[str
             raise ValueError("settings.json do Claude não é um objeto JSON")
         backup = settings_path.with_name(f"settings.json.vulcan-backup-{int(now if now is not None else time.time())}")
         backup.write_text(raw, encoding="utf-8")
+    attention_ready = attention_hook.install(settings, data_dir)
     hooks = settings.setdefault("hooks", {})
     entries = hooks.setdefault("SessionStart", [])
     # o Claude Code roda o comando pelo shell: sem aspas, "Application Support" quebra o caminho
@@ -206,4 +208,4 @@ def install_hook(claude_root, data_dir, now: Optional[float] = None) -> Dict[str
     tmp.write_text(json.dumps(settings, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     os.replace(tmp, settings_path)
     return {"script": command, "settings": str(settings_path), "backup": str(backup) if backup else None,
-            "already_installed": present}
+            "already_installed": present and attention_ready}

@@ -69,7 +69,7 @@ export function mountView() {
       app.view = new AgentsView(root, { navigate });
       break;
     case "agente":
-      app.view = new AgentSessionView(root, { navigate, id: app.route.id });
+      app.view = new AgentSessionView(root, { navigate, id: app.route.id, tab: app.route.tab, target: app.route.path ? { path: app.route.path, line: app.route.line, seq: app.route.seq } : null });
       break;
     case "agentes-historico":
       app.view = new AgentsHistoryView(root, { navigate });

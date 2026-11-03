@@ -17,13 +17,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
-from vulcan_terminal.core.agents import history
+from vulcan_terminal.core.agents import edits as edit_log, history
 from vulcan_terminal.core.agents.model import AgentSession, CommandRun, FileTouch, SessionEvent, epoch, local_day
 from vulcan_terminal.core.agents.reading import read_session
 
 # 2: tabela de busca do histórico (FTS5); 3: resumo leve, sem as listas de arquivos e comandos;
 # 4: uso por turno (agent_usage), que exige reler todos os arquivos
-SCHEMA_VERSION = 5
+# 6: estado do turno no resumo, que também só sai relendo; 7: registro das edições (session_edits)
+SCHEMA_VERSION = 7
 ACTIVE_SECONDS = 90
 # o último evento gravado também precisa ser recente: copiar ou restaurar a pasta (backup, Mac novo, clone)
 # deixa a data do arquivo nova, mas não muda a data dos eventos; 10 min cobre uma ferramenta longa
@@ -52,8 +53,8 @@ CREATE TABLE IF NOT EXISTS agent_usage (
 CREATE INDEX IF NOT EXISTS agent_usage_at ON agent_usage(at);
 CREATE TABLE IF NOT EXISTS parse_errors (file_path TEXT, byte_offset INTEGER, reason TEXT, at REAL);
 CREATE INDEX IF NOT EXISTS parse_errors_file ON parse_errors(file_path);
-"""
-TABLES = ("sessions", "session_files", "session_commands", "events", "parse_errors", "agent_usage")
+""" + edit_log.SCHEMA
+TABLES = ("sessions", "session_files", "session_commands", "events", "parse_errors", "agent_usage", "session_edits")
 USAGE_FIELDS = ("input", "output", "cache_read", "cache_write_5m", "cache_write_1h", "reasoning")
 FILE_NAME = "agentes.db"
 
@@ -128,7 +129,7 @@ class AgentIndex:
         self.db = self._open()
         self.fts = history.ensure(self.db)
         version = int(self.db.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0])
-        if version < 5:
+        if version < SCHEMA_VERSION:
             # o uso por turno (4) e a origem da sessão (5) só saem relendo os arquivos; a varredura
             # seguinte refaz tudo. Também cobre o índice anterior ao resumo leve (esquema 2)
             self.rebuild()
@@ -233,6 +234,7 @@ class AgentIndex:
                     self._forget(s.id)  # este arquivo foi lido do zero: os eventos do caminho antigo saem
                 self._write(s, path, mtime, size, res.offset, _join_state(res.state, identity), res.events,
                             res.errors, res.usage)
+                edit_log.store(self.db, s.id, res.edits)
             return s.id
 
     def note_error(self, message: str) -> None:
@@ -272,7 +274,7 @@ class AgentIndex:
     def _forget(self, session_id: str) -> None:
         for table, column in (("sessions", "id"), ("session_files", "session_id"),
                               ("session_commands", "session_id"), ("events", "session_id"),
-                              ("agent_usage", "session_id")):
+                              ("agent_usage", "session_id"), ("session_edits", "session_id")):
             self.db.execute(f"DELETE FROM {table} WHERE {column} = ?", (session_id,))
 
     def rebuild(self) -> None:

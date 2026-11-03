@@ -12,7 +12,7 @@ from vulcan_terminal.core.store import write_text_atomic
 
 INDEX_FILENAME = "TAREFAS.md"
 GLOBAL_LABEL = "Global"
-HEADER_NOTE = ("> Índice gerado automaticamente pelo Vulcan Terminal. "
+HEADER_NOTE = ("> Índice gerado automaticamente pelo Vulcan Celox. "
                "Alterações feitas à mão neste arquivo serão sobrescritas.")
 SECTIONS = (("todo", "A fazer"), ("doing", "Em andamento"), ("done", "Concluídas"))
 TABLE_HEAD = ("| Prioridade | Título | Tags | Prazo | Concluída em |\n"
@@ -118,7 +118,7 @@ class ProjectPathMissing(Exception):
 def render_project_block(site: Optional[str], tasks: Iterable[Task], tags: Dict[str, Tag]) -> str:
     group = [t for t in tasks if t.site == site]
     lines = [BLOCK_START, f"## Tarefas ({site_label(site)})", "",
-             "> Bloco mantido pelo Vulcan Terminal. O texto fora dos marcadores é preservado.", "",
+             "> Bloco mantido pelo Vulcan Celox. O texto fora dos marcadores é preservado.", "",
              _progress_line("Progresso", group), ""]
     lines += render_site_sections(group, tags)
     return "\n".join(lines).rstrip("\n") + "\n" + BLOCK_END

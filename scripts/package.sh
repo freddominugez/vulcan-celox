@@ -18,22 +18,22 @@ rm -f "$OUT/SHA256SUMS"
 # ── macOS ─────────────────────────────────────────────────────────────────
 step "macOS: app universal (arm64 + x86_64)"
 VULCAN_UNIVERSAL=1 bash scripts/build_app.sh
-APP="dist/Vulcan Terminal.app"
+APP="dist/Vulcan Celox.app"
 lipo -archs "$APP/Contents/MacOS/vulcan-terminal"
 codesign --force --deep --sign - "$APP"
 codesign --verify --deep --strict "$APP"
 
-MAC_BASE="Vulcan-Terminal-$VERSION-macos"
+MAC_BASE="Vulcan-Celox-$VERSION-macos"
 step "macOS: $MAC_BASE.zip"
 ditto -c -k --sequesterRsrc --keepParent "$APP" "$OUT/macos/$MAC_BASE.zip"
 
 step "macOS: $MAC_BASE.dmg"
 DMG_DIR="$WORK/dmg"
 mkdir -p "$DMG_DIR"
-ditto "$APP" "$DMG_DIR/Vulcan Terminal.app"
+ditto "$APP" "$DMG_DIR/Vulcan Celox.app"
 ln -s /Applications "$DMG_DIR/Aplicativos"
 cp packaging/LEIA-ME.md "$DMG_DIR/LEIA-ME.md"
-hdiutil create -quiet -volname "Vulcan Terminal $VERSION" -srcfolder "$DMG_DIR" -ov -format UDZO "$OUT/macos/$MAC_BASE.dmg"
+hdiutil create -quiet -volname "Vulcan Celox $VERSION" -srcfolder "$DMG_DIR" -ov -format UDZO "$OUT/macos/$MAC_BASE.dmg"
 hdiutil verify -quiet "$OUT/macos/$MAC_BASE.dmg"
 
 # ── Linux ─────────────────────────────────────────────────────────────────
@@ -44,13 +44,8 @@ mkdir -p "$STAGE/bin" "$STAGE/lib" "$STAGE/share/applications"
 cp packaging/linux/vulcan-terminal packaging/linux/vulcan-terminal-deps "$STAGE/bin/"
 rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' --exclude 'ui/' vulcan_terminal "$STAGE/lib/"
 cp packaging/linux/vulcan-terminal.desktop "$STAGE/share/applications/"
-for pair in 16:icon_16x16 32:icon_32x32 64:icon_32x32@2x 128:icon_128x128 256:icon_256x256 512:icon_512x512; do
-  size="${pair%%:*}"; src="${pair#*:}"
-  mkdir -p "$STAGE/share/icons/hicolor/${size}x${size}/apps"
-  cp "build/icon/$src.png" "$STAGE/share/icons/hicolor/${size}x${size}/apps/vulcan-terminal.png"
-done
-mkdir -p "$STAGE/share/icons/hicolor/48x48/apps"
-sips -z 48 48 "build/icon/icon_32x32@2x.png" --out "$STAGE/share/icons/hicolor/48x48/apps/vulcan-terminal.png" >/dev/null
+mkdir -p "$STAGE/share/icons"
+cp -R packaging/linux/icons/hicolor "$STAGE/share/icons/"
 cp packaging/linux/install.sh packaging/linux/uninstall.sh "$STAGE/"
 cp packaging/LEIA-ME.md "$STAGE/LEIA-ME.md"
 chmod +x "$STAGE/bin/vulcan-terminal" "$STAGE/bin/vulcan-terminal-deps" "$STAGE/install.sh" "$STAGE/uninstall.sh"

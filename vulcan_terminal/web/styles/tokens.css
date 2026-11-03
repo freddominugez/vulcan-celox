@@ -1,0 +1,275 @@
+/* Paleta Vulcan Celox e os tokens que a interface usa. Único lugar com cor solta; os outros CSS só usam var(). */
+
+@font-face {
+  font-family: "Inter";
+  src: url("../vendor/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --cx-navy: #0B172B;
+  --cx-ivory: #FAF6EE;
+  --cx-violet: #7C3AED;
+  --cx-lilac: #9B7AE8;
+  --cx-radius-control: 8px;
+  --cx-radius-card: 12px;
+  --cx-radius-modal: 16px;
+  --cx-fast: 120ms;
+  --cx-normal: 180ms;
+  --cx-ease: cubic-bezier(.2, 0, 0, 1);
+
+  /* Área do terminal e faixa da sessão ficam escuras nos dois temas: a cor de cada aba é pensada sobre fundo escuro */
+  --bg-term: #0A1120;
+  --on-dark: #F5F7FB;
+  --on-dark-2: rgba(245, 247, 251, 0.75);
+  --on-dark-tint: rgba(255, 255, 255, 0.08);
+  --on-dark-tint-2: rgba(255, 255, 255, 0.15);
+  --on-dark-line: rgba(255, 255, 255, 0.14);
+  --neutral-t: #A3AEC2;
+  --neutral-t-bg: #111C2F;
+  --neutral-t-ink: #B8C2D4;
+  --on-accent: #FFFFFF;
+  --on-accent-2: rgba(255, 255, 255, 0.8);
+  --on-accent-line: rgba(255, 255, 255, 0.3);
+  --agent-claude: #D97757;
+  --agent-codex: #3D3D45;
+  --node: #5FA04E;
+  --swatch-amarelo: #E7C55A;
+  --swatch-rosa: #E98AA9;
+  --swatch-verde: #6FCF8F;
+  --swatch-azul: #6FA8E8;
+  --swatch-laranja: #EB9C55;
+  --swatch-roxo: #A98BE8;
+  --us-claude: #D4704F;
+  --us-codex: #5B8DEF;
+}
+
+:root, :root[data-theme="claro"] {
+  color-scheme: light;
+  --cx-bg: #FAF6EE;
+  --cx-surface: #FFFFFF;
+  --cx-text: #0B172B;
+  --cx-muted: #566176;
+  --cx-line: #D7DCE5;
+  --cx-control: #798398;
+  --cx-primary: #7C3AED;
+  --cx-primary-hover: #6D28D9;
+  --cx-primary-active: #5B21B6;
+  --cx-focus: #7C3AED;
+  --cx-link: #7C3AED;
+  --cx-success: #137347;
+  --cx-warning: #8A4B08;
+  --cx-danger: #B42318;
+  --cx-info: #175CD3;
+  --cx-disabled-bg: #E8E4EE;
+
+  --bg: var(--cx-bg);
+  --bg-side: #F3EEE3;
+  --bg-raise: var(--cx-surface);
+  --bg-input: var(--cx-surface);
+  --bg-pop: var(--cx-surface);
+  --tab-active: var(--cx-surface);
+  --bg-dialog: var(--cx-surface);
+  --hover: rgba(11, 23, 43, 0.05);
+  --press: rgba(11, 23, 43, 0.09);
+  --hover-faint: rgba(11, 23, 43, 0.03);
+  --btn-hover: #F1EDE4;
+  --btn-press: #E8E3D8;
+  --btn-hover-line: #8E97A8;
+  --seg-on: #E8E3D8;
+  --bar: #E3E0D8;
+  --skeleton-a: #EFEAE0;
+  --skeleton-b: #E3DED2;
+  --line: var(--cx-line);
+  --line-soft: #E7E9EE;
+  --line-strong: var(--cx-control);
+  --fg: var(--cx-text);
+  --fg-2: #3D4859;
+  --fg-3: var(--cx-muted);
+  --link: var(--cx-link);
+  --scroll: #C4C8D0;
+  --scroll-hover: #A2A8B4;
+  --strike: rgba(11, 23, 43, 0.3);
+  --shade: rgba(11, 23, 43, 0.08);
+  --shade-2: rgba(11, 23, 43, 0.14);
+  --shadow-pop: 0 8px 16px rgba(11, 23, 43, 0.16);
+  --backdrop: rgba(11, 23, 43, 0.35);
+  --inset: rgba(255, 255, 255, 0.6);
+
+  --accent: var(--cx-primary);
+  --accent-strong: var(--cx-primary-active);
+  --accent-hover: var(--cx-primary-hover);
+  --accent-text: var(--cx-primary);
+  --accent-soft: rgba(124, 58, 237, 0.12);
+  --accent-line: var(--cx-focus);
+  --selection: rgba(124, 58, 237, 0.22);
+
+  --ok: var(--cx-success);
+  --warn: var(--cx-warning);
+  --err: var(--cx-danger);
+  --idle: #798398;
+  --ok-text: var(--cx-success);
+  --warn-text: var(--cx-warning);
+  --err-text: var(--cx-danger);
+  --ok-soft: rgba(19, 115, 71, 0.1);
+  --ok-line: rgba(19, 115, 71, 0.45);
+  --warn-soft: rgba(138, 75, 8, 0.1);
+  --warn-line: rgba(138, 75, 8, 0.45);
+  --err-soft: rgba(180, 35, 24, 0.09);
+  --err-soft-2: rgba(180, 35, 24, 0.16);
+  --err-line: rgba(180, 35, 24, 0.5);
+  --alert-bg: #FBEAE8;
+  --alert-fg: #8E1B13;
+  --alert-line: #E9B5B0;
+  --node-soft: rgba(95, 160, 78, 0.16);
+  --ok-on: #FFFFFF;
+  --danger-tone: #B42318;
+
+  --note-amarelo-bg: #FBF1CC; --note-amarelo-fg: #4A3B05; --note-amarelo-line: rgba(74, 59, 5, 0.2);
+  --note-rosa-bg: #FBDFE7; --note-rosa-fg: #5C1A30; --note-rosa-line: rgba(92, 26, 48, 0.2);
+  --note-verde-bg: #DDF3E2; --note-verde-fg: #123F24; --note-verde-line: rgba(18, 63, 36, 0.2);
+  --note-azul-bg: #DCEAFA; --note-azul-fg: #123355; --note-azul-line: rgba(18, 51, 85, 0.2);
+  --note-laranja-bg: #FBE6D0; --note-laranja-fg: #55300C; --note-laranja-line: rgba(85, 48, 12, 0.2);
+  --note-roxo-bg: #E9E1FA; --note-roxo-fg: #33205F; --note-roxo-line: rgba(51, 32, 95, 0.2);
+
+  --code-bg: var(--cx-surface);
+  --code-fg: var(--cx-text);
+  --code-keyword: #6D28D9;
+  --code-string: #137347;
+  --code-number: #8A4B08;
+  --code-comment: #566176;
+  --code-function: #175CD3;
+  --code-type: #8E1B6B;
+  --code-property: #0B5C6B;
+  --code-added: rgba(19, 115, 71, 0.14);
+  --code-removed: rgba(180, 35, 24, 0.12);
+}
+
+:root[data-theme="escuro"] {
+  color-scheme: dark;
+  --cx-bg: #070D18;
+  --cx-surface: #111C2F;
+  --cx-text: #F5F7FB;
+  --cx-muted: #B8C2D4;
+  --cx-line: #344159;
+  --cx-control: #8491A8;
+  --cx-focus: #B89AFF;
+  --cx-link: #B89AFF;
+  --cx-success: #73D9A5;
+  --cx-warning: #F6C76E;
+  --cx-danger: #FF9B92;
+  --cx-info: #93C5FD;
+  --cx-disabled-bg: #253047;
+
+  --bg: var(--cx-bg);
+  --bg-side: #0B1424;
+  --bg-raise: var(--cx-surface);
+  --bg-input: #18243A;
+  --bg-pop: #15213A;
+  --tab-active: var(--bg-term);
+  --bg-dialog: #15213A;
+  --hover: rgba(255, 255, 255, 0.06);
+  --press: rgba(255, 255, 255, 0.1);
+  --hover-faint: rgba(255, 255, 255, 0.03);
+  --btn-hover: #1E2B44;
+  --btn-press: #26344F;
+  --btn-hover-line: #5A6880;
+  --seg-on: #2A3853;
+  --bar: #26334A;
+  --skeleton-a: #15213A;
+  --skeleton-b: #1E2B44;
+  --line: #243149;
+  --line-soft: #1A2539;
+  --line-strong: var(--cx-control);
+  --fg: var(--cx-text);
+  --fg-2: var(--cx-muted);
+  --fg-3: #9AA6BC;
+  --link: var(--cx-link);
+  --scroll: #344159;
+  --scroll-hover: #4A5872;
+  --strike: rgba(255, 255, 255, 0.28);
+  --shade: rgba(0, 0, 0, 0.25);
+  --shade-2: rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --backdrop: rgba(3, 6, 12, 0.55);
+  --inset: rgba(255, 255, 255, 0.05);
+
+  --accent: var(--cx-primary);
+  --accent-strong: var(--cx-primary-active);
+  --accent-hover: var(--cx-primary-hover);
+  --accent-text: #B89AFF;
+  --accent-soft: rgba(184, 154, 255, 0.16);
+  --accent-line: var(--cx-focus);
+  --selection: rgba(184, 154, 255, 0.3);
+
+  --ok: var(--cx-success);
+  --warn: var(--cx-warning);
+  --err: var(--cx-danger);
+  --idle: #6E7B92;
+  --ok-text: var(--cx-success);
+  --warn-text: var(--cx-warning);
+  --err-text: var(--cx-danger);
+  --ok-soft: rgba(115, 217, 165, 0.12);
+  --ok-line: rgba(115, 217, 165, 0.4);
+  --warn-soft: rgba(246, 199, 110, 0.12);
+  --warn-line: rgba(246, 199, 110, 0.4);
+  --err-soft: rgba(255, 155, 146, 0.1);
+  --err-soft-2: rgba(255, 155, 146, 0.2);
+  --err-line: rgba(255, 155, 146, 0.5);
+  --alert-bg: #3A1D1B;
+  --alert-fg: #FFB4AE;
+  --alert-line: #5A2A26;
+  --node-soft: rgba(95, 160, 78, 0.18);
+  --ok-on: #0B2A19;
+  --danger-tone: #FF9B92;
+
+  --note-amarelo-bg: #34301F; --note-amarelo-fg: #F1E3B0; --note-amarelo-line: rgba(241, 227, 176, 0.18);
+  --note-rosa-bg: #3A2530; --note-rosa-fg: #F6C6D6; --note-rosa-line: rgba(246, 198, 214, 0.18);
+  --note-verde-bg: #1F3228; --note-verde-fg: #C1EBCD; --note-verde-line: rgba(193, 235, 205, 0.18);
+  --note-azul-bg: #1D2A3B; --note-azul-fg: #C0DAF6; --note-azul-line: rgba(192, 218, 246, 0.18);
+  --note-laranja-bg: #3A2A1D; --note-laranja-fg: #F6D0AA; --note-laranja-line: rgba(246, 208, 170, 0.18);
+  --note-roxo-bg: #2B2540; --note-roxo-fg: #DACBF7; --note-roxo-line: rgba(218, 203, 247, 0.18);
+
+  --code-bg: var(--bg-term);
+  --code-fg: var(--cx-text);
+  --code-keyword: #C9B2FF;
+  --code-string: #A5D6A7;
+  --code-number: #F6C76E;
+  --code-comment: #9AA6BC;
+  --code-function: #93C5FD;
+  --code-type: #FFD580;
+  --code-property: #9CDCFE;
+  --code-added: rgba(115, 217, 165, 0.16);
+  --code-removed: rgba(255, 155, 146, 0.16);
+}
+
+/* A área do terminal é escura nos dois temas: o que aparece dentro dela (estado vazio, memória, botões) usa os valores escuros. */
+.ws-body {
+  color-scheme: dark;
+  background: var(--bg-term);
+  color: var(--on-dark);
+  --bg-raise: #111C2F;
+  --bg-input: #18243A;
+  --bg-pop: #15213A;
+  --hover: rgba(255, 255, 255, 0.06);
+  --press: rgba(255, 255, 255, 0.1);
+  --btn-hover: #1E2B44;
+  --btn-press: #26344F;
+  --btn-hover-line: #5A6880;
+  --line: #243149;
+  --line-soft: #1A2539;
+  --line-strong: #8491A8;
+  --fg: #F5F7FB;
+  --fg-2: #B8C2D4;
+  --fg-3: #9AA6BC;
+  --accent-text: #B89AFF;
+  --accent-soft: rgba(184, 154, 255, 0.16);
+  --accent-line: #B89AFF;
+  --link: #B89AFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

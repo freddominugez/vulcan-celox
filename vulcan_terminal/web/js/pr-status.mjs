@@ -1,0 +1,57 @@
+// Estado do PR: pelo gh, se o usuário ligou, ou a estimativa pelos comandos da sessão, sempre dizendo qual é a fonte.
+
+import { get, patch, post } from "./api.mjs";
+import { esc, reportError } from "./dom.mjs";
+
+let enabled = false;
+
+export function prEnabled() {
+  return enabled;
+}
+
+export async function setPrEnabled(value) {
+  const prefs = await patch("/api/preferences", { pr_status: value });
+  enabled = prefs.pr_status === true;
+  return enabled;
+}
+
+export function startPrStatus() {
+  patch("/api/preferences", {}).then((prefs) => { enabled = prefs.pr_status === true; }).catch(() => {});
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest && event.target.closest("[data-pr-url]");
+    if (!link) return;
+    event.preventDefault();
+    post("/api/open", { kind: "url", target: link.dataset.prUrl }).catch(reportError);  // a janela segue presa à origem
+  });
+}
+
+export function loadPr(query) {
+  if (!enabled) return Promise.resolve({ source: "heuristic", reason: "off" });
+  return get(`/api/agents/pr?${new URLSearchParams(query)}`).catch(() => ({ source: "heuristic", reason: "failed" }));
+}
+
+const STATES = { OPEN: "aberto", MERGED: "integrado", CLOSED: "fechado" };
+const WHY = {
+  off: "Estimado pelos comandos da sessão.", no_gh: "Estimado pelos comandos: o gh não está instalado.",
+  no_login: "Estimado pelos comandos: faça gh auth login.", failed: "Estimado pelos comandos: o gh falhou.",
+  timeout: "Estimado pelos comandos: o gh não respondeu a tempo.", invalid: "Estimado pelos comandos: resposta do gh não reconhecida.",
+  unknown_folder: "Estimado pelos comandos.",
+};
+
+/** Texto puro do estado, para qualquer tela. */
+export function prText(data) {
+  if (data.source !== "gh") return WHY[data.reason] || WHY.off;
+  if (!data.number) return "Sem PR nesta branch, segundo o GitHub.";
+  const parts = [`PR #${data.number}`, data.draft ? "rascunho" : STATES[data.state] || data.state.toLowerCase()];
+  const c = data.checks;
+  if (c && c.total) parts.push(c.failed ? `${c.failed} de ${c.total} checagens falharam` : c.pending ? `${c.pending} de ${c.total} checagens rodando` : `${c.total} checagens ok`);
+  return `${parts.join(" · ")} (GitHub)`;
+}
+
+export function prHtml(data) {
+  const tone = data.source === "gh" && data.checks && data.checks.failed ? "is-err" : "";
+  const text = esc(prText(data));
+  return data.source === "gh" && data.url
+    ? `<a class="pr-line ${tone}" href="${esc(data.url)}" data-pr-url="${esc(data.url)}">${text}</a>`
+    : `<span class="pr-line dim hint ${tone}">${text}</span>`;
+}

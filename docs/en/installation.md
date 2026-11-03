@@ -4,13 +4,13 @@
 
 Requirements: macOS 13 or newer, Apple Silicon or Intel, Python 3.9 or newer.
 
-1. Download `Vulcan-Terminal-<version>-macos.dmg` from [Releases](https://github.com/freddominugez/vulcan-hub-painel/releases).
+1. Download `Vulcan-Celox-<version>-macos.dmg` from [Releases](https://github.com/freddominugez/vulcan-hub-painel/releases).
 2. Check it, with `SHA256SUMS` in the same folder: `shasum -a 256 -c SHA256SUMS`. A missing `.zip` will be reported if you downloaded only the `.dmg`; that is fine.
-3. Open the `.dmg` and drag **Vulcan Terminal** to Applications.
+3. Open the `.dmg` and drag **Vulcan Celox** to Applications.
 4. The app has no Apple certificate and is not notarized. The first time, right click it, choose **Open** and confirm. If macOS says the app is damaged:
 
    ```bash
-   xattr -dr com.apple.quarantine "/Applications/Vulcan Terminal.app"
+   xattr -dr com.apple.quarantine "/Applications/Vulcan Celox.app"
    ```
 
 If Python is missing, the app says so when it opens and offers **Instalar ferramentas da Apple** (`xcode-select --install`) or **Instalar com Homebrew**. Nothing is installed without your confirmation.

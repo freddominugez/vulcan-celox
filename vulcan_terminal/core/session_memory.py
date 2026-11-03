@@ -212,7 +212,7 @@ def render_session_md(record, tasks: List[Task], notes: List[Note], tags: Dict[s
     lines = [
         f"# Sessão: {record.title or record.id}",
         "",
-        "> Memória gerada pelo Vulcan Terminal. Tarefas, post-its e tags continuam editáveis no app; "
+        "> Memória gerada pelo Vulcan Celox. Tarefas, post-its e tags continuam editáveis no app; "
         "este arquivo é regravado quando eles mudam.",
         "",
         "| Campo | Valor |",
@@ -331,7 +331,7 @@ def render_general_index(records, tasks: List[Task], notes: List[Note], tags: Di
     lines = [
         "# Índice geral",
         "",
-        "> Gerado automaticamente pelo Vulcan Terminal. Reúne a memória de cada sessão de terminal "
+        "> Gerado automaticamente pelo Vulcan Celox. Reúne a memória de cada sessão de terminal "
         "(o que foi executado, tarefas, post-its e tags) e o índice de tarefas dos projetos.",
         "",
         f"- [Tarefas de todos os projetos]({INDEX_FILENAME})",

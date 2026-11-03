@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from vulcan_terminal.core.agents import rules
+from vulcan_terminal.core.agents.attention import AttentionTracker
 from vulcan_terminal.core.agents.builder import SessionBuilder
 from vulcan_terminal.core.agents.model import AgentSession, as_int, as_str
 
@@ -26,6 +27,7 @@ class ClaudeReader:
         state = state or {}
         self.b = SessionBuilder(session, state.get("builder"))
         self.session = session
+        self.att = AttentionTracker(session, state.get("attention"))
         self.cur_id: Optional[str] = state.get("cur_id")
         self.cur_usage: Dict = dict(state.get("cur_usage") or {})
         self.recent_ids = list(state.get("recent_ids") or [])
@@ -38,7 +40,7 @@ class ClaudeReader:
     def state(self) -> Dict:
         return {"builder": self.b.state(), "cur_id": self.cur_id, "cur_usage": self.cur_usage,
                 "recent_ids": self.recent_ids, "done_tokens": self.done_tokens, "pending_pub": self.pending_pub,
-                "cur_row": self.cur_row}
+                "cur_row": self.cur_row, "attention": self.att.state()}
 
     def drain_usage(self) -> list:
         out, self.usage_rows = self.usage_rows, []
@@ -50,6 +52,10 @@ class ClaudeReader:
             title = obj.get("aiTitle")
             if isinstance(title, str) and title.strip():
                 self.session.title = title.strip()
+            return
+        if kind == "system":
+            if obj.get("subtype") == "turn_duration" and not obj.get("isSidechain"):
+                self.att.turn_ended(as_str(obj.get("timestamp")))
             return
         if kind not in ("user", "assistant"):
             return  # api-request-blob e afins repetem mensagens: contar duplicaria tudo
@@ -72,14 +78,17 @@ class ClaudeReader:
             return
         content = message.get("content")
         if isinstance(content, list):
-            self._tool_results(content)
+            self._tool_results(content, at)
         if isinstance(content, str):
             text = content
         elif isinstance(content, list):
             text = "\n".join(as_str(b.get("text")) for b in content if isinstance(b, dict) and b.get("type") == "text")
         else:
             return
+        if text.lstrip().startswith("[Request interrupted"):
+            self.att.turn_ended(at)
         if text.strip() and not text.lstrip().startswith(NOT_A_PROMPT):
+            self.att.turn_started(at)
             self.b.user_turn(text, at)
 
     def _assistant(self, message: dict, at: str) -> None:
@@ -95,6 +104,8 @@ class ClaudeReader:
                 self.b.assistant_text(block.get("text"), at)
             elif block.get("type") == "tool_use":
                 tool_id = block.get("id")
+                if isinstance(tool_id, str):
+                    self.att.tool_started(tool_id, at)
                 for effect in rules.claude_tool_effects(as_str(block.get("name")), block.get("input")):
                     if effect[0] == "command" and isinstance(tool_id, str) and rules.publish_level(effect[1]):
                         self.b.command(effect[1], at, publish=False)
@@ -103,11 +114,15 @@ class ClaudeReader:
                             self.pending_pub.pop(next(iter(self.pending_pub)))
                     else:
                         self.b.apply(effect, at)
+        if message.get("stop_reason") == "end_turn":
+            self.att.turn_ended(at)
 
-    def _tool_results(self, content: list) -> None:
+    def _tool_results(self, content: list, at: str) -> None:
         for block in content:
             if not isinstance(block, dict) or block.get("type") != "tool_result":
                 continue
+            if isinstance(block.get("tool_use_id"), str):
+                self.att.tool_finished(block["tool_use_id"], at)
             pending = self.pending_pub.pop(block.get("tool_use_id"), None) if isinstance(block.get("tool_use_id"), str) else None
             if not pending:
                 continue

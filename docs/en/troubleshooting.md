@@ -4,7 +4,7 @@ First step for almost everything: `python3 -m vulcan_terminal --doctor`.
 
 | Symptom | Cause and fix |
 |---------|---------------|
-| macOS says the app is damaged | Quarantine on an unsigned app: `xattr -dr com.apple.quarantine "/Applications/Vulcan Terminal.app"` |
+| macOS says the app is damaged | Quarantine on an unsigned app: `xattr -dr com.apple.quarantine "/Applications/Vulcan Celox.app"` |
 | The app asks for Python | Accept the offer to install, or install Python 3.9+ yourself |
 | Opening in a browser asks for a token | The interface needs the token the native app creates. Open it through the app |
 | Lerd is stopped | **Ligar** on the Lerd screen or play at the top. The first start can take a minute. The bolt button starts it with the app |

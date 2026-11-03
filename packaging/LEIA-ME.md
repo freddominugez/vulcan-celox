@@ -1,19 +1,19 @@
-# Vulcan Terminal: instalação
+# Vulcan Celox: instalação
 
 Pacotes gerados por `bash scripts/package.sh` (no macOS). Confira a integridade com `shasum -a 256 -c SHA256SUMS` (macOS) ou `sha256sum -c SHA256SUMS` (Linux).
 
 | Pasta | Arquivo | Para |
 |-------|---------|------|
-| `macos/` | `Vulcan-Terminal-<versão>-macos.dmg` | instalar arrastando para Aplicativos |
-| `macos/` | `Vulcan-Terminal-<versão>-macos.zip` | o mesmo app, compactado |
+| `macos/` | `Vulcan-Celox-<versão>-macos.dmg` | instalar arrastando para Aplicativos |
+| `macos/` | `Vulcan-Celox-<versão>-macos.zip` | o mesmo app, compactado |
 | `linux/` | `vulcan-terminal_<versão>_all.deb` | Debian, Ubuntu, Mint e derivados |
 | `linux/` | `vulcan-terminal-<versão>-linux.tar.gz` | qualquer distribuição, sem sudo |
 
 ## macOS (13 ou mais novo, Apple Silicon ou Intel)
 
-1. Abra o `.dmg` e arraste **Vulcan Terminal** para **Aplicativos**.
-2. Requisito: Python 3.9 ou mais novo. Se faltar, o app avisa ao abrir e oferece **Instalar ferramentas da Apple** (`xcode-select --install`) ou **Instalar com Homebrew**; nada é instalado sem a sua confirmação. Para só verificar: `"/Applications/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal" --verificar-dependencias`.
-3. O app não é assinado com certificado da Apple. Na primeira vez: clique com o botão direito no app, **Abrir**, e confirme. Se o macOS disser que o app "está danificado", rode `xattr -dr com.apple.quarantine "/Applications/Vulcan Terminal.app"`.
+1. Abra o `.dmg` e arraste **Vulcan Celox** para **Aplicativos**.
+2. Requisito: Python 3.9 ou mais novo. Se faltar, o app avisa ao abrir e oferece **Instalar ferramentas da Apple** (`xcode-select --install`) ou **Instalar com Homebrew**; nada é instalado sem a sua confirmação. Para só verificar: `"/Applications/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --verificar-dependencias`.
+3. O app não é assinado com certificado da Apple. Na primeira vez: clique com o botão direito no app, **Abrir**, e confirme. Se o macOS disser que o app "está danificado", rode `xattr -dr com.apple.quarantine "/Applications/Vulcan Celox.app"`.
 
 Dados do usuário: `~/Library/Application Support/VulcanTerminal/`. Para remover, apague o app de Aplicativos (os dados ficam).
 

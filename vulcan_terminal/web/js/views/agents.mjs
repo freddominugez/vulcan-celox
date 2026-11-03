@@ -1,5 +1,6 @@
 // Agentes: sessões do Claude Code e do Codex com KPIs, filtros e trilha de publicação.
 
+import { sessionAttention } from "../attention-state.mjs";
 import { get } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
 import { agentPill, emptyAgents, keepScroll, relTime, RevisionWatch, track } from "../agents-ui.mjs";
@@ -95,7 +96,7 @@ export class AgentsView {
         <span class="ag-when">${s.pairing_id ? "pareada · " : ""}${esc(relTime(s.last_activity_at))}</span></span>
       <span class="ag-body">
         <span class="ag-meta">${agentPill(s.agent)}${s.branch ? `<span class="ag-pill mono">${icon(s.worktree ? "tree" : "branch")}${esc(s.branch)}</span>` : ""}
-          ${s.is_active ? `<span class="ag-pill is-ok">ativa</span>` : ""}${s.loop ? `<span class="ag-pill is-warn">${icon("alert")}possível loop</span>` : ""}</span>
+          ${s.is_active ? `<span class="ag-pill is-ok">ativa</span>` : ""}${sessionAttention(s.id) ? `<span class="ag-pill is-attention">${icon("info")}${esc(sessionAttention(s.id))}</span>` : ""}${s.loop ? `<span class="ag-pill is-warn">${icon("alert")}possível loop</span>` : ""}</span>
         <span class="ag-ask">${esc(ask)}</span>
         <span class="ag-stats">${s.files_edited} editados · ${s.files_read} lidos · ${s.commands} comandos${s.subagents ? ` · ${s.subagents} sub-agentes` : ""}</span>
         ${track(s)}

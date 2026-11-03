@@ -4,10 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Vulcan Terminal</title>
+<title>Vulcan Celox</title>
+<link rel="icon" type="image/png" sizes="48x48" href="img/brand/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="img/brand/icon-192.png">
+<script src="js/theme-boot.js"></script>
 <link rel="stylesheet" href="vendor/xterm.css">
+<link rel="stylesheet" href="styles/tokens.css">
 <link rel="stylesheet" href="styles/app.css">
 <link rel="stylesheet" href="styles/agents.css">
+<link rel="stylesheet" href="styles/code.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -70,7 +75,11 @@
 
 <div class="app" id="app">
   <aside class="sidebar" aria-label="Navegação">
-    <div class="sidebar-top" data-drag></div>
+    <div class="sidebar-top" data-drag>
+      <a class="side-brand" href="#/overview" aria-label="Vulcan Celox, ir para a Visão geral">
+        <img class="for-light" src="img/brand/celox-mark.png" alt=""><img class="for-dark" src="img/brand/celox-mark-reverse.png" alt="">
+      </a>
+    </div>
     <nav class="nav" id="nav"></nav>
     <div class="side-scroll">
       <section class="side-section side-sessions" id="side-sessions" aria-label="Sessões"></section>

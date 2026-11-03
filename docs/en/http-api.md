@@ -126,6 +126,16 @@ Project scope works only for the folder of a site, a saved Node project or an in
 
 | Method | Path | Purpose | Parameters or body | Notable status |
 |--------|------|---------|--------------------|----------------|
+| GET | `/api/agents/attention` | Sessions that finished their turn or may be waiting | | |
+| POST | `/api/agents/notice` | System notice on Linux, generic text only | `title`, `text` | |
+| GET | `/api/agents/pr` | PR state through the user's `gh`; runs nothing with `pr_status` off | query `session` or `path` | 404 |
+| GET | `/api/agents/sessions/<sid>/turns` | Session grouped by request | query `start`, `limit` | 400, 404 |
+| GET | `/api/code/file` | Read a file of the session, read only | query `session`, `path` | 400, 403, 404, 413, 415 |
+| GET | `/api/code/session/<sid>/tree` | Files the session touched | | 404 |
+| GET | `/api/code/session/<sid>/edits` | Edits of the session, paginated | query `start`, `limit`, `path` | 400, 404 |
+| GET | `/api/code/session/<sid>/diff` | Diff of a file, cut at 2 MB | query `path`, `scope` (`edit`, `turn`, `git`), `seq` | 400, 403, 404 |
+| POST | `/api/code/resolve` | Which paths printed in a tab exist in a known folder | `terminal`, `candidates` (up to 50) | 400, 404 |
+| GET | `/api/terminals/ports` | Ports opened by each tab's processes | | |
 | GET | `/api/terminals` | Open tabs | | |
 | POST | `/api/terminals` | Open a tab | `site`, `cwd`, `command`, `theme` (a name or `auto`), `agent` (`shell`, `claude` or `codex`), `title`, `rows`, `cols` (1 to 1000; default 24 by 80) | 201, 400, 404 |
 | PATCH | `/api/terminals/<tid>` | Rename the tab | `title` (up to 60 characters) | 404 |

@@ -4,7 +4,7 @@ Primeiro passo para quase tudo: `python3 -m vulcan_terminal --doctor`. Mais perg
 
 | Sintoma | Causa e solução |
 |---------|-----------------|
-| O macOS diz que o app está danificado | Quarentena em app não assinado: `xattr -dr com.apple.quarantine "/Applications/Vulcan Terminal.app"` |
+| O macOS diz que o app está danificado | Quarentena em app não assinado: `xattr -dr com.apple.quarantine "/Applications/Vulcan Celox.app"` |
 | O app pede Python | Aceite a oferta de instalar, ou instale o Python 3.9+ |
 | Abrir no navegador pede token | A interface precisa do token criado pelo app nativo. Abra pelo app |
 | Lerd parado | **Ligar** na tela Lerd ou o play no alto. A primeira vez pode levar um minuto. O botão de raio liga junto com o app |

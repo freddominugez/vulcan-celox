@@ -1,4 +1,4 @@
-"""Casca do Vulcan Terminal no Linux: sobe o servidor no próprio processo e abre a interface.
+"""Casca do Vulcan Celox no Linux: sobe o servidor no próprio processo e abre a interface.
 
 Ordem: janela GTK 3 com WebKit2GTK (PyGObject), janela de app do Chromium/Chrome/Brave/Edge ou o navegador
 padrão (xdg-open). Uso: vulcan-terminal [--check] [--mode gtk|app|browser]
@@ -89,7 +89,7 @@ def write_launcher(data_dir, port: int, token: str, route: str = "#/overview"):
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / LAUNCHER_NAME
     target = f"http://127.0.0.1:{port}/#token={token}&route={route.lstrip('#')}"
-    html = ("<!doctype html><meta charset=\"utf-8\"><title>Vulcan Terminal</title>"
+    html = ("<!doctype html><meta charset=\"utf-8\"><title>Vulcan Celox</title>"
             f"<script>location.replace({json.dumps(target)});</script>")
     fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as fh:
@@ -123,7 +123,7 @@ def check(app, token: str) -> int:
     except Exception as exc:  # noqa: BLE001
         print(f"check falhou: {exc}", file=sys.stderr)
         return 1
-    ok = "Vulcan Terminal" in page and "backend" in state
+    ok = "Vulcan Celox" in page and "backend" in state
     print(json.dumps({"ok": ok, "version": __version__, "backend": state["backend"]["label"],
                       "data_dir": state["app"]["data_dir"], "sites": len(state["sites"])}, ensure_ascii=False))
     return 0 if ok else 1

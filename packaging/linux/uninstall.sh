@@ -18,4 +18,4 @@ for dir in "$DEST" "$DEST.anterior"; do
   fi
 done
 command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$PREFIX/share/applications" 2>/dev/null || true
-echo "Vulcan Terminal removido. Seus dados continuam em ${XDG_DATA_HOME:-$HOME/.local/share}/vulcan-terminal"
+echo "Vulcan Celox removido. Seus dados continuam em ${XDG_DATA_HOME:-$HOME/.local/share}/vulcan-terminal"

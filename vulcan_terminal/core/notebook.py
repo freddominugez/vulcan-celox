@@ -423,7 +423,7 @@ class Notebook:
         """
         data = read_json_readonly(Path(path))
         if not isinstance(data, dict) or data.get("app") != "vulcan-terminal":
-            raise ValueError("arquivo não é um caderno exportado pelo Vulcan Terminal")
+            raise ValueError("arquivo não é um caderno exportado pelo Vulcan Celox")
         counts = {"tags": 0, "notes": 0, "tasks": 0}
         id_map: Dict[str, str] = {}
         for raw in data.get("tags") or []:

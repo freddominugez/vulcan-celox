@@ -1,4 +1,4 @@
-// Vulcan Terminal: casca nativa macOS (AppKit + WKWebView).
+// Vulcan Celox: casca nativa macOS (AppKit + WKWebView).
 // Inicia o servidor Python embutido, abre a interface web e cuida de janelas,
 // menus, item na barra de menu e do modo --snapshot usado como sensor visual.
 
@@ -40,7 +40,7 @@ func randomToken() -> String {
     return bytes.map { String(format: "%02x", $0) }.joined()
 }
 
-let bgColor = NSColor(srgbRed: 0x14 / 255.0, green: 0x14 / 255.0, blue: 0x16 / 255.0, alpha: 1)
+let bgColor = NSColor.windowBackgroundColor  // acompanha o sistema até a página pintar o tema
 
 // MARK: - Servidor Python
 
@@ -205,7 +205,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         controller.addUserScript(WKUserScript(source: bootstrap, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         config.userContentController = controller
         let inspect = ProcessInfo.processInfo.environment["VULCAN_INSPECT"] == "1"  // inspetor só para desenvolvimento
-        config.preferences.setValue(inspect, forKey: "developerExtrasEnabled")
+        configureWebPreferences(config.preferences, inspect: inspect)
         webView = AppWebView(frame: NSRect(origin: .zero, size: size), configuration: config)
         webView.setValue(false, forKey: "drawsBackground")
         if #available(macOS 13.3, *) { webView.isInspectable = inspect }
@@ -216,7 +216,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         window.title = title
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
-        window.appearance = NSAppearance(named: .darkAqua)
+        window.appearance = nil  // segue o sistema: prefers-color-scheme do WebView depende disto
         window.backgroundColor = bgColor
         window.minSize = NSSize(width: 760, height: 480)
         window.isReleasedWhenClosed = false
@@ -294,7 +294,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
                 NSPasteboard.general.setString(text, forType: .string)
             }
         default:
-            break
+            SystemNotice.handle(type, body, webView)
         }
     }
 
@@ -372,7 +372,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             _ = try server.start()
         } catch {
             let alert = NSAlert()
-            alert.messageText = "Não foi possível iniciar o Vulcan Terminal"
+            alert.messageText = "Não foi possível iniciar o Vulcan Celox"
             alert.informativeText = error.localizedDescription
             if options.snapshotPath == nil { alert.runModal() }
             fputs("erro: \(error.localizedDescription)\n", stderr)
@@ -408,7 +408,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             return
         }
         let controller = WebWindowController(app: self, route: options.route, size: NSSize(width: 1320, height: 840),
-                                             kind: "main", title: "Vulcan Terminal")
+                                             kind: "main", title: "Vulcan Celox")
         controller.window.setFrameAutosaveName("VulcanTerminalMain")
         if controller.window.frame.origin == .zero { controller.window.center() }
         controller.window.makeKeyAndOrderFront(nil)
@@ -448,11 +448,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let appItem = NSMenuItem()
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: "Sobre o Vulcan Terminal", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        appMenu.addItem(withTitle: "Sobre o Vulcan Celox", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Ocultar Vulcan Terminal", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
+        appMenu.addItem(withTitle: "Ocultar Vulcan Celox", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: "Sair do Vulcan Terminal", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: "Sair do Vulcan Celox", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         appItem.submenu = appMenu
         menubar.addItem(appItem)
 
@@ -513,7 +513,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // Menu Ajuda do macOS; ⌘? abre a Ajuda na seção da tela atual
         let helpItem = NSMenuItem()
         let helpMenu = NSMenu(title: "Ajuda")
-        helpMenu.addItem(item("Ajuda do Vulcan Terminal", #selector(goHelp), "?"))
+        helpMenu.addItem(item("Ajuda do Vulcan Celox", #selector(goHelp), "?"))
         helpMenu.addItem(item("Início e guia", #selector(goHome), ""))
         helpItem.submenu = helpMenu
         menubar.addItem(helpItem)
@@ -532,10 +532,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func buildStatusItem() {
         let status = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = status.button {
-            button.image = NSImage(systemSymbolName: "terminal", accessibilityDescription: "Vulcan Terminal")
+            button.image = NSImage(systemSymbolName: "terminal", accessibilityDescription: "Vulcan Celox")
         }
         let menu = NSMenu()
-        menu.addItem(item("Abrir Vulcan Terminal", #selector(showMain), ""))
+        menu.addItem(item("Abrir Vulcan Celox", #selector(showMain), ""))
         menu.addItem(item("Novo terminal", #selector(newTerminal), ""))
         menu.addItem(.separator())
         menu.addItem(item("Abrir painel do Lerd", #selector(openDashboard), ""))
@@ -587,7 +587,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: snapshot (sensor visual)
     func runSnapshot() {
         let controller = WebWindowController(app: self, route: options.route, size: options.size,
-                                             kind: "main", title: "Vulcan Terminal")
+                                             kind: "main", title: "Vulcan Celox")
         controller.window.setFrameOrigin(NSPoint(x: -20000, y: -20000))  // fora da tela
         controller.window.orderFront(nil)
         main = controller
@@ -650,9 +650,9 @@ func offerPythonInstall() {
     NSApplication.shared.activate(ignoringOtherApps: true)
     let brew = ["/opt/homebrew/bin/brew", "/usr/local/bin/brew"].first { FileManager.default.isExecutableFile(atPath: $0) }
     let alert = NSAlert()
-    alert.messageText = "O Vulcan Terminal precisa do Python 3"
+    alert.messageText = "O Vulcan Celox precisa do Python 3"
     alert.informativeText = "Não encontramos um Python 3.9 ou mais novo neste Mac. Escolha como instalar; " +
-        "nada é instalado sem a sua confirmação. Quando terminar, abra o Vulcan Terminal de novo."
+        "nada é instalado sem a sua confirmação. Quando terminar, abra o Vulcan Celox de novo."
     alert.addButton(withTitle: "Instalar ferramentas da Apple")
     if brew != nil { alert.addButton(withTitle: "Instalar com Homebrew") }
     alert.addButton(withTitle: "Cancelar")
@@ -669,10 +669,10 @@ func offerPythonInstall() {
 /// `vulcan-terminal --verificar-dependencias`: diz qual Python será usado (0) ou o que falta (1).
 func checkDependenciesAndExit() -> Never {
     if let python = BackendServer.usablePython() {
-        print("Vulcan Terminal: dependências ok (Python: \(python))")
+        print("Vulcan Celox: dependências ok (Python: \(python))")
         exit(0)
     }
-    print("Vulcan Terminal: falta o Python 3.9 ou mais novo. Instale com `xcode-select --install` ou `brew install python`.")
+    print("Vulcan Celox: falta o Python 3.9 ou mais novo. Instale com `xcode-select --install` ou `brew install python`.")
     exit(1)
 }
 

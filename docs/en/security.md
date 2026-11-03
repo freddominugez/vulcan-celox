@@ -23,6 +23,17 @@ Who this protects: one developer on their own machine, whose terminals and agent
 - Never written, with one exception: `--instalar-hook`, run by the user, with a backup. The hook script always exits with 0, so it cannot break Claude Code.
 - Read as a stream, line by line. Lines above 5 MB are dropped and recorded.
 
+## Code viewer
+
+- `GET /api/code/*` only reads; there is no write route. A file must resolve, links included, inside the session folder. A session that ran in a folder containing the agents' data, such as the home folder, cannot be opened.
+- Refused: above 1 MB, binaries, `.env*`, `*.pem`, `*.key`, `id_rsa*`, `credentials*`, and anything under `.git`, `.ssh`, `.aws` or `.gnupg`. The diff applies the same rules, because it holds the content.
+- The repository being compared belongs to someone else, so nothing in it may run: the HEAD side comes from `git cat-file blob`, which skips `diff.external`, `textconv` and filters, and the current side is read directly.
+- The index stores where each edit is in the session file, never the content. File content reaches the page as editor text, never as HTML.
+
+## Optional GitHub lookup
+
+Off by default, and with it off no command runs. If you turn on "Estado do PR pelo GitHub" in ⌘K, the app runs your own `gh pr view` in the session folder, at most once a minute per folder, only while the screen is visible. That call goes to GitHub with your own `gh` login. The app never asks for or stores a GitHub token, and never opens, merges or comments on a PR.
+
 ## Executing things
 
 - Subprocesses are argv lists through `core/runner.py`.

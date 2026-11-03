@@ -30,7 +30,7 @@ function parseRoute(hash) {
     if (parts[1] === "branches") return { name: "agentes-branches" };
     // #/agentes/uso/AAAA-MM-DD fixa o fim do período (snapshot com fixtures datadas)
     if (parts[1] === "uso") return { name: "agentes-uso", until: /^\d{4}-\d{2}-\d{2}$/.test(parts[2] || "") ? parts[2] : null };
-    return parts[1] ? { name: "agente", id: parts[1] } : { name: "agentes" };
+    return parts[1] ? { name: "agente", id: parts[1], tab: parts[2] || null, path: parts[3] || null, line: Number(parts[4]) || null, seq: /^t\d+$/.test(parts[4] || "") ? Number(parts[4].slice(1)) : null } : { name: "agentes" };
   }
   if (NAV.some((n) => n.id === parts[0])) return { name: parts[0] };
   return { name: "overview" };
@@ -74,7 +74,7 @@ function viewTitle() {
   if (r.name === "node-projeto") return r.project;
   const nav = [...NAV, ...AGENT_NAV, ...HELP_NAV].find((n) => n.id === r.name);
   if (nav && nav.id === "ambiente" && app.state && app.state.backend.available) return app.state.backend.label;
-  return nav ? nav.label : "Vulcan Terminal";
+  return nav ? nav.label : "Vulcan Celox";
 }
 
 // ── estado ──────────────────────────────────────────────────────────────────
@@ -112,7 +112,7 @@ export async function refreshState() {
     $("#app").classList.remove("is-offline");
   } catch (err) {
     $("#app").classList.add("is-offline");
-    if (err.status === 401) toast("Sessão inválida: abra o app pelo Vulcan Terminal.", { kind: "error", timeout: 10000 });
+    if (err.status === 401) toast("Sessão inválida: abra o app pelo Vulcan Celox.", { kind: "error", timeout: 10000 });
   }
 }
 
@@ -140,7 +140,7 @@ export async function toggleAutostart() {
     const data = await patch("/api/preferences", { autostart_env: enabled });
     if (app.state) app.state.autostart = data.autostart;
     const label = app.state ? app.state.backend.label : "ambiente";
-    toast(enabled ? `O ${label} vai iniciar junto com o Vulcan Terminal.` : `O ${label} não inicia mais sozinho.`, { kind: "ok" });
+    toast(enabled ? `O ${label} vai iniciar junto com o Vulcan Celox.` : `O ${label} não inicia mais sozinho.`, { kind: "ok" });
     renderToolbar();
   } catch (err) {
     reportError(err);
@@ -155,7 +155,7 @@ async function checkBuild() {
     const build = await get("/api/app/build");
     if (!build.outdated) return;
     outdatedWarned = true;
-    toast("Uma versão nova do Vulcan Terminal foi instalada. Reabra o app para usar (os terminais abertos serão fechados).", {
+    toast("Uma versão nova do Vulcan Celox foi instalada. Reabra o app para usar (os terminais abertos serão fechados).", {
       timeout: 600000,
       action: isNative ? { label: "Reabrir agora", run: () => native({ type: "relaunch" }) } : null,
     });
@@ -189,7 +189,7 @@ function renderToolbar() {
       <button class="icon-btn" data-service="stop" title="Parar ambiente" aria-label="Parar ambiente" ${state.backend.available && !app.busyService ? "" : "disabled"}>${icon("stop")}</button>
       <button class="icon-btn" data-service="restart" title="Reiniciar ambiente" aria-label="Reiniciar ambiente" ${state.backend.available && !app.busyService ? "" : "disabled"}>${icon("restart")}</button>
       <button class="icon-btn ${auto.enabled ? "is-on" : ""}" data-action="autostart" aria-pressed="${Boolean(auto.enabled)}"
-        title="Iniciar o ${esc(state.backend.label)} junto com o Vulcan Terminal: ${auto.enabled ? "ligado" : "desligado"}"
+        title="Iniciar o ${esc(state.backend.label)} junto com o Vulcan Celox: ${auto.enabled ? "ligado" : "desligado"}"
         aria-label="Iniciar o ${esc(state.backend.label)} junto com o app" ${state.backend.available ? "" : "disabled"}>${icon("bolt")}</button>
     </div>`;
   reportDragRegions();
@@ -288,7 +288,7 @@ function boot() {
     return;
   }
   if (!token) {
-    $("#view").innerHTML = `<div class="page"><div class="empty-block"><h3>Abra pelo app Vulcan Terminal</h3>
+    $("#view").innerHTML = `<div class="page"><div class="empty-block"><h3>Abra pelo app Vulcan Celox</h3>
       <p>Esta interface precisa do token de sessão que o app nativo fornece.</p></div></div>`;
     return;
   }

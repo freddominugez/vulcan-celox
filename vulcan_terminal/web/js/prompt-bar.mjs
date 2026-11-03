@@ -61,17 +61,19 @@ export class PromptBar {
 
   render() {
     const d = this.data;
-    if (!d.prompts.length) {
+    const s = d.session;
+    const paired = s && s.pairing_id && s.pairing_id === this.terminal;
+    if (!d.prompts.length && !paired) {
       this.el.hidden = true;
       return;
     }
-    const s = d.session;
     const who = s ? `${s.pairing_id === this.terminal ? "pareada · " : ""}${esc(s.project || "sem projeto")}${s.branch ? ` · ${esc(s.branch)}` : ""} · ${esc(AGENT_NAMES[s.agent] || s.agent)}` : "sem sessão de agente";
     this.el.hidden = false;
     this.el.innerHTML = `<span class="pb-label" title="Variáveis preenchidas com esta sessão de agente">${icon("text")}<span>${who}</span></span>
       ${d.prompts.map((p) => `<button type="button" class="pb-chip ${p.missing.length ? "is-missing" : ""}" data-prompt="${esc(p.id)}"
         title="${esc(this.canSend(p) ? `Colar no terminal (sem Enter): ${p.summary}` : `Copiar: ${p.summary}`)}">${icon(this.canSend(p) ? "terminal" : "copy")}<span>${esc(p.title)}</span></button>`).join("")}
-      <a class="pb-more" href="#/prompts">Todos…</a>`;
+      ${d.prompts.length ? `<a class="pb-more" href="#/prompts">Todos…</a>` : ""}
+      ${paired ? `<a class="pb-chip pb-code" href="#/agentes/${encodeURIComponent(s.id)}/codigo" title="Ver o código que esta sessão está mexendo">${icon("code")}<span>Código</span></a>` : ""}`;
   }
 
   /** Colar direto só quando a sessão é a pareada com esta aba e nenhuma variável falta. */

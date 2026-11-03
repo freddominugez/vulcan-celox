@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import shutil
+import sys
 import threading
 from collections import OrderedDict
 import time
@@ -10,8 +12,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 
-from vulcan_terminal.core import harness, prompts, themes
-from vulcan_terminal.core.agents import discovery, pairing, pricing, repos, usage
+from vulcan_terminal.core import harness, procinfo, prompts, themes
+from vulcan_terminal.core.agents import attention, attention_hook, discovery, pairing, pricing, repos, usage
 from vulcan_terminal.core.agents.history import KINDS
 from vulcan_terminal.core.textutil import headline
 from vulcan_terminal.core.agents.index import AgentIndex, index_path
@@ -41,7 +43,7 @@ def card(s: AgentSession) -> Dict[str, Any]:
         "files_edited": edited, "files_read": s.files_total() - edited, "commands": s.commands_total,
         "published": s.published, "pr_opened": s.pr_opened, "unpublished": is_unpublished(s),
         "tokens": s.tokens, "loop": s.loop_alert, "subagents": s.subagents,
-        "theme": s.theme, "pairing_id": s.pairing_id,
+        "theme": s.theme, "pairing_id": s.pairing_id, "attention": attention.resolve(s.attention, hook=s.attention_hook),
     }
 
 
@@ -163,6 +165,9 @@ class AgentsService:
             return self._pairs_cache[1]
 
     def decorate(self, sessions: List[AgentSession]) -> List[AgentSession]:
+        heard = attention_hook.read_records(attention_hook.attention_dir(self.app.data_dir))
+        for s in sessions:
+            s.attention_hook = heard.get(s.id)
         return pairing.apply(sessions, self.pairs())
 
     def paired_with(self, terminal_id: str) -> Optional[AgentSession]:
@@ -223,6 +228,13 @@ class AgentsService:
                 "context": self.context(session)}
 
 
+ATTENTION_LIMIT = 50
+
+
+def clean_line(value: Any) -> str:
+    return " ".join(str(value).split())[:160] if isinstance(value, str) else ""
+
+
 def register_agents_api(app) -> AgentsService:
     srv = app.server
     service = AgentsService(app)
@@ -231,6 +243,27 @@ def register_agents_api(app) -> AgentsService:
     def revision(_req: Request):
         return {"revision": service.index.revision(), "last_scan": service.watcher.last_scan,
                 "last_error": service.watcher.last_error}
+
+    @srv.route("GET", "/api/agents/attention")
+    def attention_items(_req: Request):
+        """Sessões que terminaram o turno ou podem estar esperando, para os sinais da interface."""
+        items = []
+        for s in service.decorate(service.index.sessions()):
+            state = attention.resolve(s.attention, hook=s.attention_hook)
+            if state and state["state"] != "running":
+                items.append({"session": s.id, "agent": s.agent, "project": s.project_name, "terminal_id": s.pairing_id,
+                              "state": state["state"], "since": state["since"], "source": state["source"]})
+        return {"items": items[:ATTENTION_LIMIT]}
+
+    @srv.route("POST", "/api/agents/notice")
+    def notice(req: Request):
+        """Aviso do sistema fora da casca do macOS. Texto limitado e passado depois de `--`: não vira opção do comando."""
+        body = req.json()
+        title, text = clean_line(body.get("title")), clean_line(body.get("text"))
+        if not title or sys.platform == "darwin" or not shutil.which("notify-send"):
+            return {"sent": False}
+        app.runner.run(["notify-send", "--", title, text], timeout=5)
+        return {"sent": True}
 
     @srv.route("GET", "/api/agents/sessions")
     def sessions(req: Request):
@@ -337,7 +370,8 @@ def register_agents_api(app) -> AgentsService:
     def paired(req: Request):
         terminal = req.arg("terminal") or ""
         s = service.paired_with(terminal) if terminal else None
-        return {"session": card(s) if s else None}
+        alive = bool(s) and procinfo.tab_runs_agent(service.app.terminals.get(terminal), s.agent)
+        return {"session": card(s) if s else None, "alive": alive}
 
     @srv.route("GET", "/api/agents/current")
     def current(_req: Request):

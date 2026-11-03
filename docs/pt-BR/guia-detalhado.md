@@ -8,7 +8,7 @@
 
 **Barra superior.** Onde você está, busca (⌘K) e o estado do ambiente (`Lerd · nginx ok · .test ok · PHP 8.5`) com Iniciar, Parar e Reiniciar.
 
-**Lerd junto com o app.** Ao abrir o Vulcan Terminal, se o Lerd estiver parado ele é iniciado em segundo plano (a barra mostra `iniciando…` e avisa quando terminar ou se falhar, com Tentar de novo). O botão de raio ao lado de Reiniciar, ou a busca ⌘K, liga e desliga esse comportamento; `VULCAN_AUTOSTART=0` desliga pelo ambiente.
+**Lerd junto com o app.** Ao abrir o Vulcan Celox, se o Lerd estiver parado ele é iniciado em segundo plano (a barra mostra `iniciando…` e avisa quando terminar ou se falhar, com Tentar de novo). O botão de raio ao lado de Reiniciar, ou a busca ⌘K, liga e desliga esse comportamento; `VULCAN_AUTOSTART=0` desliga pelo ambiente.
 
 **Site.** Cabeçalho com PHP, Node e HTTPS, link do site e pasta, e as ações Abrir site, Tinker (quando há `artisan`), Finder, Editor e **Novo terminal**. Logo abaixo fica a barra de sessões (uma aba por terminal) e, no cabeçalho, as abas **Terminal · Tarefas · Post-its · Tags**, que sempre agem sobre a sessão selecionada:
 - **Terminal:** a barra mostra só os terminais abertos; sessões encerradas abrem pelo Histórico com o aviso "Histórico · sessão". Ao abrir um terminal novo, a janela **Abrir terminal em** pergunta a pasta (sugere a do site, valida o que você digita, lista pastas recentes e tem **Escolher…** com o seletor do macOS); comandos rápidos como Tinker abrem direto na pasta do site. zsh real, com cores, vim e tinker. Várias abas (⌘1 a ⌘9 no navegador), duplo clique renomeia, **Dividir** mostra dois lado a lado, **Destacar** (⇧⌘D) abre a mesma sessão numa janela própria. Sem terminal aberto, há atalhos para `git status`, `composer install`, `php artisan about` e `npm run dev`. Os terminais continuam rodando quando você troca de tela.
@@ -42,6 +42,6 @@
 
 **Índice `TAREFAS.md`.** Sempre atualizado em `~/Library/Application Support/VulcanTerminal/TAREFAS.md`, e opcionalmente dentro da pasta de cada projeto (só entre os marcadores `<!-- vulcan:tarefas:inicio -->` e `<!-- vulcan:tarefas:fim -->`).
 
-**Para aparecer um projeto:** `cd pasta-do-projeto && lerd link`. **Diagnóstico sem janela:** `"~/Applications/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal" --snapshot /tmp/tela.png` ou `python3 -m vulcan_terminal --doctor` (inclui o bloco `agents`). **Índice dos agentes:** `--reindexar-agentes` reconstrói do zero; `--podar-agentes 180` apaga eventos de sessões paradas há mais de 180 dias, mantendo o resumo.
+**Para aparecer um projeto:** `cd pasta-do-projeto && lerd link`. **Diagnóstico sem janela:** `"~/Applications/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot /tmp/tela.png` ou `python3 -m vulcan_terminal --doctor` (inclui o bloco `agents`). **Índice dos agentes:** `--reindexar-agentes` reconstrói do zero; `--podar-agentes 180` apaga eventos de sessões paradas há mais de 180 dias, mantendo o resumo.
 
 **Segurança.** O servidor da interface escuta só em `127.0.0.1`, numa porta aleatória, e exige um token gerado a cada abertura do app; ele nunca aparece na linha de comando nem no ambiente dos terminais.

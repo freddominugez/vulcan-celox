@@ -1,0 +1,54 @@
+/* Aba Código da sessão de agente */
+.ag-page.is-code { max-width: none; height: 100%; overflow: hidden; }
+.ag-page.is-code .ag-facts, .ag-page.is-code .ag-harness, .ag-page.is-code .ag-actions, .ag-page.is-code .ag-alert { display: none; }
+.ag-page.is-code .ag-banner { padding: 10px 14px; gap: 4px; }
+.ag-page.is-code .ag-banner h2 { font-size: var(--fs-lg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ag-page.is-code > .code-slot { flex: 1 1 0; min-height: 320px; display: flex; }
+
+.code-shell { flex: 1; min-width: 0; display: grid; grid-template-columns: minmax(200px, 260px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--bg-raise); }
+.code-side { overflow: auto; border-right: 1px solid var(--line); padding: 6px 0; }
+.code-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+
+.code-tree { display: flex; flex-direction: column; }
+.code-dir, .code-file { display: flex; align-items: center; gap: 6px; min-height: 28px; padding: 3px 10px 3px calc(10px + var(--depth, 0) * 12px); font-size: var(--fs-sm); }
+.code-dir { color: var(--fg-3); }
+.code-dir span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.code-dir .i { width: 14px; height: 14px; flex: none; }
+.code-outside { margin-top: 8px; border-top: 1px solid var(--line); padding-top: 8px; }
+.code-file { width: 100%; border: 0; background: none; color: var(--fg-2); text-align: left; cursor: pointer; font-family: inherit; }
+.code-file:hover { background: var(--bg-input); }
+.code-file.is-on { background: var(--bg-input); color: var(--fg); box-shadow: inset 2px 0 0 var(--accent); }
+.code-file .i { width: 12px; height: 12px; }
+.code-file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.code-file .ag-kind { flex: none; }
+
+.code-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.code-bar:empty { display: none; }
+.code-path { min-width: 80px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.code-step { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-sm); white-space: nowrap; }
+.code-follow { display: flex; align-items: center; gap: 8px; padding: 5px 12px; border-bottom: 1px solid var(--line); color: var(--fg-3); font-size: var(--fs-sm); }
+.code-follow.is-off, .code-follow:empty { display: none; }
+.code-follow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+.code-notes:empty { display: none; }
+.code-notes { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 6px 12px; border-bottom: 1px solid var(--line); }
+.code-note { display: inline-flex; align-items: center; gap: 6px; margin: 0; color: var(--fg-3); font-size: var(--fs-sm); }
+.code-note .i { width: 14px; height: 14px; flex: none; }
+
+.code-body { flex: 1; min-height: 0; overflow: auto; background: var(--code-bg); color: var(--code-fg); }
+.code-body .cm-editor { height: 100%; background: transparent; color: inherit; font-size: 12.5px; }
+.code-body .cm-mergeView { height: 100%; }
+.code-body .cm-scroller { font-family: var(--mono); }
+.code-body .cm-gutters { background: var(--code-bg); color: var(--fg-3); border-right: 1px solid var(--line-soft); }
+.code-body .cm-content { caret-color: var(--fg); }
+.code-body .cm-selectionBackground, .code-body .cm-focused .cm-selectionBackground { background: var(--accent-soft) !important; }
+.code-body .cm-changedLine, .code-body .cm-insertedLine { background: var(--code-added); }
+.code-body .cm-deletedChunk, .code-body .cm-deletedLine { background: var(--code-removed); }
+.code-body .cm-merge-a .cm-changedLine { background: var(--code-removed); }
+.code-body .cm-merge-b .cm-changedLine { background: var(--code-added); }
+.code-body .cm-collapsedLines { background: var(--bg-raise); color: var(--fg-3); }
+.code-body .cm-panels { background: var(--bg-raise); color: var(--fg); border-color: var(--line); }
+.code-body .cm-panel input { background: var(--bg-input); color: var(--fg); border: 1px solid var(--line-strong); border-radius: 4px; }
+.code-body .cm-panel button { background: var(--bg-input); color: var(--fg); border: 1px solid var(--line-strong); border-radius: 4px; background-image: none; }
+.code-empty { max-width: 460px; padding: 32px 24px; }
+.code-empty h3 { margin: 0 0 6px; font-size: var(--fs-lg); }
+.code-empty p { margin: 0 0 14px; color: var(--fg-2); }

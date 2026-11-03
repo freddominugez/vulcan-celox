@@ -19,7 +19,7 @@ Do código-fonte, com `python3 -m vulcan_terminal <opção>`.
 Casca nativa, como sensor:
 
 ```bash
-"dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/overview"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/overview"
 ```
 
 Lançador do Linux: `vulcan-terminal --check`, `vulcan-terminal --instalar-dependencias`.

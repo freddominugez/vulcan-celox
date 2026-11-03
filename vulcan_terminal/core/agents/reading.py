@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 
 from vulcan_terminal.core.agents import claude_reader
 from vulcan_terminal.core.agents.discovery import zstd_bin
+from vulcan_terminal.core.agents.edits import EditTracker
 from vulcan_terminal.core.agents.jsonl_stream import MAX_LINE, LineStream, ZstdLineStream
 from vulcan_terminal.core.agents.model import AgentSession, SessionEvent
 
@@ -33,6 +34,7 @@ class ReadResult:
     errors: List[Tuple[int, str]] = field(default_factory=list)
     reset: bool = False
     usage: List[Dict] = field(default_factory=list)
+    edits: List[Dict] = field(default_factory=list)
 
 
 def read_session(agent: str, path, session: Optional[AgentSession] = None, state: Optional[Dict] = None,
@@ -50,10 +52,13 @@ def read_session(agent: str, path, session: Optional[AgentSession] = None, state
         session, state, offset = new_session(path), None, 0
     reader = reader_cls(session, state)
     stream = ZstdLineStream(path, zstd_bin(), max_line) if compressed else LineStream(path, offset, max_line)
+    tracker = EditTracker(agent, (state or {}).get("edits"))
+    stream.on_oversized = lambda start, raw: tracker.feed_oversized(start, raw, session.turns)
     feed_errors: List[Tuple[int, str]] = []
     for start, obj in stream:
         try:
             reader.feed(obj)
+            tracker.feed(start, obj, session.turns)
         except Exception as exc:  # noqa: BLE001  uma linha estranha não pode travar a sessão inteira
             feed_errors.append((start, f"linha ignorada: {type(exc).__name__}: {exc}"))
     if stream.reset and not reset:
@@ -63,6 +68,6 @@ def read_session(agent: str, path, session: Optional[AgentSession] = None, state
         return result
     errors = stream.errors + feed_errors
     session.parse_errors += len(errors)
-    return ReadResult(session=session, state=reader.state(), offset=stream.offset, size=stream.size or size,
-                      events=reader.b.drain_events(), errors=errors, reset=reset,
-                      usage=reader.drain_usage() if hasattr(reader, "drain_usage") else [])
+    return ReadResult(session=session, state={**reader.state(), "edits": tracker.state()}, offset=stream.offset,
+                      size=stream.size or size, events=reader.b.drain_events(), errors=errors, reset=reset,
+                      usage=reader.drain_usage() if hasattr(reader, "drain_usage") else [], edits=tracker.drain())

@@ -120,7 +120,9 @@ class HookTest(TempDirTestCase):
         self.assertEqual(json.loads(backup.read_text()), original)
         settings = json.loads((self.claude / "settings.json").read_text())
         self.assertEqual(settings["model"], "opus")
-        self.assertEqual(settings["hooks"]["Stop"], original["hooks"]["Stop"])
+        # o hook do usuário fica intacto e em primeiro; a única entrada a mais é a do hook de atenção
+        self.assertEqual(settings["hooks"]["Stop"][:-1], original["hooks"]["Stop"])
+        self.assertEqual(settings["hooks"]["Stop"][-1]["hooks"][0]["command"].count("vulcan-atencao.py"), 1)
         commands = [h["command"] for e in settings["hooks"]["SessionStart"] for h in e["hooks"]]
         self.assertEqual(commands, ["echo meu", info["script"]])
         pairing.install_hook(self.claude, self.data, now=1_800_000_100)

@@ -82,6 +82,10 @@ class VulcanApp:
         self.agents = register_agents_api(self)
         from vulcan_terminal.server.prompts_api import register_prompts_api
         self.prompts = register_prompts_api(self)
+        from vulcan_terminal.server.code_api import register_code_api
+        self.code = register_code_api(self)
+        from vulcan_terminal.server.pr_api import register_pr_api
+        register_pr_api(self)
         from vulcan_terminal.server.sites_api import register_sites_api
         register_sites_api(self)
         from vulcan_terminal.server.env_api import register_env_api
@@ -204,7 +208,25 @@ class VulcanApp:
                 self.autostart.set_enabled(body["autostart_env"])
             if "new_terminal" in body:
                 self.save_new_terminal_prefs(body["new_terminal"])
-            return {"autostart": self.autostart.state(), "new_terminal": self.new_terminal_prefs()}
+            prefs = self.store.load("preferences", {})
+            if "attention_notify" in body:
+                if not isinstance(body["attention_notify"], bool):
+                    raise HttpError(400, "attention_notify deve ser verdadeiro ou falso")
+                prefs["attention_notify"] = body["attention_notify"]
+                self.store.save("preferences", prefs)
+            if "theme" in body:
+                if body["theme"] not in ("sistema", "claro", "escuro"):
+                    raise HttpError(400, "theme deve ser sistema, claro ou escuro")
+                prefs["theme"] = body["theme"]
+                self.store.save("preferences", prefs)
+            if "pr_status" in body:
+                if not isinstance(body["pr_status"], bool):
+                    raise HttpError(400, "pr_status deve ser verdadeiro ou falso")
+                prefs["pr_status"] = body["pr_status"]
+                self.store.save("preferences", prefs)
+            return {"autostart": self.autostart.state(), "new_terminal": self.new_terminal_prefs(),
+                    "attention_notify": prefs.get("attention_notify", True), "pr_status": prefs.get("pr_status", False),
+                    "theme": prefs.get("theme", "sistema")}
 
         @srv.route("POST", "/api/open")
         def _open(req: Request):
@@ -246,14 +268,26 @@ class VulcanApp:
                 try:
                     path.relative_to(data_dir)
                 except ValueError:
-                    raise HttpError(400, "só arquivos da pasta de dados do Vulcan Terminal podem ser abertos") from None
+                    raise HttpError(400, "só arquivos da pasta de dados do Vulcan Celox podem ser abertos") from None
                 if not path.is_file():
                     raise HttpError(404, "arquivo não encontrado")
                 if path.suffix.lower() != ".md":
                     raise HttpError(400, "só arquivos .md da pasta de dados podem ser abertos assim")
                 argv = open_argv("file", str(path), self.env)
+            elif kind == "session_file":
+                # visor de código: mesma checagem da leitura, inclusive raiz da sessão e nome sensível
+                path = self.code.checked(self.code.session(str(body.get("session") or "")), target)
+                if not path.is_file():
+                    raise HttpError(404, "arquivo não encontrado")
+                argv = open_argv("editor", str(path), self.env)
+            elif kind == "terminal_file":
+                # caminho clicado no terminal: de novo a checagem do servidor, nunca o que a página afirma
+                found = self.code.resolve(str(body.get("terminal") or ""), [target]).get(target)
+                if not found or found["kind"] != "file" or found["sensitive"]:
+                    raise HttpError(403, "este arquivo não pode ser aberto")
+                argv = open_argv("editor", found["path"], self.env)
             else:
-                raise HttpError(400, "kind deve ser url, dashboard, finder, editor, file, prompt ou source")
+                raise HttpError(400, "kind deve ser url, dashboard, finder, editor, file, prompt, source, session_file ou terminal_file")
             result = self.runner.run(argv, timeout=15)
             if not result.ok:
                 raise HttpError(500, (result.output or "falha ao abrir").strip())

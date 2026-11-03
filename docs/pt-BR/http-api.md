@@ -126,6 +126,16 @@ O escopo de projeto vale só para a pasta de um site, de um projeto Node salvo o
 
 | Método | Caminho | Para quê | Parâmetros ou corpo | Status relevantes |
 |--------|---------|----------|---------------------|-------------------|
+| GET | `/api/agents/attention` | Sessões que terminaram o turno ou podem estar esperando | | |
+| POST | `/api/agents/notice` | Aviso do sistema no Linux, só com texto genérico | `title`, `text` | |
+| GET | `/api/agents/pr` | Estado do PR pelo `gh` do usuário; com `pr_status` desligado não roda nada | query `session` ou `path` | 404 |
+| GET | `/api/agents/sessions/<sid>/turns` | Sessão agrupada por pedido | query `start`, `limit` | 400, 404 |
+| GET | `/api/code/file` | Lê um arquivo da sessão, só leitura | query `session`, `path` | 400, 403, 404, 413, 415 |
+| GET | `/api/code/session/<sid>/tree` | Arquivos que a sessão tocou | | 404 |
+| GET | `/api/code/session/<sid>/edits` | Edições da sessão, paginadas | query `start`, `limit`, `path` | 400, 404 |
+| GET | `/api/code/session/<sid>/diff` | Diff de um arquivo, cortado em 2 MB | query `path`, `scope` (`edit`, `turn`, `git`), `seq` | 400, 403, 404 |
+| POST | `/api/code/resolve` | Quais caminhos impressos numa aba existem em pasta conhecida | `terminal`, `candidates` (até 50) | 400, 404 |
+| GET | `/api/terminals/ports` | Portas abertas pelos processos de cada aba | | |
 | GET | `/api/terminals` | Abas abertas | | |
 | POST | `/api/terminals` | Abrir uma aba | `site`, `cwd`, `command`, `theme` (um nome ou `auto`), `agent` (`shell`, `claude` ou `codex`), `title`, `rows`, `cols` (de 1 a 1000; padrão 24 por 80) | 201, 400, 404 |
 | PATCH | `/api/terminals/<tid>` | Renomear a aba | `title` (até 60 caracteres) | 404 |

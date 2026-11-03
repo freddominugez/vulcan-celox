@@ -7,7 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
-from typing import Iterator, List, Optional, Tuple, Union
+from typing import Callable, Iterator, List, Optional, Tuple, Union
 
 from vulcan_terminal.core.runner import close_pipe, open_pipe
 
@@ -32,6 +32,7 @@ class LineStream:
         self.reset = False
         self.missing = False
         self.size = 0
+        self.on_oversized: Optional[Callable[[int, bytes], None]] = None  # começo da linha descartada
 
     def __iter__(self) -> Iterator[Tuple[int, dict]]:
         try:
@@ -54,6 +55,8 @@ class LineStream:
                     if not self._skip_rest(fh):
                         return  # linha grande ainda sendo escrita
                     self.errors.append((start, f"linha acima de {self.max_line} bytes descartada"))
+                    if self.on_oversized:
+                        self.on_oversized(start, raw)
                     self.offset = fh.tell()
                     continue
                 self.offset = fh.tell()

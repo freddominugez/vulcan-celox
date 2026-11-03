@@ -1,6 +1,6 @@
 # Sessão: migrations
 
-> Memória gerada pelo Vulcan Terminal. Tarefas, post-its e tags continuam editáveis no app; este arquivo é regravado quando eles mudam.
+> Memória gerada pelo Vulcan Celox. Tarefas, post-its e tags continuam editáveis no app; este arquivo é regravado quando eles mudam.
 
 | Campo | Valor |
 |---|---|

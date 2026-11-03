@@ -1,5 +1,5 @@
 #!/bin/sh
-# Verifica e instala, com a permissão do usuário, as bibliotecas de que o Vulcan Terminal precisa no Linux.
+# Verifica e instala, com a permissão do usuário, as bibliotecas de que o Vulcan Celox precisa no Linux.
 #
 #   vulcan-terminal-deps              verifica, mostra o que falta e pergunta antes de instalar
 #   vulcan-terminal-deps --verificar  só verifica (0 = tudo ok, 1 = falta algo)
@@ -50,7 +50,7 @@ have secret-tool || add secret "secret-tool, para guardar a chave da Anthropic n
 have xdg-open || add xdg "xdg-open, para abrir sites, pastas e arquivos (recomendado)"
 
 if [ -z "$MISSING" ]; then
-  echo "Vulcan Terminal: todas as dependências estão instaladas."
+  echo "Vulcan Celox: todas as dependências estão instaladas."
   exit 0
 fi
 
@@ -88,7 +88,7 @@ case "$PM" in
   *) COMMAND="" ;;
 esac
 
-echo "Vulcan Terminal: faltam dependências:$LABELS"
+echo "Vulcan Celox: faltam dependências:$LABELS"
 if [ -z "$COMMAND" ]; then
   echo "Gerenciador de pacotes não reconhecido (suportados: apt, dnf, pacman). Instale os itens acima pelo seu sistema."
   [ "$MODE" = "check" ] && exit 1
@@ -117,13 +117,13 @@ if [ "$MODE" = "ask" ]; then
     read -r answer </dev/tty 2>/dev/null || answer=""
     case "$answer" in s|S|sim|SIM|y|Y|yes) ;; *) echo "Nada foi instalado."; exit 3 ;; esac
   elif [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] && have pkexec && { have zenity || have kdialog; }; then
-    question="O Vulcan Terminal precisa instalar:$LABELS
+    question="O Vulcan Celox precisa instalar:$LABELS
 
 Instalar agora? O sistema vai pedir a senha de administrador."
     if have zenity; then
-      zenity --question --title="Vulcan Terminal" --text="$question" --width=460 2>/dev/null || { echo "Nada foi instalado."; exit 3; }
+      zenity --question --title="Vulcan Celox" --text="$question" --width=460 2>/dev/null || { echo "Nada foi instalado."; exit 3; }
     else
-      kdialog --title "Vulcan Terminal" --yesno "$question" 2>/dev/null || { echo "Nada foi instalado."; exit 3; }
+      kdialog --title "Vulcan Celox" --yesno "$question" 2>/dev/null || { echo "Nada foi instalado."; exit 3; }
     fi
     pkexec sh -c "$COMMAND" || exit 4
     exec sh "$0" --verificar

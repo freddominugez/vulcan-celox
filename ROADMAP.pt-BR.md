@@ -13,15 +13,11 @@ Painel de agentes para Claude Code e Codex, busca no histórico, prompts, uso e 
 - **Release para Linux.** Testar numa área de trabalho Linux Mint real, corrigir o que falhar e publicar `.deb` e `.tar.gz`. Ajuda é bem-vinda.
 - **Terminar as conferências manuais no macOS:** pareamento com o Claude Code real, dividir, buscar e redimensionar.
 
-## Previsto para a 1.1
+## Entregue na 1.1.0 (macOS)
 
-- **Saber quando o agente precisa de você.** Anel na aba, contador na barra lateral e aviso do sistema quando uma sessão termina o turno ou pode estar esperando. Também lê as sequências padrão de terminal (OSC 9, 99 e 777), então funciona com qualquer programa. O hook opcional deixa exato o estado de permissão no Claude Code.
-- **Aba Código ao vivo, só leitura.** Os arquivos que a sessão tocou, o código com realce de sintaxe e o diff por edição, por turno e contra o git, seguindo o agente enquanto ele trabalha, mais um botão "Abrir no editor".
-- **⌘-clique em caminho no terminal.** Abre o arquivo na linha certa.
-- **Navegar entre turnos.** Atalhos saltam entre os seus pedidos, no terminal e na tela da sessão.
-- **Portas abertas e estado do PR.** Cada aba mostra as portas que abriu. O estado real do PR pelo seu próprio `gh` é opcional e vem desligado, porque usa a rede.
-- **Nome novo e identidade visual.** O Vulcan Terminal passa a se chamar Vulcan Celox, com temas claro e escuro, paleta nova, fonte Inter, ícones minimalistas, e logo e ícone do app novos. Os dados de quem já usa ficam onde estão.
-- **Landing do projeto.** Uma página que explica o que o app faz, as regras, como instalar e o que vem depois, em português e inglês.
+Nome novo Vulcan Celox com temas claro e escuro, aba Código (um visor: ela não edita arquivos), sinais de atenção, ⌘-clique em caminho, salto entre pedidos, portas por aba e estado do PR opcional. Detalhes no [registro de mudanças](CHANGELOG.pt-BR.md).
+
+Ainda espera: o conjunto de ícones da interface e a Release de Linux, depois do aceite no Mint.
 
 ## Depois, sem decisão
 

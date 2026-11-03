@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from vulcan_terminal.core import procinfo, prompts
-from vulcan_terminal.core.agents import discovery
 from vulcan_terminal.core.agents.model import AgentSession
 from vulcan_terminal.server.agents_api import card
+from vulcan_terminal.server.known_roots import known_root
 from vulcan_terminal.server.local_http import HttpError, Request
 
 SCOPES = ("global", "project")
@@ -86,34 +86,6 @@ class PromptsService:
             "project": {"root": root, "dir": str(project) if project else "", "exists": bool(project and project.is_dir())},
         }
 
-    def known_root(self, root: str) -> bool:
-        """Só pasta de site, de projeto Node salvo ou de sessão indexada, e nunca as pastas de dados
-        dos agentes (nem uma pasta que as contenha)."""
-        try:
-            real = Path(root).resolve()
-        except OSError:
-            return False
-        for data in [discovery.claude_root(), *discovery.codex_roots(), Path.home() / ".gemini", Path.home() / ".cursor"]:
-            try:
-                data = data.resolve()
-            except OSError:
-                continue
-            if real == data or real.is_relative_to(data) or data.is_relative_to(real):
-                return False
-        known = [s.path for s in self.app.sites() if s.path]
-        node = getattr(self.app, "node", None)
-        if node is not None:
-            known += list(node.saved().values())
-        for s in self.app.agents.index.sessions():
-            known += [s.project_root, s.cwd]
-        for path in known:
-            try:
-                if path and Path(path).resolve() == real:
-                    return True
-            except OSError:
-                continue
-        return False
-
     def target_dir(self, body: Dict) -> Path:
         scope = body.get("scope", "global")
         if scope not in SCOPES:
@@ -123,7 +95,7 @@ class PromptsService:
         root = body.get("project_root")
         if not isinstance(root, str) or not Path(root).is_dir():
             raise HttpError(400, "pasta do projeto não existe")
-        if not self.known_root(root):
+        if not known_root(self.app, root):
             raise HttpError(400, "a pasta não é de um site, projeto Node ou sessão de agente conhecida")
         folder = prompts.project_dir(root)
         if not folder.is_dir() and body.get("confirm_project_dir") is not True:

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Instala o Vulcan Terminal para o usuário atual, sem sudo (padrão ~/.local). PREFIX=/outro/lugar muda o destino.
+# Instala o Vulcan Celox para o usuário atual, sem sudo (padrão ~/.local). PREFIX=/outro/lugar muda o destino.
 #   sh install.sh                    instala e pergunta antes de instalar as bibliotecas que faltarem
 #   sh install.sh -y                 instala e autoriza a instalação das bibliotecas
 #   sh install.sh --sem-dependencias só copia o programa
@@ -34,7 +34,7 @@ cp -R "$HERE/share/icons/hicolor" "$PREFIX/share/icons/"
 command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$PREFIX/share/applications" 2>/dev/null || true
 command -v gtk-update-icon-cache >/dev/null 2>&1 && gtk-update-icon-cache -q -t "$PREFIX/share/icons/hicolor" 2>/dev/null || true
 
-echo "Vulcan Terminal instalado em $DEST"
+echo "Vulcan Celox instalado em $DEST"
 echo "Abra pelo menu de aplicativos ou rode: $PREFIX/bin/vulcan-terminal"
 case ":$PATH:" in *":$PREFIX/bin:"*) ;; *) echo "Dica: adicione $PREFIX/bin ao PATH." ;; esac
 

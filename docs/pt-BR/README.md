@@ -1,4 +1,4 @@
-# Documentação do Vulcan Terminal
+# Documentação do Vulcan Celox
 
 [English](../en/README.md)
 

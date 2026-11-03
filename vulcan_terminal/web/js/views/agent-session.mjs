@@ -1,19 +1,23 @@
 // Sessão de agente: faixa com a identidade, alerta de loop e abas Resumo, Arquivos, Comandos e Linha do tempo.
 
+import { dismissSession } from "../attention-state.mjs";
 import { every, get, post } from "../api.mjs";
 import { terminals } from "../terminals.mjs";
 import { esc, icon, reportError, shortPath, toast } from "../dom.mjs";
+import { CodeView } from "./code/code-view.mjs";
+import { renderTurns, stepTurn } from "./agent-turns.mjs";
+import { loadPr, prHtml } from "../pr-status.mjs";
 import { AGENT_NAMES, agentMark, clock, copy, keepScroll, loopPrompt, relPath, relTime, RevisionWatch, splitPath, tokens, track } from "../agents-ui.mjs";
 
 const TABS = [
   { id: "resumo", label: "Resumo" },
+  { id: "codigo", label: "Código" },
   { id: "arquivos", label: "Arquivos" },
   { id: "comandos", label: "Comandos" },
   { id: "linha", label: "Linha do tempo" },
 ];
 const FILE_KINDS = { edit: "edit", new: "novo", read: "leu", delete: "apagou" };
 const CMD_KINDS = { shell: "shell", test: "teste", publish: "publica" };
-const EVENT_TEXT = { user: "Pedido", assistant: "Resposta", command: "Comando", file: "Arquivo" };
 const PAGE = 200;
 
 /** Custo estimado da sessão no preço da API; assinatura cobra de outro jeito. */
@@ -29,7 +33,7 @@ export class AgentSessionView {
     this.root = root;
     this.options = options;
     this.id = options.id;
-    this.tab = "resumo";
+    this.tab = TABS.some((t) => t.id === options.tab) ? options.tab : "resumo";
     this.session = null;
     this.events = [];
     this.next = 0;
@@ -40,6 +44,7 @@ export class AgentSessionView {
   }
 
   async load() {
+    dismissSession(this.id);
     try {
       const data = await get(`/api/agents/sessions/${encodeURIComponent(this.id)}?limit=${PAGE}`);
       if (this.destroyed) return;  // saiu da tela durante a leitura: não liga o relógio
@@ -48,6 +53,7 @@ export class AgentSessionView {
       this.next = data.next;
       this.watch.seen(data.revision);
       this.render();
+      if (this.tab === "linha") this.loadTurns();
       this.loadDebug();
       if (!this.stopDebug) this.stopDebug = every(5000, () => { if (this.session && this.session.is_active) this.loadDebug(); });
     } catch (err) {
@@ -74,24 +80,24 @@ export class AgentSessionView {
     try {
       const data = await get(`/api/agents/sessions/${encodeURIComponent(this.id)}?from=${from}&limit=${PAGE}`);
       this.session = data.session;
+      if (this.tab === "codigo") {
+        // remontar a faixa tiraria o foco e a seleção do visor; os eventos novos entram ao trocar de aba
+        this.watch.seen(data.revision);
+        if (complete) {
+          this.events = this.events.concat(data.events);
+          this.next = data.next === null ? null : this.events.length;
+        }
+        if (this.code) this.code.update(data.session);
+        return;
+      }
       if (complete) {
         this.events = this.events.concat(data.events);
         this.next = data.next === null ? null : this.events.length;
       }
       this.watch.seen(data.revision);
       keepScroll(this.root, () => this.render());
+      if (this.tab === "linha") this.loadTurns(this.turns ? Math.max(50, this.turns.turns.length) : 50);
       this.loadDebug();
-    } catch (err) {
-      reportError(err);
-    }
-  }
-
-  async more() {
-    try {
-      const data = await get(`/api/agents/sessions/${encodeURIComponent(this.id)}?from=${this.next}&limit=${PAGE}`);
-      this.events = this.events.concat(data.events);
-      this.next = data.next;
-      keepScroll(this.root, () => this.render());
     } catch (err) {
       reportError(err);
     }
@@ -108,7 +114,7 @@ export class AgentSessionView {
       [null, `início ${esc(relTime(s.started_at))}, última atividade ${esc(relTime(s.last_activity_at))}`],
     ].filter((f) => f[1]);
     this.root.innerHTML = `
-      <div class="page ag-page t-${esc(theme)}">
+      <div class="page ag-page t-${esc(theme)} ${this.tab === "codigo" ? "is-code" : ""}">
         <div><button class="btn btn-ghost btn-sm" data-go="#/agentes">${icon("chevron-left")}<span>Agentes</span></button></div>
         <section class="ag-banner">
           <div class="ag-eyebrow">${agentMark(s.agent)}<span>${esc(AGENT_NAMES[s.agent] || s.agent)}${s.cli_version ? ` ${esc(s.cli_version)}` : ""}</span>
@@ -135,10 +141,22 @@ export class AgentSessionView {
         </div>
         ${this.body()}
       </div>`;
+    this.placeCode();
+  }
+
+  /** O visor sobrevive à troca de abas: o mesmo elemento volta para a tela, com seleção e rolagem. */
+  placeCode() {
+    const slot = this.root.querySelector(".code-slot");
+    if (!slot) return;
+    if (this.code) this.code.update(this.session);
+    else this.code = new CodeView(this.session, this.options.target);
+    slot.appendChild(this.code.el);
+    this.code.attached();
   }
 
   body() {
     const s = this.session;
+    if (this.tab === "codigo") return `<div class="code-slot"></div>`;
     if (this.tab === "arquivos") return this.panel("Arquivos tocados", this.files(s.files));
     if (this.tab === "comandos") return this.panel(`Comandos executados${s.commands > s.command_list.length ? ` (últimos ${s.command_list.length} de ${s.commands})` : ""}`, this.commands());
     if (this.tab === "linha") return this.panel("Linha do tempo", this.timeline());
@@ -146,12 +164,26 @@ export class AgentSessionView {
     return `<div class="ag-cols">
       ${this.panel("Arquivos editados", edited.length ? this.files(edited.slice(0, 8)) + (edited.length > 8 ? `<button class="ag-more" data-tab="arquivos">Ver todos os ${s.files.length}</button>` : "") : `<div class="empty-inline">${icon("info")}<span>Nenhum arquivo editado.</span></div>`)}
       <div class="ag-stack">
-        ${this.panel("Publicação", `<div class="ag-pad">${track(s)}<p class="dim hint">${{ none: s.files_edited ? "Há arquivos editados sem commit." : "Nada editado ainda.", committed: "Commit feito, falta o push.", pushed: "Push feito.", pr_open: "PR aberto." }[s.published]}</p></div>`,
+        ${this.panel("Publicação", `<div class="ag-pad">${track(s)}<p class="dim hint">${{ none: s.files_edited ? "Há arquivos editados sem commit." : "Nada editado ainda.", committed: "Commit feito, falta o push.", pushed: "Push feito.", pr_open: "PR aberto." }[s.published]}</p>${this.prLine()}</div>`,
           s.unpublished ? `<span class="badge">${s.published === "none" ? "sem commit" : "sem push"}</span>` : s.files_edited ? `<span class="badge badge-ok">publicado</span>` : "")}
         ${this.debugPanel()}
         ${this.panel("Primeiro pedido", `<p class="ag-pad ag-first">${esc(s.ask || "não registrado")}</p>`)}
       </div>
     </div>`;
+  }
+
+  /** Fonte do estado de publicação; com a preferência desligada não consulta nada. */
+  prLine() {
+    if (!this.pr || this.prFor !== this.session.last_activity_at) this.loadPrStatus();
+    return this.pr ? prHtml(this.pr) : "";
+  }
+
+  async loadPrStatus() {
+    this.prFor = this.session.last_activity_at;
+    const data = await loadPr({ session: this.id });
+    if (this.destroyed || JSON.stringify(data) === JSON.stringify(this.pr)) return;
+    this.pr = data;
+    if (this.tab === "resumo" && this.session) keepScroll(this.root, () => this.render());
   }
 
   /** Erros do site do Lerd durante a sessão (só aparece quando a pasta da sessão é um site do Lerd). */
@@ -201,20 +233,33 @@ export class AgentSessionView {
   }
 
   timeline() {
-    if (!this.events.length) return `<div class="empty-inline">${icon("info")}<span>Nenhum evento.</span></div>`;
-    const root = this.session.project_root || this.session.cwd;
-    return `<ol class="ag-timeline">${this.events.map((e) => {
-      const text = e.kind === "file" ? `${esc(FILE_KINDS[e.tool] || e.tool)} <code>${esc(relPath(e.text, root))}</code>`
-        : e.kind === "command" ? `<code>${esc(e.text)}</code>` : esc(e.text.length > 400 ? `${e.text.slice(0, 399)}…` : e.text);
-      return `<li class="ev-${esc(e.kind)}${e.tool === "publish" ? " ev-publish" : ""}"><span class="ag-time">${esc(clock(e.at))}</span><span class="ag-pt"></span>
-        <span class="ag-ev"><b>${esc(EVENT_TEXT[e.kind] || e.kind)}</b> ${text}</span></li>`;
-    }).join("")}</ol>${this.next !== null ? `<button class="ag-more" data-action="more">Carregar mais</button>` : ""}`;
+    if (!this.turns) return `<div class="loading"><span class="skeleton w-70"></span></div>`;
+    return renderTurns(this.id, this.session.project_root || this.session.cwd, this.turns);
+  }
+
+  async loadTurns(limit = 50) {
+    try {
+      const data = await get(`/api/agents/sessions/${encodeURIComponent(this.id)}/turns?limit=${limit}`);
+      if (this.destroyed) return;
+      this.turns = data;
+      if (this.tab === "linha") keepScroll(this.root, () => this.render());
+    } catch (err) {
+      reportError(err);
+    }
+  }
+
+  /** ⌘⇧↑/↓ na Linha do tempo. */
+  stepTurn(direction) {
+    return this.tab === "linha" && stepTurn(this.root, direction);
   }
 
   onClick(event) {
     const tab = event.target.closest("[data-tab]");
     if (tab) {
       this.tab = tab.dataset.tab;
+      if (this.tab === "linha") this.loadTurns(this.turns ? this.turns.turns.length : 50);
+      const base = `#/agentes/${encodeURIComponent(this.id)}`;
+      this.options.navigate(this.tab === "codigo" ? `${base}/codigo` : base, { silent: true });
       this.render();
       return;
     }
@@ -224,7 +269,7 @@ export class AgentSessionView {
     if (action.dataset.action === "copy-id") copy(s.id, "ID da sessão copiado.");
     if (action.dataset.action === "debug-copy") copy(this.debug.summary, "Resumo copiado. Cole no terminal do agente.");
     if (action.dataset.action === "loop") copy(loopPrompt(s), "Prompt de saída copiado. Cole no terminal da sessão.");
-    if (action.dataset.action === "more") this.more();
+    if (action.dataset.action === "more") this.loadTurns(this.turns.turns.length + 50);
     if (action.dataset.action === "folder") post("/api/open", { kind: "finder", target: s.cwd }).catch(reportError);
     if (action.dataset.action === "task") this.createTask();
     if (action.dataset.action === "goto-tab") this.options.navigate(`#/terminals/terminal/${encodeURIComponent(s.pairing_id)}`);
@@ -281,5 +326,6 @@ export class AgentSessionView {
     clearTimeout(this.retryTimer);
     this.watch.stop();
     if (this.stopDebug) this.stopDebug();
+    if (this.code) this.code.destroy();
   }
 }

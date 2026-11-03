@@ -23,6 +23,17 @@ Quem isto protege: um dev na própria máquina, cujos terminais e agentes já t�
 - Nunca são escritas, com uma exceção: `--instalar-hook`, rodado pelo usuário, com backup. O script do hook sempre termina com 0, para não atrapalhar o Claude Code.
 - Leitura em stream, linha por linha. Linha acima de 5 MB é descartada e registrada.
 
+## Visor de código
+
+- `GET /api/code/*` só lê; não existe rota de escrita. O arquivo precisa ficar, com links resolvidos, dentro da pasta da sessão. Sessão que rodou numa pasta que contém os dados dos agentes, como a pasta pessoal, não abre.
+- Recusados: acima de 1 MB, binários, `.env*`, `*.pem`, `*.key`, `id_rsa*`, `credentials*` e o que estiver em `.git`, `.ssh`, `.aws` ou `.gnupg`. O diff segue as mesmas regras, porque traz o conteúdo.
+- O repositório comparado é de terceiros, então nada dele pode rodar: o lado de HEAD vem de `git cat-file blob`, que não passa por `diff.external`, `textconv` nem filtros, e o lado atual é lido direto.
+- O índice guarda onde cada edição está no arquivo da sessão, nunca o conteúdo. O conteúdo chega à página como texto do editor, nunca como HTML.
+
+## Consulta opcional ao GitHub
+
+Vem desligada, e assim nenhum comando roda. Se você ligar "Estado do PR pelo GitHub" no ⌘K, o app roda o seu `gh pr view` na pasta da sessão, no máximo uma vez por minuto por pasta, só com a tela visível. Essa chamada vai ao GitHub com o login do seu próprio `gh`. O app nunca pede nem guarda token do GitHub, e nunca abre, integra ou comenta PR.
+
 ## Executar coisas
 
 - Subprocess é lista argv por `core/runner.py`.

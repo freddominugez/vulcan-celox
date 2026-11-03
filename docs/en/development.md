@@ -8,7 +8,7 @@ Requirements on macOS: Command Line Tools (`xcode-select --install`). For the Li
 git clone https://github.com/freddominugez/vulcan-hub-painel.git
 cd vulcan-hub-painel
 bash scripts/build_app.sh
-open "dist/Vulcan Terminal.app"
+open "dist/Vulcan Celox.app"
 ```
 
 ## Daily commands
@@ -19,7 +19,7 @@ python3 -m unittest discover -s tests -t .   # tests
 python3 -m unittest tests.test_agents_api    # one file
 bash scripts/validate.sh                     # all sensors
 bash scripts/test_linux.sh                   # suite in a Linux container
-bash scripts/build_app.sh                    # dist/Vulcan Terminal.app
+bash scripts/build_app.sh                    # dist/Vulcan Celox.app
 bash scripts/install_app.sh                  # ~/Applications and Desktop shortcut
 bash scripts/package.sh                      # packages in executaveis/
 ```
@@ -46,7 +46,7 @@ The list is in [CONTRIBUTING.md](../../CONTRIBUTING.md). Python must stay compat
 ## Seeing the interface without a person
 
 ```bash
-"dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/agentes"
+"dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal" --snapshot out.png --route "#/agentes"
 ```
 
 `--snapshot` renders a route to PNG and fails on a JavaScript error, and `--eval` runs a script in the page. `validate.sh` uses them as sensors.

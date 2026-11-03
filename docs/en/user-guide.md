@@ -1,10 +1,10 @@
-# Vulcan Terminal manual
+# Vulcan Celox manual
 
 > Screen names stay in Portuguese because the interface is in Portuguese: this guide shows the Portuguese name you see in the app. This is a translation of [the Portuguese manual](../pt-BR/user-guide.md), which has the same content as the app's Ajuda (Help) screen (⌘?).
 
 ## Contents
 
-- [First steps](#primeiros-passos): What Vulcan Terminal does and how to get started in four steps.
+- [First steps](#primeiros-passos): What Vulcan Celox does and how to get started in four steps.
 - [PHP sites](#projetos-php): Lerd sites: opening them, changing PHP, HTTPS, logs and terminal.
 - [Lerd](#lerd): The environment that runs PHP, nginx, the database and HTTPS for the sites.
 - [Node projects](#node): Next.js, Vite, local Supabase and the Vercel link.
@@ -23,9 +23,11 @@
 
 ## First steps
 
-*What Vulcan Terminal does and how to get started in four steps.*
+The app comes in light and dark. ⌘K, "Tema", picks System, Light or Dark. The terminal area stays dark in both, with each tab's color.
 
-Vulcan Terminal is a panel for people who program alone with code agents. It brings together in one place the PHP sites that **Lerd** runs on your Mac, your Node projects (Next.js, Vite and the like), the terminals of each project and the sessions of **Claude Code** and **Codex**.
+*What Vulcan Celox does and how to get started in four steps.*
+
+Vulcan Celox is a panel for people who program alone with code agents. It brings together in one place the PHP sites that **Lerd** runs on your Mac, your Node projects (Next.js, Vite and the like), the terminals of each project and the sessions of **Claude Code** and **Codex**.
 
 ![Visão geral (Overview) with PHP sites, a Node project, tasks and the terminal panel](../../vulcan_terminal/web/img/manual/visao-geral.png)
 
@@ -57,7 +59,7 @@ The sites belong to Lerd. The app only calls Lerd's own CLI and API and never ed
 
 *The environment that runs PHP, nginx, the database and HTTPS for the sites.*
 
-**Lerd** is an open source PHP development environment (MIT license). It runs nginx, PHP-FPM, DNS for `.test`, a database and HTTPS certificates in containers, without you configuring a web server by hand. Vulcan Terminal is the panel on top of it.
+**Lerd** is an open source PHP development environment (MIT license). It runs nginx, PHP-FPM, DNS for `.test`, a database and HTTPS certificates in containers, without you configuring a web server by hand. Vulcan Celox is the panel on top of it.
 
 ![Lerd screen with components, services and PHP versions](../../vulcan_terminal/web/img/manual/lerd.png)
 
@@ -65,7 +67,7 @@ The sites belong to Lerd. The app only calls Lerd's own CLI and API and never ed
 - **Services:** database, Redis and others, with start and stop.
 - **PHP:** installed versions, extensions, Xdebug and six common php.ini settings, written by `lerd php:ini` itself.
 - **Lerd's Node:** versions that Lerd manages for PHP sites with a JavaScript front end.
-- **Start with the app:** the lightning bolt button, at the top, starts Lerd together with Vulcan Terminal.
+- **Start with the app:** the lightning bolt button, at the top, starts Lerd together with Vulcan Celox.
 
 Laravel Valet also works as an alternative. Herd is commercial and is not used.
 
@@ -103,6 +105,8 @@ Each terminal is a session. It opens in the chosen folder, with a color theme th
 
 <a id="depuracao"></a>
 
+Tabs show the ports their processes opened, such as `:5173 +2`, in the tab bar and in the session list. A click opens `http://localhost:<port>` in your browser. Only the tab's own processes count.
+
 ## Debugging and logs
 
 *Dumps, queries, exceptions and laravel.log.*
@@ -124,6 +128,10 @@ The **Agentes** (Agents) screen lists the Claude Code and Codex sessions on this
 - **Histórico de agentes (Agent history):** searches everything the agents did, by text, file or command.
 - **Branches e worktrees (Branches and worktrees):** which branch each agent is working on, so work does not get mixed up.
 - **Retomar (Resume):** opens a terminal in the session's folder with the agent's resume command already in place.
+- **⌘-click a path in the terminal:** `a/b.py`, `./b.py`, `/abs/b.py`, `b.py:12`, `b.py:12:3` and `b.py(12)` become links while ⌘ is held, only if the file exists inside a known folder. With a paired session the file opens in the Código tab at that line; without one, in your editor; a folder opens in Finder. Relative paths count from the session folder, or from the folder the tab opened in: after a `cd`, a relative path may not resolve.
+- **Jump between requests:** ⌘⇧↑ and ⌘⇧↓. In the terminal, each Enter in a tab with a live agent becomes a mark, and nothing is drawn on the screen. If the agent uses the terminal's full screen there is no history to navigate, and the app says so once. In the session, **Linha do tempo** groups by request, with files and commands, and each edited file links to the diff of that request.
+- **Código tab:** inside a session, the files the agent touched, each one with syntax highlighting or as a diff: of one edit, of a whole request or against the last commit. In an active session the viewer follows the agent; scrolling, clicking or selecting pauses it, and **Voltar a seguir** resumes. It only reads: nothing is edited in the app, and binaries and sensitive names such as `.env` are not shown.
+- **PR state:** by default the app estimates it from the session's commands, and says so. Turn on "Estado do PR pelo GitHub" in ⌘K to read number, draft, state and checks with your own `gh`. This one uses the network.
 - **Pairing:** the terminal that opened an agent stays linked to its session, so prompts come out filled in. On Codex the link is by folder and time: two sessions opened almost together in the same folder can still swap tabs. Subagents and the Codex desktop app do not link to tabs.
 
 The app only reads these files, line by line. It never writes to `~/.claude` or `~/.codex`. The only exception is the pairing hook, which you install on purpose with `--instalar-hook`, and which keeps a backup.
@@ -221,7 +229,7 @@ The harness is the contract with verifiable items, the execution state and the h
 
 **What is Lerd for?**
 
-It is the environment that runs your PHP and Laravel sites on your Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. Vulcan Terminal is the panel on top of it.
+It is the environment that runs your PHP and Laravel sites on your Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. Vulcan Celox is the panel on top of it.
 
 **Do I need Lerd to use the app?**
 
@@ -289,7 +297,7 @@ Click Início in the sidebar. To make it open with the app again, untick Não mo
 
 **I opened it in the browser and it asks for a token.**
 
-The interface needs the token the native app creates on each run. Open it through Vulcan Terminal, from the Desktop shortcut or in Applications.
+The interface needs the token the native app creates on each run. Open it through Vulcan Celox, from the Desktop shortcut or in Applications.
 
 **Does a prompt sent to the terminal run right away?**
 

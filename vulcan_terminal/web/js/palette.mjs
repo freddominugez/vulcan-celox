@@ -1,8 +1,11 @@
 // Paleta de comandos.
 
 import { api, get, isMac, post } from "./api.mjs";
+import { noticesEnabled, setNoticesEnabled } from "./attention-notify.mjs";
 import { AGENT_NAV, HELP_NAV, NAV, app } from "./app-state.mjs";
 import { navigate, runCommand, service, toggleAutostart } from "./app.mjs";
+import { prEnabled, setPrEnabled } from "./pr-status.mjs";
+import { setThemePref, THEME_OPTIONS, themePref } from "./theme.mjs";
 import { $, debounce, esc, icon, reportError, shortPath } from "./dom.mjs";
 import { loadHelp } from "./help-content.mjs";
 
@@ -32,6 +35,9 @@ export const palette = {
       { kind: "Ações", title: "Iniciar ambiente", icon: "play", run: () => service("start") },
       { kind: "Ações", title: "Parar ambiente", icon: "stop", run: () => service("stop") },
       { kind: "Ações", title: `Iniciar ambiente junto com o app: ${app.state && app.state.autostart && app.state.autostart.enabled ? "desligar" : "ligar"}`, icon: "bolt", run: () => toggleAutostart() },
+      { kind: "Ações", title: `Aviso do sistema quando um agente espera: ${noticesEnabled() ? "desligar" : "ligar"}`, icon: "info", run: () => setNoticesEnabled(!noticesEnabled()).catch(reportError) },
+      ...THEME_OPTIONS.map(([id, label]) => ({ kind: "Tema", title: `Tema: ${label}${themePref() === id ? " (em uso)" : ""}`, icon: "circle-half", run: () => setThemePref(id).catch(reportError) })),
+      { kind: "Ações", title: `Estado do PR pelo GitHub (usa a rede): ${prEnabled() ? "desligar" : "ligar"}`, icon: "branch", run: () => setPrEnabled(!prEnabled()).catch(reportError) },
       { kind: "Ações", title: "Abrir painel do Lerd", icon: "gauge", run: () => post("/api/open", { kind: "dashboard" }).catch(reportError) },
       ...[...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => ({ kind: "Ir para", title: n.label, icon: n.icon, run: () => navigate(n.hash) })),
       ...helpSections.map((h) => ({ kind: "Ajuda", title: `Ajuda: ${h.titulo}`, sub: h.resumo, icon: "help", run: () => navigate(`#/ajuda/${h.id}`) })),

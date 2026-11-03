@@ -109,7 +109,7 @@ export function emptyAgents(roots) {
   const where = roots ? [...(roots.claude || []), ...(roots.codex || [])].map((r) => `<code>${esc(r)}</code>`).join(" e ") : "~/.claude e ~/.codex";
   return `<div class="empty-block">
     <h3>Nenhuma sessão de agente ainda</h3>
-    <p>O Vulcan Terminal lê as sessões que o Claude Code e o Codex gravam em ${where}, sem chave de API e sem alterar nada lá.
+    <p>O Vulcan Celox lê as sessões que o Claude Code e o Codex gravam em ${where}, sem chave de API e sem alterar nada lá.
       Abra o <code>claude</code> ou o <code>codex</code> num terminal: a sessão aparece aqui em poucos segundos.</p>
   </div>`;
 }

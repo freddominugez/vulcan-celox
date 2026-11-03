@@ -1,4 +1,6 @@
-# Vulcan Terminal
+# Vulcan Celox
+
+> Formerly Vulcan Terminal. Your data stays where it was.
 
 **English** | [Português](README.pt-BR.md)
 
@@ -6,11 +8,11 @@ A desktop panel for developers who work alone with code agents. Real terminals, 
 
 ![Overview screen with PHP sites, a Node project, tasks and the terminal panel](vulcan_terminal/web/img/manual/visao-geral.png)
 
-**Status: 1.0.0 for macOS.** The Linux code is in the repository and its tests pass in CI, but it has not been accepted on a real desktop yet, so no Linux package is released. The interface is in Brazilian Portuguese.
+**Status: 1.1.0 for macOS.** The Linux code is in the repository and its tests pass in CI, but it has not been accepted on a real desktop yet, so no Linux package is released. The interface is in Brazilian Portuguese.
 
 ## Why it exists
 
-Agents write code faster than one person can track. After a few parallel sessions it is hard to say which branch has unpublished work, which agent is stuck repeating the same test, and which terminal belongs to which session. Vulcan Terminal answers those questions by reading the session files that the agents already write, without an API key and without writing to their folders.
+Agents write code faster than one person can track. After a few parallel sessions it is hard to say which branch has unpublished work, which agent is stuck repeating the same test, and which terminal belongs to which session. Vulcan Celox answers those questions by reading the session files that the agents already write, without an API key and without writing to their folders.
 
 ## Features
 
@@ -30,14 +32,14 @@ Agents write code faster than one person can track. After a few parallel session
 ## Install
 
 1. Download the `.dmg` from [Releases](https://github.com/freddominugez/vulcan-hub-painel/releases).
-2. Drag **Vulcan Terminal** to Applications.
+2. Drag **Vulcan Celox** to Applications.
 3. The app is not signed by Apple. The first time, right click it, choose **Open** and confirm.
 
 Requires macOS 13+ (Apple Silicon or Intel) and Python 3.9+. If Python is missing, the app offers to install it. Details and building from source: [docs/en/installation.md](docs/en/installation.md).
 
 ## Principles
 
-- **Local.** The server listens only on `127.0.0.1` with a per-run token. No telemetry.
+- **Local.** The server listens only on `127.0.0.1` with a per-run token. No telemetry. Nothing leaves your machine unless you ask: AI documentation runs on click, and the GitHub PR lookup is off by default.
 - **Read-only toward agents.** The app never writes to `~/.claude` or `~/.codex`. The one exception is the optional pairing hook, which you install yourself and which keeps a backup.
 - **Nothing is deleted for good.** Removed folders go to the Trash.
 - **Zero dependencies to install.** Python standard library, a web interface with no build step, a thin Swift shell. xterm.js is vendored.
@@ -76,7 +78,7 @@ Also: [CHANGELOG](CHANGELOG.md), [CONTRIBUTING](CONTRIBUTING.md), [SECURITY](SEC
 ## Quick start for contributors
 
 ```bash
-bash scripts/build_app.sh && open "dist/Vulcan Terminal.app"   # build and open the app
+bash scripts/build_app.sh && open "dist/Vulcan Celox.app"   # build and open the app
 python3 -m vulcan_terminal --serve     # local server only, prints the port
 python3 -m unittest discover -s tests -t .   # tests only
 bash scripts/validate.sh               # all sensors (macOS, needs Command Line Tools)
@@ -90,7 +92,7 @@ The creation of this code was assisted by AI. Every change goes through the test
 
 [MIT](LICENSE). Third-party code in `vulcan_terminal/web/vendor` is MIT too: see [LICENSES.md](vulcan_terminal/web/vendor/LICENSES.md).
 
-Vulcan Terminal is independent and is not affiliated with Anthropic, OpenAI, Laravel, Lerd, Supabase or Vercel. Product names belong to their owners.
+Vulcan Celox is independent and is not affiliated with Anthropic, OpenAI, Laravel, Lerd, Supabase or Vercel. Product names belong to their owners.
 
 ## Contact
 

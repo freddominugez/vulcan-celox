@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from vulcan_terminal.core.agents import rules
+from vulcan_terminal.core.agents.attention import AttentionTracker
 from vulcan_terminal.core.agents.builder import SessionBuilder
 from vulcan_terminal.core.agents.model import AgentSession, as_int, as_str, epoch
 
@@ -66,6 +67,7 @@ class CodexReader:
         state = state or {}
         self.b = SessionBuilder(session, state.get("builder"))
         self.session = session
+        self.att = AttentionTracker(session, state.get("attention"))
         self.meta = bool(state.get("meta"))
         self.items = bool(state.get("items"))  # comandos e arquivos vêm por item_completed: ignorar function_call
         self.ev_turns = int(state.get("ev_turns", 0))
@@ -80,7 +82,8 @@ class CodexReader:
     def state(self) -> Dict:
         return {"builder": self.b.state(), "meta": self.meta, "items": self.items, "ev_turns": self.ev_turns,
                 "fb_turns": self.fb_turns, "fb_first": self.fb_first, "last_user": self.last_user,
-                "last_cmd": self.last_cmd, "last_total": self.last_total, "usage_seq": self.usage_seq}
+                "last_cmd": self.last_cmd, "last_total": self.last_total, "usage_seq": self.usage_seq,
+                "attention": self.att.state()}
 
     def drain_usage(self) -> list:
         out, self.usage_rows = self.usage_rows, []
@@ -119,6 +122,10 @@ class CodexReader:
         kind = p.get("type")
         if kind == "user_message":
             self._user(p.get("message"), at)
+        elif kind == "task_started":
+            self.att.turn_started(at)
+        elif kind in ("task_complete", "turn_aborted"):
+            self.att.turn_ended(at)
         elif kind == "agent_message":
             self.b.assistant_text(p.get("message"), at)
         elif kind == "token_count":

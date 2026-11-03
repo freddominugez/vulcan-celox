@@ -50,7 +50,7 @@ def package(root, output):
         for path in sorted((stage / "lib/vulcan_terminal").rglob("*")):
             if path.is_file():
                 source_files[str(path.relative_to(stage / "lib"))] = hashlib.sha256(path.read_bytes()).hexdigest()
-        manifest = {"application": "Vulcan Terminal", "version": version, "files": source_files}
+        manifest = {"application": "Vulcan Celox", "version": version, "files": source_files}
         (stage / "SOURCE-MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n")
         portable = output / (stage.name + "-linux.tar.gz")
         with tarfile.open(portable, "w:gz", format=tarfile.GNU_FORMAT) as archive:
@@ -68,7 +68,7 @@ def package(root, output):
         shutil.copytree(stage / "share/icons", debroot / "usr/share/icons")
         control = work / "control"
         control.write_text((root / "packaging/linux/deb/control").read_text().replace("@VERSION@", version))
-        deb = output / ("vulcan-terminal_" + version + "_all.deb")
+        deb = output / ("vulcan-celox_" + version + "_all.deb")
         make_deb.main(str(debroot), str(control), str(root / "packaging/linux/deb/postinst"), str(deb))
         shutil.copy2(root / "packaging/LEIA-ME.md", output / "LEIA-ME.md")
         paths = [deb, portable, output / "LEIA-ME.md"]

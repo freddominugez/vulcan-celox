@@ -1,4 +1,4 @@
-"""Suíte do Vulcan Terminal.
+"""Suíte do Vulcan Celox.
 
 Vigia: se a suíte passar de 15 min (normal: cerca de 2 min), despeja a pilha de todas as threads e sai com erro,
 para o validate.sh falhar com a causa em vez de ficar parado. Uma rodada travou uma vez em 2026-10-31

@@ -46,7 +46,7 @@ class KeychainStore:
         if not valid_key(value):
             raise SecretError("formato de chave inválido")
         command = (f'add-generic-password -U -s {self.service} -a {self.account} '
-                   f'-l "Vulcan Terminal: chave da Anthropic" -w {value}\n')
+                   f'-l "Vulcan Celox: chave da Anthropic" -w {value}\n')
         result = self.runner.run([self.security, "-i"], input=command, timeout=15)
         if not result.ok or self.get() != value:
             raise SecretError("não foi possível gravar a chave no Keychain")
@@ -80,7 +80,7 @@ class SecretToolStore:
             raise SecretError("formato de chave inválido")
         if not self.tool:
             raise SecretError("instale o secret-tool (pacote libsecret-tools) para guardar a chave no chaveiro do sistema")
-        result = self.runner.run([self.tool, "store", "--label=Vulcan Terminal: chave da Anthropic", *self._attrs()],
+        result = self.runner.run([self.tool, "store", "--label=Vulcan Celox: chave da Anthropic", *self._attrs()],
                                  input=value, timeout=15)
         if not result.ok or self.get() != value:
             raise SecretError("não foi possível gravar a chave no chaveiro do sistema")

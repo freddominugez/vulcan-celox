@@ -179,7 +179,7 @@ def session_summary(events: List[Dict[str, Any]], site: str) -> str:
         request = f" em {e['request']}" if e.get("request") else ""
         lines.append(f"- {e.get('ts', '')[11:19]} {level} {message}{where}{request}")
     if len(events) > SUMMARY_MAX:
-        lines.append(f"(e mais {len(events) - SUMMARY_MAX} eventos no painel Depuração do Vulcan Terminal)")
+        lines.append(f"(e mais {len(events) - SUMMARY_MAX} eventos no painel Depuração do Vulcan Celox)")
     lines.append("Verifique se alguma delas vem das mudanças desta sessão.")
     return redact("\n".join(lines))[0]
 

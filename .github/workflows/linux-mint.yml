@@ -29,7 +29,7 @@ jobs:
           set -euo pipefail
           cd executaveis/linux
           sha256sum -c SHA256SUMS
-          sudo apt-get install -y --no-install-recommends ./vulcan-terminal_1.0.0_all.deb
+          sudo apt-get install -y --no-install-recommends ./vulcan-celox_*_all.deb
           VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-deb-home" vulcan-terminal --check
           VULCAN_TERMINAL_HOME="$RUNNER_TEMP/vulcan-deb-home" vulcan-terminal --doctor
           tar xzf vulcan-terminal-1.0.0-linux.tar.gz -C "$RUNNER_TEMP"

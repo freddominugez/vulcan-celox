@@ -133,4 +133,4 @@ class PastaDeTrabalhoTest(TempDirTestCase):
                               capture_output=True, text=True, timeout=60)
         self.assertFalse(marker.exists(), "o lançador importou secrets.py da pasta atual")
         self.assertEqual(proc.returncode, 0, proc.stderr)
-        self.assertIn("Vulcan Terminal", proc.stdout)
+        self.assertIn("Vulcan Celox", proc.stdout)

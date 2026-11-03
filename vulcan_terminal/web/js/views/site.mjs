@@ -208,7 +208,7 @@ export class SiteView extends SessionTabsView {
         </header>
         <div class="site-body" data-role="body"></div>
       </section>`;
-    native({ type: "setTitle", title: `${s.name} · Vulcan Terminal` });
+    native({ type: "setTitle", title: `${s.name} · Vulcan Celox` });
     try {
       localStorage.setItem("vulcan-last-site", s.name);
     } catch {
@@ -263,7 +263,7 @@ export class SiteView extends SessionTabsView {
     let typed = "";
     const yes = await confirmDialog({
       title: `Remover ${s.name}`,
-      body: `<p>${manual ? "Tira o site da lista do Vulcan Terminal." : `Desregistra o site do ${esc(backend.label)}: ele deixa de ser servido em <code>${esc(s.domain)}</code>.`}
+      body: `<p>${manual ? "Tira o site da lista do Vulcan Celox." : `Desregistra o site do ${esc(backend.label)}: ele deixa de ser servido em <code>${esc(s.domain)}</code>.`}
         A pasta fica onde está.</p>
         <label class="dialog-check"><input type="checkbox" data-trash><span>Também mover a pasta <code>${esc(s.path)}</code> para a Lixeira</span></label>
         <label class="field-label" for="remove-confirm">Para mover para a Lixeira, digite <b>${esc(s.name)}</b></label>

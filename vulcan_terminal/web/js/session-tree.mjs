@@ -4,6 +4,7 @@
 import { confirmDialog } from "./ai.mjs";
 import { del, get, patch, post } from "./api.mjs";
 import { esc, icon, reportError, toast } from "./dom.mjs";
+import { syncPorts } from "./terminal-ports.mjs";
 import { terminals } from "./terminals.mjs";
 import { agentMark } from "./agents-ui.mjs";
 
@@ -86,6 +87,7 @@ export class SessionTree {
     try {
       this.data = await get(`/api/sessions/tree?closed=${this.closedLimit}`);
       this.render();
+      syncPorts();
     } catch {
       /* servidor fora do ar: a barra lateral mostra o estado offline pelo app */
     }

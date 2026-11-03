@@ -1,6 +1,6 @@
 # Índice geral
 
-> Gerado automaticamente pelo Vulcan Terminal. Reúne a memória de cada sessão de terminal (o que foi executado, tarefas, post-its e tags) e o índice de tarefas dos projetos.
+> Gerado automaticamente pelo Vulcan Celox. Reúne a memória de cada sessão de terminal (o que foi executado, tarefas, post-its e tags) e o índice de tarefas dos projetos.
 
 - [Tarefas de todos os projetos](TAREFAS.md)
 - [Documentação dos projetos (gerada por IA)](DOCUMENTACAO.md)

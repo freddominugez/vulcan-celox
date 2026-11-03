@@ -1,6 +1,30 @@
 # Registro de mudanças
 
-Mudanças relevantes do Vulcan Terminal. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Versão em inglês: [CHANGELOG.md](CHANGELOG.md).
+Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e as versões seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Versão em inglês: [CHANGELOG.md](CHANGELOG.md).
+
+## [1.1.0] - 2026-11-03
+
+**O Vulcan Terminal agora é Vulcan Celox.** Seus dados, o item do Keychain e as preferências ficam onde estavam. Ao instalar, o app antigo vai para a Lixeira.
+
+### Adicionado
+- **Aba Código** na sessão de agente: árvore dos arquivos tocados, realce de sintaxe e diff por edição, por pedido ou contra o último commit, lado a lado ou unificado. Só leitura. Em sessão ativa ela segue o agente; qualquer gesto pausa, e **Voltar a seguir** retoma.
+- **Quem espera por você:** anel na aba, contador na barra lateral, ⌘⇧U para ir até lá e aviso do sistema com a janela sem foco. Também lê OSC 9, 99, 777 e o sino. Um hook opcional mostra na hora os pedidos de permissão.
+- **⌘-clique em caminho no terminal:** abre na aba Código na linha, no seu editor ou no Finder.
+- **Saltar entre pedidos:** ⌘⇧↑ e ⌘⇧↓ no terminal, e **Linha do tempo** agrupada por pedido, com link para o diff daquele pedido.
+- **Portas por aba:** um selo como `:5173 +2` na barra de abas e na lista de sessões.
+- **Estado real do PR, opcional e desligado por padrão:** número, rascunho, estado e checagens pelo seu próprio `gh`. Desligado, nenhum comando roda.
+- Temas claro e escuro (Sistema por padrão), Inter, o logo novo e o ícone do app.
+
+### Segurança
+- A aba Código recusa o que estiver fora da pasta da sessão, inclusive por link, além de binários, arquivos acima de 1 MB e nomes sensíveis como `.env`. O diff segue as mesmas regras.
+- O diff contra o git não consegue executar nada do repositório analisado: `diff.external`, `textconv` e filtros nunca rodam.
+
+### Mudou
+- O índice das sessões guarda onde cada edição está, nunca o conteúdo. Ele é refeito uma vez ao atualizar.
+
+### Limites conhecidos
+- O ícone do app ficou sem os tamanhos de 16 e 32 px por decisão da marca; o macOS reduz a partir dos maiores.
+- Caminho relativo impresso depois de um `cd` pode não ser encontrado pelo ⌘-clique: ele conta a partir da pasta da sessão ou da pasta em que a aba abriu.
 
 ## [1.0.0] - 2026-11-01
 

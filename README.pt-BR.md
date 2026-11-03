@@ -1,4 +1,6 @@
-# Vulcan Terminal
+# Vulcan Celox
+
+> Antes se chamava Vulcan Terminal. Seus dados continuam onde estavam.
 
 [English](README.md) | **Português**
 
@@ -6,11 +8,11 @@ Um painel desktop para quem programa sozinho com agentes de código. Terminais r
 
 ![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](vulcan_terminal/web/img/manual/visao-geral.png)
 
-**Situação: 1.0.0 para macOS.** O código do Linux está no repositório e os testes passam no CI, mas ele ainda não foi aceito numa área de trabalho real, então nenhum pacote de Linux é distribuído. A interface é em português do Brasil.
+**Situação: 1.1.0 para macOS.** O código do Linux está no repositório e os testes passam no CI, mas ele ainda não foi aceito numa área de trabalho real, então nenhum pacote de Linux é distribuído. A interface é em português do Brasil.
 
 ## Por que existe
 
-Agentes escrevem código mais rápido do que uma pessoa consegue acompanhar. Depois de algumas sessões em paralelo fica difícil dizer qual branch tem trabalho sem publicar, qual agente está preso repetindo o mesmo teste e qual terminal é de qual sessão. O Vulcan Terminal responde a isso lendo os arquivos de sessão que os agentes já gravam, sem chave de API e sem escrever nas pastas deles.
+Agentes escrevem código mais rápido do que uma pessoa consegue acompanhar. Depois de algumas sessões em paralelo fica difícil dizer qual branch tem trabalho sem publicar, qual agente está preso repetindo o mesmo teste e qual terminal é de qual sessão. O Vulcan Celox responde a isso lendo os arquivos de sessão que os agentes já gravam, sem chave de API e sem escrever nas pastas deles.
 
 ## Recursos
 
@@ -30,14 +32,14 @@ Agentes escrevem código mais rápido do que uma pessoa consegue acompanhar. Dep
 ## Instalar
 
 1. Baixe o `.dmg` em [Releases](https://github.com/freddominugez/vulcan-hub-painel/releases).
-2. Arraste o **Vulcan Terminal** para Aplicativos.
+2. Arraste o **Vulcan Celox** para Aplicativos.
 3. O app não é assinado pela Apple. Na primeira vez, clique com o botão direito, escolha **Abrir** e confirme.
 
 Requer macOS 13+ (Apple Silicon ou Intel) e Python 3.9+. Se faltar Python, o app oferece instalar. Detalhes e como compilar: [docs/pt-BR/installation.md](docs/pt-BR/installation.md).
 
 ## Princípios
 
-- **Local.** O servidor só atende em `127.0.0.1`, com token por execução. Sem telemetria.
+- **Local.** O servidor só atende em `127.0.0.1`, com token por execução. Sem telemetria. Nada sai da máquina sem você pedir: a documentação com IA roda por clique, e a consulta de PR ao GitHub vem desligada.
 - **Só leitura diante dos agentes.** O app nunca escreve em `~/.claude` ou `~/.codex`. A única exceção é o hook opcional de pareamento, instalado por você, com backup.
 - **Nada é apagado de vez.** Pastas removidas vão para a Lixeira.
 - **Nada para instalar.** Biblioteca padrão do Python, interface web sem build e uma casca fina em Swift. O xterm.js é vendorizado.
@@ -76,7 +78,7 @@ Também: [Registro de mudanças](CHANGELOG.pt-BR.md), [Como contribuir](CONTRIBU
 ## Início rápido para contribuir
 
 ```bash
-bash scripts/build_app.sh && open "dist/Vulcan Terminal.app"   # compila e abre o app
+bash scripts/build_app.sh && open "dist/Vulcan Celox.app"   # compila e abre o app
 python3 -m vulcan_terminal --serve     # só o servidor local, imprime a porta
 python3 -m unittest discover -s tests -t .   # só os testes
 bash scripts/validate.sh               # todos os sensores (macOS, precisa das Command Line Tools)
@@ -90,7 +92,7 @@ A criação do código foi assistida por IA. Toda mudança passa pelos testes e 
 
 [MIT](LICENSE). O código de terceiros em `vulcan_terminal/web/vendor` também é MIT: veja [LICENSES.md](vulcan_terminal/web/vendor/LICENSES.md).
 
-O Vulcan Terminal é independente e não tem vínculo com Anthropic, OpenAI, Laravel, Lerd, Supabase ou Vercel. Os nomes de produtos pertencem aos seus donos.
+O Vulcan Celox é independente e não tem vínculo com Anthropic, OpenAI, Laravel, Lerd, Supabase ou Vercel. Os nomes de produtos pertencem aos seus donos.
 
 ## Contato
 

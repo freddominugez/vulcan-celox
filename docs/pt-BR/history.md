@@ -73,3 +73,8 @@ Dos 245 commits, 168 aconteceram nesses três dias.
 | 0.8.0, 0.8.1 | 01/11/2026 | Lerd e Codex |
 | 0.9.0 | 01/11/2026 | Qualidade |
 | **1.0.0** | **01/11/2026** | **Primeira versão estável, só macOS** |
+| 1.1.0 | 2026-11-03 | Nome novo Vulcan Celox, aba Código, atenção, caminhos clicáveis, pedidos, portas e PR |
+
+## 1.1.0: o nome muda
+
+O produto se chamou Vulcan Terminal até a 1.0. A partir da 1.1.0 é Vulcan Celox, com identidade visual própria. A pasta de dados, o item do Keychain, o id do app e o pacote Python mantêm os nomes antigos, para ninguém perder nada ao atualizar.

@@ -2,6 +2,7 @@
 // passo escolhido e um cartão por área da interface. Aparece na abertura até os passos estarem feitos ou o usuário
 // marcar "Não mostrar mais o guia"; depois fica em Início e em Ajuda.
 
+import { brandLogo } from "../brand.mjs";
 import { get, put } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
 
@@ -74,6 +75,7 @@ export class HomeView {
       terminal: `<button class="btn btn-primary btn-sm" data-home="terminal">${icon("terminal")}<span>Abrir terminal</span></button>`,
     };
     this.root.innerHTML = `<div class="page in-page">
+        ${brandLogo()}
       <div class="in-hello">
         <div class="in-left">
           <h1>${this.greeting()}. ${esc(head)}</h1>
@@ -86,7 +88,7 @@ export class HomeView {
             ${s.ok ? `<span class="sr-only">feito</span>` : action[s.id] || ""}</li>`).join("")}</ol>
         </div>
         <figure class="in-shot">
-          <div class="in-shot-frame"><img src="img/manual/visao-geral.png" alt="Captura da Visão geral do Vulcan Terminal com a área do passo escolhido destacada">
+          <div class="in-shot-frame"><img src="img/manual/visao-geral.png" alt="Captura da Visão geral do Vulcan Celox com a área do passo escolhido destacada">
             <span class="in-hl" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"></span></div>
           <figcaption>${esc(spot.text)}</figcaption>
         </figure>

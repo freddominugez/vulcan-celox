@@ -13,15 +13,11 @@ Agent panel for Claude Code and Codex, history search, prompts, usage and cost, 
 - **Linux release.** Test on a real Linux Mint desktop, fix what fails, publish `.deb` and `.tar.gz`. Help welcome.
 - **Finish the manual checks on macOS:** pairing with the real Claude Code, split, search and resize.
 
-## Planned for 1.1
+## Delivered in 1.1.0 (macOS)
 
-- **Know when an agent needs you.** A ring on the tab, a counter in the sidebar and a system notification when a session finishes its turn or may be waiting. It also reads standard terminal sequences (OSC 9, 99 and 777), so it works with any program. The optional hook makes the permission state exact for Claude Code.
-- **Live Code tab, read-only.** The files a session touched, the code with syntax highlighting, and diffs by edit, by turn and against git, following the agent as it works, plus an "Open in editor" button.
-- **Command-click a path in the terminal.** Opens the file at the right line.
-- **Move between turns.** Shortcuts jump between your requests, in the terminal and on the session screen.
-- **Listening ports and pull request status.** Each tab shows the ports it opened. Real pull request status through your own `gh` is optional and off by default, because it uses the network.
-- **New name and visual identity.** Vulcan Terminal becomes Vulcan Celox, with light and dark themes, a new palette, the Inter typeface, a minimal icon set, and a new logo and app icon. Existing data stays where it is.
-- **Project landing page.** One page that explains what the app does, its rules, how to install it and what comes next, in English and Portuguese.
+New name Vulcan Celox with light and dark themes, Code tab (a viewer: it does not edit files), attention signals, ⌘-click on paths, jumping between requests, ports per tab and optional PR state. Details in the [changelog](CHANGELOG.md).
+
+Still waiting: the interface icon set, and the Linux release after the acceptance on Mint.
 
 ## Later, not decided
 

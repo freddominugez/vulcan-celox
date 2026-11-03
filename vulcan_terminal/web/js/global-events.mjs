@@ -1,8 +1,14 @@
 // Ouvintes globais da casca.
 
 import { onJobsChange } from "./ai.mjs";
+import { startNotices } from "./attention-notify.mjs";
+import { startPrStatus } from "./pr-status.mjs";
+import { startPorts } from "./terminal-ports.mjs";
+import { startTheme } from "./theme.mjs";
+import { clearTab, dismissSession, latestAttention, startAttention } from "./attention-state.mjs";
 import { isMac, isNative, post } from "./api.mjs";
 import { app } from "./app-state.mjs";
+import { stepTerminalTurn } from "./terminal-watch.mjs";
 import { loadNodeProjects, navigate, refreshState, reportDragRegions, route, runCommand, service, toggleAutostart } from "./app.mjs";
 import { CurrentSession } from "./current-session.mjs";
 import { $, debounce, reportError } from "./dom.mjs";
@@ -89,6 +95,11 @@ export function bindGlobalEvents() {
       navigate(`#/terminals/terminal/${id}`);
     }
   });
+  startTheme();
+  startNotices();
+  startPorts();
+  startPrStatus();
+  startAttention();
   const reloadTree = debounce(() => app.tree.load(), 300);
   onJobsChange(() => reloadTree());
 
@@ -118,6 +129,23 @@ export function bindGlobalEvents() {
     if (key === "k") { event.preventDefault(); palette.open(); }
     if (key === "p" && event.shiftKey) { event.preventDefault(); navigate("#/prompts"); }
     if (key === "j") { event.preventDefault(); runCommand("togglePanel"); }
+    if (event.shiftKey && (key === "arrowup" || key === "arrowdown")) {
+      event.preventDefault();
+      const direction = key === "arrowup" ? -1 : 1;
+      const inTerminal = document.activeElement && document.activeElement.closest(".xterm");
+      if (inTerminal || !(app.view && app.view.stepTurn && app.view.stepTurn(direction))) stepTerminalTurn(direction);
+    }
+    if (key === "u" && event.shiftKey) {
+      event.preventDefault();
+      const latest = latestAttention();
+      if (latest && latest.tab) {
+        clearTab(latest.tab);
+        window.dispatchEvent(new CustomEvent("vulcan-show-terminal", { detail: { id: latest.tab } }));
+      } else if (latest) {
+        dismissSession(latest.session);
+        navigate(`#/agentes/${encodeURIComponent(latest.session)}`);
+      }
+    }
     // ⌘? abre a Ajuda já na seção da tela atual
     if (key === "?" || (key === "/" && event.shiftKey)) { event.preventDefault(); navigate(`#/ajuda/${sectionFor(app.route)}`); }
     if (key === "e" && event.shiftKey) { event.preventDefault(); navigate("#/depuracao"); }

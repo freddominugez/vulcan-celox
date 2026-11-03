@@ -84,3 +84,11 @@ def agent_running(procs: List[Proc], agent: str) -> bool:
         if candidates & names:
             return True
     return False
+
+
+def tab_runs_agent(terminal, agent: str) -> bool:
+    """O agente ainda roda em primeiro plano nesta aba? Sem como saber, a aba viva vale."""
+    if terminal is None or not getattr(terminal, "alive", False):
+        return False
+    foreground = terminal.foreground() if hasattr(terminal, "foreground") else None
+    return foreground is None or agent_running(foreground, agent)

@@ -1,4 +1,4 @@
-# Vulcan Terminal: technical manual
+# Vulcan Celox: technical manual
 
 Reference for a developer who has never seen this project. It describes version 1.0.0. For a shorter tour, read [architecture.md](architecture.md). Screens, many identifiers and error messages are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
 
@@ -6,7 +6,7 @@ Paths written as `core/...`, `server/...`, `web/...` and `ui/...` are relative t
 
 ## 1. Overview and goals
 
-Vulcan Terminal is a desktop panel for a solo developer who works with coding agents and local PHP/Laravel and Node projects. It brings together:
+Vulcan Celox is a desktop panel for a solo developer who works with coding agents and local PHP/Laravel and Node projects. It brings together:
 
 1. **Environment management**: local `.test` sites, TLS, PHP and Node versions, services, sharing, logs and dumps, through Lerd or Laravel Valet.
 2. **Terminals per project**: real PTYs with live output, history, quick commands and a Markdown memory of each session.
@@ -47,7 +47,7 @@ Verify at any time with `git ls-files`.
 
 ```
 packaging/macos/main.swift   macOS shell: WKWebView, windows, menus, menu bar item, child server, --snapshot, --eval
-packaging/macos/icon.swift   app icon drawn in code; becomes AppIcon.icns during the build
+packaging/macos/AppIcon.icns   app icon from the brand kit; the build copies it
 packaging/linux/             launcher, dependency script, .desktop entry, icons, .deb control, install and uninstall
 packaging/LEIA-ME.md         install notes shipped inside the packages
 vulcan_terminal/
@@ -239,6 +239,16 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 | `server/ai_api.py` | Key, validation against Anthropic, choice of model. |
 | `server/ai_docs.py` | Preview of what will be sent, generation and reading of generated files. |
 | `server/ai_jobs.py` | Background AI jobs: one per target, with state the interface can poll. |
+
+### Code tab, attention, ports and PR state (1.1)
+
+- `core/agents/edits.py`: table `session_edits` with path, time, tool, turn and offset. Content is read on demand from the session file by `edit_detail()`, so a session deleted by the agent has no diff. On Claude Code the sources are `Edit`, `MultiEdit` and `Write`; `originalFile` is only read, never stored. On Codex the `FileChange` item carries the diff, and a readable patch covers the older format.
+- `core/code_files.py`, `core/code_diff.py`, `server/code_api.py`, `server/known_roots.py`: read-only viewer. The HEAD side comes from `git cat-file blob`, and the current side is read directly, so `diff.external`, `textconv` and clean filters from the analyzed repository never run.
+- `core/agents/attention.py`, `core/agents/attention_hook.py`: turn state per session and the optional hook for permission requests.
+- `core/agents/turns.py`: events and edits grouped by request, with the same count as the reader.
+- `core/listening_ports.py`: ports of each PTY and its descendants, with `lsof` on macOS and `/proc/net` on Linux, cached for 10 s.
+- `core/pr_status.py`, `server/pr_api.py`: PR state through the user's `gh`, only with the `pr_status` preference on, cached for 60 s.
+- Interface: `web/js/views/code/`, `web/js/terminal-watch.mjs` (attention, path links and request marks for each terminal), `web/js/terminal-ports.mjs`, `web/js/pr-status.mjs`, `web/js/theme.mjs`, `web/styles/tokens.css` (the only file with loose colors), and `web/vendor/codemirror.js`, loaded the first time the Code tab opens.
 
 ## 6. HTTP server and WebSocket
 
@@ -580,7 +590,7 @@ Outside the data folder the app writes only: `<project>/TAREFAS.md` (opt-in, mar
 
 ### macOS shell
 
-`dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal`. It does not forward the Python flags.
+`dist/Vulcan Celox.app/Contents/MacOS/vulcan-terminal`. It does not forward the Python flags.
 
 | Flag | Does |
 |------|------|
@@ -603,14 +613,14 @@ Requirements: on macOS, the Command Line Tools. There is no `pip install` or `np
 
 | Script | Does |
 |--------|------|
-| `scripts/build_app.sh` | Creates `dist/Vulcan Terminal.app`: copies `vulcan_terminal/` to `Contents/Resources` with `rsync`, writes `Info.plist` (id `com.byvulcan.terminal`, minimum macOS 13.0, version from `vulcan_terminal/__init__.py`), compiles `packaging/macos/main.swift` with `swiftc` for the current architecture, or arm64 and x86_64 joined by `lipo` with `VULCAN_UNIVERSAL=1`, runs `packaging/macos/icon.swift` to draw the icon, and `iconutil` makes `AppIcon.icns`. PNGs go to `build/icon/` |
+| `scripts/build_app.sh` | Creates `dist/Vulcan Celox.app`: copies `vulcan_terminal/` to `Contents/Resources` with `rsync`, writes `Info.plist` (id `com.byvulcan.terminal`, minimum macOS 13.0, version from `vulcan_terminal/__init__.py`), compiles `packaging/macos/main.swift` with `swiftc` for the current architecture, or arm64 and x86_64 joined by `lipo` with `VULCAN_UNIVERSAL=1`, runs `packaging/macos/icon.swift` to draw the icon, and `iconutil` makes `AppIcon.icns`. PNGs go to `build/icon/` |
 | `scripts/install_app.sh` | Installs in `~/Applications` and creates a Desktop shortcut. The previous version goes to the Trash. `VULCAN_INSTALL_DEST` and `VULCAN_DESKTOP` redirect it |
 | `scripts/package.sh` | On macOS, generates everything in `executaveis/`: universal app, ad hoc signature (`codesign --sign -`), `.zip` and `.dmg`, Linux `.tar.gz` and `.deb`, and `SHA256SUMS` |
 | `scripts/package_linux.py` | Builds the Linux installers with Python 3.9+ only, with no Swift or macOS tools. Output in `executaveis/linux` by default (`--output`), with `SOURCE-MANIFEST.json` carrying a SHA-256 per file. Used by CI |
 | `scripts/make_deb.py` | Assembles a `.deb` with the standard library only, with no `dpkg-deb` |
 | `scripts/manual_md.py`, `scripts/manual_shots.sh`, `scripts/help_json.py` | User guide from the Help content, its screenshots, and JSON layout |
 
-`packaging/` holds the sources: `macos/main.swift`, `macos/icon.swift`, `linux/vulcan-terminal` (launcher: runs from inside the library folder so that a `json.py` in the current repository is not imported), `linux/vulcan-terminal-deps` (checks and installs libraries with permission, using apt, dnf or pacman), `linux/install.sh` and `linux/uninstall.sh` (no sudo, under `~/.local` by default), `linux/vulcan-terminal.desktop`, `linux/icons/`, `linux/deb/control` and `linux/deb/postinst`, and `LEIA-ME.md`, which ships in the packages.
+`packaging/` holds the sources: `macos/main.swift`, `macos/AppIcon.icns`, `linux/vulcan-terminal` (launcher: runs from inside the library folder so that a `json.py` in the current repository is not imported), `linux/vulcan-terminal-deps` (checks and installs libraries with permission, using apt, dnf or pacman), `linux/install.sh` and `linux/uninstall.sh` (no sudo, under `~/.local` by default), `linux/vulcan-terminal.desktop`, `linux/icons/`, `linux/deb/control` and `linux/deb/postinst`, and `LEIA-ME.md`, which ships in the packages.
 
 Linux packages leave `ui/` out, and the `.deb` installs under `/opt/vulcan-terminal` with a link in `/usr/bin`.
 

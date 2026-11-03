@@ -1,6 +1,30 @@
 # Changelog
 
-All notable changes to Vulcan Terminal. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Portuguese version: [CHANGELOG.pt-BR.md](CHANGELOG.pt-BR.md).
+All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Portuguese version: [CHANGELOG.pt-BR.md](CHANGELOG.pt-BR.md).
+
+## [1.1.0] - 2026-11-03
+
+**Vulcan Terminal is now Vulcan Celox.** Your data, Keychain item and preferences stay where they were. Installing moves the old app to the Trash.
+
+### Added
+- **Code tab** in the agent session: tree of touched files, syntax highlighting, and diffs per edit, per request or against the last commit, side by side or unified. Read only. In an active session it follows the agent; any gesture pauses it, and **Voltar a seguir** resumes.
+- **Who is waiting for you:** ring on the tab, count in the sidebar, ⌘⇧U to jump, and a system notice with the window out of focus. It also reads OSC 9, 99, 777 and the bell. An optional hook shows permission requests at once.
+- **⌘-click a path in the terminal:** opens in the Code tab at the line, in your editor, or in Finder.
+- **Jump between requests:** ⌘⇧↑ and ⌘⇧↓ in the terminal, and **Linha do tempo** grouped by request, linking to the diff of that request.
+- **Ports per tab:** a badge such as `:5173 +2` in the tab bar and the session list.
+- **Real PR state, optional and off by default:** number, draft, state and checks through your own `gh`. With it off no command runs.
+- Light and dark themes (System by default), Inter, the new logo and app icon.
+
+### Security
+- The Code tab refuses anything outside the session folder, links included, as well as binaries, files above 1 MB and sensitive names such as `.env`. The diff follows the same rules.
+- The diff against git cannot run anything from the analyzed repository: `diff.external`, `textconv` and filters never run.
+
+### Changed
+- The session index stores where each edit is, never its content. The index is rebuilt once when you update.
+
+### Known limits
+- The app icon lost its 16 and 32 px sizes by brand decision; macOS scales down from the larger ones.
+- A relative path printed after a `cd` may not resolve for ⌘-click: it counts from the session folder or the folder the tab opened in.
 
 ## [1.0.0] - 2026-11-01
 

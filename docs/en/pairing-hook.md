@@ -1,10 +1,10 @@
 # Claude Code pairing hook
 
-Vulcan Terminal links each terminal tab to the Claude Code session started in it, so the tab and the session share a color and prompts use the right data. Without the hook, it does this by folder and time (the session that started up to 60 seconds after the tab opened, or after `claude` was typed in it). With the hook, the pair is exact, even with two sessions in the same folder.
+Vulcan Celox links each terminal tab to the Claude Code session started in it, so the tab and the session share a color and prompts use the right data. Without the hook, it does this by folder and time (the session that started up to 60 seconds after the tab opened, or after `claude` was typed in it). With the hook, the pair is exact, even with two sessions in the same folder.
 
 ## What the hook does
 
-- Each Vulcan Terminal tab has `VULCAN_SESSION_ID` (the tab id) in its environment and, when it has a theme, `VULCAN_THEME`.
+- Each Vulcan Celox tab has `VULCAN_SESSION_ID` (the tab id) in its environment and, when it has a theme, `VULCAN_THEME`.
 - When Claude Code starts a session, it runs the `SessionStart` hooks and passes a JSON with the `session_id` on stdin.
 - The Vulcan script reads the tab id from the environment and writes `<data>/pairings/<session_id>.json`, with the session, tab, theme, folder and source. Outside a Vulcan tab, it does nothing. It never fails: any problem ends with exit code 0, so it does not get in Claude Code's way.
 - `<data>` is `~/Library/Application Support/VulcanTerminal/` on macOS and `~/.local/share/vulcan-terminal/` on Linux (or `$XDG_DATA_HOME/vulcan-terminal/`). `VULCAN_TERMINAL_HOME` changes the folder on both.
@@ -17,7 +17,7 @@ The hook's file wins over pairing by folder and time.
 # from the repository:
 python3 -m vulcan_terminal --instalar-hook
 # or with the code of the installed app on macOS (the native shell does not pass this option on):
-cd ~ && PYTHONPATH="$HOME/Applications/Vulcan Terminal.app/Contents/Resources" python3 -m vulcan_terminal --instalar-hook
+cd ~ && PYTHONPATH="$HOME/Applications/Vulcan Celox.app/Contents/Resources" python3 -m vulcan_terminal --instalar-hook
 ```
 
 The command:
@@ -35,12 +35,12 @@ The path goes in single quotes because Claude Code runs the command through the 
 
 If `settings.json` is not a valid JSON object, the command reports it, exits with code 1 and does not change that file.
 
-This is Vulcan Terminal's only write to `~/.claude`, and it happens only through this command. It respects `CLAUDE_CONFIG_DIR`.
+This is Vulcan Celox's only write to `~/.claude`, and it happens only through this command. It respects `CLAUDE_CONFIG_DIR`.
 
 ## Check
 
 1. In `~/.claude/settings.json`, the `hooks.SessionStart` entry with `vulcan-pareamento.py` is in single quotes.
-2. Open a tab in Vulcan Terminal and run `claude`. Within a few seconds `<data>/pairings/<session_id>.json` appears, and the session shows "pareada" (paired) on the Agents screen and in the tab's prompt bar.
+2. Open a tab in Vulcan Celox and run `claude`. Within a few seconds `<data>/pairings/<session_id>.json` appears, and the session shows "pareada" (paired) on the Agents screen and in the tab's prompt bar.
 3. Outside Vulcan, the hook writes nothing.
 
 ## Remove

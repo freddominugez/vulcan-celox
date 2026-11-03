@@ -1,6 +1,6 @@
 # Tarefas
 
-> Índice gerado automaticamente pelo Vulcan Terminal. Alterações feitas à mão neste arquivo serão sobrescritas.
+> Índice gerado automaticamente pelo Vulcan Celox. Alterações feitas à mão neste arquivo serão sobrescritas.
 
 **Progresso geral:** 3/7 · 43% `[████░░░░░░]`
 

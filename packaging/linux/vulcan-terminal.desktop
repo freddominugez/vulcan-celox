@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Vulcan Terminal
+Name=Vulcan Celox
 GenericName=Painel de desenvolvimento PHP
 Comment=Sites locais do Lerd, terminais, tarefas, post-its e documentação das sessões
 Exec=@EXEC@

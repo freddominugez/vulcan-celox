@@ -119,7 +119,7 @@ class IndexUsageTest(TempDirTestCase):
         index = AgentIndex(self.db)
         try:
             version = index.db.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0]
-            self.assertEqual((version, SCHEMA_VERSION), ("5", 5))
+            self.assertEqual((version, SCHEMA_VERSION), ("7", 7))
             self.assertEqual(index.db.execute("SELECT COUNT(*) FROM sessions").fetchone()[0], 0)
             index.update_file("claude", self.tmp / "c.jsonl")
             self.assertEqual(len(index.usage_rows()), 3)

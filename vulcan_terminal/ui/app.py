@@ -1,4 +1,4 @@
-"""Janela principal do Vulcan Terminal."""
+"""Janela principal do Vulcan Celox."""
 
 from __future__ import annotations
 
@@ -193,7 +193,7 @@ class App(tk.Tk):
         self._build_menu()
         header = ttk.Frame(self, style="Panel.TFrame")
         header.pack(fill="x")
-        ttk.Label(header, text="Vulcan Terminal", style="Brand.TLabel").pack(side="left", padx=14, pady=10)
+        ttk.Label(header, text="Vulcan Celox", style="Brand.TLabel").pack(side="left", padx=14, pady=10)
         self.var_status = tk.StringVar(value="…")
         ttk.Label(header, textvariable=self.var_status, style="PanelDim.TLabel").pack(side="left", padx=12)
         self.var_global_progress = tk.StringVar(value="")

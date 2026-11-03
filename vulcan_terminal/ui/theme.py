@@ -1,4 +1,4 @@
-"""Paleta, fontes e estilos ttk do Vulcan Terminal."""
+"""Paleta, fontes e estilos ttk do Vulcan Celox."""
 
 from __future__ import annotations
 

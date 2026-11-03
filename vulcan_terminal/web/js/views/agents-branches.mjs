@@ -3,6 +3,7 @@
 import { api, every, post } from "../api.mjs";
 import { esc, icon, reportError, shortPath } from "../dom.mjs";
 import { agentMark, copy, keepScroll, relTime } from "../agents-ui.mjs";
+import { loadPr, prEnabled, prHtml } from "../pr-status.mjs";
 
 const REFRESH_MS = 30000;  // git é caro: a tela se atualiza a cada 30 s ou pelo botão Atualizar
 
@@ -34,11 +35,20 @@ export class AgentsBranchesView {
       const data = await api(`/api/agents/repos${fresh ? "?fresh=1" : ""}`, { timeout: 120000 });  // git em vários repositórios
       this.projects = data.projects;
       keepScroll(this.root, () => this.render());
+      this.fillPr();
     } catch (err) {
       reportError(err);
     } finally {
       this.loading = false;
     }
+  }
+
+  /** Só com a preferência ligada: uma consulta por pasta, com cache de 60 s no servidor. */
+  fillPr() {
+    this.root.querySelectorAll("[data-pr-row]").forEach(async (slot) => {
+      const data = await loadPr({ path: slot.dataset.prRow });
+      if (slot.isConnected) slot.innerHTML = prHtml(data);
+    });
   }
 
   render() {
@@ -68,6 +78,8 @@ export class AgentsBranchesView {
         <span class="ag-pill ${TONE[r.state] || ""}">${esc(r.state)}</span>
         ${r.stale_days ? `<span class="ag-pill is-err">${icon("alert")}parada há ${r.stale_days} dias</span>` : ""}
         ${detail ? `<span class="dim hint">${esc(detail)}</span>` : ""}
+        ${r.state === "PR aberto" && !prEnabled() ? `<span class="dim hint">pelos comandos da sessão</span>` : ""}
+        ${prEnabled() && r.path ? `<span data-pr-row="${esc(r.path)}"></span>` : ""}
         ${r.sessions.map((s) => `<button type="button" class="ag-pill ag-pill-btn" data-open="${esc(s.id)}" title="Abrir sessão">${agentMark(s.agent)}${esc(relTime(s.last_activity_at))}</button>`).join("")}
       </div>
       <div class="ag-br-actions">

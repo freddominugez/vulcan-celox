@@ -109,6 +109,8 @@ class AgentSession:
     pairing_id: Optional[str] = None
     theme: Optional[str] = None
     loop_alert: Optional[Dict] = None
+    attention: Optional[Dict] = None
+    attention_hook: Optional[Dict] = None  # só na leitura, vem de <dados>/attention
     parse_errors: int = 0
     # contagens guardadas no resumo leve (a lista usa estas; files e commands só vêm no detalhe)
     files_count: int = 0

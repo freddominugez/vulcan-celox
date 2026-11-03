@@ -98,7 +98,7 @@ export class AgentsHistoryView {
     this.root.querySelector("[data-role=note]").innerHTML = `
       <div class="ag-note">${icon("info")}<div><b>Sessões antigas</b>
         <p>O ${AGENT_NAMES.claude} apaga sessões com mais de ${cleanup.days} dias (<code>cleanupPeriodDays</code> em <code>~/.claude/settings.json</code>${cleanup.configured ? "" : ", valor padrão"}).
-          O Vulcan Terminal guarda o resumo e o texto pesquisável dessas sessões no próprio índice, sem alterar a configuração do Claude.${data.fts ? "" : " Este SQLite não tem FTS5: a busca não ignora acentos."}</p></div></div>`;
+          O Vulcan Celox guarda o resumo e o texto pesquisável dessas sessões no próprio índice, sem alterar a configuração do Claude.${data.fts ? "" : " Este SQLite não tem FTS5: a busca não ignora acentos."}</p></div></div>`;
   }
 
   onClick(event) {

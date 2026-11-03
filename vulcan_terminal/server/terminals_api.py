@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict
 
 from vulcan_terminal.core import themes
+from vulcan_terminal.core.listening_ports import PortWatcher
 from vulcan_terminal.core.quick_commands import is_long_running
 from vulcan_terminal.server.local_http import HttpError, Request
 from vulcan_terminal.server.websocket import OP_BINARY, OP_TEXT, WebSocket, WebSocketError
@@ -92,6 +93,13 @@ def register_terminal_api(app) -> None:
     @srv.route("GET", "/api/terminals")
     def _list(_req: Request):
         return {"terminals": [s.info() for s in app.terminals.list()]}
+
+    port_watcher = PortWatcher(app.runner)
+
+    @srv.route("GET", "/api/terminals/ports")
+    def _ports(_req: Request):
+        tabs = [(s.id, s.pid) for s in app.terminals.list() if s.alive]
+        return port_watcher.ports(tabs)
 
     @srv.route("POST", "/api/terminals")
     def _create(req: Request):
