@@ -1,4 +1,4 @@
-"""vt-02 C6: compartilhar o site por túnel numa aba e achar a URL pública na saída.
+"""Compartilhar o site por túnel numa aba e achar a URL pública na saída.
 
 As saídas abaixo são ilustrativas (formato das ferramentas), não capturas: abrir um túnel público de verdade
 expõe o site do usuário na internet e não entra nos testes.

@@ -1,4 +1,4 @@
-"""vt-29 C3: prompts e categorias na pasta de dados do app saem 0600 e 0700 (regra do vt-20 C4); na pasta do
+"""Prompts e categorias na pasta de dados do app saem 0600 e 0700; na pasta do
 projeto continuam como o editor criaria."""
 import os
 import stat

@@ -1,4 +1,4 @@
-"""vt-17 C3: rotas dos prompts, criação com confirmação para a pasta do projeto e abertura só de arquivos de prompt."""
+"""Rotas dos prompts, criação com confirmação para a pasta do projeto e abertura só de arquivos de prompt."""
 
 from pathlib import Path
 
@@ -56,7 +56,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
     def test_prompt_do_projeto_pede_confirmacao_para_criar_a_pasta(self):
         project = self.tmp / "loja-real"
         project.mkdir()
-        self.app.store.save("node_projects", {"loja-real": str(project)})  # pasta conhecida (vt-28 C2)
+        self.app.store.save("node_projects", {"loja-real": str(project)})  # pasta conhecida
         body = {"title": "Só neste projeto", "category": "Testes", "scope": "project", "project_root": str(project)}
         status, data = self.post("/api/prompts", body)
         self.assertEqual((status, data.get("needs_confirmation")), (409, True))
@@ -66,7 +66,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
         self.assertTrue(Path(data["path"]).is_relative_to(project / ".vulcan" / "prompts"))
 
     def test_pasta_desconhecida_ou_dos_agentes_recusada(self):
-        """vt-28 C2: project_root precisa ser site, projeto Node ou sessão; nunca a pasta de dados de um agente."""
+        """Project_root precisa ser site, projeto Node ou sessão; nunca a pasta de dados de um agente."""
         stranger = self.tmp / "qualquer"
         stranger.mkdir()
         claude = self.tmp / "claude-home"

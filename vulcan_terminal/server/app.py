@@ -42,7 +42,7 @@ class VulcanApp:
                  port: int = 0, keystore=None, ai_transport=None):
         self.env = dict(os.environ if env is None else env)
         self.data_dir = paths.data_dir(self.env)
-        secure_data_dir(self.data_dir)  # 0700/0600: memórias e eventos dos agentes só do usuário (vt-20 C4)
+        secure_data_dir(self.data_dir)  # 0700/0600: memórias e eventos dos agentes só do usuário
         self.store = Store(self.data_dir)
         migrate_legacy(self.store, paths.legacy_dir(self.env))
         self.notebook = Notebook(self.store)
@@ -131,12 +131,12 @@ class VulcanApp:
             },
         }
 
-    # ── novo terminal (vt-18 C4) ─────────────────────────────────────────
+    # ── novo terminal ─────────────────────────────────────────
     def spawn_terminal(self, cwd: str, title: str, theme: Optional[str], site: Optional[str] = None,
                        rows: int = 30, cols: int = 110, command: Optional[str] = None, typed: Optional[str] = None):
         """Cria a aba, registra a sessão e, se `typed` vier, digita o comando (agente) assim que o shell nascer.
         O shell guarda o que chega antes de ficar pronto; o comando entra no registro da aba para o pareamento por
-        pasta e horário (vt-18 C3). `typed` é sempre montado pelo servidor a partir de valores validados."""
+        pasta e horário. `typed` é sempre montado pelo servidor a partir de valores validados."""
         session = self.terminals.create(cwd, command=command, title=title[:60], site=site, rows=rows, cols=cols,
                                         theme=theme)
         self.hub.on_created(session)
@@ -234,7 +234,7 @@ class VulcanApp:
                     raise HttpError(400, "só arquivos de prompt (.md da pasta de prompts) podem ser abertos assim")
                 argv = open_argv("editor", str(Path(target).resolve()), self.env)
             elif kind == "source":
-                # vt-06 C2: arquivo de origem de um evento de depuração, só se estiver dentro de um site registrado
+                # Arquivo de origem de um evento de depuração, só se estiver dentro de um site registrado
                 path = Path(os.path.abspath(target))
                 roots = [Path(os.path.abspath(s.path)) for s in self.sites() if s.path]
                 if not path.is_file() or not any(r in path.parents for r in roots):
@@ -277,7 +277,7 @@ class VulcanApp:
 def _watch_parent(parent_pid: int, shutdown=None, getppid=os.getppid, exit=os._exit, interval: float = 1.0,
                   grace: float = 3.0) -> None:
     """App nativo encerrou (até de forma anormal): grava memórias e fecha as abas com prazo, depois sai sem deixar
-    servidor nem PTYs órfãos (vt-20 C7, QUA-M6)."""
+    servidor nem PTYs órfãos."""
     while True:
         time.sleep(interval)
         if getppid() != parent_pid:

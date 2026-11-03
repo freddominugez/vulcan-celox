@@ -1,4 +1,4 @@
-"""vt-05 C1: estado do ambiente do Lerd (DNS, nginx, PHP-FPM, watcher, serviços) e ações nos serviços.
+"""Estado do ambiente do Lerd (DNS, nginx, PHP-FPM, watcher, serviços) e ações nos serviços.
 
 `lerd-api-status.json` é resposta real do Lerd. `lerd-api-services-montada.json` foi montada com os campos que o
 painel do próprio Lerd 1.37.1 lê de /api/services (name, status "active", version, pinned, connection_url...),
@@ -72,7 +72,7 @@ class ApiTest(ServerTestCase):
 
 
 class CacheTest(ApiTest):
-    """vt-21 C4 (AUD-05): a tela Ambiente atualiza a cada 15 s; php:list e xdebug status ficam 60 s guardados."""
+    """A tela Ambiente atualiza a cada 15 s; php:list e xdebug status ficam 60 s guardados."""
 
     def tearDown(self):
         self.app.terminals.close_all()

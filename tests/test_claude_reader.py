@@ -1,4 +1,4 @@
-"""vt-16 C3: leitor do Claude Code com fixture real anonimizada e casos sintéticos."""
+"""Leitor do Claude Code com fixture real anonimizada e casos sintéticos."""
 
 import json
 import tempfile

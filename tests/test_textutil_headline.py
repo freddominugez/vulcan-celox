@@ -1,4 +1,4 @@
-"""vt-33 (P-009): título curto a partir do pedido colado."""
+"""Título curto a partir do pedido colado."""
 import unittest
 
 from vulcan_terminal.core.textutil import HEADLINE_MAX, headline

@@ -1,4 +1,4 @@
-"""vt-25 C1: leitor de projeto Node, só leitura e sem abrir .env."""
+"""Leitor de projeto Node, só leitura e sem abrir.env."""
 
 import builtins
 import os

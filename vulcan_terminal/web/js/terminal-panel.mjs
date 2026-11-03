@@ -1,4 +1,4 @@
-// Painel inferior de terminal (vt-19 C1, D-009): abaixo das telas que não têm terminal, com as abas de todos os
+// Painel inferior de terminal: abaixo das telas que não têm terminal, com as abas de todos os
 // terminais. ⌘J mostra e esconde, a borda de cima arrasta, a altura fica lembrada. Nas telas de site e Terminais o
 // terminal já ocupa a área principal: o painel se recolhe e devolve os terminais (um xterm só fica num lugar).
 

@@ -45,7 +45,7 @@ step() { printf '\n==> %s\n' "$*"; }
 step "compileall"
 "$PY" -m compileall -q vulcan_terminal tests
 
-step "manual em Markdown igual à Ajuda (vt-26 C4)"
+step "manual em Markdown igual à Ajuda"
 "$PY" scripts/manual_md.py "$TMP_ROOT/MANUAL.md" > /dev/null
 cmp -s "$TMP_ROOT/MANUAL.md" docs/pt-BR/user-guide.md || { echo "docs/pt-BR/user-guide.md desatualizado: rode python3 scripts/manual_md.py"; exit 1; }
 
@@ -77,7 +77,7 @@ if [ -f scripts/build_app.sh ]; then
   [ -f "$shot_png" ] && [ "$(stat -f %z "$shot_png")" -gt 20000 ] || { echo "captura do guia ausente no pacote: $shot_png"; exit 1; }
   [ "$(sips -g pixelWidth "$icns" 2>/dev/null | awk '/pixelWidth/ {print $2}')" = "1024" ] || { echo "AppIcon.icns ausente ou sem 1024 px"; exit 1; }
 
-  # vt-21 C3: painel ou faixa visível com um filho em fluxo normal passando da borda de baixo vira erro
+  # Painel ou faixa visível com um filho em fluxo normal passando da borda de baixo vira erro
   # (overflow hidden + contêiner que espreme); decoração em posição absoluta não conta
   CLIP_JS="setTimeout(function () { document.querySelectorAll('.panel, .ag-banner').forEach(function (el) {
     if (el.offsetParent === null) return;
@@ -96,10 +96,10 @@ if [ -f scripts/build_app.sh ]; then
     [ "$(stat -f %z "$shot")" -gt 20000 ] || { echo "snapshot vazio: $shot"; exit 1; }
   done
 
-  step "telas com Lerd simulado (vt-21 C2)"
+  step "telas com Lerd simulado"
   # API falsa com as fixtures reais e um lerd falso; o Lerd de verdade nunca é tocado. A sessão de agente das
   # fixtures roda em /Users/dev/projeto entre 01:04 e 01:46 UTC: o site loja aponta para lá e os eventos caem às 01:10.
-  # vt-23 C2: o site vulcan-demo aponta para a fixture com harness do formato do repositório
+  # O site vulcan-demo aponta para a fixture com harness do formato do repositório
   "$PY" -I tests/tools/fake_lerd_api.py --site-path loja=/Users/dev/projeto \
     --site-path vulcan-demo="$ROOT/tests/fixtures/harness/repo" --dumps-at 2026-10-31T01:10 \
     > "$TMP_ROOT/lerd-api.port" 2>/dev/null &
@@ -114,7 +114,7 @@ if [ -f scripts/build_app.sh ]; then
       var t = setInterval(function () { if (document.querySelector(s)) { var i = window.__vtErrors.indexOf(tag);
         if (i >= 0) window.__vtErrors.splice(i, 1); clearInterval(t); } }, 150); });"
   }
-  # vt-21 C4: texto selecionado num dump continua selecionado depois de duas voltas da atualização (2 s cada)
+  # Texto selecionado num dump continua selecionado depois de duas voltas da atualização (2 s cada)
   SEL_JS="(function () { var tag = 'seleção perdida na Depuração'; window.__vtErrors.push(tag);
     var t = setInterval(function () { var d = document.querySelector('.debug-dump'); if (!d) return; clearInterval(t);
       var r = document.createRange(); r.selectNodeContents(d); getSelection().removeAllRanges(); getSelection().addRange(r);
@@ -137,9 +137,9 @@ if [ -f scripts/build_app.sh ]; then
     shot="$TMP_ROOT/lerd-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     extra=""; wait_s=4
     if [ "$route" = "#/depuracao" ]; then extra="$SEL_JS"; wait_s=7; fi
-    # vt-26 C1: a captura do guia precisa carregar de verdade
-    # vt-26 C2: busca por "custo" deixa à vista só seções e perguntas com a palavra
-    # vt-26 C3: o botão ? da tela Uso e custo leva à seção custo da Ajuda
+    # A captura do guia precisa carregar de verdade
+    # Busca por "custo" deixa à vista só seções e perguntas com a palavra
+    # O botão ? da tela Uso e custo leva à seção custo da Ajuda
     if [ "$route" = "#/agentes/uso/2026-10-31" ]; then extra="(function () { var tag = 'botão ? não levou a #/ajuda/custo'; window.__vtErrors.push(tag);
       setTimeout(function () { document.getElementById('help-here').click(); setTimeout(function () {
         if (location.hash === '#/ajuda/custo' && document.querySelector('#hp-custo')) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 900); }, 3500); })();"; wait_s=6; fi
@@ -151,7 +151,7 @@ if [ -f scripts/build_app.sh ]; then
         var bad = vis.filter(function (e) { return fold(e.textContent).indexOf('custo') < 0; });
         if (vis.length >= 2 && !bad.length) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
         else window.__vtErrors.push('busca: ' + vis.length + ' visíveis, ' + bad.length + ' sem a palavra'); }, 200); })();"; fi
-    # vt-27 C1: nenhum marcador {{nome}} à vista na grade de prompts; C2: o compositor tem campos e a prévia muda ao editar
+    # Nenhum marcador {{nome}} à vista na grade de prompts; o compositor tem campos e a prévia muda ao editar
     if [ "$route" = "#/prompts" ]; then extra="setTimeout(function () { var g = document.querySelectorAll('.pr-grid');
       Array.prototype.forEach.call(g, function (e) { if (e.innerText.indexOf('{{') >= 0) window.__vtErrors.push('marcador {{ à vista na grade'); });
       var tag = 'compositor: prévia não acompanhou o campo'; window.__vtErrors.push(tag);
@@ -159,9 +159,9 @@ if [ -f scripts/build_app.sh ]; then
       var i = document.querySelector('.pc-field input[name=branch]'); if (!i || !document.querySelector('.pc-preview mark')) return;
       i.value = 'teste-do-sensor'; i.dispatchEvent(new Event('input', { bubbles: true }));
       if (document.querySelector('.pc-preview').textContent.indexOf('teste-do-sensor') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 2500);"; wait_s=5; fi
-    # vt-27 C4: grupos fixos, nenhum item perdido (17: os 16 de antes e Sites PHP) e o grupo Agentes recolhe e volta
-    # vt-29 C6: o foco do teclado continua no cabeçalho do grupo depois de recolher
-    # vt-32 C2: a paleta (⌘K) abre e lista: era a única parte do antigo app.mjs sem roteiro
+    # Grupos fixos, nenhum item perdido (17: os 16 de antes e Sites PHP) e o grupo Agentes recolhe e volta
+    # O foco do teclado continua no cabeçalho do grupo depois de recolher
+    # A paleta (⌘K) abre e lista: era a única parte do antigo app.mjs sem roteiro
     if [ "$route" = "#/overview" ]; then extra="setTimeout(function () {
       var ids = Array.prototype.map.call(document.querySelectorAll('.nav-group'), function (g) { return g.dataset.group; }).join(',');
       if (ids !== 'geral,projetos,ambiente,agentes,organizar,ajuda') window.__vtErrors.push('grupos: ' + ids);
@@ -178,7 +178,7 @@ if [ -f scripts/build_app.sh ]; then
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
       var inp = document.getElementById('palette-input'); inp.value = 'ajuda'; inp.dispatchEvent(new Event('input', { bubbles: true }));
       setTimeout(function () { if (document.querySelectorAll('.pal-item').length) window.__vtErrors.splice(window.__vtErrors.indexOf(pal), 1); }, 800); }, 2500);"; fi
-    # vt-29 C5: Enter no último passo do guia seleciona o passo e o foco fica nele
+    # Enter no último passo do guia seleciona o passo e o foco fica nele
     if [ "$route" = "#/inicio" ]; then extra="setTimeout(function () { var i = document.querySelector('.in-shot img');
       if (!i || !i.naturalWidth) window.__vtErrors.push('captura do guia não carregou');
       var s = document.querySelectorAll('.in-step'); var alvo = s[s.length - 1]; if (!alvo) return;
@@ -188,7 +188,7 @@ if [ -f scripts/build_app.sh ]; then
     lerd_env "dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal" --snapshot "$shot" --route "$route" --wait "$wait_s" \
       --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
   done
-  # vt-25 C4: projeto Node registrado pela própria API da página (fixture só leitura) e aberto na tela dele
+  # Projeto Node registrado pela própria API da página (fixture só leitura) e aberto na tela dele
   if [ "$lerd_ok" -eq 0 ]; then
     NODE_JS="import('./js/api.mjs').then(function (m) { return m.post('/api/node-projects', { path: '$ROOT/tests/fixtures/node/painel', name: 'painel' }); })
       .then(function () { window.dispatchEvent(new CustomEvent('vulcan-node-changed')); location.hash = '#/node/painel'; }, function (e) { window.__vtErrors.push('node: ' + e.message); });"
@@ -200,7 +200,7 @@ if [ -f scripts/build_app.sh ]; then
   wait "$LERD_API_PID" 2>/dev/null || true
   [ "$lerd_ok" -eq 0 ] || exit 1
 
-  step "texto digitado sobrevive à mudança da lista de sites (vt-29 C4)"
+  step "texto digitado sobrevive à mudança da lista de sites"
   # API falsa com um site que aparece e some a cada 3 s; o campo do compositor de Prompts precisa manter o texto
   "$PY" -I tests/tools/fake_lerd_api.py --site-path loja=/Users/dev/projeto --sites-alternam 3 \
     > "$TMP_ROOT/lerd-alterna.port" 2>/dev/null &
@@ -220,7 +220,7 @@ if [ -f scripts/build_app.sh ]; then
   wait "$ALT_PID" 2>/dev/null || true
   [ "$alt_ok" -eq 0 ] || { echo "falhou: #/prompts com a lista de sites mudando"; exit 1; }
 
-  step "janela presa à origem do app (vt-20 C2)"
+  step "janela presa à origem do app"
   # outra origem que responde de verdade: sem a política de navegação a janela iria para lá e o snapshot sai com 4
   mkdir -p "$TMP_ROOT/fora" && echo '<html><body>fora</body></html>' > "$TMP_ROOT/fora/index.html"
   "$PY" -c 'import http.server, functools, sys
@@ -237,7 +237,7 @@ s = http.server.HTTPServer(("127.0.0.1", 0), h); print(s.server_port, flush=True
   wait "$FORA_PID" 2>/dev/null || true
   [ "$nav_ok" -eq 0 ] || { echo "a janela saiu do app ou falhou (saída $nav_ok)"; exit 1; }
 
-  step "servidor não importa módulo da pasta atual (vt-20 C4)"
+  step "servidor não importa módulo da pasta atual"
   mkdir -p "$TMP_ROOT/hostil"
   printf "open(%s, 'w').write('x')\n" "'$TMP_ROOT/importou'" > "$TMP_ROOT/hostil/secrets.py"
   app_bin="$ROOT/dist/Vulcan Terminal.app/Contents/MacOS/vulcan-terminal"

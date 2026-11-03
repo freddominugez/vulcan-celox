@@ -1,4 +1,4 @@
-"""vt-29 C1: processos do grupo em primeiro plano da aba, com PTY real e /proc falso."""
+"""Processos do grupo em primeiro plano da aba, com PTY real e /proc falso."""
 import os
 import shutil
 

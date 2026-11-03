@@ -123,7 +123,7 @@ export function keepScroll(root, draw) {
   if (next) next.scrollTop = top;
 }
 
-/** Consulta a revisão do índice a cada 2 s e chama onChange quando muda (D-005). */
+/** Consulta a revisão do índice a cada 2 s e chama onChange quando muda. */
 export class RevisionWatch {
   constructor(onChange, interval = 2000) {
     this.onChange = onChange;

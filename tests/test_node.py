@@ -1,4 +1,4 @@
-"""vt-05 C5: Node pelo Lerd (padrão, gerenciador, instaladas; instalar, tornar padrão e remover).
+"""Node pelo Lerd (padrão, gerenciador, instaladas; instalar, tornar padrão e remover).
 
 As instaladas vêm de GET /api/node-versions, a rota que o painel do Lerd 1.37.1 usa; nesta máquina ela respondeu
 ["24","26"], o mesmo que `mise ls node`.

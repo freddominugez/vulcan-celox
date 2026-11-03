@@ -1,6 +1,6 @@
-"""Log do Laravel (storage/logs/laravel.log) para a aba Logs do site (vt-05 C6).
+"""Log do Laravel (storage/logs/laravel.log) para a aba Logs do site.
 
-Leitura incremental pelo offset, só linhas completas, como os JSONL dos agentes (D-014): nenhum `tail -F` fica vivo
+Leitura incremental pelo offset, só linhas completas, como os JSONL dos agentes: nenhum `tail -F` fica vivo
 por aba. Linhas que não começam com data (stack trace) entram na entrada anterior.
 """
 

@@ -27,7 +27,7 @@ class SessionRecord:
     closed_at: Optional[str] = None
     exit_code: Optional[int] = None
     memory_file: Optional[str] = None
-    theme: Optional[str] = None  # vt-18: identidade de cor da aba, a mesma da sessão de agente pareada
+    theme: Optional[str] = None  # Identidade de cor da aba, a mesma da sessão de agente pareada
 
     @property
     def is_open(self) -> bool:

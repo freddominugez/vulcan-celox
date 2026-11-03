@@ -1,4 +1,4 @@
-"""vt-02 C3: HTTPS, PHP e Node do site a partir do registro do Lerd, e as ações que os mudam."""
+"""HTTPS, PHP e Node do site a partir do registro do Lerd, e as ações que os mudam."""
 
 import json
 import os

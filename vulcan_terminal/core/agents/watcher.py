@@ -79,7 +79,7 @@ class AgentWatcher:
                 debouncer.touch()
                 scheduled += 1
         for key in [k for k in self._seen if k not in current and k not in self._pending]:
-            del self._seen[key]  # arquivo removido ou arquivado: não fica na memória para sempre (vt-20 C5)
+            del self._seen[key]  # arquivo removido ou arquivado: não fica na memória para sempre
         self.last_scan = time.time()
         return scheduled
 
@@ -100,7 +100,7 @@ class AgentWatcher:
         return read
 
     def settled(self) -> bool:
-        """Já varreu ao menos uma vez e não há arquivo esperando leitura nem sendo lido (vt-22 C4)."""
+        """Já varreu ao menos uma vez e não há arquivo esperando leitura nem sendo lido."""
         return self.last_scan is not None and not self._pending and not self._reading
 
     def poll(self, flush: bool = False) -> List[str]:

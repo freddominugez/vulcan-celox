@@ -14,7 +14,7 @@ function readToken() {
   const match = /token=([^&]+)/.exec(location.hash) || /token=([^&]+)/.exec(location.search);
   if (match) {
     stored(match[1]);
-    // tira o token da barra e do histórico (vt-20 C4); o lançador do Linux manda a rota em route=
+    // tira o token da barra e do histórico; o lançador do Linux manda a rota em route=
     const route = /route=([^&]+)/.exec(location.hash);
     history.replaceState(null, "", `${location.pathname}#${route ? route[1] : "/overview"}`);
     return match[1];
@@ -39,7 +39,7 @@ export class ApiError extends Error {
 const TIMEOUT_MS = 20000;
 
 export async function api(path, { method = "GET", body, timeout = TIMEOUT_MS } = {}) {
-  // prazo: um servidor ocupado não deixa consultas empilhadas para sempre (vt-20 C8)
+  // prazo: um servidor ocupado não deixa consultas empilhadas para sempre
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), timeout);
   let response;
@@ -74,7 +74,7 @@ export const patch = (path, body = {}) => api(path, { method: "PATCH", body });
 export const put = (path, body = {}) => api(path, { method: "PUT", body });
 export const del = (path) => api(path, { method: "DELETE" });
 
-/** Repete `fn` a cada `ms` depois que a anterior terminou, e não consulta com a janela oculta (vt-20 C8).
+/** Repete `fn` a cada `ms` depois que a anterior terminou, e não consulta com a janela oculta.
  *  Devolve a função que para. */
 export function every(ms, fn) {
   let timer = null;

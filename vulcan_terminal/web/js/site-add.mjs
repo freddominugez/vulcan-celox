@@ -1,4 +1,4 @@
-// Adicionar site (vt-02 C2): linkar uma pasta com um domínio ou parkear uma pasta de projetos, pelo backend.
+// Adicionar site: linkar uma pasta com um domínio ou parkear uma pasta de projetos, pelo backend.
 
 import { get, hasBridge, post } from "./api.mjs";
 import { esc, icon, toast } from "./dom.mjs";

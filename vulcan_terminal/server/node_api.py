@@ -1,4 +1,4 @@
-"""Projetos Node (vt-25): lista guardada pelo app, detalhe lido do disco e sugestões vindas das sessões dos agentes.
+"""Projetos Node: lista guardada pelo app, detalhe lido do disco e sugestões vindas das sessões dos agentes.
 
 A lista é só do app (`node_projects` no Store): tirar um projeto dela não toca na pasta.
 """
@@ -125,7 +125,7 @@ class NodeProjects:
     def __init__(self, app):
         self.app = app
         self._lock = threading.Lock()
-        self.list_lock = threading.Lock()  # vt-28 C3: a lista salva de projetos
+        self.list_lock = threading.Lock()  # A lista salva de projetos
         self._runs: Dict[str, List[Dict[str, Any]]] = {}  # projeto -> abas abertas por ele (memória desta execução)
 
     def start(self, name: str, path: str, label: str, typed: str) -> Dict[str, Any]:

@@ -1,4 +1,4 @@
-"""vt-16 C5: índice sqlite das sessões de agente e observação incremental das pastas."""
+"""Índice sqlite das sessões de agente e observação incremental das pastas."""
 
 import json
 import os

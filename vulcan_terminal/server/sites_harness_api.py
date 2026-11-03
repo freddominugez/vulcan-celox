@@ -1,4 +1,4 @@
-"""Harness de um site pela interface (vt-23 C2 a C4); separado de sites_api.py no vt-32 C2."""
+"""Harness de um site pela interface."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ def register_site_harness_api(srv, site_or_404, site_name: str) -> None:
 
     @srv.route("GET", rf"/api/sites/{site_name}/harness/install")
     def site_harness_plan(req: Request):
-        """Lista exata dos arquivos e do conteúdo que a instalação criaria; nada é gravado (vt-23 C3)."""
+        """Lista exata dos arquivos e do conteúdo que a instalação criaria; nada é gravado."""
         site = site_or_404(req.params["name"])
         try:
             return {"arquivos": harness.install_plan(Path(site.path))}
@@ -46,7 +46,7 @@ def register_site_harness_api(srv, site_or_404, site_name: str) -> None:
 
     @srv.route("POST", rf"/api/sites/{site_name}/harness/tasks")
     def site_harness_task(req: Request):
-        """Novo contrato no formato mínimo, preenchido pelo formulário; APROVAÇÃO fica pendente (vt-23 C4)."""
+        """Novo contrato no formato mínimo, preenchido pelo formulário; APROVAÇÃO fica pendente."""
         site = site_or_404(req.params["name"])
         try:
             return harness.create_task(Path(site.path), req.json())

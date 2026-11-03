@@ -1,4 +1,4 @@
-"""vt-33 C1: aceite de ponta a ponta do caminho aba, sessão e prompt, com PTY e shell reais.
+"""Aceite de ponta a ponta do caminho aba, sessão e prompt, com PTY e shell reais.
 
 Só o agente é falso: um executável chamado `claude` que grava a sessão como o Claude Code e guarda o que chega pelo
 terminal. Nunca roda o Claude Code de verdade e nunca toca em ~/.claude. O servidor, o índice, o pareamento por pasta

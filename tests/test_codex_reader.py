@@ -1,4 +1,4 @@
-"""vt-16 C4: leitor do Codex com fixture real anonimizada (0.166.0) e fixture sintética de versão anterior."""
+"""Leitor do Codex com fixture real anonimizada (0.166.0) e fixture sintética de versão anterior."""
 
 import json
 import unittest
@@ -29,7 +29,7 @@ class CodexFixtureRealTest(unittest.TestCase):
         s = self.s
         self.assertEqual((s.id, s.agent, s.cwd, s.project_name), (SID, "codex", "/Users/dev/clerk", "clerk"))
         self.assertEqual((s.model, s.cli_version), ("gpt-6.1-sol", "0.166.0"))
-        self.assertIsNone(s.git_branch)  # o 0.166.0 não grava git: o app resolve pelo cwd (C8)
+        self.assertIsNone(s.git_branch)  # o 0.166.0 não grava git: o app resolve pelo cwd
         self.assertEqual(s.parse_errors, 0)
 
     def test_pedidos_comandos_e_arquivos_do_item_completed(self):
@@ -93,7 +93,7 @@ class CodexVersaoAnteriorTest(TempDirTestCase):
         self.assertEqual((s.turns, s.first_user_message), (1, "arrume o README"))
 
     def test_origem_da_sessao(self):
-        """vt-31 C1: subagente e app desktop são marcados; terminal e versão antiga ficam sem marca."""
+        """Subagente e app desktop são marcados; terminal e versão antiga ficam sem marca."""
         def origin(meta):
             path = self.tmp / "rollout-o.jsonl"
             path.write_text(json.dumps({"type": "session_meta", "payload": dict({"id": "o", "cwd": "/r"}, **meta)}) + "\n", encoding="utf-8")

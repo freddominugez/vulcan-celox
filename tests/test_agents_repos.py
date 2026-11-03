@@ -1,4 +1,4 @@
-"""vt-16 C8: branches e worktrees cruzando as sessões com o git real (só leitura)."""
+"""Branches e worktrees cruzando as sessões com o git real (só leitura)."""
 
 import shutil
 import unittest
@@ -108,7 +108,7 @@ class ReposTest(unittest.TestCase):
         self.build([session("s1", "/dev/loja", "main")])
         self.assertTrue(self.runner.calls)
         for call in self.runner.calls:
-            # vt-16b C4: sem fsmonitor nem untrackedCache, o git status não executa programa do repositório analisado
+            # Sem fsmonitor nem untrackedCache, o git status não executa programa do repositório analisado
             self.assertEqual(list(call.argv[:len(SAFE)]), SAFE)
             verb = call.argv[len(SAFE) + 2]
             self.assertNotIn(verb, WRITE_VERBS, call.argv)

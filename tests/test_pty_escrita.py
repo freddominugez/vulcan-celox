@@ -1,4 +1,4 @@
-"""vt-29 C2: escrita no PTY com trava e prazo. Uma colagem grande não se mistura com teclas de outra thread e
+"""Escrita no PTY com trava e prazo. Uma colagem grande não se mistura com teclas de outra thread e
 uma aba que não lê a entrada não prende a thread HTTP."""
 import os
 import threading

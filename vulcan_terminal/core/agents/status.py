@@ -43,7 +43,7 @@ def indexed_counts(data_dir: Path) -> Dict[str, int]:
 
 
 def last_error(data_dir: Path) -> Optional[str]:
-    """Último erro do observador de agentes, gravado no índice pelo app (vt-20 C5)."""
+    """Último erro do observador de agentes, gravado no índice pelo app."""
     path = index_path(data_dir)
     if not path.is_file():
         return None
@@ -75,7 +75,7 @@ def collect(env: Optional[Mapping[str, str]] = None, data_dir: Optional[Path] = 
         "codex_dirs": [str(p) for p in codex_roots], "codex_found": any(p.is_dir() for p in codex_roots),
         "claude_session_files": len(discovery.claude_session_files(claude)),
         "codex_session_files": len(codex_files), "codex_zst_ignored": zst,
-        "codex_zst_reader": zstd,  # vt-31 C2: com o comando, os .jsonl.zst são lidos; sem ele, ignorados e contados
+        "codex_zst_reader": zstd,  # Com o comando, os.jsonl.zst são lidos; sem ele, ignorados e contados
         "claude_cleanup": claude_cleanup_days(claude),
         "fts5": history.fts5_available(),
     }

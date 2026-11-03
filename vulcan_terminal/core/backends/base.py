@@ -56,12 +56,12 @@ class Backend:
     def list_sites(self, manual: Optional[Mapping[str, str]] = None) -> List[Site]:
         return discover_sites(self.valet_home if self.available else None, manual)
 
-    # Ações de site (vt-02 C1). Cada backend diz o argv e a pasta de trabalho em `site_command`; a execução, a
+    # Ações de site. Cada backend diz o argv e a pasta de trabalho em `site_command`; a execução, a
     # validação e o "sem backend" ficam aqui. Valor que começaria com hífen viraria opção da CLI: é recusado.
     def site_command(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
         raise NotImplementedError(f"{self.label} não tem a ação {action}")
 
-    # o que o backend escreve na pasta do projeto em cada ação, para a interface avisar antes (vt-02)
+    # o que o backend escreve na pasta do projeto em cada ação, para a interface avisar antes
     project_writes: Dict[str, str] = {}
 
     @staticmethod

@@ -132,7 +132,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "rid": "0065f29392b873830"
   },
   "src": {
@@ -399,7 +399,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "rid": "0065f29392b873830"
   },
   "src": {
@@ -666,7 +666,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "rid": "0065f29392b873830"
   },
   "src": {
@@ -933,7 +933,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "pid": 3,
    "rid": "0065f29392b873830"
   },
@@ -943,7 +943,7 @@
   },
   "data": {
    "level": "error",
-   "message": "Erro de teste do vt-06",
+   "message": "Erro de teste do exemplo",
    "channel": "local",
    "context": "array:1 [\n  \"pedido\" => 42\n]",
    "trace": [
@@ -1189,7 +1189,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "pid": 3,
    "rid": "0065f29392b873830"
   },
@@ -1208,7 +1208,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "rid": "0065f29392b873830"
   },
   "src": {
@@ -1475,7 +1475,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "rid": "0065f29392b873830"
   },
   "src": {
@@ -1747,7 +1747,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06",
+   "request": "GET /exemplo",
    "pid": 3,
    "rid": "0065f29392b873830"
   },
@@ -1771,7 +1771,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -2038,7 +2038,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -2305,7 +2305,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -2572,7 +2572,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "pid": 2,
    "rid": "0065f29392f658220"
   },
@@ -2582,7 +2582,7 @@
   },
   "data": {
    "level": "error",
-   "message": "Erro de teste do vt-06",
+   "message": "Erro de teste do exemplo",
    "channel": "local",
    "context": "array:1 [\n  \"pedido\" => 42\n]",
    "trace": [
@@ -2828,7 +2828,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "pid": 2,
    "rid": "0065f29392f658220"
   },
@@ -2847,7 +2847,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "pid": 2,
    "rid": "0065f29392f658220"
   },
@@ -2857,9 +2857,9 @@
   },
   "data": {
    "level": "error",
-   "message": "Falha de teste do vt-06",
+   "message": "Falha de teste do exemplo",
    "channel": "local",
-   "context": "array:1 [\n  \"exception\" => RuntimeException {#307\n    #message: \"Falha de teste do vt-06\"\n    #code: 0\n    #file: \"/Users/dev/Code/loja/routes/web.php\"\n    #line: 15\n    trace: {\n      /Users/dev/Code/loja/routes/web.php:15 {\n        Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}\n        › if (request('erro') === '1') {\n        ›     throw new \\RuntimeException('Falha de teste do vt-06');\n        › }\n      }\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php:39 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php:254 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:835 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php:52 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php:104 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php:48 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:120 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:63 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php:36 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php:74 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:834 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:813 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:777 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:766 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:38 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php:31 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:38 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php:51 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php:27 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php:110 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php:61 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php:58 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php:22 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php:28 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1228 { …}\n      /Users/dev/Code/loja/public/index.php:20 { …}\n    }\n  }\n]",
+   "context": "array:1 [\n  \"exception\" => RuntimeException {#307\n    #message: \"Falha de teste do exemplo\"\n    #code: 0\n    #file: \"/Users/dev/Code/loja/routes/web.php\"\n    #line: 15\n    trace: {\n      /Users/dev/Code/loja/routes/web.php:15 {\n        Illuminate\\Routing\\RouteFileRegistrar->{closure:/Users/dev/Code/loja/routes/web.php:9}\n        › if (request('erro') === '1') {\n        ›     throw new \\RuntimeException('Falha de teste do exemplo');\n        › }\n      }\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php:39 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php:254 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Route.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:835 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php:52 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php:104 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php:48 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:120 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php:63 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php:36 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php:74 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:834 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:813 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:777 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Routing/Router.php:766 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:200 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:180 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:38 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php:31 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php:38 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php:51 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php:27 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php:110 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php:61 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php:58 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php:22 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php:28 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:219 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:137 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:175 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:144 { …}\n      /Users/dev/Code/loja/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:1228 { …}\n      /Users/dev/Code/loja/public/index.php:20 { …}\n    }\n  }\n]",
    "trace": [
     {
      "file": "/Users/dev/Code/loja/vendor/monolog/monolog/src/Monolog/Logger.php",
@@ -3103,7 +3103,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -3370,7 +3370,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -3642,7 +3642,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "pid": 2,
    "rid": "0065f29392f658220"
   },
@@ -3666,7 +3666,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -3935,7 +3935,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -3951,7 +3951,7 @@
    ],
    "data_preview": {
     "exception": "Exception",
-    "exceptionAsMarkdown": "\"# RuntimeException - Internal Server Error\n\nFalha de teste do vt-06\n\nPHP 8.5.12\nLaravel 13.39.0\nloja.test\n\n## Stack Trace\n\n0 - routes/web.php:15\n1 - ven...\""
+    "exceptionAsMarkdown": "\"# RuntimeException - Internal Server Error\n\nFalha de teste do exemplo\n\nPHP 8.5.12\nLaravel 13.39.0\nloja.test\n\n## Stack Trace\n\n0 - routes/web.php:15\n1 - ven...\""
    },
    "trace": [
     {
@@ -4206,7 +4206,7 @@
    "type": "fpm",
    "site": "loja",
    "domain": "loja.test",
-   "request": "GET /vt06?erro=1",
+   "request": "GET /exemplo?erro=1",
    "rid": "0065f29392f658220"
   },
   "src": {
@@ -4222,7 +4222,7 @@
    ],
    "data_preview": {
     "title": "\"Internal Server Error\"",
-    "markdown": "\"# RuntimeException - Internal Server Error\n\nFalha de teste do vt-06\n\nPHP 8.5.12\nLaravel 13.39.0\nloja.test\n\n## Stack Trace\n\n0 - routes/web.php:15\n1 - ven...\""
+    "markdown": "\"# RuntimeException - Internal Server Error\n\nFalha de teste do exemplo\n\nPHP 8.5.12\nLaravel 13.39.0\nloja.test\n\n## Stack Trace\n\n0 - routes/web.php:15\n1 - ven...\""
    },
    "trace": [
     {

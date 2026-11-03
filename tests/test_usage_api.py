@@ -1,4 +1,4 @@
-"""vt-22 C3 e C5: API de uso (JSON e CSV) sobre as fixtures."""
+"""API de uso (JSON e CSV) sobre as fixtures."""
 
 import csv
 import io

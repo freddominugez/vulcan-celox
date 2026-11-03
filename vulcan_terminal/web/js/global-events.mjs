@@ -1,4 +1,4 @@
-// Ouvintes globais da casca; separados de app.mjs no vt-32 C2.
+// Ouvintes globais da casca.
 
 import { onJobsChange } from "./ai.mjs";
 import { isMac, isNative, post } from "./api.mjs";
@@ -29,7 +29,7 @@ export function bindGlobalEvents() {
     const dash = event.target.closest("[data-action='dashboard']");
     if (dash && dash.closest("#side-env")) post("/api/open", { kind: "dashboard" }).catch(reportError);
     if (event.target.closest("#open-palette")) palette.open();
-    if (event.target.closest("#help-here")) runCommand("help");  // vt-26 C3: Ajuda já na seção da tela atual
+    if (event.target.closest("#help-here")) runCommand("help");  // Ajuda já na seção da tela atual
     if (event.target.closest("#add-node")) {
       addNodeDialog().then((added) => {
         if (!added) return;
@@ -78,7 +78,7 @@ export function bindGlobalEvents() {
   });
   applyNode();
   window.addEventListener("vulcan-node-changed", () => loadNodeProjects());
-  // vt-25 C4: aba aberta por um script do projeto aparece no painel de baixo, sem sair da tela
+  // Aba aberta por um script do projeto aparece no painel de baixo, sem sair da tela
   window.addEventListener("vulcan-show-terminal", async (event) => {
     const id = event.detail && event.detail.id;
     if (!id) return;
@@ -118,9 +118,9 @@ export function bindGlobalEvents() {
     if (key === "k") { event.preventDefault(); palette.open(); }
     if (key === "p" && event.shiftKey) { event.preventDefault(); navigate("#/prompts"); }
     if (key === "j") { event.preventDefault(); runCommand("togglePanel"); }
-    // vt-26: ⌘? abre a Ajuda já na seção da tela atual
+    // ⌘? abre a Ajuda já na seção da tela atual
     if (key === "?" || (key === "/" && event.shiftKey)) { event.preventDefault(); navigate(`#/ajuda/${sectionFor(app.route)}`); }
-    if (key === "e" && event.shiftKey) { event.preventDefault(); navigate("#/depuracao"); }  // D-016
+    if (key === "e" && event.shiftKey) { event.preventDefault(); navigate("#/depuracao"); }
     // ⌘F (Ctrl+Shift+F no Linux) busca no terminal quando há um terminal na tela; senão fica com o comportamento normal
     if (key === "f" && (!isMac || !event.shiftKey) && document.querySelector(".term-workspace .tab")) {
       event.preventDefault();

@@ -1,4 +1,4 @@
-"""vt-05 C4: extensões de PHP por versão, só leitura.
+"""Extensões de PHP por versão, só leitura.
 
 `lerd-php-m-8.5.txt` e `lerd-php-ext-list-vazio.txt` são saídas reais do Lerd 1.37.1 nesta máquina (php -m no
 contêiner do 8.5, por `lerd php -m` numa pasta com .php-version). `lerd-php-ext-list-docs.txt` é o exemplo da

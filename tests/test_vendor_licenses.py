@@ -1,4 +1,4 @@
-"""vt-19 C3: todo arquivo em web/vendor tem entrada MIT em LICENSES.md e vem de um pacote conhecido do xterm.js."""
+"""Todo arquivo em web/vendor tem entrada MIT em LICENSES.md e vem de um pacote conhecido do xterm.js."""
 
 import re
 import unittest

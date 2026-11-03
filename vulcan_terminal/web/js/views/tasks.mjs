@@ -81,7 +81,7 @@ export class TasksView {
     this.root.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && e.target.classList && e.target.classList.contains("task-title")) {
         e.preventDefault();
-        this.onDblClick(e);  // editar pelo teclado (vt-20 C8)
+        this.onDblClick(e);  // editar pelo teclado
       }
     });
     this.root.addEventListener("submit", (e) => this.onSubmit(e));

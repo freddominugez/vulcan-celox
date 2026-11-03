@@ -1,4 +1,4 @@
-"""vt-02 C7: remover site em três níveis (lista, backend, pasta para a Lixeira), nunca apagando em definitivo."""
+"""Remover site em três níveis (lista, backend, pasta para a Lixeira), nunca apagando em definitivo."""
 
 import os
 from unittest import mock

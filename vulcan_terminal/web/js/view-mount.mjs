@@ -1,4 +1,4 @@
-// Monta a tela da rota atual; separado de app.mjs no vt-32 C2.
+// Monta a tela da rota atual.
 
 import { app } from "./app-state.mjs";
 import { navigate, refreshState, runCommand } from "./app.mjs";

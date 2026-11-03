@@ -1,4 +1,4 @@
-"""vt-06 C1: cliente da ponte de dumps do Lerd (D-015: API com X-Lerd-CSRF).
+"""Cliente da ponte de dumps do Lerd (API com X-Lerd-CSRF).
 
 `lerd-api-dumps.json` são eventos reais do Lerd 1.37.1 gravados em 2026-10-31 (um site PHP simples e um Laravel 13
 de teste, depois desfeitos), anonimizados: dump, request, query, log e view.

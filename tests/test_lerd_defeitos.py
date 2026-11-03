@@ -1,9 +1,9 @@
-"""vt-30 C1: um teste por defeito do Lerd 1.37.1 achado nas provas (P-006), contra a API falsa do Lerd.
+"""Um teste por defeito do Lerd 1.37.1 achado nas provas, contra a API falsa do Lerd.
 
 1. `lerd dump clear` dá 403 no macOS: o app limpa pela API com `X-Lerd-CSRF` e nunca pela CLI.
 2. `lerd dump status` fala em socket unix: o endereço da ponte vem só de `/api/dumps/status`.
 3. Nomes dos `php.ini` de usuário: no disco `98-user.ini` e `95-shared.ini`; a documentação cita os do contêiner.
-4. Exceção do Laravel como `log` de nível `error` (D-020: comportamento documentado): conta como erro.
+4. Exceção do Laravel como `log` de nível `error` (comportamento documentado): conta como erro.
 """
 
 import http.server

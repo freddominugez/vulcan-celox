@@ -1,4 +1,4 @@
-"""vt-20 C3: API endurecida (SEG-M2, B3, B4, B5, I1, I3; QUA-B2)."""
+"""API endurecida."""
 
 import http.client
 import json
@@ -41,7 +41,7 @@ class TokenEOrigemTest(ServerTestCase):
         self.assertFalse(marker.exists())
 
     def test_tamanho_do_terminal_fora_do_limite(self):
-        """vt-28 C3: rows/cols fora de 1 a 1000 dão 400 antes de abrir processo."""
+        """Rows/cols fora de 1 a 1000 dão 400 antes de abrir processo."""
         for bad in ({"rows": 70000, "cols": 80}, {"rows": 24, "cols": -3}, {"rows": "x", "cols": 80}):
             with self.subTest(bad=bad):
                 status, _, _ = self.request("POST", "/api/terminals", {"cwd": str(self.tmp), **bad})

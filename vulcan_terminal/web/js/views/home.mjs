@@ -1,6 +1,6 @@
-// Tela Início (vt-26 C1): guia de quatro passos que se confere sozinho, a captura da Visão geral com o destaque do
+// Tela Início: guia de quatro passos que se confere sozinho, a captura da Visão geral com o destaque do
 // passo escolhido e um cartão por área da interface. Aparece na abertura até os passos estarem feitos ou o usuário
-// marcar "Não mostrar mais o guia" (vt-27 C5); depois fica em Início e em Ajuda.
+// marcar "Não mostrar mais o guia"; depois fica em Início e em Ajuda.
 
 import { get, put } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
@@ -98,7 +98,7 @@ export class HomeView {
     </div>`;
   }
 
-  // vt-29 C5: o passo tem tabindex, então responde a Enter e Espaço como ao clique
+  // O passo tem tabindex, então responde a Enter e Espaço como ao clique
   onKey(event) {
     if (event.key !== "Enter" && event.key !== " ") return;
     const step = event.target.closest && event.target.closest("[data-spot]");

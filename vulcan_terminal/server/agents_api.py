@@ -20,7 +20,7 @@ from vulcan_terminal.core.agents.model import AgentSession, local_day
 from vulcan_terminal.core.agents.watcher import AgentWatcher
 from vulcan_terminal.server.local_http import HttpError, RawResponse, Request
 
-SESSION_ID = r"(?P<sid>[A-Za-z0-9][A-Za-z0-9._-]{0,79})"  # começa por letra ou dígito: nada de opção (vt-20 C3)
+SESSION_ID = r"(?P<sid>[A-Za-z0-9][A-Za-z0-9._-]{0,79})"  # começa por letra ou dígito: nada de opção
 UNPUBLISHED = ("none", "committed")
 RESUME_COMMANDS = {"claude": "claude --resume {id}", "codex": "codex resume {id}"}
 CONTEXT_TTL = 30.0
@@ -97,7 +97,7 @@ def _int(req: Request, name: str, default: int, low: int, high: int) -> int:
 
 
 class BoundedCache:
-    """Dicionário com lock e limite (vt-20 C5): várias threads HTTP leem e gravam; o mais antigo sai primeiro."""
+    """Dicionário com lock e limite: várias threads HTTP leem e gravam; o mais antigo sai primeiro."""
 
     def __init__(self, limit: int = 256):
         self.limit = limit
@@ -147,7 +147,7 @@ class AgentsService:
     def refresh(self) -> List[str]:
         return self.watcher.run_once()
 
-    # ── pareamento com as abas (vt-18 C3) ───────────────────────────────────
+    # ── pareamento com as abas ───────────────────────────────────
     def pairs(self) -> Dict[str, Dict]:
         """Pares sessão de agente -> aba; refeito só quando índice, abas ou arquivos do hook mudam."""
         folder = pairing.pairings_dir(self.app.data_dir)
@@ -172,7 +172,7 @@ class AgentsService:
                 return s
         return None
 
-    # ── sessão atual (vt-17 C2) ─────────────────────────────────────────────
+    # ── sessão atual ─────────────────────────────────────────────
     def chosen_id(self) -> Optional[str]:
         data = self.store.load("agents_current", {})
         value = data.get("session_id") if isinstance(data, dict) else None
@@ -194,7 +194,7 @@ class AgentsService:
         return ctx
 
     def harness_line(self, s: AgentSession) -> Optional[Dict[str, str]]:
-        """Resumo de uma linha do harness do projeto da sessão, com o site para o link da aba (vt-23 C2)."""
+        """Resumo de uma linha do harness do projeto da sessão, com o site para o link da aba."""
         key = f"harness:{s.project_root or s.cwd}"
         cached = self._context_cache.get(key)
         if cached and time.monotonic() - cached[0] < CONTEXT_TTL:
@@ -238,7 +238,7 @@ def register_agents_api(app) -> AgentsService:
         chosen = [s for s in all_sessions if matches(s, req)]
         projects: Dict[str, int] = {}
         for s in all_sessions:
-            if s.project_name:  # sessão sem pasta: um nome vazio no filtro viraria "Todos os projetos" (vt-33 C1)
+            if s.project_name:  # sessão sem pasta: um nome vazio no filtro viraria "Todos os projetos"
                 projects[s.project_name] = projects.get(s.project_name, 0) + 1
         today = datetime.now().astimezone().date().isoformat()
         edited_today = service.index.edited_on_day(today, None if len(chosen) == len(all_sessions) else [s.id for s in chosen])
@@ -260,7 +260,7 @@ def register_agents_api(app) -> AgentsService:
         table, _ = pricing.load(service.app.data_dir)
         costs = [pricing.cost(r, table) for r in rows]
         known = [c for c in costs if c is not None]
-        # custo estimado da sessão no preço da API (vt-22 C4): None sem nenhum turno com preço
+        # custo estimado da sessão no preço da API: None sem nenhum turno com preço
         data["cost"] = {"value": round(sum(known), 6) if known else None, "partial": bool(known) and len(known) < len(costs),
                         "turns": len(rows)}
         data["harness"] = service.harness_line(s)
@@ -278,7 +278,7 @@ def register_agents_api(app) -> AgentsService:
                 "claude_cleanup": claude_cleanup_days(discovery.claude_root(service.env))}
 
     def usage_report(req: Request, default_group: str = "day") -> Dict[str, Any]:
-        """Tokens e custo estimado por grupo no período (dias locais), com o total (vt-22 C3)."""
+        """Tokens e custo estimado por grupo no período (dias locais), com o total."""
         group = req.arg("group") or default_group
         if group not in usage.GROUPS:
             raise HttpError(400, "group deve ser " + ", ".join(usage.GROUPS))

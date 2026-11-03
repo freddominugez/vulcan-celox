@@ -1,4 +1,4 @@
-"""vt-17 C1: prompts em Markdown com cabeçalho, globais e por projeto, renderizados com as variáveis da sessão."""
+"""Prompts em Markdown com cabeçalho, globais e por projeto, renderizados com as variáveis da sessão."""
 
 from tests.helpers import TempDirTestCase
 from vulcan_terminal.core import prompts
@@ -112,7 +112,7 @@ class CreateTest(TempDirTestCase):
 
 
 class CardTest(TempDirTestCase):
-    """vt-27 C1: o cartão diz o que o prompt faz, sem `{{nome}}`."""
+    """O cartão diz o que o prompt faz, sem `{{nome}}`."""
 
     def load(self, text):
         path = self.tmp / "p.md"

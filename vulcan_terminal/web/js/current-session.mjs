@@ -1,4 +1,4 @@
-// Botão "Sessão atual" da barra superior (vt-17 C2): os prompts usam os dados desta sessão.
+// Botão "Sessão atual" da barra superior: os prompts usam os dados desta sessão.
 // Padrão: a mais recente (ativa primeiro); um clique troca. Avisa as telas com o evento "vulcan-current-changed".
 
 import { get, put } from "./api.mjs";

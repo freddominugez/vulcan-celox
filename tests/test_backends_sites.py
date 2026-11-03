@@ -1,4 +1,4 @@
-"""vt-02 C1: ações de site no Lerd e no Valet, por argv em lista e pasta de trabalho."""
+"""Ações de site no Lerd e no Valet, por argv em lista e pasta de trabalho."""
 
 import json
 from pathlib import Path

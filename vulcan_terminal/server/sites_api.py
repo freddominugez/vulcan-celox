@@ -1,4 +1,4 @@
-"""Sites no backend (vt-02): adicionar, HTTPS, PHP, Node, ações, favoritos, compartilhar e remover."""
+"""Sites no backend: adicionar, HTTPS, PHP, Node, ações, favoritos, compartilhar e remover."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ NOT_TUNNEL = (".test", "localhost", "127.0.0.1", "ngrok.com", "cloudflare.com", 
 
 
 def extract_public_url(text: str):
-    """Primeira URL https do túnel na saída do share (vt-02 C6), sem códigos de terminal."""
+    """Primeira URL https do túnel na saída do share, sem códigos de terminal."""
     clean = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", text or "")
     fallback = None
     for line in clean.splitlines():
@@ -119,7 +119,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/versions")
     def versions(req: Request):
-        """Opções do cabeçalho do site (vt-02 C3) e o que o backend escreve no projeto em cada ação."""
+        """Opções do cabeçalho do site e o que o backend escreve no projeto em cada ação."""
         site = site_or_404(req.params["name"])
         return {"php": app.backend.php_versions(), "current": {"php": site.php, "node": site.node,
                                                                "secured": site.secured},
@@ -153,13 +153,13 @@ def register_sites_api(app) -> None:
             raise HttpError(400, str(err)) from None
         except NotImplementedError as err:
             raise HttpError(409, str(err)) from None
-        # pode construir a imagem da versão: roda numa aba do site, com a saída à vista (vt-02 C3)
+        # pode construir a imagem da versão: roda numa aba do site, com a saída à vista
         session = app.spawn_terminal(cwd or site.path, title, None, site=site.name, command=shlex.join(argv))
         return 201, session.info()
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/actions/(?P<action>[a-z]+)")
     def action(req: Request):
-        """Ações rápidas do site (vt-02 C4): banco e diagnóstico numa aba do site; painel do Lerd no site."""
+        """Ações rápidas do site: banco e diagnóstico numa aba do site; painel do Lerd no site."""
         site = site_or_404(req.params["name"])
         name = req.params["action"]
         if name not in SITE_ACTIONS:
@@ -183,7 +183,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("PUT", rf"/api/sites/{SITE_NAME}/favorite")
     def favorite(req: Request):
-        """Estrela do site (vt-02 C5): só o nome vai para favorites.json."""
+        """Estrela do site: só o nome vai para favorites.json."""
         site = site_or_404(req.params["name"])
         value = req.json().get("favorite")
         if not isinstance(value, bool):
@@ -194,7 +194,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/share")
     def share(req: Request):
-        """Túnel público numa aba do site (vt-02 C6); fechar a aba encerra o túnel."""
+        """Túnel público numa aba do site; fechar a aba encerra o túnel."""
         site = site_or_404(req.params["name"])
         tool = req.json().get("tool") or None
         b = backend()
@@ -215,7 +215,7 @@ def register_sites_api(app) -> None:
             raise HttpError(404, "terminal não encontrado")
         return {"url": extract_public_url(session.history().decode("utf-8", "replace"))}
 
-    # ── remover (vt-02 C7) ─────────────────────────────────────────────
+    # ── remover ─────────────────────────────────────────────
     released: Dict[str, str] = {}  # sites tirados da lista ou do backend nesta execução: só eles vão para a Lixeira
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/remove")
@@ -264,7 +264,7 @@ def register_sites_api(app) -> None:
         released.pop(name, None)
         return {"ok": True, "moved_to": str(moved)}
 
-    # ── PHP e Node da aba (vt-04 C1) ────────────────────────────────────
+    # ── PHP e Node da aba ────────────────────────────────────
     runtime_cache: Dict[str, Tuple[float, Dict[str, Any]]] = {}
 
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/runtime")
@@ -285,7 +285,7 @@ def register_sites_api(app) -> None:
         runtime_cache[site.name] = (time.monotonic(), info)
         return info
 
-    # ── comandos do projeto (vt-04 C2) ──────────────────────────────────
+    # ── comandos do projeto ──────────────────────────────────
     def custom_commands(name: str) -> list:
         data = app.store.load("quick", {})
         items = data.get(name) if isinstance(data, dict) else None
@@ -326,13 +326,13 @@ def register_sites_api(app) -> None:
 
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/recent")
     def recent(req: Request):
-        """Últimos comandos do site (vt-04 C4), das sessões de terminal registradas."""
+        """Últimos comandos do site, das sessões de terminal registradas."""
         site = site_or_404(req.params["name"])
         return {"commands": recent_commands(app.hub.sessions.list(site.name), site.name, 20)}
 
     register_site_harness_api(srv, site_or_404, SITE_NAME)
 
-    # ── logs (vt-05 C6) ─────────────────────────────────────────────────
+    # ── logs ─────────────────────────────────────────────────
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/log")
     def site_log(req: Request):
         """storage/logs/laravel.log em pedaços: sem offset, o fim do arquivo; com offset, o que chegou depois."""

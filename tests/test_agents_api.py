@@ -1,4 +1,4 @@
-"""vt-16 C6: rotas das sessões de agente."""
+"""Rotas das sessões de agente."""
 
 import json
 import shutil
@@ -59,7 +59,7 @@ class AgentsApiTest(AgentsServerCase):
             self.assertIn(key, first)
 
     def test_sessao_sem_projeto_nao_entra_no_filtro(self):
-        """vt-33 C1: nome vazio no filtro ficava selecionado no lugar de Todos os projetos e aparecia como (1)."""
+        """Nome vazio no filtro ficava selecionado no lugar de Todos os projetos e aparecia como (1)."""
         sem_pasta = self.tmp / "claude" / "projects" / "-vazio"
         sem_pasta.mkdir(parents=True)
         (sem_pasta / "bbbbbbbb-1111-4222-8333-444444444444.jsonl").write_text(

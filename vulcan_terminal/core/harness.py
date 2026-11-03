@@ -1,4 +1,4 @@
-"""Leitor do harness de um projeto (vt-23 C1). Só leitura.
+"""Leitor do harness de um projeto. Só leitura.
 
 Dois formatos:
 - "repo": o deste repositório (`.harness/state.json`, `specs/<feature>/contract.md`, `.harness/handoff.md`);
@@ -272,7 +272,7 @@ def summary(info: Dict) -> Optional[str]:
     return f"{info['contrato'].get('id') or 'contrato'}: {done} de {len(items)} itens feitos{nxt}"
 
 
-# ── instalação do formato mínimo (vt-23 C3) ────────────────────────────────
+# ── instalação do formato mínimo ────────────────────────────────
 BLOCK_START = "<!-- vulcan:harness:inicio -->"
 BLOCK_END = "<!-- vulcan:harness:fim -->"
 FIRST_TASK = "primeira-tarefa"
@@ -408,7 +408,7 @@ def install(root) -> List[Dict[str, str]]:
     return done
 
 
-# ── novo contrato pela interface (vt-23 C4) ───────────────────────────────
+# ── novo contrato pela interface ───────────────────────────────
 FAIXAS = ("verde", "amarela", "vermelha")
 MAX_ITEMS = 20
 MAX_FIELD = 300

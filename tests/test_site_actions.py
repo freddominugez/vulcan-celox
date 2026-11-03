@@ -1,4 +1,4 @@
-"""vt-02 C4: ações rápidas do site (banco, diagnóstico, painel do Lerd)."""
+"""Ações rápidas do site (banco, diagnóstico, painel do Lerd)."""
 
 import os
 import shlex

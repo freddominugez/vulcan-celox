@@ -1,4 +1,4 @@
-"""vt-16b C5: KPIs do dia contam o que aconteceu hoje, no fuso local."""
+"""KPIs do dia contam o que aconteceu hoje, no fuso local."""
 
 import unittest
 from datetime import datetime, timedelta, timezone

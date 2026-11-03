@@ -1,4 +1,4 @@
-// Tela Depuração (vt-06 C2): eventos da ponte de dumps do Lerd agrupados por requisição, com filtros, o interruptor
+// Tela Depuração: eventos da ponte de dumps do Lerd agrupados por requisição, com filtros, o interruptor
 // da ponte e a origem de cada evento. Global (#/depuracao) ou presa a um site (aba Depuração do site).
 
 import { every, get, post, put } from "../api.mjs";
@@ -56,7 +56,7 @@ export class DebugView {
   async load() {
     try {
       const [bridge, data] = await Promise.all([get("/api/debug/bridge"), get(`/api/debug/events?${this.query()}`)]);
-      // vt-21 C4: redesenha só quando algo mudou, e nunca com texto selecionado no corpo (copiar um dump)
+      // Redesenha só quando algo mudou, e nunca com texto selecionado no corpo (copiar um dump)
       const signature = JSON.stringify([bridge.enabled, bridge.count, this.query(),
         data.groups.map((g) => g.events.map((e) => e.id || e.ts).join(","))]);
       if (signature === this.signature) return;
@@ -101,7 +101,7 @@ export class DebugView {
   }
 
   groupHtml(g) {
-    // vt-06 C3: SQL repetido na mesma requisição ganha marca com contagem e tempo somado
+    // SQL repetido na mesma requisição ganha marca com contagem e tempo somado
     this.repeated = new Map((g.queries || []).filter((q) => q.count > 1).map((q) => [q.sql, q]));
     const reps = [...this.repeated.values()].map((q) => `<div class="debug-repeat"><span class="badge badge-warn">${q.count}×</span>
         <code class="debug-sql">${esc(q.sql)}</code><span class="dim">${q.total_ms} ms no total</span></div>`).join("");

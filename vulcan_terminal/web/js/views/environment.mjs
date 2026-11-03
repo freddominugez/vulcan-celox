@@ -1,4 +1,4 @@
-// Tela Ambiente (vt-05): o que o Lerd mantém rodando, com as ações do dia a dia; o resto fica no painel do Lerd.
+// Tela Ambiente: o que o Lerd mantém rodando, com as ações do dia a dia; o resto fica no painel do Lerd.
 
 import { every, get, post } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
@@ -112,7 +112,7 @@ export class EnvironmentView {
     return (this.xdebug && this.xdebug.port) || 9003;
   }
 
-  /** vt-06 C5: liga com modo e sob demanda, ou desliga; reconstrói a imagem do PHP-FPM numa aba do terminal. */
+  /** Liga com modo e sob demanda, ou desliga; reconstrói a imagem do PHP-FPM numa aba do terminal. */
   async xdebugAction(version, isOn) {
     let choice = null;
     const port = this.xdebugPort();
@@ -182,7 +182,7 @@ export class EnvironmentView {
     await this.load();
   }
 
-  /** vt-05 C3: seis ajustes comuns, gravados pelo próprio lerd php:ini (o Lerd reaplica o PHP-FPM). */
+  /** Seis ajustes comuns, gravados pelo próprio lerd php:ini (o Lerd reaplica o PHP-FPM). */
   async editIni(version) {
     const info = await get(`/api/environment/php/${version}/ini`);
     const hints = { memory_limit: "512M", upload_max_filesize: "64M", post_max_size: "64M", max_execution_time: "60",
@@ -224,7 +224,7 @@ export class EnvironmentView {
     else toast(`php.ini: ${(result.output || "").split("\n").pop()}`, { kind: "error", timeout: 8000 });
   }
 
-  /** vt-05 C4: extensões carregadas (php -m no contêiner da versão), só leitura; gerenciar fica no painel do Lerd. */
+  /** Extensões carregadas (php -m no contêiner da versão), só leitura; gerenciar fica no painel do Lerd. */
   async showExtensions(version) {
     const info = await get(`/api/environment/php/${version}/extensions`);
     const chips = (list) => list.map((m) => `<span class="chip ext-chip" data-name="${esc(m.toLowerCase())}">${esc(m)}</span>`).join("");

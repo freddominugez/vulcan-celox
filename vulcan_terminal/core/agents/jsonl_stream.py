@@ -103,7 +103,7 @@ class _CountedPipe:
 
 
 class ZstdLineStream(LineStream):
-    """vt-31 C2: um .jsonl.zst lido em stream por `zstd -dcq`, sempre do início: arquivo comprimido não cresce. O offset
+    """Um.jsonl.zst lido em stream por `zstd -dcq`, sempre do início: arquivo comprimido não cresce. O offset
     é na saída descomprimida. Sem o comando, ou com arquivo corrompido, registra o erro e devolve o que conseguiu."""
 
     def __init__(self, path: Union[str, Path], zstd: Optional[str], max_line: int = MAX_LINE):

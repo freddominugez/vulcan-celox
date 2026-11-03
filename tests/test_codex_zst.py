@@ -1,4 +1,4 @@
-"""vt-31 C2: sessões do Codex comprimidas (.jsonl.zst). Fixture sintética: o Codex só comprime em manutenção e não há
+"""Sessões do Codex comprimidas (.jsonl.zst). Fixture sintética: o Codex só comprime em manutenção e não há
 arquivo real nesta máquina. A maior parte usa um `zstd` falso (cat); um teste usa o de verdade, quando existe."""
 import json
 import os

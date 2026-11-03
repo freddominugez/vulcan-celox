@@ -1,4 +1,4 @@
-// Tela Ajuda (vt-26 C2): manual por assunto e perguntas frequentes, com busca enquanto digita.
+// Tela Ajuda: manual por assunto e perguntas frequentes, com busca enquanto digita.
 
 import { put } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";

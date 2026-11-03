@@ -1,4 +1,4 @@
-// Barra lateral; separada de app.mjs no vt-32 C2.
+// Barra lateral.
 
 import { AGENT_NAV, HELP_NAV, NAV, NAV_GROUPS, app } from "./app-state.mjs";
 import { $, esc, icon } from "./dom.mjs";
@@ -25,7 +25,7 @@ export function renderSidebar() {
       ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count">${count}</span>` : ""}${dot}</a>`;
   };
   const byId = Object.fromEntries([...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => [n.id, n]));
-  // vt-29 C6: o redesenho troca os elementos do #nav; guarda o que tinha o foco (grupo ou link) para devolver
+  // O redesenho troca os elementos do #nav; guarda o que tinha o foco (grupo ou link) para devolver
   const nav = $("#nav");
   const had = nav.contains(document.activeElement) ? document.activeElement : null;
   const refocus = had && (had.dataset.navGroup ? `[data-nav-group="${CSS.escape(had.dataset.navGroup)}"]`
@@ -48,7 +48,7 @@ export function renderSidebar() {
   if (app.tree) app.tree.render();
   if (!state) return;
   const running = state.status.running;
-  // vt-02 C5: favoritos no topo e o resto em ordem alfabética (mesma regra de core/site_list.py)
+  // Favoritos no topo e o resto em ordem alfabética (mesma regra de core/site_list.py)
   const filter = app.siteFilter.trim().toLowerCase();
   const favorites = new Set(state.favorites || []);
   const sites = state.sites.filter((s) => !filter || s.name.toLowerCase().includes(filter) || s.domain.toLowerCase().includes(filter))

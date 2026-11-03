@@ -87,7 +87,7 @@ final class BackendServer {
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: pythonPath())
         proc.arguments = ["-m", "vulcan_terminal", "--serve"]
-        // com -m a pasta atual vai para o começo do sys.path: roda dentro dos recursos do bundle (vt-20 C4)
+        // com -m a pasta atual vai para o começo do sys.path: roda dentro dos recursos do bundle
         proc.currentDirectoryURL = URL(fileURLWithPath: resources)
         var env = ProcessInfo.processInfo.environment
         env["PYTHONPATH"] = resources
@@ -131,7 +131,7 @@ final class BackendServer {
     func stop() {
         guard let proc = process, proc.isRunning else { return }
         proc.terminate()
-        // espera com prazo: o servidor grava as memórias e fecha as abas; a janela nunca congela (vt-20 C6)
+        // espera com prazo: o servidor grava as memórias e fecha as abas; a janela nunca congela
         let deadline = Date().addingTimeInterval(6)
         while proc.isRunning && Date() < deadline { usleep(50_000) }
         if proc.isRunning { kill(proc.processIdentifier, SIGKILL) }
@@ -193,7 +193,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         let controller = WKUserContentController()
         let origin = "http://127.0.0.1:\(app.server.port ?? 0)"
         self.appOrigin = origin
-        // o token só existe na página do próprio app: outra origem que chegue a carregar aqui não o vê (vt-20 C2)
+        // o token só existe na página do próprio app: outra origem que chegue a carregar aqui não o vê
         let bootstrap = """
         if (location.origin === "\(origin)") {
           window.VULCAN = { token: "\(app.server.token)", native: true, kind: "\(kind)" };
@@ -238,7 +238,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         evaluate("window.vulcanCommand && window.vulcanCommand(\(jsString(name)))")
     }
 
-    /// A janela só mostra o próprio app; link externo abre no navegador padrão (vt-20 C2).
+    /// A janela só mostra o próprio app; link externo abre no navegador padrão.
     func isAppURL(_ url: URL?) -> Bool {
         guard let url = url else { return false }
         if url.absoluteString == "about:blank" { return true }
@@ -486,7 +486,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         goMenu.addItem(item("Tarefas", #selector(goTasks), "3"))
         goMenu.addItem(item("Post-its", #selector(goNotes), "4"))
         goMenu.addItem(item("Tags", #selector(goTags), "5"))
-        goMenu.addItem(item("Depuração", #selector(goDebug), "e", [.command, .shift]))  // D-016
+        goMenu.addItem(item("Depuração", #selector(goDebug), "e", [.command, .shift]))
         goItem.submenu = goMenu
         menubar.addItem(goItem)
 
@@ -510,7 +510,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menubar.addItem(windowItem)
         NSApp.windowsMenu = windowMenu
 
-        // vt-26 C2: menu Ajuda do macOS; ⌘? abre a Ajuda na seção da tela atual
+        // Menu Ajuda do macOS; ⌘? abre a Ajuda na seção da tela atual
         let helpItem = NSMenuItem()
         let helpMenu = NSMenu(title: "Ajuda")
         helpMenu.addItem(item("Ajuda do Vulcan Terminal", #selector(goHelp), "?"))

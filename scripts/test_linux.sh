@@ -8,7 +8,7 @@ IMAGE="${VULCAN_LINUX_IMAGE:-docker.io/library/python:3.9-slim}"
 "$ENGINE" run --rm -v "$ROOT":/src:ro "$IMAGE" sh -c '
   set -e
   # cópia sem os __pycache__ do Mac, sem apagar nada (regra D7). Sem manter dono e modo: em contêiner sem root
-  # de verdade (CI do GitHub) o tar não consegue ajustá-los (vt-32 C1)
+  # de verdade (CI do GitHub) o tar não consegue ajustá-los
   mkdir /tmp/app && tar -C /src --exclude=__pycache__ -cf - . | tar -C /tmp/app --no-same-owner --no-same-permissions -xf -
   cd /tmp/app
   PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -t .

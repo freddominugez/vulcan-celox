@@ -1,4 +1,4 @@
-"""vt-26 C2: conteúdo da Ajuda num lugar só, sem travessão, com FAQ suficiente e imagens que existem."""
+"""Conteúdo da Ajuda num lugar só, sem travessão, com FAQ suficiente e imagens que existem."""
 
 import json
 import unittest

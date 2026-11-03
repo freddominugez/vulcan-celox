@@ -1,4 +1,4 @@
-"""Os seis ajustes comuns do php.ini de usuário do Lerd (vt-05 C3).
+"""Os seis ajustes comuns do php.ini de usuário do Lerd.
 
 A gravação passa pelo próprio `lerd php:ini [versão|shared]` com EDITOR apontando para este módulo: o Lerd entrega o
 caminho do arquivo ao "editor" e reaplica o PHP-FPM quando ele termina, como faz ao salvar no nano ou no vim.

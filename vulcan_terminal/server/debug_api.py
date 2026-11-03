@@ -1,4 +1,4 @@
-"""Depuração (vt-06): eventos da ponte de dumps do Lerd e o interruptor dela (D-015)."""
+"""Depuração: eventos da ponte de dumps do Lerd e o interruptor dela."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def register_debug_api(app) -> None:
                 e["tone"] = log_tone(e["data"].get("level"))
         if req.arg("group") == "1":
             groups = group_by_request(found)
-            for g in groups:  # vt-06 C3: queries repetidas na mesma requisição
+            for g in groups:  # Queries repetidas na mesma requisição
                 g["queries"] = group_queries(g["events"])
             return {"groups": groups, "available": rows is not None}
         return {"events": found, "available": rows is not None}
@@ -75,7 +75,7 @@ def register_debug_api(app) -> None:
 
     @srv.route("GET", r"/api/debug/agent/(?P<sid>[A-Za-z0-9][A-Za-z0-9._-]{0,79})")
     def agent_session(req: Request):
-        """vt-06 C4: exceções e logs de erro do site da sessão de agente entre o início e a última atividade."""
+        """Exceções e logs de erro do site da sessão de agente entre o início e a última atividade."""
         s = app.agents.index.session(req.params["sid"])
         if not s:
             raise HttpError(404, "sessão de agente não encontrada")

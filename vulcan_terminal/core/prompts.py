@@ -1,4 +1,4 @@
-"""Prompts por botão (vt-17): arquivos Markdown com cabeçalho, globais e por projeto, com variáveis da sessão.
+"""Prompts por botão: arquivos Markdown com cabeçalho, globais e por projeto, com variáveis da sessão.
 
 Globais em <dados>/prompts/, do projeto em <projeto>/.vulcan/prompts/ (lidos sempre; a pasta só é criada com
 confirmação do usuário). O do projeto sobrescreve o global pelo `id`. Categoria pelo campo `category` ou pela
@@ -24,7 +24,7 @@ FALLBACK_CATEGORY = "Outros"
 NAME_FILE = ".nome"  # nome de exibição de uma categoria criada pelo usuário (a pasta é só o slug)
 VAR = re.compile(r"\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}")
 VARIABLES = ("projectName", "branch", "base", "sessionId", "agent", "cwd")
-# rótulo legível de cada variável (vt-27): aparece nos cartões e nos campos do compositor, nunca o {{nome}}
+# rótulo legível de cada variável: aparece nos cartões e nos campos do compositor, nunca o {{nome}}
 LABELS = {"projectName": "Projeto", "branch": "Branch", "base": "Base", "sessionId": "Sessão", "agent": "Agente",
           "cwd": "Pasta"}
 ICON_NAME = re.compile(r"^[a-z][a-z-]{0,23}$")
@@ -181,7 +181,7 @@ def summary(prompt: Prompt, context: Dict[str, str]) -> str:
     return text if len(text) <= DESCRIPTION_MAX else text[:DESCRIPTION_MAX - 1].rstrip() + "…"
 
 
-# ── envio ao terminal (vt-27 C3) ───────────────────────────────────────────
+# ── envio ao terminal ───────────────────────────────────────────
 PASTE_START, PASTE_END = b"\x1b[200~", b"\x1b[201~"
 VALUE_MAX = 2000
 _CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")  # tudo de controle, menos \t e \n

@@ -1,4 +1,4 @@
-// vt-29 C4: quando a lista de sites muda, só remonta a tela que recebeu essa lista ao ser montada. As outras
+// Quando a lista de sites muda, só remonta a tela que recebeu essa lista ao ser montada. As outras
 // (Prompts, projetos Node, Agentes, Ajuda...) ficam como estão: remontar perdia o texto digitado no compositor.
 // A tela de um site também fica: ela recebe o próprio site, não a lista.
 

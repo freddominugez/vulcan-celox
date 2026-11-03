@@ -1,4 +1,4 @@
-"""Leitor de projeto Node (vt-25 C1). Só leitura.
+"""Leitor de projeto Node. Só leitura.
 
 Lê o `package.json` da raiz, o lockfile (para saber o gerenciador), a versão do Node pedida, o Supabase local
 (`supabase/config.toml`) e o vínculo com a Vercel (`.vercel/project.json`, só `projectId` e `orgId`). Nunca abre

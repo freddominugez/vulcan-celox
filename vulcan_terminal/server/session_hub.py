@@ -110,7 +110,7 @@ class SessionHub:
         return render_session_md(record, tasks, notes, dict(nb.tags), transcript, truncated,
                                  agents=self.agents_for(record.id))
 
-    # ── sessões de agente pareadas (vt-18 C5) ───────────────────────────
+    # ── sessões de agente pareadas ───────────────────────────
     def _agent_service(self):
         return getattr(self.app, "agents", None)  # o hub nasce antes do serviço de agentes
 
@@ -180,14 +180,14 @@ class SessionHub:
             self._flush_once()
 
     def _flush_once(self) -> None:
-        """Uma volta da thread de gravação: nenhuma exceção a derruba (vt-20 C7, QUA-M5)."""
+        """Uma volta da thread de gravação: nenhuma exceção a derruba."""
         try:
             self.flush()
         except Exception as exc:  # noqa: BLE001  a próxima volta tenta de novo
             self._error(exc)
 
     def flush(self) -> None:
-        """Grava as memórias pendentes e o índice geral uma vez só no fim (vt-20 C7, QUA-M7)."""
+        """Grava as memórias pendentes e o índice geral uma vez só no fim."""
         with self._lock:
             dirty, self._dirty = self._dirty, set()
         wrote = False
@@ -212,7 +212,7 @@ class SessionHub:
     def _on_notebook_change(self, kind: str) -> None:
         if kind not in ("tasks", "notes", "tags", "all"):
             return
-        with self._nb_lock:  # várias threads HTTP mudam o caderno ao mesmo tempo (vt-20 C7, QUA-B11)
+        with self._nb_lock:  # várias threads HTTP mudam o caderno ao mesmo tempo
             if self._nb_timer is not None:
                 self._nb_timer.cancel()
             self._nb_timer = threading.Timer(NOTEBOOK_DEBOUNCE_SECONDS, self.refresh_linked_memories)

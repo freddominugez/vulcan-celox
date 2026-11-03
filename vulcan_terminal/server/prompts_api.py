@@ -1,4 +1,4 @@
-"""Rotas dos prompts por botão (vt-17): lista renderizada com a sessão, criação de prompt e de categoria."""
+"""Rotas dos prompts por botão: lista renderizada com a sessão, criação de prompt e de categoria."""
 
 from __future__ import annotations
 
@@ -87,7 +87,7 @@ class PromptsService:
         }
 
     def known_root(self, root: str) -> bool:
-        """vt-28 C2: só pasta de site, de projeto Node salvo ou de sessão indexada, e nunca as pastas de dados
+        """Só pasta de site, de projeto Node salvo ou de sessão indexada, e nunca as pastas de dados
         dos agentes (nem uma pasta que as contenha)."""
         try:
             real = Path(root).resolve()
@@ -152,7 +152,7 @@ def register_prompts_api(app) -> PromptsService:
 
     @srv.route("POST", "/api/prompts/send")
     def send(req: Request):
-        """vt-27 C3: cola o texto do prompt na aba pareada à sessão (vt-18), sem Enter. Sem aba pareada viva, 409
+        """Cola o texto do prompt na aba pareada à sessão, sem Enter. Sem aba pareada viva, 409
         com o que a interface precisa para oferecer retomar a sessão num terminal."""
         body = req.json()
         pid, sid, values = body.get("prompt"), body.get("session"), body.get("values") or {}
@@ -185,7 +185,7 @@ def register_prompts_api(app) -> PromptsService:
         if terminal is None or not terminal.alive:
             raise HttpError(409, "a sessão não tem terminal aberto e pareado",
                             {"needs_terminal": True, "session": session.id})
-        # vt-29 C1: o pareamento expira com o agente. Outra sessão mais nova na aba, ou a aba de volta ao shell,
+        # O pareamento expira com o agente. Outra sessão mais nova na aba, ou a aba de volta ao shell,
         # e o prompt cairia no lugar errado.
         newest = agents.paired_with(terminal.id)
         foreground = terminal.foreground() if hasattr(terminal, "foreground") else None

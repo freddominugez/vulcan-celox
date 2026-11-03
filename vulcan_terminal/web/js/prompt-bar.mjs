@@ -1,5 +1,5 @@
-// Barra de prompts fixados na área de terminal (vt-17 C4): com a aba pareada a uma sessão de agente (vt-18 C3), um
-// clique cola o texto no terminal sem Enter (vt-27 C3); sem par ou com variável faltando, copia.
+// Barra de prompts fixados na área de terminal: com a aba pareada a uma sessão de agente, um
+// clique cola o texto no terminal sem Enter; sem par ou com variável faltando, copia.
 
 import { get, post, put } from "./api.mjs";
 import { esc, icon, toast } from "./dom.mjs";
@@ -45,7 +45,7 @@ export class PromptBar {
     if (tabChanged) this.followPairedSession(terminal);
   }
 
-  /** D-007: focar uma aba pareada torna a sessão de agente dela a sessão atual. */
+  /** Focar uma aba pareada torna a sessão de agente dela a sessão atual. */
   async followPairedSession(terminal) {
     const s = this.data && this.data.session;
     if (!s || s.pairing_id !== terminal) return;

@@ -1,4 +1,4 @@
-"""vt-23 C2: rota do harness do site e resumo na sessão de agente."""
+"""Rota do harness do site e resumo na sessão de agente."""
 
 import json
 import shutil
@@ -28,8 +28,8 @@ class HarnessApiTest(ServerTestCase):
         repo = self.get("/api/sites/repo/harness")
         self.assertEqual((repo["tipo"], repo["estado"], repo["proximo"]), ("repo", "ok", "C3"))
         self.assertFalse(repo["pode_instalar"])
-        self.assertTrue(repo["contrato"]["absoluto"].endswith("specs/vt-22-uso-e-custo/contract.md"))
-        self.assertEqual(repo["resumo"], "vt-22-uso-e-custo: 2 de 5 itens feitos, próximo C3")
+        self.assertTrue(repo["contrato"]["absoluto"].endswith("specs/exemplo-uso-e-custo/contract.md"))
+        self.assertEqual(repo["resumo"], "exemplo-uso-e-custo: 2 de 5 itens feitos, próximo C3")
         minimo = self.get("/api/sites/minimo/harness")
         self.assertEqual((minimo["tipo"], minimo["status"]), ("minimo", "RUNNING"))
         self.assertEqual([i["estado"] for i in minimo["itens"]], ["feito", "bloqueado", "pendente"])

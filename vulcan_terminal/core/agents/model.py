@@ -105,7 +105,7 @@ class AgentSession:
     tokens: Optional[Dict[str, int]] = None
     first_user_message: Optional[str] = None
     subagents: int = 0
-    origin: str = ""  # vt-31 C1: subagent ou desktop quando a sessão não nasce de uma aba; vazio nos outros casos
+    origin: str = ""  # Subagent ou desktop quando a sessão não nasce de uma aba; vazio nos outros casos
     pairing_id: Optional[str] = None
     theme: Optional[str] = None
     loop_alert: Optional[Dict] = None

@@ -1,4 +1,4 @@
-"""vt-02 C2: adicionar site (linkar ou parkear pasta) pela API do app."""
+"""Adicionar site (linkar ou parkear pasta) pela API do app."""
 
 import os
 

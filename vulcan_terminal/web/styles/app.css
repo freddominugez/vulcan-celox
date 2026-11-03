@@ -387,7 +387,7 @@ button.tree-more { border: 0; background: transparent; text-align: left; width: 
 
 /* ── páginas ──────────────────────────────────────────────────────────── */
 .page { height: 100%; overflow-y: auto; padding: 20px 24px 40px; }
-/* vt-21 C3: a página rola; quando ela é flex ou grid, os filhos (painéis com overflow hidden) não encolhem para caber.
+/* A página rola; quando ela é flex ou grid, os filhos (painéis com overflow hidden) não encolhem para caber.
    .page-flush fica de fora: lá os filhos dividem a altura de propósito. */
 .page:not(.page-flush) > * { flex-shrink: 0; }
 .page:not(.page-flush) { grid-auto-rows: max-content; }
@@ -892,7 +892,7 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
 
-/* adicionar site (vt-02 C2) */
+/* adicionar site */
 #side-sites, #side-node { position: relative; }
 .side-add { position: absolute; top: 4px; right: 4px; }
 .site-add .segmented { margin: 4px 0 6px; }
@@ -904,29 +904,29 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .site-add-output { max-height: 160px; overflow: auto; margin: 10px 0 0; padding: 8px 10px; background: var(--bg-input); border: 1px solid var(--line); border-radius: var(--r); font: 11.5px/1.45 var(--mono); white-space: pre-wrap; color: var(--err); }
 .link-btn { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; font: inherit; }
 
-/* selos do site que mudam PHP, Node e HTTPS (vt-02 C3) */
+/* selos do site que mudam PHP, Node e HTTPS */
 .badge-btn { cursor: pointer; border: 1px solid transparent; font: inherit; }
 .badge-btn:hover { border-color: var(--line-strong); color: var(--fg); }
 .dialog-body .select, .dialog-body .input { width: 100%; margin: 4px 0 8px; }
 
-/* favoritos (vt-02 C5) */
+/* favoritos */
 .site-group { display: flex; align-items: center; gap: 5px; padding: 8px 10px 3px; font-size: var(--fs-xs); font-weight: 600; color: var(--fg-3); }
 .site-group .i { width: 11px; height: 11px; }
 .site-star .i { fill: none; }
 .site-star.is-on { color: var(--warn); }
 .site-star.is-on .i { fill: currentColor; }
 
-/* compartilhar (vt-02 C6) */
+/* compartilhar */
 .share-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 260px; height: 26px; padding: 0 9px; border: 1px solid var(--accent-line); border-radius: 13px; background: var(--accent-soft); color: var(--fg); font: 12px var(--mono); cursor: pointer; }
 .share-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .share-chip .i { width: 13px; height: 13px; flex: none; }
 
-/* PHP e Node do site na barra das abas (vt-04 C1) */
+/* PHP e Node do site na barra das abas */
 .runtime-chip { display: inline-flex; align-items: center; gap: 4px; flex: none; height: 22px; padding: 0 8px; margin-right: 4px; border: 1px solid var(--line); border-radius: 11px; font: 11px var(--mono); color: var(--fg-3); }
 .runtime-chip.is-warn { border-color: var(--warn); color: var(--warn); }
 .runtime-chip .i { width: 12px; height: 12px; }
 
-/* comandos do projeto (vt-04 C2) */
+/* comandos do projeto */
 .cmd-btn { flex: none; margin-right: 4px; }
 .cmd-menu { position: absolute; top: 100%; z-index: 40; width: min(440px, 90vw); max-height: 60vh; overflow: auto; padding: 4px; background: #1e1e21; border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow-pop); }
 .cmd-row { display: flex; align-items: center; gap: 2px; }
@@ -937,13 +937,13 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .cmd-item code { margin-left: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-3); font-size: 11px; }
 .cmd-add { color: var(--fg-3); border-top: 1px solid var(--line-soft); border-radius: 0 0 6px 6px; margin-top: 2px; }
 
-/* processo longo (vt-04 C3) */
+/* processo longo */
 .tab-long { flex: none; padding: 0 5px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); font: 600 9.5px/16px var(--mono); text-transform: uppercase; letter-spacing: 0.03em; }
 .cmd-group { display: flex; align-items: center; gap: 6px; padding: 8px 8px 3px; font-size: var(--fs-xs); font-weight: 600; color: var(--fg-3); border-top: 1px solid var(--line-soft); margin-top: 4px; }
 .cmd-group .i { width: 12px; height: 12px; }
 .cmd-item code.cmd-recent { margin-left: 0; color: var(--fg); font-size: 11.5px; }
 
-/* tela Ambiente (vt-05) */
+/* tela Ambiente */
 .env-page { display: grid; gap: 16px; align-content: start; max-width: 980px; }
 .env-head { display: flex; align-items: baseline; gap: 10px; }
 .env-head h1 { margin: 0; font-size: 20px; }
@@ -968,7 +968,7 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .ext-chip[hidden] { display: none; }
 .env-node-input { width: 140px; font-family: var(--mono); }
 
-/* aba Logs do site (vt-05 C6) */
+/* aba Logs do site */
 .logs { height: 100%; display: flex; flex-direction: column; }
 .logs-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .logs-bar .spacer { flex: 1; }
@@ -986,7 +986,7 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .log-dim .log-level, .log-dim .log-msg { color: var(--fg-3); }
 .logs-empty { padding: 12px; }
 
-/* tela Depuração (vt-06 C2) */
+/* tela Depuração */
 .debug { height: 100%; display: flex; flex-direction: column; }
 .view-depuracao .debug { padding: 0; }
 .debug-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid var(--line); }
@@ -1024,7 +1024,7 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 
 .badge.badge-warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
 
-/* ── Projetos Node (vt-25 C4) ─────────────────────────────────────────── */
+/* ── Projetos Node ─────────────────────────────────────────── */
 .dot-node { background: #5fa04e; }
 .node-fw { margin-left: 6px; font-size: var(--fs-xs); color: var(--fg-3); }
 .np-page { display: flex; flex-direction: column; gap: 14px; }
@@ -1060,7 +1060,7 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .nav-item .nav-dot { margin-left: auto; width: 7px; height: 7px; }
 .nav-item .count + .nav-dot { margin-left: 6px; }
 
-/* ── Início (vt-26 C1) ─────────────────────────────────────────────── */
+/* ── Início ─────────────────────────────────────────────── */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .in-page { display: flex; flex-direction: column; gap: 16px; max-width: 1280px; }
 .in-hello { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 1.05fr); gap: 22px; align-items: start; }
@@ -1098,7 +1098,7 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 @media (max-width: 1000px) { .in-hello { grid-template-columns: minmax(0, 1fr); } .in-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: reduce) { .in-hl { transition: none; } }
 
-/* ── Ajuda (vt-26 C2) ──────────────────────────────────────────────── */
+/* ── Ajuda ──────────────────────────────────────────────── */
 .hp-page { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: start; max-width: 1180px; }
 .hp-toc { position: sticky; top: 0; display: flex; flex-direction: column; gap: 1px; }
 .hp-toc-label { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-3); padding: 12px 10px 4px; }

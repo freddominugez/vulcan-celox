@@ -1,4 +1,4 @@
-"""vt-32 C2: arquivo novo de código não passa de 400 linhas, e os antigos desta lista não crescem (dívida registrada em
+"""Arquivo novo de código não passa de 400 linhas, e os antigos desta lista não crescem (dívida registrada em
 docs/pt-BR/technical-manual.md). Quem reduzir um deles baixa o número aqui."""
 
 import unittest

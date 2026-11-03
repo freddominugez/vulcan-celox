@@ -22,7 +22,7 @@ from vulcan_terminal.core.agents.model import AgentSession, CommandRun, FileTouc
 from vulcan_terminal.core.agents.reading import read_session
 
 # 2: tabela de busca do histórico (FTS5); 3: resumo leve, sem as listas de arquivos e comandos;
-# 4: uso por turno (agent_usage, vt-22 C1), que exige reler todos os arquivos
+# 4: uso por turno (agent_usage), que exige reler todos os arquivos
 SCHEMA_VERSION = 5
 ACTIVE_SECONDS = 90
 # o último evento gravado também precisa ser recente: copiar ou restaurar a pasta (backup, Mac novo, clone)
@@ -81,7 +81,7 @@ def _join_state(state: Dict, identity: Dict) -> Dict:
 
 def _file_identity(path: str, st, old: Optional[Dict]) -> Dict:
     """Inode e hash do começo do arquivo. Compara o mesmo trecho que foi medido antes: um arquivo que só cresceu
-    tem o mesmo começo; um trocado por outro maior (vt-20 C5, QUA-B4) não."""
+    tem o mesmo começo; um trocado por outro maior não."""
     length = min(int(old.get("len", HEAD_BYTES)) if old else HEAD_BYTES, HEAD_BYTES)
     try:
         with open(path, "rb") as fh:
@@ -129,7 +129,7 @@ class AgentIndex:
         self.fts = history.ensure(self.db)
         version = int(self.db.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0])
         if version < 5:
-            # o uso por turno (4) e a origem da sessão (5, vt-31 C1) só saem relendo os arquivos; a varredura
+            # o uso por turno (4) e a origem da sessão (5) só saem relendo os arquivos; a varredura
             # seguinte refaz tudo. Também cobre o índice anterior ao resumo leve (esquema 2)
             self.rebuild()
         self.db.execute("UPDATE meta SET value = ? WHERE key = 'schema_version'", (str(SCHEMA_VERSION),))
@@ -163,7 +163,7 @@ class AgentIndex:
         db.execute("PRAGMA journal_mode=WAL")
         for suffix in ("", "-wal", "-shm"):
             try:
-                os.chmod(str(self.path) + suffix, 0o600)  # eventos dos agentes: só do usuário (vt-20 C4)
+                os.chmod(str(self.path) + suffix, 0o600)  # eventos dos agentes: só do usuário
             except OSError:
                 pass
         return db
@@ -189,7 +189,7 @@ class AgentIndex:
     def update_file(self, agent: str, path, mtime: Optional[float] = None, size: Optional[int] = None) -> Optional[str]:
         """Lê o que for novo no arquivo. Devolve o id da sessão se algo mudou, senão None.
 
-        A leitura e a interpretação do JSONL ficam fora do lock (vt-20 C5): revision() e as listas da API não
+        A leitura e a interpretação do JSONL ficam fora do lock: revision() e as listas da API não
         esperam um arquivo grande. O lock volta só para gravar, e só se ninguém gravou este arquivo no meio."""
         path = str(path)
         try:
@@ -236,7 +236,7 @@ class AgentIndex:
             return s.id
 
     def note_error(self, message: str) -> None:
-        """Último erro do observador, gravado no índice para o --doctor (outro processo) ver (vt-20 C5)."""
+        """Último erro do observador, gravado no índice para o --doctor (outro processo) ver."""
         value = json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "message": message[:500]}, ensure_ascii=False)
         with self.lock, self.db:
             self.db.execute("INSERT OR REPLACE INTO meta VALUES ('last_error', ?)", (value,))
@@ -292,7 +292,7 @@ class AgentIndex:
     # ── leitura ────────────────────────────────────────────────────────────
     def _hydrate(self, row) -> AgentSession:
         s = AgentSession.from_dict(json.loads(row["summary"]))
-        if s.files and not s.files_count:  # resumo gravado antes do vt-16b C6, com as listas dentro
+        if s.files and not s.files_count:  # resumo de formato antigo, com as listas dentro
             s.files_count, s.edited_count = len(s.files), len(s.edited_files())
         s.is_active = is_active(row["mtime"], s.last_activity_at, self.clock())
         s.subagents = self.subagents.get(s.id, s.subagents)

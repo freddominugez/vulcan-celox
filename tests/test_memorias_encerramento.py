@@ -1,4 +1,4 @@
-"""vt-20 C7: memórias e encerramento (QUA-M5, M6, M7, B11)."""
+"""Memórias e encerramento."""
 
 import sqlite3
 import threading

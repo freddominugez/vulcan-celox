@@ -1,5 +1,5 @@
 #!/bin/bash
-# Capturas do manual (vt-26): telas do app com as fixtures e o Lerd simulado, nunca com dado real.
+# Capturas do manual: telas do app com as fixtures e o Lerd simulado, nunca com dado real.
 # Gera vulcan_terminal/web/img/manual/*.png a partir do bundle em dist/ (rode scripts/build_app.sh antes).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -35,6 +35,6 @@ shot lerd "#/lerd"
 shot agentes "#/agentes"
 shot uso-e-custo "#/agentes/uso/2026-10-31"
 shot harness "#/sites/vulcan-demo/harness"
-# vt-27: compositor aberto no prompt de segurança, com os campos preenchidos pela sessão das fixtures
+# Compositor aberto no prompt de segurança, com os campos preenchidos pela sessão das fixtures
 shot prompts "#/prompts" "setTimeout(function () { window.dispatchEvent(new CustomEvent('vulcan-current-changed')); }, 2500);
   setTimeout(function () { var c = document.querySelector('[data-pick=seguranca]'); if (c) c.click(); }, 4000);"

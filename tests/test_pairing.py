@@ -1,4 +1,4 @@
-"""vt-18 C3: pareamento entre a aba do terminal e a sessão de agente, por hook e por reserva."""
+"""Pareamento entre a aba do terminal e a sessão de agente, por hook e por reserva."""
 
 import json
 import os
@@ -56,7 +56,7 @@ class ResolveTest(TempDirTestCase):
         pairs = pairing.resolve([agent("s1", "/r/loja", "2026-10-31T10:00:20Z")], tabs, files)
         self.assertEqual(pairs["s1"], {"terminal_id": "t9", "theme": "homebrew", "how": "hook"})
 
-    # ── vt-31 C1: só quem nasce de uma aba, e um lançamento por sessão ────────────────────
+    # ── só quem nasce de uma aba, e um lançamento por sessão ────────────────────
     def test_subagente_e_desktop_nao_pareiam_por_pasta_e_horario(self):
         t = tab("t1", "/r/loja", "2026-10-31T08:00:00Z", [("2026-10-31T10:00:00Z", "codex")])
         principal = agent("principal", "/r/loja", "2026-10-31T10:00:05Z", "codex")
@@ -183,7 +183,7 @@ class InstallCommandTest(TempDirTestCase):
 
 
 class HookComEspacoTest(TempDirTestCase):
-    """vt-20 C1 (SEG-P2): no macOS a pasta de dados tem espaço (Application Support)."""
+    """No macOS a pasta de dados tem espaço (Application Support)."""
 
     def setUp(self):
         super().setUp()

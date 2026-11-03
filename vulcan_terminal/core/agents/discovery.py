@@ -57,7 +57,7 @@ ZSTD_PLACES = ("/opt/homebrew/bin/zstd", "/usr/local/bin/zstd", "/usr/bin/zstd")
 
 
 def zstd_bin(env: Optional[Mapping[str, str]] = None, extra: Sequence[str] = ZSTD_PLACES) -> Optional[str]:
-    """O comando zstd, se houver (vt-31 C2). VULCAN_ZSTD_BIN manda (vazio: sem zstd); o app aberto pelo Finder tem
+    """O comando zstd, se houver. VULCAN_ZSTD_BIN manda (vazio: sem zstd); o app aberto pelo Finder tem
     PATH curto, por isso também olha nos lugares de costume."""
     env = os.environ if env is None else env
     if "VULCAN_ZSTD_BIN" in env:

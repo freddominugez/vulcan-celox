@@ -1,4 +1,4 @@
-"""Preço por milhão de tokens de cada modelo e custo estimado de um turno (vt-22 C2).
+"""Preço por milhão de tokens de cada modelo e custo estimado de um turno.
 
 Os valores padrão foram conferidos nas páginas oficiais em CONFERIDO_EM (ver FONTES). O usuário pode
 sobrescrever qualquer modelo em <dados>/precos.json; o arquivo dele vence o padrão, modelo por modelo.

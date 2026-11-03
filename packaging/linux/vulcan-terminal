@@ -28,6 +28,6 @@ if ! python_ok; then
   python_ok || { echo "Instale o Python 3.9+ e abra de novo (vulcan-terminal --instalar-dependencias)." >&2; exit 1; }
 fi
 # com -m, a pasta atual entra no começo do sys.path: roda de dentro da biblioteca para um json.py ou secrets.py
-# do repositório onde o usuário está não ser importado no lugar do módulo de verdade (vt-20 C4)
+# do repositório onde o usuário está não ser importado no lugar do módulo de verdade
 cd "$LIB"
 PYTHONPATH="$LIB${PYTHONPATH:+:$PYTHONPATH}" exec "$PYTHON" -m vulcan_terminal.desktop_linux "$@"

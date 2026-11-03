@@ -75,7 +75,7 @@ class Session {
     this.fit = new window.FitAddon.FitAddon();
     this.term.loadAddon(this.fit);
     this.term.loadAddon(new window.WebLinksAddon.WebLinksAddon((_event, uri) => hooks.openUrl(uri)));
-    // vt-19 C3: busca com contagem, largura certa de emoji e acentos, e cópia fiel da saída
+    // Busca com contagem, largura certa de emoji e acentos, e cópia fiel da saída
     this.search = addon("SearchAddon");
     this.serializer = addon("SerializeAddon");
     const unicode = addon("Unicode11Addon");
@@ -92,7 +92,7 @@ class Session {
     this.retry = 0;
     this.term.onData((data) => {
       if (this.disconnected) {
-        if (data.includes("\r")) this.reconnect();  // Enter na aba desconectada tenta de novo (vt-20 C8)
+        if (data.includes("\r")) this.reconnect();  // Enter na aba desconectada tenta de novo
         return;
       }
       this.send(encoder.encode(data));
@@ -157,7 +157,7 @@ class Session {
         this.retry += 1;
         setTimeout(() => this.connect(), 400 * this.retry);
       } else if (this.alive && !this.disposed) {
-        // desistiu de reconectar sozinho: a aba diz o que houve em vez de ficar muda (vt-20 C8)
+        // desistiu de reconectar sozinho: a aba diz o que houve em vez de ficar muda
         this.disconnected = true;
         this.term.write("\r\n\x1b[33m[conexão com o terminal perdida. Pressione Enter para reconectar.]\x1b[0m\r\n");
         this.hooks.onExit(this);
@@ -458,7 +458,7 @@ export class TerminalWorkspace {
     let cwd = null;
     let theme = null;
     let agent = null;
-    // terminal comum pergunta a pasta (vt-11), já com o próximo tema; com "não perguntar" abre direto (D-008);
+    // terminal comum pergunta a pasta, já com o próximo tema; com "não perguntar" abre direto;
     // comandos rápidos (Tinker, git status) rodam na pasta do site, sem tema
     if (!command) {
       await loadThemes(true);
@@ -529,7 +529,7 @@ export class TerminalWorkspace {
         // a checagem só protege; se falhar, fechar continua possível
         const busy = await get(`/api/terminals/${id}/busy`).catch(() => ({ busy: false, processes: [] }));
         if (busy.long_running && live.alive) {
-          // vt-04 C3: diz o que para, em vez do aviso genérico de processo rodando
+          // Diz o que para, em vez do aviso genérico de processo rodando
           toast(`Fechar a aba para “${busy.command}”.`, {
             kind: "error", timeout: 8000,
             action: { label: "Fechar e parar", run: () => this.closeTerminal(id, true) },
@@ -562,7 +562,7 @@ export class TerminalWorkspace {
     }
   }
 
-  /** Abas pelo teclado (vt-20 C8): setas trocam de aba, Enter ou espaço abrem a focada. */
+  /** Abas pelo teclado: setas trocam de aba, Enter ou espaço abrem a focada. */
   onTabKey(event) {
     const tab = event.target.closest && event.target.closest(".tab[role=tab]");
     if (!tab || event.target.closest(".tab-close")) return;
@@ -766,7 +766,7 @@ export class TerminalWorkspace {
     if (this.options.onChange) this.options.onChange(this.sessions().length);
   }
 
-  // ── comandos do projeto (vt-04 C2) ─────────────────────────────────────
+  // ── comandos do projeto ─────────────────────────────────────
   sitePath() {
     return `/api/sites/${encodeURIComponent(this.options.site.name)}/commands`;
   }
@@ -784,7 +784,7 @@ export class TerminalWorkspace {
 
   async toggleCommands() {
     if (this.commandMenu && this.commandMenu.isConnected) return this.closeCommands();
-    // vt-04 C4: os últimos comandos digitados nas sessões do site vêm logo abaixo
+    // Os últimos comandos digitados nas sessões do site vêm logo abaixo
     const recent = await get(`/api/sites/${encodeURIComponent(this.options.site.name)}/recent`)
       .then((d) => d.commands).catch(() => []);
     this.closeCommands();  // a barra foi redesenhada com o menu aberto: limpa o ouvinte antigo
@@ -857,7 +857,7 @@ export class TerminalWorkspace {
     }
   }
 
-  /** vt-04 C1: PHP e Node que o backend usa para o site, com aviso se a aba não passa pelos shims do Lerd. */
+  /** PHP e Node que o backend usa para o site, com aviso se a aba não passa pelos shims do Lerd. */
   async loadRuntime() {
     if (this.options.scope !== "site" || !this.options.site) return;
     try {
@@ -915,9 +915,9 @@ export class TerminalWorkspace {
     const title = live ? terminals.get(id).info.title : record ? record.title : "";
     const common = { site: this.activeSite() || null, terminal: id, sessionTitle: title, sites: this.options.sites || [], onChange, focus: this.focus };
     if (this.mode === "tasks") this.child = new TasksView(host, common);
-    if (this.mode === "debug" && this.options.site) this.child = new DebugView(host, { site: this.options.site });  // vt-06 C2
-    if (this.mode === "harness" && this.options.site) this.child = new HarnessView(host, { site: this.options.site });  // vt-23 C2
-    if (this.mode === "logs" && this.options.site) {  // vt-05 C6: só no site
+    if (this.mode === "debug" && this.options.site) this.child = new DebugView(host, { site: this.options.site });
+    if (this.mode === "harness" && this.options.site) this.child = new HarnessView(host, { site: this.options.site });
+    if (this.mode === "logs" && this.options.site) {  // Só no site
       this.child = new LogsView(host, { site: this.options.site, onTerminal: async (tabId) => {
         await terminals.sync();
         // o roteador troca a seção do site e seleciona a aba sem remontar a tela
@@ -994,7 +994,7 @@ export class TerminalWorkspace {
 
   emptyHtml(message) {
     const site = this.options.site;
-    // vt-04 C2: no site, os comandos do projeto (os 6 primeiros); fora dele, os genéricos
+    // No site, os comandos do projeto (os 6 primeiros); fora dele, os genéricos
     const list = this.options.scope === "site" && this.commands ? this.commands.slice(0, 6)
       : QUICK.filter((q) => !q.when || q.when(site));
     const quick = list
@@ -1016,7 +1016,7 @@ export class TerminalWorkspace {
       </div>`;
   }
 
-  // ── busca (vt-19 C3) ────────────────────────────────────────────────────
+  // ── busca ────────────────────────────────────────────────────
   bindSearch() {
     const input = $(".term-search-input", this.searchBar);
     input.addEventListener("input", () => this.find("type"));
@@ -1084,7 +1084,7 @@ export class TerminalWorkspace {
     else session.search.findNext(query, options);
   }
 
-  /** Copia a saída do terminal: o serialize junta as linhas que o terminal quebrou só na tela (D-011). */
+  /** Copia a saída do terminal: o serialize junta as linhas que o terminal quebrou só na tela. */
   copyOutput() {
     const session = terminals.get(this.activeId);
     if (!session) return;

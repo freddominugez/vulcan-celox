@@ -1,4 +1,4 @@
-"""vt-16 C5: detector de possível loop de testes."""
+"""Detector de possível loop de testes."""
 
 import json
 import unittest
@@ -18,7 +18,7 @@ class LoopTrackerTest(unittest.TestCase):
         self.assertEqual(t.alert(), {"command": "php artisan test --filter=Frete", "count": 3, "since": "t1", "last_at": "t3"})
 
     def test_so_o_commit_que_deu_certo_zera(self):
-        # vt-16b C3: o texto "git commit" não zera sozinho (o commit pode ter falhado); o montador chama reset()
+        # O texto "git commit" não zera sozinho (o commit pode ter falhado); o montador chama reset()
         t = LoopTracker()
         for i in range(4):
             t.feed("pytest -x", f"t{i}")

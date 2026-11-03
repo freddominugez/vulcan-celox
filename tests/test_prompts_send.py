@@ -1,4 +1,4 @@
-"""vt-27 C3: o prompt vai como colagem, sem Enter, só para a aba pareada à sessão."""
+"""O prompt vai como colagem, sem Enter, só para a aba pareada à sessão."""
 import unittest
 
 from tests import test_agents_api
@@ -71,7 +71,7 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.assertEqual(self.paired.written, [])
 
     def test_agente_fechou_e_a_aba_voltou_ao_shell_409(self):
-        """vt-29 C1: depois que o agente sai, a aba pareada vira shell comum; o prompt não pode cair no shell."""
+        """Depois que o agente sai, a aba pareada vira shell comum; o prompt não pode cair no shell."""
         self.paired.foreground = lambda: [("-zsh", "-zsh")]
         status, data = self.send({"prompt": "seguranca", "session": CLAUDE_SID})
         self.assertEqual(status, 409, data)
@@ -85,7 +85,7 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.assertEqual(status, 200)  # o binário nativo do Claude Code também conta
 
     def test_outra_sessao_mais_nova_na_mesma_aba_409(self):
-        """vt-29 C1: a sessão escolhida acabou e outra do mesmo agente começou na aba: o prompt iria para a nova."""
+        """A sessão escolhida acabou e outra do mesmo agente começou na aba: o prompt iria para a nova."""
         real = self.app.agents.paired_with
         self.app.agents.paired_with = lambda tab: type("S", (), {"id": "outra-sessao"})() if tab == TAB else None
         self.addCleanup(setattr, self.app.agents, "paired_with", real)
@@ -94,7 +94,7 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.assertEqual(self.paired.written, [])
 
     def test_aba_parada_503(self):
-        """vt-29 C2: a aba não leu a colagem no prazo: 503 em vez de prender a thread HTTP."""
+        """A aba não leu a colagem no prazo: 503 em vez de prender a thread HTTP."""
         self.paired.write = lambda data: False
         status, data = self.send({"prompt": "seguranca", "session": CLAUDE_SID})
         self.assertEqual(status, 503, data)
@@ -108,9 +108,9 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         status, data = self.send({"prompt": "ticket", "session": CLAUDE_SID})
         self.assertEqual(status, 400)
         self.assertEqual(data["missing"], ["ticket"])
-        status, _ = self.send({"prompt": "ticket", "session": CLAUDE_SID, "values": {"ticket": "VT-9"}})
+        status, _ = self.send({"prompt": "ticket", "session": CLAUDE_SID, "values": {"ticket": "ABC-9"}})
         self.assertEqual(status, 200)
-        self.assertIn(b"Resolva o ticket VT-9.", self.paired.written[-1])
+        self.assertIn(b"Resolva o ticket ABC-9.", self.paired.written[-1])
         for bad in ({}, {"prompt": "nao-existe", "session": CLAUDE_SID}, {"prompt": "seguranca", "session": "x"},
                     {"prompt": "seguranca", "values": {"branch": 1}}, {"prompt": "seguranca", "values": {"b": "x" * 2001}}):
             status, _ = self.send(bad)

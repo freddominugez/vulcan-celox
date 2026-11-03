@@ -1,4 +1,4 @@
-"""Processos do grupo em primeiro plano de um terminal (vt-29 C1).
+"""Processos do grupo em primeiro plano de um terminal.
 
 Serve para saber se o agente de uma sessão ainda roda na aba pareada: depois que o Claude Code ou o Codex sai, a
 aba vira shell comum e um prompt colado nela cairia no shell. Linux lê /proc; macOS roda `ps` pelo runner.

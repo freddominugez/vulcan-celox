@@ -1,4 +1,4 @@
-"""vt-05 C6: aba Logs do site (storage/logs/laravel.log) e atalhos para os logs do Lerd."""
+"""Aba Logs do site (storage/logs/laravel.log) e atalhos para os logs do Lerd."""
 
 import os
 from unittest import mock

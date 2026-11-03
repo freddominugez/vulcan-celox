@@ -1,4 +1,4 @@
-"""Estado do ambiente do Lerd para a tela Ambiente (vt-05): componentes de /api/status e serviços de /api/services."""
+"""Estado do ambiente do Lerd para a tela Ambiente: componentes de /api/status e serviços de /api/services."""
 
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ def parse_ext_list(text: str) -> Dict[str, Any]:
     return {"declared": declared, "per_version": per_version}
 
 
-# ── Xdebug por versão (vt-06 C5) ─────────────────────────────────────────
+# ── Xdebug por versão ─────────────────────────────────────────
 XDEBUG_MODES = ("debug", "coverage", "develop", "profile", "trace", "gcstats")  # os que `lerd xdebug on --mode` aceita
 XDEBUG_PORT = 9003
 

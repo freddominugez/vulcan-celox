@@ -1,4 +1,4 @@
-"""vt-34: documentação pública nas duas línguas, com links internos válidos."""
+"""Documentação pública nas duas línguas, com links internos válidos."""
 import re
 import unittest
 from pathlib import Path

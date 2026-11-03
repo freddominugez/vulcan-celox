@@ -1,4 +1,4 @@
-"""vt-04 C1: PHP e Node da aba iguais aos do site (lerd which) e aviso quando a aba não usa os shims do Lerd."""
+"""PHP e Node da aba iguais aos do site (lerd which) e aviso quando a aba não usa os shims do Lerd."""
 
 import os
 from unittest import mock

@@ -41,7 +41,7 @@ class HttpError(Exception):
 
 
 class RawResponse:
-    """Resposta que não é JSON (vt-22 C5: CSV de uso). Mesmos cabeçalhos de segurança da API."""
+    """Resposta que não é JSON (CSV de uso). Mesmos cabeçalhos de segurança da API."""
 
     def __init__(self, body: bytes, content_type: str, filename: Optional[str] = None):
         self.body, self.content_type, self.filename = body, content_type, filename
@@ -219,7 +219,7 @@ class Handler(BaseHTTPRequestHandler):
             query = parse_qs(parts.query)
             path = parts.path
             if path.startswith("/api/") or path.startswith("/ws/"):
-                # vt-20 C3: na API o token vem só pelo cabeçalho (força preflight entre origens, que aqui falha);
+                # Na API o token vem só pelo cabeçalho (força preflight entre origens, que aqui falha);
                 # a query vale só no WebSocket, que o navegador não deixa abrir com cabeçalho próprio
                 token = self.headers.get("X-Vulcan-Token")
                 if path.startswith("/ws/"):

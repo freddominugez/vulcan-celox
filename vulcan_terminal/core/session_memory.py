@@ -181,7 +181,7 @@ MAX_AGENT_FILES = 15
 
 
 def agent_lines(agents) -> List[str]:
-    """Resumo de cada sessão de agente pareada com a aba (vt-18 C5), igual na memória e no texto para a IA."""
+    """Resumo de cada sessão de agente pareada com a aba, igual na memória e no texto para a IA."""
     lines: List[str] = []
     for s in agents:
         root = (s.project_root or s.cwd or "").rstrip("/") + "/"

@@ -1,4 +1,4 @@
-"""vt-18 C5: memória, índice geral, árvore de sessões e documentação com IA mostram o agente pareado."""
+"""Memória, índice geral, árvore de sessões e documentação com IA mostram o agente pareado."""
 
 from pathlib import Path
 

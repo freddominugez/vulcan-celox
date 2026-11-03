@@ -1,4 +1,4 @@
-// Paleta de comandos; separada de app.mjs no vt-32 C2.
+// Paleta de comandos.
 
 import { api, get, isMac, post } from "./api.mjs";
 import { AGENT_NAV, HELP_NAV, NAV, app } from "./app-state.mjs";

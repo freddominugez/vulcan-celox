@@ -11,7 +11,7 @@ class ServerSecurityTest(ServerTestCase):
         self.assertEqual(self.request("GET", "/api/state", token="outro")[0], 401)
 
     def test_token_na_query(self):
-        # vt-20 C3: na API o token vem só pelo cabeçalho; a query vale só no WebSocket (test_api_endurecida)
+        # Na API o token vem só pelo cabeçalho; a query vale só no WebSocket (test_api_endurecida)
         self.assertEqual(self.request("GET", f"/api/state?token={self.token}", token=False)[0], 401)
 
     def test_host_estranho(self):

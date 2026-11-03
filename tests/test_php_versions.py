@@ -1,4 +1,4 @@
-"""vt-05 C2: versões de PHP do Lerd (lista, padrão, instalar, atualizar)."""
+"""Versões de PHP do Lerd (lista, padrão, instalar, atualizar)."""
 
 import os
 from unittest import mock

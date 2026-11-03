@@ -24,7 +24,7 @@ export function pickNative(start) {
   });
 }
 
-/** Pasta sugerida para abrir direto (D-008): a do site, senão a mais recente, senão a pasta de início. */
+/** Pasta sugerida para abrir direto: a do site, senão a mais recente, senão a pasta de início. */
 export async function suggestedFolder(site = null) {
   if (site && site.path) return site.path;
   try {
@@ -47,7 +47,7 @@ function themeCards(t, chosen) {
 }
 
 /**
- * Pergunta a pasta do terminal novo, o agente e o tema (vt-18 C4).
+ * Pergunta a pasta do terminal novo, o agente e o tema.
  * @param {{suggested?: string, site?: string}} options  suggested: caminho absoluto ou com ~
  * @returns {Promise<{cwd: string, title: string, theme: string, agent: string}|null>}
  */

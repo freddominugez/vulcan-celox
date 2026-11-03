@@ -1,4 +1,4 @@
-"""vt-17 C2: sessão atual pela API, lembrada entre aberturas do app."""
+"""Sessão atual pela API, lembrada entre aberturas do app."""
 
 from tests import test_agents_api
 from vulcan_terminal.server.app import VulcanApp

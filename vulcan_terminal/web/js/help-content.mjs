@@ -1,4 +1,4 @@
-// Conteúdo da Ajuda (vt-26 C2): um lugar só, `help/conteudo.json`, lido pela tela Ajuda e pelo gerador do
+// Conteúdo da Ajuda: um lugar só, `help/conteudo.json`, lido pela tela Ajuda e pelo gerador do
 // docs/pt-BR/user-guide.md (scripts/manual_md.py). Aqui ficam só a carga e o desenho do texto.
 
 import { esc } from "./dom.mjs";
@@ -42,7 +42,7 @@ export function fold(text) {
   return String(text).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
-// seção da Ajuda de cada tela (vt-26 C3); toda rota da barra lateral precisa estar aqui
+// seção da Ajuda de cada tela; toda rota da barra lateral precisa estar aqui
 export const ROUTE_SECTION = {
   inicio: "primeiros-passos",
   overview: "projetos-php",

@@ -1,4 +1,4 @@
-"""Comandos do projeto em um clique (vt-04 C2): o que a pasta tem, o que o Lerd oferece e os do usuário."""
+"""Comandos do projeto em um clique: o que a pasta tem, o que o Lerd oferece e os do usuário."""
 
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ def project_commands(folder: str, lerd: bool = False, custom: Optional[List[Dict
     return out
 
 
-# vt-04 C3: comandos que ficam rodando até alguém parar (servidor de desenvolvimento, fila, logs, túnel)
+# Comandos que ficam rodando até alguém parar (servidor de desenvolvimento, fila, logs, túnel)
 LONG_RUNNING = [re.compile(p) for p in (
     r"\b(npm|pnpm|yarn|bun)\s+(run\s+)?dev\b", r"\bartisan\s+serve\b", r"\bqueue:(work|listen)\b",
     r"\breverb:start\b", r"\bartisan\s+horizon\b", r"\blerd\s+logs\b.*\s(-f|--follow)\b", r"\blerd\s+share\b",
@@ -52,7 +52,7 @@ def is_long_running(command: Optional[str]) -> bool:
 
 
 def recent_commands(records, site: str, limit: int = 20) -> List[Dict[str, str]]:
-    """Últimos comandos digitados nas sessões do site (vt-04 C4), do mais novo ao mais velho, sem repetir seguidos."""
+    """Últimos comandos digitados nas sessões do site, do mais novo ao mais velho, sem repetir seguidos."""
     rows = [(str(c.get("ts") or ""), i, str(c.get("cmd") or "").strip())
             for r in records if r.site == site for i, c in enumerate(r.commands) if isinstance(c, dict)]
     out: List[Dict[str, str]] = []

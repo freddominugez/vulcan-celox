@@ -70,7 +70,7 @@ class ClientTest(TempDirTestCase):
 
 
 class RecusaTest(unittest.TestCase):
-    """vt-32 C3: recusa vira erro claro; texto parcial não passa por documento pronto."""
+    """Recusa vira erro claro; texto parcial não passa por documento pronto."""
 
     def test_recusa_com_e_sem_categoria(self):
         for extra, esperado in (({"stop_details": {"type": "refusal", "category": "cyber"}}, "categoria: cyber"), ({}, "recusou"),

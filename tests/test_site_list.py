@@ -1,4 +1,4 @@
-"""vt-02 C5: favoritos no topo da barra lateral e busca por nome e domínio."""
+"""Favoritos no topo da barra lateral e busca por nome e domínio."""
 
 from types import SimpleNamespace
 

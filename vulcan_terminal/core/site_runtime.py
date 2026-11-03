@@ -1,4 +1,4 @@
-"""PHP e Node que o backend usa para um site (vt-04 C1), e se a aba do terminal chega neles pelos shims do Lerd."""
+"""PHP e Node que o backend usa para um site, e se a aba do terminal chega neles pelos shims do Lerd."""
 
 from __future__ import annotations
 

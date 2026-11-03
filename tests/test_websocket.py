@@ -113,7 +113,7 @@ class WebSocketIntegrationTest(ServerTestCase):
         sock.sendall((f"GET /ws/terminals/{info['id']}?token={self.token} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n"
                       "Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: eA==\r\n"
                       "Sec-WebSocket-Version: 13\r\nOrigin: https://evil.example\r\n\r\n").encode())
-        self.assertIn(b" 403 ", sock.recv(200))  # vt-20 C3: origem estranha cai antes do upgrade
+        self.assertIn(b" 403 ", sock.recv(200))  # Origem estranha cai antes do upgrade
         sock.close()
 
     def test_criar_com_pasta_invalida_e_site_inexistente(self):

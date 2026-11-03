@@ -82,7 +82,7 @@ class LerdBackend(Backend):
         except (OSError, ValueError):
             return None
 
-    # ── ações de site (vt-02 C1) ─────────────────────────────────────────
+    # ── ações de site ─────────────────────────────────────────
     # link, isolate e isolate:node agem na pasta atual (lerd --help); os demais recebem o nome ou a pasta
     def site_command(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
         if action == "link":
@@ -96,7 +96,7 @@ class LerdBackend(Backend):
             return self.argv("isolate:node", node), path
         if action in ("unlink", "park", "unpark", "secure", "unsecure"):
             return self.argv(action, args[0]), None
-        if action in SITE_TERMINAL_ACTIONS:  # vt-02 C4: interativos ou longos, rodam numa aba do site
+        if action in SITE_TERMINAL_ACTIONS:  # Interativos ou longos, rodam numa aba do site
             return self.argv(SITE_TERMINAL_ACTIONS[action]), args[0]
         return super().site_command(action, *args)
 
@@ -121,7 +121,7 @@ class LerdBackend(Backend):
         return [out[v] for v in sorted(out, key=_version_key)]
 
     def api_post(self, path: str, body: Optional[dict] = None, timeout: float = 10.0) -> int:
-        """POST na API do Lerd com o cabeçalho que o painel dele manda (X-Lerd-CSRF); devolve o código HTTP (D-015)."""
+        """POST na API do Lerd com o cabeçalho que o painel dele manda (X-Lerd-CSRF); devolve o código HTTP."""
         data = json.dumps(body or {}).encode("utf-8")
         request = urllib.request.Request(self.api_base + path, data=data, method="POST",
                                          headers={"Content-Type": "application/json", "X-Lerd-CSRF": "1"})

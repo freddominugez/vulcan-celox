@@ -87,7 +87,7 @@ def _items_block(tasks: List[Task], notes: List[Note], tags: Dict[str, Tag], not
 
 def session_doc_prompt(record, tasks: List[Task], notes: List[Note], tags: Dict[str, Tag], transcript: str,
                        limit: int = TRANSCRIPT_LIMIT, agents=None) -> Prompt:
-    # máscara antes do corte: um segredo cortado ao meio perderia o prefixo que a máscara reconhece (vt-20 C4)
+    # máscara antes do corte: um segredo cortado ao meio perderia o prefixo que a máscara reconhece
     transcript, early = redact(transcript)
     truncated = len(transcript) > limit
     tail = transcript[-limit:] if truncated else transcript

@@ -1,4 +1,4 @@
-"""vt-04 C4: últimos comandos do site, das sessões registradas (vt-09), para reexecutar."""
+"""Últimos comandos do site, das sessões registradas, para reexecutar."""
 
 from tests.server_helpers import ServerTestCase
 from vulcan_terminal.core.quick_commands import recent_commands

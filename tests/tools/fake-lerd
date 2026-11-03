@@ -1,5 +1,5 @@
 #!/bin/sh
-# lerd falso do sensor (vt-21 C2): só as saídas que as telas leem; o resto não faz nada
+# lerd falso do sensor: só as saídas que as telas leem; o resto não faz nada
 case "$1 $2" in
   "php:list "*) printf 'Installed PHP versions:\n  8.4\n* 8.5\n' ;;
   "xdebug status") printf 'Version  Xdebug    Mode\n8.4      disabled  \n8.5      enabled   debug,coverage\n' ;;

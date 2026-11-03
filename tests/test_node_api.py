@@ -1,4 +1,4 @@
-"""vt-25 C2: lista de projetos Node, detalhe e sugestões vindas das sessões dos agentes."""
+"""Lista de projetos Node, detalhe e sugestões vindas das sessões dos agentes."""
 
 import json
 import shutil
@@ -34,7 +34,7 @@ class NodeApiTest(ServerTestCase):
         self.assertTrue((self.tmp / "painel" / "package.json").is_file())  # nada saiu do disco
 
     def test_dois_cadastros_ao_mesmo_tempo_nao_perdem_projeto(self):
-        """vt-28 C3: ler, mudar e salvar a lista ficam sob a mesma trava."""
+        """Ler, mudar e salvar a lista ficam sob a mesma trava."""
         import threading
         for name in ("um", "dois", "tres", "quatro"):
             shutil.copytree(N / "painel", self.tmp / name)

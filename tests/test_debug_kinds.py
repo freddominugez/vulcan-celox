@@ -1,4 +1,4 @@
-"""vt-06 C3: queries (repetidas, tempo mínimo), logs com nível e tipos desconhecidos."""
+"""Queries (repetidas, tempo mínimo), logs com nível e tipos desconhecidos."""
 
 import json
 
@@ -22,7 +22,7 @@ class QueriesTest(TempDirTestCase):
                          [("select * from users where id = ?", 3, 60.0), ("select * from orders", 2, 20.0)])
 
     def test_repetidas_nos_eventos_reais(self):
-        req = [e for e in EVENTS if e["kind"] == "query" and e["request"] == "GET /vt06"]
+        req = [e for e in EVENTS if e["kind"] == "query" and e["request"] == "GET /exemplo"]
         users = next(g for g in group_queries(req) if g["sql"] == "select * from users where id = ?")
         self.assertEqual(users["count"], 2)  # a rota de teste roda a mesma query duas vezes
 

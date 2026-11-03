@@ -1,4 +1,4 @@
-"""vt-26 C3: toda rota da barra lateral tem seção na Ajuda, e toda seção mapeada existe no conteúdo."""
+"""Toda rota da barra lateral tem seção na Ajuda, e toda seção mapeada existe no conteúdo."""
 
 import json
 import re

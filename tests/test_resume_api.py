@@ -1,4 +1,4 @@
-"""vt-19 C4: retomar uma sessão de agente numa aba nova, na pasta e no tema dela."""
+"""Retomar uma sessão de agente numa aba nova, na pasta e no tema dela."""
 
 import json
 

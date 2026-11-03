@@ -1,4 +1,4 @@
-"""vt-21 C2: a API falsa do Lerd que o sensor usa responde como o Lerd e nunca sai do 127.0.0.1."""
+"""A API falsa do Lerd que o sensor usa responde como o Lerd e nunca sai do 127.0.0.1."""
 
 import json
 import threading

@@ -1,4 +1,4 @@
-"""Rotas dos terminais (REST e WebSocket) e o envio por cliente; separado de app.py no vt-32 C2."""
+"""Rotas dos terminais (REST e WebSocket) e o envio por cliente."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from vulcan_terminal.server.websocket import OP_BINARY, OP_TEXT, WebSocket, WebS
 AGENT_COMMANDS = {"claude": "claude", "codex": "codex"}  # argv fixo: nada vindo do cliente vira comando
 
 class ClientSender:
-    """Fila e thread de envio de um cliente WebSocket (vt-20 C6). A thread leitora do PTY só enfileira: um cliente
+    """Fila e thread de envio de um cliente WebSocket. A thread leitora do PTY só enfileira: um cliente
     lento ou travado nunca para a leitura, os outros clientes nem o processo. Quem passa do limite é desligado."""
 
     LIMIT = 4 * 1024 * 1024
@@ -76,7 +76,7 @@ class ClientSender:
 
 
 def terminal_size(rows, cols):
-    """Linhas e colunas do resize, de 1 a 1000; None se o valor não servir (vt-20 C3)."""
+    """Linhas e colunas do resize, de 1 a 1000; None se o valor não servir."""
     try:
         rows, cols = int(rows), int(cols)
     except (TypeError, ValueError):
@@ -183,7 +183,7 @@ def register_terminal_api(app) -> None:
             else:
                 sender.push(chunk)
 
-        # o histórico entra na fila dentro do lock do PTY: vem antes de qualquer saída nova (vt-20 C6)
+        # o histórico entra na fila dentro do lock do PTY: vem antes de qualquer saída nova
         session.subscribe(forward, prime=lambda history: sender.push(history) if history else None)
         try:
             if not session.alive:

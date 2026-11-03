@@ -1,4 +1,4 @@
-"""vt-18 C1: temas de sessão como dados e rotação lembrada."""
+"""Temas de sessão como dados e rotação lembrada."""
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase

@@ -1,4 +1,4 @@
-"""vt-18 C4: novo terminal com tema da rotação, agente digitado ao abrir e preferência de não perguntar a pasta."""
+"""Novo terminal com tema da rotação, agente digitado ao abrir e preferência de não perguntar a pasta."""
 
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for

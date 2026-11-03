@@ -1,4 +1,4 @@
-// Aba Logs do site (vt-05 C6): storage/logs/laravel.log lido aos pedaços, com nível, busca e pausa; e atalhos que
+// Aba Logs do site: storage/logs/laravel.log lido aos pedaços, com nível, busca e pausa; e atalhos que
 // abrem os logs do Lerd (PHP-FPM, nginx, serviços) numa aba do terminal.
 
 import { every, get, post } from "../api.mjs";

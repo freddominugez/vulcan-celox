@@ -1,4 +1,4 @@
-"""vt-26 C1: guia do Início, passos conferidos pelo estado do app e escolha de pular."""
+"""Guia do Início, passos conferidos pelo estado do app e escolha de pular."""
 
 import shutil
 
@@ -30,7 +30,7 @@ class GuideApiTest(AgentsServerCase):
         self.assertTrue(self.get("/api/guide")["skipped"])
 
     def test_caixa_nao_mostrar_mais_liga_e_desliga(self):
-        """vt-27 C5: a caixa do Início grava `skipped`; desmarcar volta a abrir o guia com o app."""
+        """A caixa do Início grava `skipped`; desmarcar volta a abrir o guia com o app."""
         for value, shown in ((True, False), (False, True), (True, False)):
             status, data, _ = self.request("PUT", "/api/guide", {"skipped": value})
             self.assertEqual(status, 200)

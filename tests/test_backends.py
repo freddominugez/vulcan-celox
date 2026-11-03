@@ -63,7 +63,7 @@ class DetectTest(TempDirTestCase):
         self.assertEqual(detect_backend(self._env(self.tmp / "nada")).list_sites(), [])
 
     def test_acoes_de_site_implementadas(self):
-        # vt-02 C1: o que era "disponível a partir do vt-02" agora chama a CLI (tabela em test_backends_sites)
+        # O que era "disponível depois" agora chama a CLI (tabela em test_backends_sites)
         fake = FakeRunner()
         backend = detect_backend(self._env(self._bin()), runner=fake)
         self.assertTrue(backend.secure("loja").ok)

@@ -144,8 +144,8 @@ class SessionTabsView {
 
 export class SiteView extends SessionTabsView {
   get tabList() {
-    return [...TABS, { id: "harness", label: "Harness", icon: "check-square" },  // vt-23 C2: contrato dos agentes
-      { id: "logs", label: "Logs", icon: "text" },  // vt-05 C6: laravel.log e logs do Lerd
+    return [...TABS, { id: "harness", label: "Harness", icon: "check-square" },  // Contrato dos agentes
+      { id: "logs", label: "Logs", icon: "text" },  // Laravel.log e logs do Lerd
       ...(this.options.state.backend && this.options.state.backend.name === "lerd" ? [{ id: "debug", label: "Depuração", icon: "bolt" }] : [])];
   }
 
@@ -166,7 +166,7 @@ export class SiteView extends SessionTabsView {
     const progress = (this.options.state.progress.sites || {})[s.name];
     const [label, ...rest] = s.domain.split(".");
     const tld = rest.length ? `.${rest.join(".")}` : "";
-    // vt-02 C3: com Lerd ou Valet, os selos viram botões que mudam PHP, Node e HTTPS
+    // Com Lerd ou Valet, os selos viram botões que mudam PHP, Node e HTTPS
     const live = Boolean(this.options.state.backend && this.options.state.backend.available && s.kind !== "manual");
     const lerd = live && this.options.state.backend.name === "lerd";
     const starred = (this.options.state.favorites || []).includes(s.name);
@@ -254,7 +254,7 @@ export class SiteView extends SessionTabsView {
     return `/api/sites/${encodeURIComponent(this.site.name)}`;
   }
 
-  /** Remover em três níveis (vt-02 C7): lista ou backend, e opcionalmente a pasta para a Lixeira. */
+  /** Remover em três níveis: lista ou backend, e opcionalmente a pasta para a Lixeira. */
   async remove() {
     const s = this.site;
     const manual = s.kind === "manual";

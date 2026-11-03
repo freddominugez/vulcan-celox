@@ -1,6 +1,6 @@
 {
-  "feature": "vt-22-uso-e-custo",
-  "contract": "specs/vt-22-uso-e-custo/contract.md",
+  "feature": "exemplo-uso-e-custo",
+  "contract": "specs/exemplo-uso-e-custo/contract.md",
   "updated_at": "2026-10-31T12:00:00+00:00",
   "items": [
     {
@@ -40,11 +40,11 @@
     }
   ],
   "completed": [
-    "vt-01-fundacao",
-    "vt-21-correcoes-lerd"
+    "exemplo-fundacao",
+    "exemplo-correcoes-lerd"
   ],
   "queue": [
-    "specs/vt-23-harness-pela-interface/contract.md"
+    "specs/exemplo-harness-pela-interface/contract.md"
   ],
   "last_green_commit": "1f024ffabcdef0123456789abcdef0123456789a",
   "next": "C3"

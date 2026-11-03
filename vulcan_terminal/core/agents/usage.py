@@ -1,4 +1,4 @@
-"""Agregação do uso por turno (agent_usage) em tokens e custo estimado por grupo (vt-22 C3).
+"""Agregação do uso por turno (agent_usage) em tokens e custo estimado por grupo.
 
 Datas no fuso local desta máquina. O custo é estimativa no preço de API (pricing.py); assinatura cobra de
 outro jeito. Linha de modelo sem preço entra nos tokens, não no custo, e marca o grupo como parcial.
@@ -146,7 +146,7 @@ CSV_HEADER = ("grupo", "chave", "agente", "projeto", "turnos", "input", "output"
 
 
 def to_csv(report: Dict) -> str:
-    """CSV de um relatório (vt-22 C5): só ids, projetos, modelos e números; nenhum texto de sessão."""
+    """CSV de um relatório: só ids, projetos, modelos e números; nenhum texto de sessão."""
     out = io.StringIO()
     w = csv.writer(out, lineterminator="\n")
     w.writerow(CSV_HEADER)

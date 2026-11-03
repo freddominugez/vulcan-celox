@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional
 SCHEMA_VERSION = 1
 MIGRATIONS_FILE = "migrations"
 DEFAULT_FILE_MODE = 0o644  # arquivos em pasta de projeto (TAREFAS.md opt-in), como o editor criaria
-PRIVATE_FILE_MODE = 0o600  # pasta de dados do app: memórias, índices e documentação (vt-20 C4)
+PRIVATE_FILE_MODE = 0o600  # pasta de dados do app: memórias, índices e documentação
 PRIVATE_DIR_MODE = 0o700
 _PRIVATE_ROOTS: set = set()
 
@@ -46,7 +46,7 @@ def in_private_root(path: Path) -> bool:
 
 
 def make_private(path: Path) -> None:
-    """vt-29 C3: arquivo ou pasta criados depois de secure_data_dir ficam 0600 e 0700, fora da umask. Fora da
+    """Arquivo ou pasta criados depois de secure_data_dir ficam 0600 e 0700, fora da umask. Fora da
     pasta de dados (pasta de projeto) não muda nada."""
     path = Path(path)
     if not path.is_symlink() and in_private_root(path):

@@ -1,8 +1,8 @@
-"""Temas de sessão (vt-18): a aba do terminal e a sessão de agente pareada usam a mesma identidade de cor.
+"""Temas de sessão: a aba do terminal e a sessão de agente pareada usam a mesma identidade de cor.
 
 Temas são dados: acrescentar um é um item em THEMES e um id em ROTATION. Cada tema tem a paleta do xterm e os três
 tokens da interface (--t cor viva, --t-bg fundo, --t-ink texto sobre o app). A rotação segue a ordem do Escopo 3.6
-(D-003): Homebrew, Clássico (o tradicional), Oceano e Ardósia, e é lembrada entre aberturas do app.
+: Homebrew, Clássico (o tradicional), Oceano e Ardósia, e é lembrada entre aberturas do app.
 """
 
 from __future__ import annotations

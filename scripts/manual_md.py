@@ -1,4 +1,4 @@
-"""Gera docs/pt-BR/user-guide.md a partir de vulcan_terminal/web/help/conteudo.json (vt-26 C4).
+"""Gera docs/pt-BR/user-guide.md a partir de vulcan_terminal/web/help/conteudo.json.
 
 Uso: python3 scripts/manual_md.py [saida.md]   (padrão: docs/pt-BR/user-guide.md)
 O conteúdo da Ajuda do app e o manual em Markdown saem do mesmo arquivo; o validate.sh compara os dois.

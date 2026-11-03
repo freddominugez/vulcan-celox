@@ -144,7 +144,7 @@ class Runner:
 
 
 def open_pipe(argv: Sequence[str]) -> subprocess.Popen:
-    """Saída de um comando em stream, sem guardar tudo na memória (vt-31 C2). Levanta OSError se não rodar."""
+    """Saída de um comando em stream, sem guardar tudo na memória. Levanta OSError se não rodar."""
     return subprocess.Popen(list(argv), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                             start_new_session=True)
 
@@ -222,7 +222,7 @@ def terminate_pty(pid: int, grace: float = 2.0) -> Optional[int]:
 
 
 def terminate_many(pids: Sequence[int], grace: float = 2.0) -> Dict[int, Optional[int]]:
-    """Como terminate_pty para várias abas de uma vez: sinal para todas, uma espera só (vt-20 C6).
+    """Como terminate_pty para várias abas de uma vez: sinal para todas, uma espera só.
     Dez abas que ignoram SIGHUP levam `grace` segundos, não dez vezes isso."""
     for pid in pids:
         for sig in (signal.SIGHUP, signal.SIGTERM):

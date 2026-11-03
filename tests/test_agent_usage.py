@@ -1,4 +1,4 @@
-"""vt-22 C1: uso por turno no índice (tabela agent_usage)."""
+"""Uso por turno no índice (tabela agent_usage)."""
 
 import shutil
 import sqlite3

@@ -1,4 +1,4 @@
-"""vt-20 C5: índice de agentes sem bloqueio (QUA-M1, B3, B4, B5, B6, B11)."""
+"""Índice de agentes sem bloqueio."""
 
 import json
 import os

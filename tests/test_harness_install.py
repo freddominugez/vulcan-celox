@@ -1,4 +1,4 @@
-"""vt-23 C3 e C4: instalar o formato mínimo e novo contrato pela interface."""
+"""Instalar o formato mínimo e novo contrato pela interface."""
 
 import json
 import os

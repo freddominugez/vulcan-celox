@@ -1,4 +1,4 @@
-// Aba Harness do site (vt-23): onde os agentes estão no contrato. Só leitura: o app não muda status de item nem
+// Aba Harness do site: onde os agentes estão no contrato. Só leitura: o app não muda status de item nem
 // roda sensor; quem valida é o sensor do projeto.
 
 import { every, get, post } from "../api.mjs";
@@ -23,7 +23,7 @@ export function resumePrompt(info) {
 
 const ACTION = { criar: "criar arquivo novo", bloco: "acrescentar só o bloco marcado (o resto do arquivo não muda)" };
 
-/** Mostra a lista exata de arquivos e o conteúdo de cada um; só grava com a confirmação (vt-23 C3). */
+/** Mostra a lista exata de arquivos e o conteúdo de cada um; só grava com a confirmação. */
 export async function installDialog(site) {
   const base = `/api/sites/${encodeURIComponent(site.name)}/harness/install`;
   const plan = await get(base);
@@ -54,7 +54,7 @@ function taskForm() {
     <p class="dim hint">APROVAÇÃO fica pendente: só você aprova, editando o arquivo depois de revisar.</p></div>`;
 }
 
-/** Formulário do contrato no formato mínimo (vt-23 C4); grava .vulcan/tasks/<id>.md e nunca sobrescreve. */
+/** Formulário do contrato no formato mínimo; grava.vulcan/tasks/<id>.md e nunca sobrescreve. */
 export async function newTaskDialog(site) {
   let data = null;
   const ok = await confirmDialog({

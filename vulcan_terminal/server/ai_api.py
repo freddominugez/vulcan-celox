@@ -48,7 +48,7 @@ class AiConfig:
 
     def base(self) -> str:
         """VULCAN_ANTHROPIC_BASE_URL permite proxy corporativo ou servidor de teste local; http só no loopback,
-        para a chave nunca sair em claro da máquina (vt-20 C3)."""
+        para a chave nunca sair em claro da máquina."""
         base = self.app.env.get("VULCAN_ANTHROPIC_BASE_URL") or API_BASE
         parts = urlsplit(base)
         if parts.scheme == "https" and parts.hostname:

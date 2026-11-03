@@ -1,4 +1,4 @@
-"""vt-18 C2: o shell da aba (e o agente iniciado nele) vê VULCAN_SESSION_ID e VULCAN_THEME."""
+"""O shell da aba (e o agente iniciado nele) vê VULCAN_SESSION_ID e VULCAN_THEME."""
 
 import os
 

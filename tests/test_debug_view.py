@@ -1,4 +1,4 @@
-"""vt-06 C2: tela Depuração (agrupar por requisição, filtrar, abrir a origem no editor)."""
+"""Tela Depuração (agrupar por requisição, filtrar, abrir a origem no editor)."""
 
 import json
 import os

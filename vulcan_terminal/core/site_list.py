@@ -1,4 +1,4 @@
-"""Ordem dos sites na barra lateral (vt-02 C5): favoritos no topo, os demais em ordem alfabética."""
+"""Ordem dos sites na barra lateral: favoritos no topo, os demais em ordem alfabética."""
 
 from __future__ import annotations
 

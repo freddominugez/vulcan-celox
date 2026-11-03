@@ -56,7 +56,7 @@ class WebAssetsTest(ServerTestCase):
             self.assertNotIn("SyntaxError", proc.stdout + proc.stderr, module.name)
 
 
-# vt-20 C8 (QUA-B10): campo sem contorno de foco precisa de outro sinal de foco, no próprio campo ou no contêiner
+# Campo sem contorno de foco precisa de outro sinal de foco, no próprio campo ou no contêiner
 FOCO_SUBSTITUTO = {
     ".ag-search input": ".ag-search:focus-within",
     ".term-search-input": ".term-search-input:focus",
@@ -121,7 +121,7 @@ console.log(JSON.stringify({ hidden, visible, after: calls, overlap }));
 
 
 class PollingTest(unittest.TestCase):
-    """vt-20 C8 (QUA-B8): repetição encadeada, sem sobreposição, pausada com a janela oculta."""
+    """Repetição encadeada, sem sobreposição, pausada com a janela oculta."""
 
     @unittest.skipUnless(shutil.which("node"), "node ausente")
     def test_every(self):
@@ -148,13 +148,13 @@ console.log(JSON.stringify(out));
 
 class AtalhosLinuxTest(unittest.TestCase):
     def test_busca_aceita_o_shift_do_linux(self):
-        """vt-33 C1: no Linux o modificador é Ctrl+Shift; exigir "sem Shift" fazia o atalho nunca disparar."""
+        """No Linux o modificador é Ctrl+Shift; exigir "sem Shift" fazia o atalho nunca disparar."""
         src = (WEB / "js" / "global-events.mjs").read_text(encoding="utf-8")
         self.assertIn('key === "f" && (!isMac || !event.shiftKey)', src)
 
 
 class RemountTest(unittest.TestCase):
-    """vt-29 C4: só remonta com a lista de sites nova a tela que recebeu essa lista."""
+    """Só remonta com a lista de sites nova a tela que recebeu essa lista."""
 
     @unittest.skipUnless(shutil.which("node"), "node ausente")
     def test_regra(self):

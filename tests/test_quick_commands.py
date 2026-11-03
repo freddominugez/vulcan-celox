@@ -1,4 +1,4 @@
-"""vt-04 C2: comandos do projeto em um clique, a partir do que existe na pasta, mais os do usuário."""
+"""Comandos do projeto em um clique, a partir do que existe na pasta, mais os do usuário."""
 
 import json
 import os

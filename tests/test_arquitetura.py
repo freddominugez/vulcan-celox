@@ -40,7 +40,7 @@ class ArquiteturaTest(unittest.TestCase):
                 self.assertNotIn(termo, texto, f"{path.relative_to(PKG)} contém {termo}")
 
     def test_scripts_sem_apagamento_definitivo(self):
-        """vt-20 C9: a regra vale também para os scripts de desenvolvimento e os de instalação."""
+        """A regra vale também para os scripts de desenvolvimento e os de instalação."""
         root = PKG.parent
         for folder in ("scripts", "packaging"):
             for path in sorted((root / folder).rglob("*")):

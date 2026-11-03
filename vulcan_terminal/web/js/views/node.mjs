@@ -1,4 +1,4 @@
-// Projetos Node (vt-25 C4): lista com sugestões e a página de cada projeto. Scripts rodam numa aba de terminal à
+// Projetos Node: lista com sugestões e a página de cada projeto. Scripts rodam numa aba de terminal à
 // vista; parar é Ctrl-C na aba do próprio projeto. O app não fala com a Vercel nem com o Supabase remoto.
 
 import { every, get, hasBridge, post } from "../api.mjs";

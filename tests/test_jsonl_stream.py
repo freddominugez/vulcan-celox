@@ -1,4 +1,4 @@
-"""vt-16 C2: leitura incremental de JSONL tolerante a linha cortada, lixo, linha grande e encolhimento."""
+"""Leitura incremental de JSONL tolerante a linha cortada, lixo, linha grande e encolhimento."""
 
 import json
 import unittest

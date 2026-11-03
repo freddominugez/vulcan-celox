@@ -52,7 +52,7 @@ def _command_text(args) -> str:
 
 
 def session_origin(meta: dict) -> str:
-    """vt-31 C1: subagente e app desktop não nascem de uma aba do terminal. Terminal e versão antiga: vazio."""
+    """Subagente e app desktop não nascem de uma aba do terminal. Terminal e versão antiga: vazio."""
     source = meta.get("source")
     if (isinstance(source, dict) and "subagent" in source) or meta.get("thread_source") == "subagent":
         return "subagent"
@@ -73,7 +73,7 @@ class CodexReader:
         self.fb_first: Optional[str] = state.get("fb_first")
         self.last_user: list = list(state.get("last_user") or ["", None])  # [texto, epoch]
         self.last_cmd: List[str] = list(state.get("last_cmd") or ["", ""])
-        self.last_total: Dict = dict(state.get("last_total") or {})  # último total acumulado (vt-22 C1)
+        self.last_total: Dict = dict(state.get("last_total") or {})  # último total acumulado
         self.usage_seq = int(state.get("usage_seq", 0))
         self.usage_rows: list = []
 
@@ -132,7 +132,7 @@ class CodexReader:
             self._item(p["item"], at)
 
     def _usage(self, total: dict, at: str) -> None:
-        """O Codex grava o total acumulado; o consumo de cada evento é a diferença para o anterior (vt-22 C1).
+        """O Codex grava o total acumulado; o consumo de cada evento é a diferença para o anterior.
         Um total menor que o anterior (sessão retomada do zero) recomeça a conta a partir dele."""
         cached = as_int(total.get("cached_input_tokens"))
         cur = {"input": max(0, as_int(total.get("input_tokens")) - cached), "output": as_int(total.get("output_tokens")),

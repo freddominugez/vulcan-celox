@@ -1,4 +1,4 @@
-"""vt-20 C6: PTY e WebSocket (QUA-M2, M3, M4, B1, B7)."""
+"""PTY e WebSocket."""
 
 import os
 import re

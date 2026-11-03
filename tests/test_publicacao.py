@@ -1,4 +1,4 @@
-"""vt-16b C3: trilha de publicação e alerta de loop seguem a ordem real e ignoram comandos que falharam."""
+"""Trilha de publicação e alerta de loop seguem a ordem real e ignoram comandos que falharam."""
 
 import json
 

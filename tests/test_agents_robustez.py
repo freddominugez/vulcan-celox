@@ -1,4 +1,4 @@
-"""vt-16b C1: leitura robusta. Linha com tipo inesperado não trava a sessão; datas fora do padrão; sidechain."""
+"""Leitura robusta. Linha com tipo inesperado não trava a sessão; datas fora do padrão; sidechain."""
 
 import io
 import json

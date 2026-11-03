@@ -1,4 +1,4 @@
-"""Guia do Início (vt-26 C1): quatro passos que se conferem pelo estado do app, e a escolha de pular o guia.
+"""Guia do Início: quatro passos que se conferem pelo estado do app, e a escolha de pular o guia.
 
 Nada aqui muda o ambiente: só lê o que o app já sabe e guarda `guide` no Store.
 """

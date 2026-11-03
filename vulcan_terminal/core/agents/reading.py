@@ -18,7 +18,7 @@ def _readers() -> Dict:
     try:
         from vulcan_terminal.core.agents import codex_reader
         readers["codex"] = (codex_reader.new_session, codex_reader.CodexReader)
-    except ImportError:  # pragma: no cover  (o leitor do Codex faz parte do pacote desde o vt-16)
+    except ImportError:  # pragma: no cover  (o leitor do Codex faz parte do pacote)
         pass
     return readers
 
@@ -44,7 +44,7 @@ def read_session(agent: str, path, session: Optional[AgentSession] = None, state
         size = os.path.getsize(path)
     except OSError:
         size = 0
-    compressed = path.name.endswith(".zst")  # vt-31 C2: sempre do início; o offset não é do arquivo em disco
+    compressed = path.name.endswith(".zst")  # Sempre do início; o offset não é do arquivo em disco
     if session is None or size < offset or compressed:
         reset = session is not None
         session, state, offset = new_session(path), None, 0
@@ -57,7 +57,7 @@ def read_session(agent: str, path, session: Optional[AgentSession] = None, state
         except Exception as exc:  # noqa: BLE001  uma linha estranha não pode travar a sessão inteira
             feed_errors.append((start, f"linha ignorada: {type(exc).__name__}: {exc}"))
     if stream.reset and not reset:
-        # o arquivo encolheu entre o stat acima e a abertura: o estado antigo não vale, relê do zero (vt-20 C5)
+        # o arquivo encolheu entre o stat acima e a abertura: o estado antigo não vale, relê do zero
         result = read_session(agent, path, None, None, 0, max_line)
         result.reset = True
         return result

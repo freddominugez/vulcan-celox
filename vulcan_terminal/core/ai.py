@@ -100,7 +100,7 @@ class AnthropicClient:
         payload = {"model": model, "max_tokens": max_tokens, "system": system,
                    "messages": [{"role": "user", "content": prompt}]}
         data = self._call("POST", "/v1/messages", payload, timeout)
-        if data.get("stop_reason") == "refusal":  # vt-32 C3: o texto parcial não pode virar documento
+        if data.get("stop_reason") == "refusal":  # O texto parcial não pode virar documento
             details = data.get("stop_details") if isinstance(data.get("stop_details"), dict) else {}
             category = f" (categoria: {details['category']})" if details.get("category") else ""
             raise AiError(f"a Anthropic recusou o pedido{category}; tente outro modelo ou reduza o texto enviado")

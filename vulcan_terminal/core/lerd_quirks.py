@@ -1,7 +1,7 @@
-"""Contornos do app para defeitos do Lerd achados nas provas (P-006, vt-30 C2).
+"""Contornos do app para defeitos do Lerd achados nas provas.
 
 Cada entrada diz o defeito, o que o app faz no lugar e a versão do Lerd que corrige (None enquanto não sair). O
-comportamento do app não muda com a versão (D-021): limpar pela API com o cabeçalho e ler os nomes reais dos
+comportamento do app não muda com a versão: limpar pela API com o cabeçalho e ler os nomes reais dos
 php.ini continuam certos depois da correção. A tabela serve para o --doctor dizer o que ainda é necessário.
 """
 

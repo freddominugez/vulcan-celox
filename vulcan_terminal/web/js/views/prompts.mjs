@@ -29,7 +29,7 @@ export class PromptsView {
     this.data = null;
     this.picked = null;
     this.values = {};  // valores dos campos por prompt, guardados enquanto a tela está aberta
-    this.typed = {};  // só o que o usuário digitou: sobrevive à troca de sessão e à recarga (vt-29 C4)
+    this.typed = {};  // só o que o usuário digitou: sobrevive à troca de sessão e à recarga
     this.root.addEventListener("click", (e) => this.onClick(e));
     this.root.addEventListener("input", (e) => {
       if (!e.target.closest(".pc-field")) return;
@@ -45,7 +45,7 @@ export class PromptsView {
       }
     });
     // só recarrega (e zera os campos) se a sessão mudou de fato: o primeiro aviso, de nenhuma para a mesma
-    // sessão que a tela já mostra, chegava depois do usuário digitar e apagava o texto (vt-29 C4)
+    // sessão que a tela já mostra, chegava depois do usuário digitar e apagava o texto
     this.onCurrent = (e) => {
       const next = e.detail && e.detail.session ? e.detail.session.id : null;
       const shown = this.data && this.data.session ? this.data.session.id : null;
@@ -172,7 +172,7 @@ export class PromptsView {
     return this.data.prompts.find((p) => p.id === id);
   }
 
-  /** vt-27 C3: cola o texto na aba pareada à sessão, sem Enter. Sem aba, oferece retomar a sessão num terminal. */
+  /** Cola o texto na aba pareada à sessão, sem Enter. Sem aba, oferece retomar a sessão num terminal. */
   async send() {
     const out = this.refreshPreview();
     if (!out || out.missing.length) return;

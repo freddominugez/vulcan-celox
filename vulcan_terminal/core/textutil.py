@@ -24,7 +24,7 @@ _SENTENCE_END = re.compile(r"(?<=[.!?])\s")
 
 def headline(text: Optional[str], limit: int = HEADLINE_MAX) -> str:
     """Uma linha curta para título a partir de um pedido colado: sem as crases do bloco (duas ou mais: há colagem real
-    com uma a menos), a primeira frase quando ela tem tamanho de título, senão cortada numa palavra (vt-33, P-009)."""
+    com uma a menos), a primeira frase quando ela tem tamanho de título, senão cortada numa palavra."""
     line = _FENCE_END.sub("", _FENCE_START.sub("", " ".join((text or "").split()))).strip()
     match = _SENTENCE_END.search(line)
     if match and 20 <= match.start() <= limit:

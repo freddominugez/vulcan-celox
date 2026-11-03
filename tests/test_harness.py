@@ -1,4 +1,4 @@
-"""vt-23 C1: leitor de harness dos dois formatos, só leitura."""
+"""Leitor de harness dos dois formatos, só leitura."""
 
 import hashlib
 import shutil
@@ -25,16 +25,16 @@ class HarnessReaderTest(TempDirTestCase):
         before = digest(root)
         info = harness.read(root)
         self.assertEqual((info["tipo"], info["estado"]), ("repo", "ok"))
-        self.assertEqual(info["contrato"]["id"], "vt-22-uso-e-custo")
+        self.assertEqual(info["contrato"]["id"], "exemplo-uso-e-custo")
         self.assertTrue(info["contrato"]["existe"])
         self.assertEqual([i["estado"] for i in info["itens"]], ["feito", "feito", "andamento", "bloqueado", "pendente"])
         self.assertEqual(info["itens"][3]["causa"], "pendência registrada")
         self.assertEqual(info["itens"][0]["titulo"], "Uso por turno no índice")
         self.assertEqual(info["proximo"], "C3")
         self.assertTrue(info["ultimo_commit_verde"].startswith("1f024ff"))
-        self.assertEqual(info["fila"], ["specs/vt-23-harness-pela-interface/contract.md"])
+        self.assertEqual(info["fila"], ["specs/exemplo-harness-pela-interface/contract.md"])
         self.assertIn("C3 em andamento.", info["handoff"])
-        self.assertEqual(harness.summary(info), "vt-22-uso-e-custo: 2 de 5 itens feitos, próximo C3")
+        self.assertEqual(harness.summary(info), "exemplo-uso-e-custo: 2 de 5 itens feitos, próximo C3")
         self.assertEqual(digest(root), before)
 
     def test_formato_minimo(self):
@@ -76,7 +76,7 @@ class HarnessReaderTest(TempDirTestCase):
     def test_contrato_fora_da_pasta_nao_e_lido(self):
         root = self.copy("repo")
         state = (root / ".harness/state.json").read_text(encoding="utf-8")
-        (root / ".harness/state.json").write_text(state.replace("specs/vt-22-uso-e-custo/contract.md", "../../etc/passwd"),
+        (root / ".harness/state.json").write_text(state.replace("specs/exemplo-uso-e-custo/contract.md", "../../etc/passwd"),
                                                   encoding="utf-8")
         info = harness.read(root)
         self.assertFalse(info["contrato"]["existe"])

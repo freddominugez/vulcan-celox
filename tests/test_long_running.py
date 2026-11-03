@@ -1,4 +1,4 @@
-"""vt-04 C3: abas de processo longo (servidor de desenvolvimento, fila, logs, túnel)."""
+"""Abas de processo longo (servidor de desenvolvimento, fila, logs, túnel)."""
 
 import os
 

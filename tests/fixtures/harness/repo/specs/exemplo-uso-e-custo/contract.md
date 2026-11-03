@@ -1,4 +1,4 @@
-# Contrato: vt-22-uso-e-custo
+# Contrato: exemplo-uso-e-custo
 
 | ID | Descrição | Sensor / critério de aceite |
 |----|-----------|------------------------------|

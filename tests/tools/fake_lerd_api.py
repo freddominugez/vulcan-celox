@@ -1,11 +1,11 @@
-"""API falsa do Lerd para o sensor (vt-21 C2): responde como a do Lerd 1.37.1 com as fixtures reais de tests/fixtures.
+"""API falsa do Lerd para o sensor: responde como a do Lerd 1.37.1 com as fixtures reais de tests/fixtures.
 
 Só stdlib, só 127.0.0.1, porta escolhida pelo sistema (impressa na primeira linha). POST exige `X-Lerd-CSRF: 1`,
 como o Lerd. Nunca fala com o Lerd de verdade.
 
 uso: python3 -I tests/tools/fake_lerd_api.py [--site-path nome=pasta] [--dumps-at AAAA-MM-DDTHH:MM] [--sites-alternam S]
 
---sites-alternam S: a cada S segundos um site extra aparece ou some da lista (vt-29 C4: a tela não pode perder o
+--sites-alternam S: a cada S segundos um site extra aparece ou some da lista (a tela não pode perder o
 texto digitado quando a lista de sites muda).
 """
 

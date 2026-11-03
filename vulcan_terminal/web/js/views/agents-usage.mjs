@@ -1,4 +1,4 @@
-// Uso dos agentes (vt-22 C4): tokens e custo estimado no preço da API por dia, projeto, modelo e sessão.
+// Uso dos agentes: tokens e custo estimado no preço da API por dia, projeto, modelo e sessão.
 
 import { get, token } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";

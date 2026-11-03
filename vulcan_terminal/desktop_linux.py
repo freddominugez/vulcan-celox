@@ -61,7 +61,7 @@ def choose_mode(env, which: Callable[[str], Optional[str]] = shutil.which,
 
 
 def is_app_uri(uri: Optional[str], port: int) -> bool:
-    """A janela só mostra o próprio app (vt-20 C2): http://127.0.0.1:<porta> ou about:blank."""
+    """A janela só mostra o próprio app: http://127.0.0.1:<porta> ou about:blank."""
     if uri == "about:blank":
         return True
     try:
@@ -82,7 +82,7 @@ LAUNCHER_NAME = "abrir-janela.html"
 
 
 def write_launcher(data_dir, port: int, token: str, route: str = "#/overview"):
-    """Página 0600 na pasta de dados que leva o navegador ao app com o token no fragmento (vt-20 C4).
+    """Página 0600 na pasta de dados que leva o navegador ao app com o token no fragmento.
     O token não aparece na linha de comando do navegador nem do xdg-open, que outros usuários da máquina leem."""
     from pathlib import Path
     folder = Path(data_dir)

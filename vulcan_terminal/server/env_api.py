@@ -1,4 +1,4 @@
-"""Tela Ambiente (vt-05): serviços, versões de PHP, php.ini, extensões, Node e logs do backend."""
+"""Tela Ambiente: serviços, versões de PHP, php.ini, extensões, Node e logs do backend."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from vulcan_terminal.server.local_http import HttpError, Request
 
 NODE = re.compile(r"^(\d+(\.\d+){0,2}|lts)$")
 SERVICE_TIMEOUT = 300.0  # um start pode baixar a imagem do serviço
-CLI_CACHE_S = 60.0  # vt-21 C4: a tela Ambiente atualiza a cada 15 s; php:list e xdebug status mudam só com ação
+CLI_CACHE_S = 60.0  # A tela Ambiente atualiza a cada 15 s; php:list e xdebug status mudam só com ação
 _now = time.monotonic
 
 
@@ -65,7 +65,7 @@ def register_env_api(app) -> None:
         return _result(b.runner.run(b.argv("service", action, name), timeout=SERVICE_TIMEOUT))
 
     def in_tab(b, title: str, *args: str):
-        """Comando demorado do Lerd numa aba de terminal, com a saída à vista (vt-05)."""
+        """Comando demorado do Lerd numa aba de terminal, com a saída à vista."""
         home = app.env.get("HOME") or str(Path.home())
         session = app.spawn_terminal(home, title, None, command=shlex.join(b.argv(*args)))
         return 201, session.info()
@@ -99,7 +99,7 @@ def register_env_api(app) -> None:
                 forget()
         return wrapped
 
-    # ── versões de PHP (vt-05 C2) ────────────────────────────────────────
+    # ── versões de PHP ────────────────────────────────────────
     def installed_php(b):
         return parse_php_list(cli_output(b, "php:list"))
 
@@ -128,7 +128,7 @@ def register_env_api(app) -> None:
             return in_tab(b, f"PHP {version} · atualizar", "php:update", version)
         return _result(b.runner.run(b.argv("use", version), timeout=120))
 
-    # ── Xdebug por versão (vt-06 C5) ─────────────────────────────────────
+    # ── Xdebug por versão ─────────────────────────────────────
     @srv.route("GET", "/api/environment/xdebug")
     def xdebug_state(_req: Request):
         b = lerd()
@@ -160,7 +160,7 @@ def register_env_api(app) -> None:
         title = f"PHP {version} · Xdebug {'ligar' if enabled else 'desligar'}"
         return in_tab(b, title, *xdebug_argv(version, enabled, mode, on_demand))  # reconstrói a imagem: demora
 
-    # ── php.ini de usuário (vt-05 C3) ────────────────────────────────────
+    # ── php.ini de usuário ────────────────────────────────────
     def ini_target(version: str) -> str:
         if version != "shared" and version not in SUPPORTED_PHP:
             raise HttpError(400, "versão de PHP desconhecida")
@@ -177,7 +177,7 @@ def register_env_api(app) -> None:
         """Script que o Lerd chama como EDITOR: roda este app em modo ajudante de php.ini."""
         target = Path(app.data_dir) / "hooks" / "php-ini-editor.sh"
         root = str(Path(__file__).resolve().parent.parent.parent)
-        # -I: sem a pasta atual nem PYTHONPATH em sys.path (vt-21 C1); a biblioteca entra pelo caminho absoluto
+        # -I: sem a pasta atual nem PYTHONPATH em sys.path; a biblioteca entra pelo caminho absoluto
         code = (f"import sys; sys.path.insert(0, {root!r}); "
                 "from vulcan_terminal.core.php_ini import main; sys.exit(main(sys.argv[1:]))")
         text = f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -I -c {shlex.quote(code)} \"$@\"\n"
@@ -223,7 +223,7 @@ def register_env_api(app) -> None:
         version = ini_target(req.params["version"])
         return in_tab(b, f"php.ini {version}", "php:ini", version)  # editor do usuário, numa aba
 
-    # ── extensões (vt-05 C4), só leitura ─────────────────────────────────
+    # ── extensões, só leitura ─────────────────────────────────
     @srv.route("GET", r"/api/environment/php/(?P<version>[0-9.]{3,4})/extensions")
     def extensions(req: Request):
         b = lerd()
@@ -239,7 +239,7 @@ def register_env_api(app) -> None:
         return {"version": version, "php": modules["php"], "zend": modules["zend"], "declared": custom["declared"],
                 "note": custom["per_version"].get(version, ""), "dashboard": b.dashboard_url()}
 
-    # ── Node (vt-05 C5) ──────────────────────────────────────────────────
+    # ── Node ──────────────────────────────────────────────────
     @srv.route("GET", "/api/environment/node")
     def node(_req: Request):
         b = lerd()

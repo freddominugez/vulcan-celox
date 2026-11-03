@@ -27,7 +27,7 @@ class ValetBackend(Backend):
     def restart(self) -> Result:
         return self.runner.run(self.argv("restart"), timeout=SERVICE_TIMEOUT)
 
-    # ── ações de site (vt-02 C1) ─────────────────────────────────────────
+    # ── ações de site ─────────────────────────────────────────
     def site_command(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
         if action == "link":
             path, domain = args
@@ -35,7 +35,7 @@ class ValetBackend(Backend):
         if action == "park":
             return self.argv("park"), args[0]
         if action == "unpark":
-            return self.argv("forget"), args[0]  # forget é o equivalente do unpark no Valet (D-013)
+            return self.argv("forget"), args[0]  # forget é o equivalente do unpark no Valet
         if action == "isolate":
             _path, php, name = args
             return self.argv("isolate", f"php@{php}", f"--site={name}"), None

@@ -1,4 +1,4 @@
-"""vt-20 C4: processo e dados locais (SEG-M3, M4, B1, B2; QUA-B12)."""
+"""Processo e dados locais."""
 
 import os
 import shutil
@@ -59,7 +59,7 @@ class PermissoesTest(TempDirTestCase):
         self.assertEqual(mode(data / "sessoes" / "loja" / "nova.md"), 0o600)
 
     def test_script_executavel_continua_executavel(self):
-        # o hook de pareamento (vt-18) e o ajudante do php.ini (vt-05) são executados direto; achado no vt-05 C3
+        # o hook de pareamento e o ajudante do php.ini são executados direto
         data = self.tmp / "dados"
         (data / "hooks").mkdir(parents=True)
         script = data / "hooks" / "vulcan-pareamento.py"

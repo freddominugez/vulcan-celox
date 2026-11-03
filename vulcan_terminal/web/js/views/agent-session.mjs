@@ -16,7 +16,7 @@ const CMD_KINDS = { shell: "shell", test: "teste", publish: "publica" };
 const EVENT_TEXT = { user: "Pedido", assistant: "Resposta", command: "Comando", file: "Arquivo" };
 const PAGE = 200;
 
-/** Custo estimado da sessão no preço da API (vt-22 C4); assinatura cobra de outro jeito. */
+/** Custo estimado da sessão no preço da API; assinatura cobra de outro jeito. */
 function costText(cost) {
   if (!cost || !cost.turns) return "";
   if (cost.value === null) return " · custo sem preço conferido";
@@ -154,7 +154,7 @@ export class AgentSessionView {
     </div>`;
   }
 
-  /** vt-06 C4: erros do site do Lerd durante a sessão (só aparece quando a pasta da sessão é um site do Lerd). */
+  /** Erros do site do Lerd durante a sessão (só aparece quando a pasta da sessão é um site do Lerd). */
   async loadDebug() {
     try {
       const data = await get(`/api/debug/agent/${encodeURIComponent(this.id)}`);
@@ -231,7 +231,7 @@ export class AgentSessionView {
     if (action.dataset.action === "resume") this.resume(action);
   }
 
-  /** Retoma a sessão numa aba nova (vt-19 C4): o servidor abre o terminal e digita o comando do agente. */
+  /** Retoma a sessão numa aba nova: o servidor abre o terminal e digita o comando do agente. */
   async resume(button) {
     button.disabled = true;
     try {
@@ -245,7 +245,7 @@ export class AgentSessionView {
     }
   }
 
-  /** Tarefa a partir da sessão de agente (vt-18 C5): fica na aba pareada, e com ela no site e no caderno. */
+  /** Tarefa a partir da sessão de agente: fica na aba pareada, e com ela no site e no caderno. */
   createTask() {
     const s = this.session;
     const backdrop = document.createElement("div");

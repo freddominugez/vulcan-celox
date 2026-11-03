@@ -1,4 +1,4 @@
-"""vt-05 C3: os seis ajustes comuns do php.ini de usuário do Lerd, gravados pelo próprio `lerd php:ini`.
+"""Os seis ajustes comuns do php.ini de usuário do Lerd, gravados pelo próprio `lerd php:ini`.
 
 Prova de 2026-10-31 nesta máquina (registrada no progresso): com EDITOR apontando para um ajudante, o Lerd passou
 ~/.local/share/lerd/php/8.5/98-user.ini ao editor e reaplicou o PHP 8.5; memory_limit foi de 128M a 256M e voltou.
@@ -104,7 +104,7 @@ class ApiTest(ServerTestCase):
         self.assertIn(f"{self.lerd} php:ini 8.5", " ".join(self.app.terminals.get(info["id"]).argv))
 
     def test_ajudante_ignora_a_pasta_atual(self):
-        # vt-21 C1 (AUD-01): `python -m` punha a pasta atual em sys.path; um re.py ou json.py ali era importado
+        # `python -m` punha a pasta atual em sys.path; um re.py ou json.py ali era importado
         self.request("POST", "/api/environment/php/8.5/ini", body={"values": {"memory_limit": "512M"}})
         wrapper = self.fake.calls[-1].env["EDITOR"]
         script = Path(wrapper).read_text(encoding="utf-8")

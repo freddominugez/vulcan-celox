@@ -1,4 +1,4 @@
-"""vt-17 C2: variáveis dos prompts a partir da sessão de agente."""
+"""Variáveis dos prompts a partir da sessão de agente."""
 
 import unittest
 

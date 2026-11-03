@@ -1,4 +1,4 @@
-// Temas de sessão (vt-18 C1): carregados uma vez do servidor (core/themes.py é a fonte), injetados como estilo
+// Temas de sessão: carregados uma vez do servidor (core/themes.py é a fonte), injetados como estilo
 // e aplicados a cada terminal pelo tema da aba. Sem tema, o terminal usa a paleta padrão do app.
 
 import { get } from "./api.mjs";

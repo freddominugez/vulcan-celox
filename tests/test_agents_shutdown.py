@@ -1,4 +1,4 @@
-"""vt-16b C4: desligamento na ordem certa e observador que para entre arquivos."""
+"""Desligamento na ordem certa e observador que para entre arquivos."""
 
 from unittest import mock
 

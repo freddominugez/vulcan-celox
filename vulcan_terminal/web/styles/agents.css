@@ -1,5 +1,5 @@
-/* Telas de agentes (vt-16), conforme docs/MOCKUP-AGENTES.html, sobre os tokens de app.css.
-   --t, --t-bg e --t-ink são a identidade da sessão; os temas nomeados chegam no vt-18 e só trocam essas três. */
+/* Telas de agentes, conforme docs/MOCKUP-AGENTES.html, sobre os tokens de app.css.
+   --t, --t-bg e --t-ink são a identidade da sessão; os temas nomeados só trocam essas três. */
 
 .t-neutro { --t: #9a9aa3; --t-bg: #1b1b1f; --t-ink: #b0b0b8; }
 
@@ -114,7 +114,7 @@
   .ag-card { transition: none; }
 }
 
-/* histórico de agentes (C7) */
+/* histórico de agentes */
 .ag-search { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--bg-raise); }
 .ag-search:focus-within { border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-soft); }
 .ag-search > .i { width: 18px; height: 18px; color: var(--fg-3); }
@@ -136,7 +136,7 @@
 .ag-note p { margin: 2px 0 0; color: var(--fg-2); }
 .ag-note code { font-size: 11.5px; }
 
-/* branches e worktrees (C8) */
+/* branches e worktrees */
 .ag-br-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) auto; gap: 12px; align-items: center; padding: 9px 14px; border-top: 1px solid var(--line-soft); }
 .ag-br-row:first-of-type { border-top: 0; }
 .ag-br-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -153,7 +153,7 @@
   .ag-br-actions { justify-content: flex-start; }
 }
 
-/* sessão atual na barra superior (vt-17 C2) */
+/* sessão atual na barra superior */
 .current-session { position: relative; flex: none; min-width: 0; }
 .cs-btn { display: inline-flex; align-items: center; gap: 7px; height: 28px; max-width: 340px; padding: 0 9px 0 9px; border-radius: 14px;
   border: 1px solid color-mix(in srgb, var(--t) 45%, var(--line-strong)); background: color-mix(in srgb, var(--t) 10%, var(--bg-raise)); color: var(--fg); }
@@ -173,7 +173,7 @@
 .cs-tx b { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cs-tx span { font: 11px var(--mono); color: var(--fg-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* prompts (vt-17 C3) */
+/* prompts */
 .pr-ctx { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px;
   background: color-mix(in srgb, var(--t) 8%, var(--bg-raise)); border: 1px solid color-mix(in srgb, var(--t) 30%, var(--line)); }
 .pr-cat { display: flex; flex-direction: column; gap: 8px; }
@@ -243,7 +243,7 @@
   .cs-btn { max-width: 230px; }
 }
 
-/* barra de prompts na área de terminal (vt-17 C4) */
+/* barra de prompts na área de terminal */
 .prompt-bar { display: flex; align-items: center; gap: 6px; flex: none; padding: 5px 10px; overflow-x: auto; scrollbar-width: none;
   border-bottom: 1px solid var(--line-soft); background: var(--bg-side); }
 .prompt-bar::-webkit-scrollbar { display: none; }
@@ -260,14 +260,14 @@
 .pb-more { flex: none; font-size: var(--fs-xs); color: var(--fg-3); padding: 0 6px; }
 .pb-more:hover { color: var(--fg); }
 
-/* abas com tema de sessão (vt-18 C1): a cor da aba é a mesma da sessão de agente pareada */
+/* abas com tema de sessão: a cor da aba é a mesma da sessão de agente pareada */
 .tab.has-theme > .i { color: var(--t); }
 .tab.has-theme.is-active { background: var(--t-bg); }
 .tab.has-theme.is-active::before { background: var(--t); }
 .tab.has-theme.is-active .tab-label { color: #f2f2f4; }
 .pane.has-theme, .pane.has-theme .xterm-host, .pane.has-theme .xterm, .pane.has-theme .xterm-viewport { background: var(--t-bg); }
 
-/* diálogo "Abrir terminal em" com agente e tema (vt-18 C4) */
+/* diálogo "Abrir terminal em" com agente e tema */
 .folder-dialog { width: min(560px, 100%); }
 .nt-agents { margin-bottom: 10px; }
 .nt-themes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; }
@@ -287,12 +287,12 @@
 .nt-pair code { font: 11px var(--mono); padding: 0 4px; border-radius: 4px; background: var(--bg-input); color: var(--fg); }
 .nt-skip { font-size: var(--fs-sm); }
 @media (max-width: 620px) { .nt-themes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* árvore de sessões com tema e agente pareado (vt-18 C5) */
+/* árvore de sessões com tema e agente pareado */
 .tree-node.has-theme > .tree-row .tree-link > .i { color: var(--t); }
 .tree-agents { display: inline-flex; gap: 2px; flex: none; }
 .tree-agents .agent-mark { width: 13px; height: 13px; font-size: 8px; }
 
-/* painel inferior de terminal (vt-19 C1, D-009) */
+/* painel inferior de terminal */
 .app { grid-template-rows: var(--toolbar) minmax(0, 1fr) auto; }
 .app > .sidebar { grid-row: 1 / 4; }
 .term-panel { grid-column: 2; position: relative; display: flex; flex-direction: column; min-height: 38px; height: 280px;
@@ -310,7 +310,7 @@
 .term-panel:not(.is-open) .tp-body { display: none; }
 .tp-body > .term-workspace { flex: 1; min-height: 0; }
 
-/* dividir (vt-19 C2): duas colunas, cada uma com o tema da sua aba; abaixo de 760 px de área, uma coluna (a focada) */
+/* dividir: duas colunas, cada uma com o tema da sua aba; abaixo de 760 px de área, uma coluna (a focada) */
 .ws-body { container-type: inline-size; container-name: workspace; }
 @container workspace (max-width: 760px) {
   .panes.is-split { grid-template-columns: minmax(0, 1fr); }
@@ -318,7 +318,7 @@
 }
 .panes.is-split > .pane.has-theme.is-focused { box-shadow: inset 0 2px 0 var(--t); }
 
-/* busca no terminal (vt-19 C3) */
+/* busca no terminal */
 .term-search { display: flex; align-items: center; gap: 6px; flex: none; padding: 5px 10px; border-bottom: 1px solid var(--line-soft); background: var(--bg-side); }
 .term-search[hidden] { display: none; }
 .term-search > .i { width: 14px; height: 14px; color: var(--fg-3); }
@@ -328,7 +328,7 @@
 .ag-banner .btn.ag-primary { background: var(--t); border-color: transparent; color: var(--t-bg); font-weight: 600; }
 .ag-banner .btn.ag-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--t) 85%, #fff 15%); }
 
-/* Uso e custo (vt-22 C4). Cores por agente validadas contra a superfície escura #202024 (skill de visualização:
+/* Uso e custo. Cores por agente validadas contra a superfície escura #202024 (skill de visualização:
    faixa de luminosidade, croma, separação para daltonismo e contraste). O texto fica nas cores de texto. */
 :root { --us-claude: #d4704f; --us-codex: #5b8def; }
 .us-note { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 9px 12px; border: 1px solid var(--line);
@@ -356,7 +356,7 @@
 .us-link:hover span:nth-child(2) { color: var(--accent); text-decoration: underline; }
 @media (max-width: 900px) { .us-tables { grid-template-columns: 1fr; } }
 
-/* Harness do site (vt-23). Estados com cor e rótulo (a legenda diz o número de cada um). */
+/* Harness do site. Estados com cor e rótulo (a legenda diz o número de cada um). */
 .ag-harness { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; color: var(--fg-2); font-size: var(--fs-sm);
   text-decoration: none; padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px; }
 .ag-harness:hover { color: var(--fg); border-color: var(--line-strong); }

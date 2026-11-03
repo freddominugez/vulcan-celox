@@ -1,4 +1,4 @@
-"""vt-06 C5: Xdebug por versão na tela Ambiente (estado, ligar com modo e sob demanda, desligar)."""
+"""Xdebug por versão na tela Ambiente (estado, ligar com modo e sob demanda, desligar)."""
 
 import os
 from unittest import mock

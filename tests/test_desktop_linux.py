@@ -31,7 +31,7 @@ class ChooseModeTest(unittest.TestCase):
 
 
 class OrigemTest(unittest.TestCase):
-    """vt-20 C2 (SEG-M1): a janela GTK só navega e só fala com a ponte na origem do app."""
+    """A janela GTK só navega e só fala com a ponte na origem do app."""
 
     def test_so_a_origem_do_app(self):
         self.assertTrue(is_app_uri("http://127.0.0.1:5000/#/overview", 5000))

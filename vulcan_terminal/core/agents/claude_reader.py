@@ -32,7 +32,7 @@ class ClaudeReader:
         self.done_tokens: Dict = dict(state.get("done_tokens") or {})
         # publicação do Bash espera o tool_result: só conta se não voltou com is_error
         self.pending_pub: Dict[str, list] = dict(state.get("pending_pub") or {})
-        self.cur_row: Dict = dict(state.get("cur_row") or {})  # linha de uso do turno aberto (vt-22 C1)
+        self.cur_row: Dict = dict(state.get("cur_row") or {})  # linha de uso do turno aberto
         self.usage_rows: list = []
 
     def state(self) -> Dict:
@@ -134,7 +134,7 @@ class ClaudeReader:
         self._usage_row(usage, model)
 
     def _usage_row(self, usage: dict, model) -> None:
-        """Uma linha por turno para o agent_usage (vt-22 C1). A mesma chave regrava a linha (upsert no índice).
+        """Uma linha por turno para o agent_usage. A mesma chave regrava a linha (upsert no índice).
         `<synthetic>` é mensagem do próprio Claude Code (erro, interrupção): não é cobrada e fica de fora."""
         if not isinstance(model, str) or not model or model.startswith("<"):
             return

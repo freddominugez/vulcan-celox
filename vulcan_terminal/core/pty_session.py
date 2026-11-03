@@ -16,7 +16,7 @@ from vulcan_terminal.core.runner import set_winsize, spawn_pty, terminate_many, 
 
 HISTORY_LIMIT = 256 * 1024
 READ_CHUNK = 65536
-WRITE_TIMEOUT = 5.0  # segundos sem a aba ler nada: a escrita desiste (vt-29 C2)
+WRITE_TIMEOUT = 5.0  # segundos sem a aba ler nada: a escrita desiste
 
 Listener = Callable[[Optional[bytes]], None]  # None = processo terminou
 
@@ -39,12 +39,12 @@ class PtySession:
         self._listeners: List[Listener] = []
         self._lock = threading.Lock()
         self.pid, self.fd = spawn_pty(self.argv, cwd, env, rows, cols)
-        # vt-29 C2: mestre não bloqueante e uma escrita por vez. Uma colagem grande não se mistura com teclas do
+        # Mestre não bloqueante e uma escrita por vez. Uma colagem grande não se mistura com teclas do
         # WebSocket, e uma aba que não lê a entrada não prende a thread que escreve.
         os.set_blocking(self.fd, False)
         self._write_lock = threading.Lock()
         self._closed = False
-        # self-pipe: close() acorda a thread leitora, que é a única a fechar o fd do PTY (vt-20 C6). Fechar o fd
+        # self-pipe: close() acorda a thread leitora, que é a única a fechar o fd do PTY. Fechar o fd
         # de outra thread deixava o número livre para outra aba enquanto o leitor ainda podia ler dele.
         self._wake_r, self._wake_w = os.pipe()
         self._fds_closed = False
@@ -68,7 +68,7 @@ class PtySession:
                     listener(None)
                 except Exception:  # noqa: BLE001
                     pass
-            self._close_fds()  # também quando o processo sai sozinho (vt-20 C6, QUA-B1)
+            self._close_fds()  # também quando o processo sai sozinho
 
     def _pump(self) -> None:
         while True:
@@ -147,7 +147,7 @@ class PtySession:
             return True
 
     def foreground(self) -> Optional[List[procinfo.Proc]]:
-        """Processos do grupo em primeiro plano da aba (vt-29 C1); None quando não dá para saber."""
+        """Processos do grupo em primeiro plano da aba; None quando não dá para saber."""
         if not self.alive or self._fds_closed:
             return None
         return procinfo.group_processes(procinfo.foreground_pgid(self.fd))
@@ -162,7 +162,7 @@ class PtySession:
 
     def subscribe(self, listener: Listener, prime: Optional[Callable[[bytes], None]] = None) -> bytes:
         """Registra o ouvinte e devolve o histórico atual, sem perder bytes entre os dois. `prime` recebe o histórico
-        dentro do lock: o que ele enfileirar vem antes de qualquer bloco novo entregue ao ouvinte (vt-20 C6)."""
+        dentro do lock: o que ele enfileirar vem antes de qualquer bloco novo entregue ao ouvinte."""
         with self._lock:
             self._listeners.append(listener)
             history = bytes(self._history)
@@ -251,7 +251,7 @@ class TerminalManager:
 
     def create(self, cwd: str, command: Optional[str] = None, title: str = "", site: Optional[str] = None,
                rows: int = 24, cols: int = 80, theme: Optional[str] = None) -> PtySession:
-        session_id = new_session_id()  # antes do processo nascer: o id vai no ambiente do shell (vt-18 C2)
+        session_id = new_session_id()  # antes do processo nascer: o id vai no ambiente do shell
         env = terminal_env(self.base_env)
         # pareamento: o Claude Code ou o Codex iniciado nesta aba herda o id dela e o tema
         env["VULCAN_SESSION_ID"] = session_id
@@ -293,7 +293,7 @@ class TerminalManager:
         return True
 
     def close_all(self) -> None:
-        """Encerra todas as abas juntas: sinal para todas e uma espera só (vt-20 C6, QUA-B7)."""
+        """Encerra todas as abas juntas: sinal para todas e uma espera só."""
         with self._lock:
             sessions = list(self._sessions.values())
             self._sessions.clear()

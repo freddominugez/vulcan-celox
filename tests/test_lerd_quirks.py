@@ -1,4 +1,4 @@
-"""vt-30 C2: tabela dos contornos do Lerd e o bloco do --doctor (D-021: o comportamento não muda com a versão)."""
+"""Tabela dos contornos do Lerd e o bloco do --doctor (o comportamento não muda com a versão)."""
 import unittest
 
 from tests.helpers import TempDirTestCase

@@ -1,10 +1,10 @@
-"""Pareamento entre a aba do terminal e a sessão de agente (vt-18 C3), sem adivinhação quando possível.
+"""Pareamento entre a aba do terminal e a sessão de agente, sem adivinhação quando possível.
 
-1. Hook SessionStart do Claude Code: o script lê VULCAN_SESSION_ID (herdado da aba, vt-18 C2) e grava
+1. Hook SessionStart do Claude Code: o script lê VULCAN_SESSION_ID (herdado da aba) e grava
    <dados>/pairings/<sessão>.json. Só é instalado por `--instalar-hook`, com backup do settings.json.
 2. Reserva sem hook (e para o Codex): mesma pasta e início até 60 s depois de a aba abrir ou de `claude`/`codex`
    ser digitado nela. Subagente e app desktop não nascem de uma aba e ficam de fora. Na disputa, os pares seguem a
-   ordem no tempo: o maior número possível e, no empate, os menores intervalos (vt-31 C1, D-022).
+   ordem no tempo: o maior número possível e, no empate, os menores intervalos.
 """
 
 from __future__ import annotations
@@ -188,7 +188,7 @@ def install_hook(claude_root, data_dir, now: Optional[float] = None) -> Dict[str
         backup.write_text(raw, encoding="utf-8")
     hooks = settings.setdefault("hooks", {})
     entries = hooks.setdefault("SessionStart", [])
-    # o Claude Code roda o comando pelo shell: sem aspas, "Application Support" quebra o caminho (vt-20 C1)
+    # o Claude Code roda o comando pelo shell: sem aspas, "Application Support" quebra o caminho
     command = shlex.quote(str(script))
     ours = (command, str(script))  # a entrada sem aspas gravada até a 0.3.0 é trocada, não duplicada
     present = False

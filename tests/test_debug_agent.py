@@ -1,4 +1,4 @@
-"""vt-06 C4: exceções e logs de erro do site durante a sessão de agente, com resumo mascarado."""
+"""Exceções e logs de erro do site durante a sessão de agente, com resumo mascarado."""
 
 import json
 

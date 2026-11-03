@@ -1,4 +1,4 @@
-"""vt-16b C6: desempenho com muitas sessões pesadas, cache do git e poda do índice."""
+"""Desempenho com muitas sessões pesadas, cache do git e poda do índice."""
 
 import io
 import json
@@ -62,8 +62,8 @@ class CargaTest(TempDirTestCase):
         index.close()
 
     def test_indice_antigo_e_reconstruido(self):
-        # índice criado antes do vt-16b C6: resumos com as listas dentro; sessão parada nunca seria regravada.
-        # Desde o vt-22 C1 (esquema 4) o índice antigo é esvaziado e relido, o que também tira as listas
+        # índice de formato antigo: resumos com as listas dentro; sessão parada nunca seria regravada.
+        # Desde o esquema 4 o índice antigo é esvaziado e relido, o que também tira as listas
         path = self.tmp / "agentes.db"
         index = AgentIndex(path)
         with index.db:

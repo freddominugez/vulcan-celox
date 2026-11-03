@@ -1,5 +1,5 @@
 // Shell da interface: roteamento, barra superior e comandos nativos. Estado e barra lateral em app-state.mjs e
-// sidebar.mjs; paleta em palette.mjs; montagem das telas em view-mount.mjs; ouvintes em global-events.mjs (vt-32 C2).
+// sidebar.mjs; paleta em palette.mjs; montagem das telas em view-mount.mjs; ouvintes em global-events.mjs.
 
 import { api, every, get, isMac, isNative, native, patch, token } from "./api.mjs";
 import { $, $$, debounce, esc, icon, reportError, toast } from "./dom.mjs";
@@ -230,7 +230,7 @@ export async function runCommand(name) {
     if (handled !== null && handled !== undefined) return handled;
     if (name.startsWith("tab:") || name === "popoutTerminal") return null;
   }
-  // nas telas sem terminal o terminal novo abre no painel inferior, sem trocar de tela (vt-19 C1)
+  // nas telas sem terminal o terminal novo abre no painel inferior, sem trocar de tela
   if ((name === "newTerminal" || name === "newTerminalOptions") && app.panel && app.panel.available) {
     return app.panel.newTerminal(name === "newTerminalOptions" ? { ask: true } : {});
   }
@@ -260,7 +260,7 @@ export const reportDragRegions = debounce(() => {
 // ── inicialização ───────────────────────────────────────────────────────────
 
 async function initialRoute(state) {
-  // vt-26 C1: o Início abre o app até os quatro passos estarem feitos ou o usuário pular o guia
+  // O Início abre o app até os quatro passos estarem feitos ou o usuário pular o guia
   try {
     if ((await get("/api/guide")).show_on_open) return "#/inicio";
   } catch {
@@ -301,7 +301,7 @@ function boot() {
     if (!explicit && app.state) navigate(await initialRoute(app.state), { replace: true });
     else route();
   });
-  every(5000, refreshState);  // encadeado e pausado com a janela oculta (vt-20 C8)
+  every(5000, refreshState);  // encadeado e pausado com a janela oculta
   every(60000, checkBuild);
   setTimeout(checkBuild, 8000);
   new ResizeObserver(reportDragRegions).observe(document.body);

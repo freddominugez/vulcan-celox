@@ -1,4 +1,4 @@
-"""Eventos da ponte de dumps do Lerd (vt-06): dump(), queries, logs, views e requisições, lidos pela API dele.
+"""Eventos da ponte de dumps do Lerd: dump(), queries, logs, views e requisições, lidos pela API dele.
 
 Formato conferido em 2026-10-31 no Lerd 1.37.1 (protocolo v1): id, ts, kind, ctx {type, site, branch, domain,
 request, pid, rid}, src {file, line}, e `text` (dump) ou `data` (query, log, view, request). Campos novos ou ausentes
@@ -53,7 +53,7 @@ def event_text(event: Dict[str, Any]) -> str:
 
 def filter_events(events: List[Dict[str, Any]], site: str = "", branch: str = "", kind: str = "",
                   q: str = "") -> List[Dict[str, Any]]:
-    """Filtro combinado (vt-06 C2); a busca de texto passa pelo dump, SQL, mensagem, view, requisição e arquivo."""
+    """Filtro combinado; a busca de texto passa pelo dump, SQL, mensagem, view, requisição e arquivo."""
     text = (q or "").strip().lower()
     return [e for e in events if (not site or e["site"] == site) and (not branch or e["branch"] == branch)
             and (not kind or e["kind"] == kind) and (not text or text in event_text(e).lower())]
@@ -84,7 +84,7 @@ def _ms(event: Dict[str, Any]) -> float:
 
 
 def group_queries(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Queries idênticas (mesmo SQL) somadas: contagem e tempo total, as mais caras primeiro (vt-06 C3)."""
+    """Queries idênticas (mesmo SQL) somadas: contagem e tempo total, as mais caras primeiro."""
     found: Dict[str, Dict[str, Any]] = {}
     for e in events:
         if e.get("kind") != "query":
@@ -111,7 +111,7 @@ def log_tone(level: str) -> str:
     return LOG_TONES.get(str(level or "").lower(), "info")
 
 
-# vt-06 C4: o que deu erro no site enquanto um agente trabalhava nele
+# O que deu erro no site enquanto um agente trabalhava nele
 SUMMARY_MAX = 20
 SESSION_GRACE = timedelta(minutes=1)  # a última requisição costuma vir logo depois da última resposta do agente
 

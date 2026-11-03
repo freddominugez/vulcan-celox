@@ -1,4 +1,4 @@
-"""vt-22 C2: tabela de preços e custo estimado por turno."""
+"""Tabela de preços e custo estimado por turno."""
 
 import json
 

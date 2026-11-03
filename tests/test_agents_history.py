@@ -1,4 +1,4 @@
-"""vt-16 C7: histórico unificado dos agentes com busca por conteúdo, e bloco agents do --doctor."""
+"""Histórico unificado dos agentes com busca por conteúdo, e bloco agents do --doctor."""
 
 import json
 import shutil
@@ -87,7 +87,7 @@ class HistoryTest(TempDirTestCase):
                                     "UPDATE meta SET value='1' WHERE key='schema_version';")
         self.index.close()
         self.index = AgentIndex(self.db_path)
-        AgentWatcher(self.index, self.env).run_once()  # esquema antigo: o índice é relido (vt-22 C1)
+        AgentWatcher(self.index, self.env).run_once()  # esquema antigo: o índice é relido
         self.assertEqual(self.index.search("seguro")[0]["session_id"], FRETE_SID)
         version = self.index.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[0]
         self.assertEqual(version, str(SCHEMA_VERSION))

@@ -24,7 +24,7 @@ class DoctorTest(TempDirTestCase):
                 "VULCAN_VALET_BIN": str(self.tmp / "sem-valet"), "VULCAN_VALET_HOME": str(self.tmp / "valet")}
 
     def test_precos_invalidos_avisam(self):
-        # vt-22 C2: precos.json inválido mantém o padrão e aparece no --doctor
+        # Precos.json inválido mantém o padrão e aparece no --doctor
         home = self.tmp / "home"
         home.mkdir()
         (home / "precos.json").write_text("{", encoding="utf-8")
