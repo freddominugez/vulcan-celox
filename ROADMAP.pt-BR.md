@@ -17,7 +17,7 @@ Painel de agentes para Claude Code e Codex, busca no histórico, prompts, uso e 
 
 Nome novo Vulcan Celox com temas claro e escuro, aba Código (um visor: ela não edita arquivos), sinais de atenção, ⌘-clique em caminho, salto entre pedidos, portas por aba e estado do PR opcional. Detalhes no [registro de mudanças](CHANGELOG.pt-BR.md).
 
-Ainda espera: o conjunto de ícones da interface e a Release de Linux, depois do aceite no Mint.
+Ainda espera: a Release de Linux, depois do aceite no Mint.
 
 ## Depois, sem decisão
 

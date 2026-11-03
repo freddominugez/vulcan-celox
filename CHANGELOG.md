@@ -13,7 +13,7 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 - **Jump between requests:** ⌘⇧↑ and ⌘⇧↓ in the terminal, and **Linha do tempo** grouped by request, linking to the diff of that request.
 - **Ports per tab:** a badge such as `:5173 +2` in the tab bar and the session list.
 - **Real PR state, optional and off by default:** number, draft, state and checks through your own `gh`. With it off no command runs.
-- Light and dark themes (System by default), Inter, the new logo and app icon.
+- Light and dark themes (System by default), Inter, Phosphor icons, the new logo and app icon.
 
 ### Security
 - The Code tab refuses anything outside the session folder, links included, as well as binaries, files above 1 MB and sensitive names such as `.env`. The diff follows the same rules.

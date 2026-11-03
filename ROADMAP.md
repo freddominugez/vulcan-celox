@@ -17,7 +17,7 @@ Agent panel for Claude Code and Codex, history search, prompts, usage and cost, 
 
 New name Vulcan Celox with light and dark themes, Code tab (a viewer: it does not edit files), attention signals, ⌘-click on paths, jumping between requests, ports per tab and optional PR state. Details in the [changelog](CHANGELOG.md).
 
-Still waiting: the interface icon set, and the Linux release after the acceptance on Mint.
+Still waiting: the Linux release after the acceptance on Mint.
 
 ## Later, not decided
 

@@ -13,7 +13,7 @@ Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O form
 - **Saltar entre pedidos:** ⌘⇧↑ e ⌘⇧↓ no terminal, e **Linha do tempo** agrupada por pedido, com link para o diff daquele pedido.
 - **Portas por aba:** um selo como `:5173 +2` na barra de abas e na lista de sessões.
 - **Estado real do PR, opcional e desligado por padrão:** número, rascunho, estado e checagens pelo seu próprio `gh`. Desligado, nenhum comando roda.
-- Temas claro e escuro (Sistema por padrão), Inter, o logo novo e o ícone do app.
+- Temas claro e escuro (Sistema por padrão), Inter, ícones Phosphor, o logo novo e o ícone do app.
 
 ### Segurança
 - A aba Código recusa o que estiver fora da pasta da sessão, inclusive por link, além de binários, arquivos acima de 1 MB e nomes sensíveis como `.env`. O diff segue as mesmas regras.

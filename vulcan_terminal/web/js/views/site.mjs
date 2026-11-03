@@ -186,7 +186,7 @@ export class SiteView extends SessionTabsView {
           <div class="site-ident" title="${esc(s.path)}">
             <h1 class="site-title">${esc(s.name)}</h1>
             <button class="icon-btn icon-btn-sm site-star ${starred ? "is-on" : ""}" data-action="site-favorite" aria-pressed="${starred}"
-              title="${starred ? "Tirar dos favoritos" : "Marcar como favorito"}" aria-label="Favorito">${icon("star")}</button>
+              title="${starred ? "Tirar dos favoritos" : "Marcar como favorito"}" aria-label="Favorito">${icon(starred ? "star-on" : "star")}</button>
             <a class="site-domain" href="${esc(s.url)}" data-action="open-url" title="Abrir ${esc(s.url)}">${esc(label)}<span>${esc(tld)}</span></a>
             <div class="badges">${badges}</div>
           </div>
