@@ -13,6 +13,14 @@ Agent panel for Claude Code and Codex, history search, prompts, usage and cost, 
 - **Linux release.** Test on a real Linux Mint desktop, fix what fails, publish `.deb` and `.tar.gz`. Help welcome.
 - **Finish the manual checks on macOS:** pairing with the real Claude Code, split, search and resize.
 
+## Planned for 1.1
+
+- **Know when an agent needs you.** A ring on the tab, a counter in the sidebar and a system notification when a session finishes its turn or may be waiting. It also reads standard terminal sequences (OSC 9, 99 and 777), so it works with any program. The optional hook makes the permission state exact for Claude Code.
+- **Live Code tab, read-only.** The files a session touched, the code with syntax highlighting, and diffs by edit, by turn and against git, following the agent as it works, plus an "Open in editor" button.
+- **Command-click a path in the terminal.** Opens the file at the right line.
+- **Move between turns.** Shortcuts jump between your requests, in the terminal and on the session screen.
+- **Listening ports and pull request status.** Each tab shows the ports it opened. Real pull request status through your own `gh` is optional and off by default, because it uses the network.
+
 ## Later, not decided
 
 - English interface. The interface is in Portuguese today.
@@ -25,4 +33,4 @@ Agent panel for Claude Code and Codex, history search, prompts, usage and cost, 
 
 - Windows: Python's `pty` module does not exist there.
 - Herd as a backend.
-- Reimplementing a chat, an editor or the agents' protocols. The terminal stays the official CLI.
+- Reimplementing a chat, an editor or the agents' protocols. The terminal stays the official CLI, and the Code tab only displays files.
