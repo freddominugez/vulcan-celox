@@ -20,7 +20,7 @@ Agent panel for Claude Code and Codex, history search, prompts, usage and cost, 
 - **Command-click a path in the terminal.** Opens the file at the right line.
 - **Move between turns.** Shortcuts jump between your requests, in the terminal and on the session screen.
 - **Listening ports and pull request status.** Each tab shows the ports it opened. Real pull request status through your own `gh` is optional and off by default, because it uses the network.
-- **Visual identity.** Apply the Vulcan Celox identity across the app: light and dark themes, its palette and type, and the logo.
+- **New name and visual identity.** Vulcan Terminal becomes Vulcan Celox, with light and dark themes, a new palette, the Inter typeface, a minimal icon set, and a new logo and app icon. Existing data stays where it is.
 
 ## Later, not decided
 
