@@ -28,6 +28,8 @@ def main(argv=None) -> int:
                         help="instala o hook SessionStart do Claude Code que pareia a aba com a sessão "
                              "(edita ~/.claude/settings.json com backup; ver docs/en/pairing-hook.md)")
     args = parser.parse_args(argv)
+    from vulcan_celox.core import paths
+    paths.migrate_data_folder()
 
     if args.instalar_hook:
         return install_pairing_hook()

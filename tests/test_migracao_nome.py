@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from vulcan_celox.core import keychain, oscompat
+from vulcan_celox.core import keychain, oscompat, paths
 from vulcan_celox.core.runner import FakeRunner, Result
 
 OLD = "VulcanTerminal"
@@ -20,7 +20,22 @@ class PastaTest(unittest.TestCase):
         self.support.mkdir(parents=True)
 
     def folder(self):
-        return oscompat.default_data_dir({"HOME": str(self.home)}, system="darwin")
+        env = {"HOME": str(self.home)}
+        oscompat.migrate_old_folder(env, system="darwin")
+        return oscompat.default_data_dir(env, system="darwin")
+
+    def test_calcular_o_caminho_nao_move_nada(self):
+        old = self.support / OLD
+        old.mkdir()
+        oscompat.default_data_dir({"HOME": str(self.home)}, system="darwin")
+        self.assertFalse(old.is_symlink())
+        self.assertFalse((self.support / "VulcanCelox").exists())
+
+    def test_com_pasta_definida_por_variavel_nao_migra(self):
+        old = self.support / OLD
+        old.mkdir()
+        paths.migrate_data_folder({"HOME": str(self.home), paths.ENV_HOME: str(self.home / "outra")})
+        self.assertFalse(old.is_symlink())
 
     def test_muda_de_nome_e_deixa_link(self):
         old = self.support / OLD
@@ -54,7 +69,9 @@ class PastaTest(unittest.TestCase):
         base = self.home / "xdg"
         old = base / ("vulcan-" + "terminal")
         old.mkdir(parents=True)
-        new = oscompat.default_data_dir({"HOME": str(self.home), "XDG_DATA_HOME": str(base)}, system="linux")
+        env = {"HOME": str(self.home), "XDG_DATA_HOME": str(base)}
+        oscompat.migrate_old_folder(env, system="linux")
+        new = oscompat.default_data_dir(env, system="linux")
         self.assertEqual(new, base / "vulcan-celox")
         self.assertTrue(new.is_dir() and old.is_symlink())
 

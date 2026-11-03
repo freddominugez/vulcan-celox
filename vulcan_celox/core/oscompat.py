@@ -6,7 +6,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import List, Mapping, Optional
+from typing import Tuple, List, Mapping, Optional
 
 SHELL_CANDIDATES = ("/bin/zsh", "/usr/bin/zsh", "/bin/bash", "/usr/bin/bash", "/bin/sh")
 
@@ -29,9 +29,22 @@ OLD_MACOS_FOLDER = "VulcanTerminal"
 OLD_LINUX_FOLDER = "vulcan-" + "terminal"
 
 
-def migrate_old_folder(old: Path, new: Path) -> None:
+def _folders(env: Mapping[str, str], system: Optional[str]) -> Tuple[Path, Path]:
+    """(pasta de dados, pasta com o nome antigo)."""
+    home = Path(env.get("HOME") or Path.home())
+    if is_macos(system):
+        support = home / "Library" / "Application Support"
+        return support / "VulcanCelox", support / OLD_MACOS_FOLDER
+    base = env.get("XDG_DATA_HOME")
+    root = Path(base) if base else home / ".local" / "share"
+    return root / "vulcan-celox", root / OLD_LINUX_FOLDER
+
+
+def migrate_old_folder(env: Optional[Mapping[str, str]] = None, system: Optional[str] = None) -> None:
     """Primeira abertura depois do novo nome: a pasta muda de nome inteira e fica um link no lugar antigo, porque o hook
-    já instalado no agente aponta para lá. Com as duas pastas, ou sem permissão, não mexe em nada."""
+    já instalado no agente aponta para lá. Com as duas pastas, ou sem permissão, não mexe em nada. Só o início do app chama
+    isto: calcular o caminho nunca move nada."""
+    new, old = _folders(os.environ if env is None else env, system)
     try:
         if old.is_dir() and not old.is_symlink() and not new.exists():
             new.parent.mkdir(parents=True, exist_ok=True)
@@ -42,17 +55,7 @@ def migrate_old_folder(old: Path, new: Path) -> None:
 
 
 def default_data_dir(env: Optional[Mapping[str, str]] = None, system: Optional[str] = None) -> Path:
-    env = os.environ if env is None else env
-    home = Path(env.get("HOME") or Path.home())
-    if is_macos(system):
-        support = home / "Library" / "Application Support"
-        folder, old = support / "VulcanCelox", support / OLD_MACOS_FOLDER
-    else:
-        base = env.get("XDG_DATA_HOME")
-        root = Path(base) if base else home / ".local" / "share"
-        folder, old = root / "vulcan-celox", root / OLD_LINUX_FOLDER
-    migrate_old_folder(old, folder)
-    return folder
+    return _folders(os.environ if env is None else env, system)[0]
 
 
 def open_argv(kind: str, target: str, env: Optional[Mapping[str, str]] = None, system: Optional[str] = None,

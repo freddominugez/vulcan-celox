@@ -43,6 +43,7 @@ class VulcanApp:
     def __init__(self, env: Optional[Mapping[str, str]] = None, runner=None, token: Optional[str] = None,
                  port: int = 0, keystore=None, ai_transport=None):
         self.env = dict(os.environ if env is None else env)
+        paths.migrate_data_folder(self.env)
         self.data_dir = paths.data_dir(self.env)
         secure_data_dir(self.data_dir)  # 0700/0600: memórias e eventos dos agentes só do usuário
         self.store = Store(self.data_dir)

@@ -31,6 +31,13 @@ def data_dir(env: Optional[Mapping[str, str]] = None) -> Path:
     return default_data_dir(_env(env))
 
 
+def migrate_data_folder(env: Optional[Mapping[str, str]] = None) -> None:
+    """Pasta com o nome antigo vira a nova, salvo se os dados estão em outro lugar por variável de ambiente."""
+    if not _env(env).get(ENV_HOME):
+        from vulcan_celox.core.oscompat import migrate_old_folder
+        migrate_old_folder(_env(env))
+
+
 def legacy_dir(env: Optional[Mapping[str, str]] = None) -> Path:
     """Dados do protótipo Valet GUI."""
     value = _env(env).get(ENV_LEGACY)
