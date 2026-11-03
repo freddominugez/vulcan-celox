@@ -1,9 +1,11 @@
 """Árvore, edições e diff do visor. Fixtures sintéticas; repositório hostil não pode executar nada."""
 
 import json
+import shutil
 import subprocess
 import unittest
 from pathlib import Path
+from unittest import mock
 from urllib.parse import quote
 
 from tests.test_agents_api import AgentsServerCase
@@ -121,6 +123,14 @@ class EditAndTurnScopeTest(CodeDiffCase):
         self.assertEqual(len(data["new"]), 2 * 1024 * 1024)
 
 
+class SemGitTest(CodeDiffCase):
+    def test_sem_o_comando_git_diz_o_motivo(self):
+        with mock.patch("vulcan_terminal.core.code_diff.open_pipe", side_effect=OSError("sem git")):
+            status, data = self.diff("a.py", "git")
+        self.assertEqual((status, data["available"], data["reason"]), (200, False, "no_git"))
+
+
+@unittest.skipUnless(shutil.which("git"), "sem git")
 class GitScopeTest(CodeDiffCase):
     def repo(self):
         git(self.project, "init", "-q")
