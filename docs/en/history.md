@@ -74,7 +74,9 @@ Of the 245 commits, 168 happened in these three days.
 | 0.9.0 | 2026-11-01 | Quality |
 | **1.0.0** | **2026-11-01** | **First stable version, macOS only** |
 | 1.1.0 | 2026-11-03 | New name Vulcan Celox, Code tab, attention, path links, requests, ports and PR |
+| 1.1.1 | 2026-11-03 | New terminal failing with an unknown theme |
+| 1.2.0 | 2026-11-03 | Windows and Linux as test builds |
 
 ## 1.1.0: the name changes
 
-The product was called Vulcan Terminal until 1.0. From 1.1.0 it is Vulcan Celox, with its own visual identity. The data folder, the Keychain item, the app id and the Python package keep their old names, so nobody loses anything when updating.
+The product was called Vulcan Terminal until 1.0. From 1.1.0 it is Vulcan Celox, with its own visual identity. The technical names changed too: the data folder is now `VulcanCelox`, the app id `com.byvulcan.celox`, the Python package `vulcan_celox`. Nobody loses anything when updating: the old folder is moved when the app starts, and the Anthropic key is copied to the new Keychain item the first time it is read.

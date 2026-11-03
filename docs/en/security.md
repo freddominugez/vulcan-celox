@@ -13,8 +13,8 @@ Who this protects: one developer on their own machine, whose terminals and agent
 
 ## Data
 
-- Data folder 0700, files 0600.
-- Anthropic key in the Keychain (macOS) or Secret Service (Linux), always passed by stdin, never by argv. Never shown in the interface or written to a file.
+- Data folder 0700, files 0600. On Windows these modes have no effect, and the protection is that of the user profile (`%APPDATA%`).
+- Anthropic key in the Keychain (macOS), Secret Service (Linux) or Credential Manager (Windows). On macOS and Linux it is always passed by stdin, never by argv. Never shown in the interface or written to a file.
 - AI documentation happens only on click. A dialog first shows the size of the text and how many secrets were masked. Masking runs before the text is cut.
 - `.env` files of projects are never opened.
 
@@ -39,7 +39,7 @@ Off by default, and with it off no command runs. If you turn on "Estado do PR pe
 - Subprocesses are argv lists through `core/runner.py`.
 - Git runs with `-c core.fsmonitor=false -c core.untrackedCache=false --no-optional-locks`. This is verified against real git: without it, `git status` ran a hook of the repository being analyzed.
 - Python helpers run with `python -I` from a fixed working directory, so a hostile folder cannot plant a module. Verified by a test with fake `json.py` and `re.py`.
-- Prompts are pasted using bracketed paste, with control characters removed, and **never with Enter**. Sending is refused (409) unless the tab is alive, the session is still the newest paired to it and the agent is in the foreground, so text cannot fall into a shell.
+- Prompts are pasted using bracketed paste, with control characters removed, and **never with Enter**. Sending is refused (409) unless the tab is alive, the session is still the newest paired to it and the agent is in the foreground, so text cannot fall into a shell. Windows cannot tell which program is in the foreground, so there the tab being alive and paired is what counts.
 - The interface escapes data it displays. It loads no external resource.
 
 ## Deleting
@@ -51,7 +51,7 @@ No permanent deletion in the code: folders go to the Trash, with confirmation by
 | Risk | Why accepted |
 |------|--------------|
 | Another process of the same user can read the app's memory, or the Keychain item through `/usr/bin/security` | Outside the threat model; a limitation of the platform |
-| The macOS app has only an ad hoc signature and is not notarized | Decision for 1.0. Check downloads with `SHA256SUMS` |
+| The macOS app has only an ad hoc signature and is not notarized; the Windows package is not signed | Decision so far. Check downloads with `SHA256SUMS` |
 | An agent or a site you run can do what your user can | The app shows what happened; it is not a sandbox |
 
 Report a vulnerability: [SECURITY.md](../../SECURITY.md).

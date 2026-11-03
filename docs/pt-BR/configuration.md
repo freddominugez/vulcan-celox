@@ -30,6 +30,7 @@ Lançador do Linux: `vulcan-celox --check`, `vulcan-celox --instalar-dependencia
 |---------|--------|
 | `~/Library/Application Support/VulcanCelox/` | Pasta de dados no macOS (0700; arquivos 0600) |
 | `$XDG_DATA_HOME/vulcan-celox` | Pasta de dados no Linux |
+| `%APPDATA%\VulcanCelox` | Pasta de dados no Windows |
 | `<dados>/agentes.db` | Índice SQLite descartável das sessões de agentes |
 | `<dados>/precos.json` | Seus preços; valem mais que a tabela embutida |
 | `<dados>/prompts/` | Prompts globais |

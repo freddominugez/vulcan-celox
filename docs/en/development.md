@@ -58,4 +58,4 @@ The list is in [CONTRIBUTING.md](../../CONTRIBUTING.md). Python must stay compat
 3. `bash scripts/package.sh`, `bash scripts/install_app.sh`.
 4. Tag, push, create the release with the packages and `SHA256SUMS`, then download and check the sums.
 
-Until the Linux acceptance is done, releases carry only the macOS files.
+Stable releases carry only the macOS files. Windows and Linux stay as pre-releases until they are accepted on real machines. The Windows package is built by `.github/workflows/windows.yml`.

@@ -58,9 +58,9 @@ O app abre em janela própria do Microsoft Edge ou do Chrome. O shell padrão é
 
 Sem suporte no Windows: Lerd e Valet (os sites PHP ficam em modo local), o hook opcional dos agentes (`--instalar-hook`) e clicar em caminhos `C:\...` no terminal. Sem a checagem de primeiro plano, a aba pareada vale enquanto estiver aberta.
 
-## Linux (ainda não distribuído)
+## Linux (versão de teste)
 
-O código está no repositório e os testes rodam em contêiner e no CI, incluindo a instalação do `.deb` no Ubuntu 22.04. Ele **não** foi aceito numa área de trabalho real, então nenhum pacote de Linux é publicado. Para ajudar, gere o pacote e experimente numa área de trabalho real:
+Baixe o `.deb` ou o `.tar.gz` na pre-release em Releases, ou gere os pacotes. Os testes rodam em contêiner e no CI, incluindo a instalação do `.deb` no Ubuntu 22.04, mas ele **não** foi aceito numa área de trabalho real, então ainda não há Release estável para Linux. Para gerar:
 
 ```bash
 python3 scripts/package_linux.py

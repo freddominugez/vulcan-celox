@@ -6,9 +6,9 @@ Portuguese version: [SECURITY.pt-BR.md](SECURITY.pt-BR.md).
 
 | Version | Supported |
 |---------|-----------|
-| 1.0.x (macOS) | Yes |
+| 1.1.x (macOS) | Yes |
 | Older | No |
-| Linux builds | Not released yet; reports are welcome |
+| 1.2.0 test builds (Windows, Linux) | Not released as stable; reports are welcome |
 
 ## Reporting a vulnerability
 

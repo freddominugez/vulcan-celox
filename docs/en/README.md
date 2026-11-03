@@ -2,12 +2,13 @@
 
 [Português](../pt-BR/README.md)
 
-Describes version 1.1.0. The interface is in English by default, with Portuguese available from ⌘K.
+Describes version 1.2.0. The interface is in English by default, with Portuguese available from ⌘K.
 
 | To... | Read |
 |-------|------|
 | Install or build | [installation.md](installation.md) |
 | Learn the app | [user-guide.md](user-guide.md) |
+| Go screen by screen | [detailed-guide.md](detailed-guide.md) |
 | Change settings, flags and paths | [configuration.md](configuration.md) |
 | Fix a problem | [troubleshooting.md](troubleshooting.md) |
 | Understand the structure | [architecture.md](architecture.md) |

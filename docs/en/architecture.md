@@ -5,7 +5,7 @@ Overview. The detailed reference, kept in sync by a test, is the [technical manu
 ## The shape of it
 
 ```
-Native shell (Swift + WKWebView)        Linux shell (GTK + WebKit, or Chromium --app)
+Native shell (Swift + WKWebView)        Linux and Windows shell (GTK + WebKit, or Edge/Chromium --app)
         | starts, with a token                     |
         v                                          v
 Python server on 127.0.0.1  <-- JSON + WebSocket --> Web interface (no build, xterm.js)
@@ -55,7 +55,7 @@ Startup: the Swift executable generates a random token, starts `python3 -m vulca
 | `vulcan_celox/core/agents/` | Discovery, JSONL stream, Claude and Codex readers, builder, index, history, watcher, loops, repos, pairing, pricing, usage |
 | `vulcan_celox/server/` | HTTP and WebSocket server and one `*_api.py` per area |
 | `vulcan_celox/web/` | `index.html`, `styles/`, `js/`, `js/views/`, `help/`, `vendor/` |
-| `vulcan_celox/desktop_linux.py` | Linux shell |
+| `vulcan_celox/desktop_linux.py`, `desktop_windows.py` | Linux and Windows shells |
 | `vulcan_celox/ui/` | Old tkinter interface, fallback only |
 | `scripts/` | `validate.sh`, `test_linux.sh`, `build_app.sh`, `install_app.sh`, `package.sh` |
 | `packaging/linux/` | Launcher, menu entry, icons, `.deb` control |
@@ -71,7 +71,7 @@ Startup: the Swift executable generates a random token, starts `python3 -m vulca
 
 ## Terminals
 
-One real PTY per tab (`os.forkpty`), with the user's shell in login mode. One reader thread per PTY keeps up to 256 KB of history. WebSocket `/ws/terminals/<id>` carries input and output as binary frames, and `resize`, `input` and `exit` as JSON. Each client has a bounded queue (4 MB) and its own sender thread; a client that falls behind is dropped without stopping the reader. The server token is removed from the tab's environment.
+One real PTY per tab (`os.forkpty`, or ConPTY on Windows), with the user's shell in login mode. One reader thread per PTY keeps up to 256 KB of history. WebSocket `/ws/terminals/<id>` carries input and output as binary frames, and `resize`, `input` and `exit` as JSON. Each client has a bounded queue (4 MB) and its own sender thread; a client that falls behind is dropped without stopping the reader. The server token is removed from the tab's environment.
 
 ## Known debt
 

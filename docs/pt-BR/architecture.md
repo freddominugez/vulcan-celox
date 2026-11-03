@@ -5,7 +5,7 @@ Visão geral. A referência detalhada, mantida em dia por um teste, é o [manual
 ## O desenho
 
 ```
-Casca nativa (Swift + WKWebView)         Casca Linux (GTK + WebKit, ou Chromium --app)
+Casca nativa (Swift + WKWebView)         Casca Linux e Windows (GTK + WebKit, ou Edge/Chromium --app)
         | inicia, com um token                     |
         v                                          v
 Servidor Python em 127.0.0.1  <-- JSON + WebSocket --> Interface web (sem build, xterm.js)
@@ -55,7 +55,7 @@ Abertura: o executável Swift gera um token aleatório, inicia `python3 -m vulca
 | `vulcan_celox/core/agents/` | Descoberta, stream JSONL, leitores do Claude e do Codex, builder, índice, histórico, observador, loops, repos, pareamento, preços, uso |
 | `vulcan_celox/server/` | Servidor HTTP e WebSocket e um `*_api.py` por área |
 | `vulcan_celox/web/` | `index.html`, `styles/`, `js/`, `js/views/`, `help/`, `vendor/` |
-| `vulcan_celox/desktop_linux.py` | Casca Linux |
+| `vulcan_celox/desktop_linux.py`, `desktop_windows.py` | Cascas Linux e Windows |
 | `vulcan_celox/ui/` | Interface tkinter antiga, só reserva |
 | `scripts/` | `validate.sh`, `test_linux.sh`, `build_app.sh`, `install_app.sh`, `package.sh` |
 | `packaging/linux/` | Lançador, atalho de menu, ícones e controle do `.deb` |
@@ -71,7 +71,7 @@ Abertura: o executável Swift gera um token aleatório, inicia `python3 -m vulca
 
 ## Terminais
 
-Um PTY real por aba (`os.forkpty`), com o shell do usuário em modo login. Uma thread leitora por PTY guarda até 256 KB de histórico. O WebSocket `/ws/terminals/<id>` leva entrada e saída em quadros binários, e `resize`, `input` e `exit` em JSON. Cada cliente tem fila limitada (4 MB) e thread de envio própria; quem não acompanha é desligado sem parar a leitora. O token do servidor é tirado do ambiente da aba.
+Um PTY real por aba (`os.forkpty`, ou ConPTY no Windows), com o shell do usuário em modo login. Uma thread leitora por PTY guarda até 256 KB de histórico. O WebSocket `/ws/terminals/<id>` leva entrada e saída em quadros binários, e `resize`, `input` e `exit` em JSON. Cada cliente tem fila limitada (4 MB) e thread de envio própria; quem não acompanha é desligado sem parar a leitora. O token do servidor é tirado do ambiente da aba.
 
 ## Dívida conhecida
 

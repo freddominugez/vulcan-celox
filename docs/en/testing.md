@@ -1,6 +1,6 @@
 # Testing
 
-`bash scripts/validate.sh` is the single sensor: **its exit code decides**. At version 1.0.0 it ran 701 tests.
+`bash scripts/validate.sh` is the single sensor: **its exit code decides**.
 
 ## What validate.sh runs
 

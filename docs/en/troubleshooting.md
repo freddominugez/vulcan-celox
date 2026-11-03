@@ -6,6 +6,8 @@ First step for almost everything: `python3 -m vulcan_celox --doctor`.
 |---------|---------------|
 | macOS says the app is damaged | Quarantine on an unsigned app: `xattr -dr com.apple.quarantine "/Applications/Vulcan Celox.app"` |
 | The app asks for Python | Accept the offer to install, or install Python 3.9+ yourself |
+| Windows warns about an unknown publisher | The package is not signed: **More info**, then **Run anyway** |
+| The Windows window opens in a normal browser tab | Edge or Chrome was not found, so the app fell back to the default browser. Install either one |
 | Opening in a browser asks for a token | The interface needs the token the native app creates. Open it through the app |
 | Lerd is stopped | **Ligar** on the Lerd screen or play at the top. The first start can take a minute. The bolt button starts it with the app |
 | `.test` DNS problem | Lerd's steps that need the administrator password were not finished. In a terminal: `sudo /opt/homebrew/bin/podman-mac-helper install`, then `lerd install`. The password is your Mac user's. The app never asks for it or stores it |

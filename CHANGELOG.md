@@ -2,6 +2,14 @@
 
 All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Portuguese version: [CHANGELOG.pt-BR.md](CHANGELOG.pt-BR.md).
 
+## [Unreleased]
+
+### Fixed
+- Documentation that no longer matched the code: the technical names after the rename, versions, Linux and Windows status, and the supported versions in the security policy.
+
+### Changed
+- CI now covers macOS, lint and the whole suite on Windows. A test keeps the version cited in the documentation equal to the code.
+
 ## [1.2.0] - 2026-11-03
 
 ### Added

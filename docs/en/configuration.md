@@ -30,6 +30,7 @@ Linux launcher: `vulcan-celox --check`, `vulcan-celox --instalar-dependencias`.
 |------|-------|
 | `~/Library/Application Support/VulcanCelox/` | macOS data folder (0700; files 0600) |
 | `$XDG_DATA_HOME/vulcan-celox` | Linux data folder |
+| `%APPDATA%\VulcanCelox` | Windows data folder |
 | `<data>/agentes.db` | Disposable SQLite index of agent sessions |
 | `<data>/precos.json` | Your price overrides; beats the built-in table |
 | `<data>/prompts/` | Global prompts |

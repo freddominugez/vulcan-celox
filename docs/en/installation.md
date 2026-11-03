@@ -58,9 +58,9 @@ The app opens in its own Microsoft Edge or Chrome window. The default shell is P
 
 Not available on Windows: Lerd and Valet (PHP sites run in local mode), the optional agent hook (`--instalar-hook`), and clicking `C:\...` paths in the terminal. Without the foreground check, a paired tab counts as long as it is open.
 
-## Linux (not released yet)
+## Linux (test build)
 
-The code is in the repository and its tests run in a container and in CI, including `.deb` installation on Ubuntu 22.04. It has **not** been accepted on a real desktop, so no Linux package is published. If you want to help, build it and try it on a real desktop:
+Download the `.deb` or `.tar.gz` from the pre-release on Releases, or build them. The tests run in a container and in CI, including `.deb` installation on Ubuntu 22.04, but it has **not** been accepted on a real desktop, so there is no stable Linux release yet. To build:
 
 ```bash
 python3 scripts/package_linux.py

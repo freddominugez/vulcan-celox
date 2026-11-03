@@ -2,12 +2,13 @@
 
 [English](../en/README.md)
 
-Descreve a versão 1.0.0.
+Descreve a versão 1.2.0.
 
 | Para... | Leia |
 |---------|------|
 | Instalar ou compilar | [installation.md](installation.md) |
 | Aprender o app | [user-guide.md](user-guide.md) |
+| Ver tela por tela | [guia-detalhado.md](guia-detalhado.md) |
 | Mudar opções, comandos e caminhos | [configuration.md](configuration.md) |
 | Resolver um problema | [troubleshooting.md](troubleshooting.md) |
 | Entender a estrutura | [architecture.md](architecture.md) |

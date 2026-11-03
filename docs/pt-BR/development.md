@@ -58,4 +58,4 @@ O `--snapshot` desenha uma rota em PNG e falha com erro de JavaScript, e o `--ev
 3. `bash scripts/package.sh`, `bash scripts/install_app.sh`.
 4. Tag, push, Release com os pacotes e o `SHA256SUMS`; depois baixe e confira as somas.
 
-Até o aceite no Linux, as Releases levam só os arquivos do macOS.
+As Releases estáveis levam só os arquivos do macOS. Windows e Linux ficam como pre-release até o aceite em máquinas reais. O pacote do Windows é gerado por `.github/workflows/windows.yml`.

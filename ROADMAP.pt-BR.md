@@ -11,6 +11,7 @@ Painel de agentes para Claude Code e Codex, busca no histórico, prompts, uso e 
 ## Agora
 
 - **Release para Linux.** Testar numa área de trabalho Linux Mint real, corrigir o que falhar e publicar `.deb` e `.tar.gz`. Ajuda é bem-vinda.
+- **Aceite no Windows.** A versão de teste 1.2.0 só rodou nas máquinas da CI. Testar em Windows 10 e 11 reais e depois decidir sobre instalador e assinatura.
 - **Terminar as conferências manuais no macOS:** pareamento com o Claude Code real, dividir, buscar e redimensionar.
 
 ## Entregue na 1.1.0 (macOS)

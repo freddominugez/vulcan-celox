@@ -1,6 +1,6 @@
 # Vulcan Celox
 
-> Formerly Vulcan Terminal. Your data stays where it was.
+> Formerly Vulcan Terminal. Your data and key move to the new names by themselves.
 
 **English** | [Português](README.pt-BR.md)
 
@@ -8,7 +8,7 @@ A desktop panel for developers who work alone with code agents. Real terminals, 
 
 ![Overview screen with PHP sites, a Node project, tasks and the terminal panel](vulcan_celox/web/img/manual/visao-geral.png)
 
-**Status: 1.2.0 for macOS; Windows and Linux as test builds.** The Linux code is in the repository and its tests pass in CI, but it has not been accepted on a real desktop yet, so no Linux package is released. The interface is in English by default, with Portuguese available from ⌘K.
+**Status:** the latest stable release is 1.1.1, for macOS. Version 1.2.0 is on `main`, with test builds for Windows and Linux on the [Releases](https://github.com/freddominugez/vulcan-celox/releases) page. Neither test build has been accepted on a real machine yet. The interface is in English by default, with Portuguese available from ⌘K.
 
 ## Why it exists
 
@@ -31,11 +31,17 @@ Agents write code faster than one person can track. After a few parallel session
 
 ## Install
 
+**macOS**
+
 1. Download the `.dmg` from [Releases](https://github.com/freddominugez/vulcan-celox/releases).
 2. Drag **Vulcan Celox** to Applications.
 3. The app is not signed by Apple. The first time, right click it, choose **Open** and confirm.
 
-Requires macOS 13+ (Apple Silicon or Intel) and Python 3.9+. If Python is missing, the app offers to install it. Details and building from source: [docs/en/installation.md](docs/en/installation.md).
+Requires macOS 13+ (Apple Silicon or Intel) and Python 3.9+. If Python is missing, the app offers to install it.
+
+**Windows and Linux (test builds).** Download the `.zip` for Windows, with Python included, or the `.deb` or `.tar.gz` for Linux from the pre-release on [Releases](https://github.com/freddominugez/vulcan-celox/releases). Lerd and Valet are not available on Windows.
+
+Details, limits and building from source: [docs/en/installation.md](docs/en/installation.md).
 
 ## Principles
 
@@ -70,7 +76,7 @@ Also: [CHANGELOG](CHANGELOG.md), [CONTRIBUTING](CONTRIBUTING.md), [SECURITY](SEC
 | Folder | What it holds |
 |--------|---------------|
 | `vulcan_celox/` | The app: Python core and server, web interface |
-| `packaging/` | Swift shell for macOS, Linux launcher and packages |
+| `packaging/` | Swift shell for macOS, launchers for Linux and Windows, package sources |
 | `scripts/` | Build, packaging and the validation script |
 | `tests/` | Automated tests and anonymized fixtures |
 | `docs/` | Documentation in English and Portuguese |

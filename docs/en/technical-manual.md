@@ -1,6 +1,6 @@
 # Vulcan Celox: technical manual
 
-Reference for a developer who has never seen this project. It describes version 1.1.0. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
+Reference for a developer who has never seen this project. It describes version 1.2.0. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
 
 Paths written as `core/...`, `server/...`, `web/...` and `ui/...` are relative to `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Goals that shape the code:
 - Never delete anything for good.
 - Everything testable without a window, a real Lerd or real agents.
 
-Release state: 1.0.0 ships for macOS 13 or newer, Apple Silicon and Intel. The Linux code stays in the repository and in CI, but no Linux package ships until it passes acceptance on a real desktop.
+Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.1.1. Version 1.2.0 adds test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
 
 ## 2. Design decisions
 
@@ -53,6 +53,7 @@ packaging/LEIA-ME.md         install notes shipped inside the packages
 vulcan_celox/
   __main__.py                command line of the Python package
   desktop_linux.py           Linux shell: GTK 3 + WebKit2GTK, Chromium --app or browser
+  desktop_windows.py         Windows shell: the same as Linux, in an Edge or Chrome app window
   core/                      logic with no interface
   core/agents/               agent sessions: discovery, readers, index, watcher, pairing, usage
   core/backends/             Lerd, Valet and local mode
@@ -63,7 +64,7 @@ scripts/                     validate.sh, test_linux.sh, build_app.sh, install_a
                              make_deb.py, manual_md.py, manual_shots.sh, help_json.py
 tests/                       unittest suite, fixtures/, golden/, tools/ (fake Lerd)
 docs/en/, docs/pt-BR/        public documentation, same pages in both languages
-.github/                     issue and pull request templates, Linux workflow
+.github/                     issue and pull request templates, workflows for Linux, Windows and macOS
 ```
 
 `dist/`, `build/` and `executaveis/` are build output and are ignored by git.
@@ -118,6 +119,10 @@ Closing the last window does not quit: the app stays in the menu bar. `WebWindow
 
 In the last two modes the token never goes on a command line. A 0600 page, `<data>/abrir-janela.html`, redirects to the app with the token in the URL fragment, and `web/js/api.mjs` moves it to `sessionStorage` and removes it from the address bar.
 
+### Windows
+
+`desktop_windows.py` reuses the Linux shell with `VulcanApp` in its own process, in the `app` mode with Edge or Chrome, and the `browser` mode as a fallback. The token follows the same 0600-page path as Linux. The packaged `.zip` carries an embedded Python and a `Vulcan Celox.cmd` launcher. Terminals use ConPTY through `ctypes` (`core/pty_windows.py`), with PowerShell by default. Process creation goes through `core/runner.py` with `CREATE_NO_WINDOW`, and URLs, folders and editors open without passing through `cmd.exe`, so a file name cannot become a command.
+
 ## 5. Core modules
 
 ### General
@@ -126,6 +131,8 @@ In the last two modes the token never goes on a command line. A 0600 page, `<dat
 |--------|------|
 | `core/paths.py` | Data folder and tool locations. Every path can be overridden by environment variable for tests. |
 | `core/oscompat.py` | What differs between macOS and Linux: default shell (`$SHELL`, then zsh, bash, sh), data folder, `open_argv`. |
+| `core/pty_windows.py` | Windows terminal: `WinPty` over ConPTY through `ctypes`, with no dependency. Open, read, write, resize and close, ending the whole process tree. |
+| `core/win32.py` | Windows calls through `ctypes`: Recycle Bin, Credential Manager, process table. |
 | `core/store.py` | Atomic JSON (`write_json_atomic`, `read_json`), `Store` with envelope `{schema_version, data}`, private permissions (`secure_data_dir`, `make_private`), one-time migration from the old prototype. |
 | `core/runner.py` | The only module that uses `subprocess`: `Runner.run`, `run_shell`, `stream`, `open_pipe`, `spawn_pty`, `terminate_pty`, `terminate_many`, and the test double `FakeRunner`. Text for `input=` goes by stdin, never on the command line. |
 | `core/trash.py` | `move_to_trash`: Finder on macOS, `gio trash` on Linux, and `<data>/lixeira/` with a date in the name if neither works. |
@@ -632,6 +639,8 @@ Linux packages leave `ui/` out, and the `.deb` installs under `/opt/vulcan-celox
 
 `.github/workflows/linux-mint.yml` runs on Ubuntu 22.04: `scripts/test_linux.sh`, `scripts/package_linux.py`, verification of the sums, installation of the `.deb`, `--check` and `--doctor`, and installation from the `.tar.gz`.
 
+`.github/workflows/windows.yml` runs `tests.test_windows` and the whole suite, builds the `.zip` with `scripts/package_windows.py`, extracts it and runs `scripts/smoke_windows.py` from it. `.github/workflows/macos.yml` builds the app and runs the suite on macOS.
+
 Release steps are in [development.md](development.md).
 
 ## 16. Testing and sensors
@@ -662,7 +671,8 @@ Base classes: `tests/helpers.py` (`TempDirTestCase`) and `tests/server_helpers.p
 |------|-----------|
 | Seven files above 400 lines: `web/js/terminals.mjs` (1126), `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Accepted for 1.0, because splitting terminal and window code with no browser test carries more risk than gain. `tests/test_tamanho_arquivos.py` stops them from growing and blocks new files above 400 |
 | macOS package has no embedded Python and is not notarized | It has only an ad hoc signature. `--verificar-dependencias` explains and offers to install. `packaging/LEIA-ME.md` explains how to open an app that is not signed with an Apple certificate |
-| Linux | Code and CI exist, with no release until acceptance on a real desktop |
+| Linux | Test builds as pre-releases; no stable release until acceptance on a real desktop |
+| Windows | Test builds as pre-releases, tested only on CI machines. Not available: Lerd and Valet, the optional hook, clicking `C:\...` paths, the foreground check before writing to a tab. No installer or code signature |
 | Interface language | English by default, Portuguese from ⌘K. The source text in the code is Portuguese, and `web/i18n/en.json` is the only dictionary, shared by the interface, the server and the macOS shell |
 | JSONL formats of Claude Code and Codex change without notice | Reading is tolerant: a strange line becomes `parse_errors` and reading continues. Fixtures come from real sessions |
 | Codex pairing | No exact link exists on Codex 0.166.0, and no stable hook. Pairing is by folder and time, so two Codex sessions started in the same folder less than 60 seconds apart can swap tabs |

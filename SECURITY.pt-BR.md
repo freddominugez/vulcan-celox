@@ -6,9 +6,9 @@ Versão em inglês: [SECURITY.md](SECURITY.md).
 
 | Versão | Suporte |
 |--------|---------|
-| 1.0.x (macOS) | Sim |
+| 1.1.x (macOS) | Sim |
 | Anteriores | Não |
-| Pacotes de Linux | Ainda não distribuídos; relatos são bem-vindos |
+| Versões de teste 1.2.0 (Windows, Linux) | Ainda não estáveis; relatos são bem-vindos |
 
 ## Como relatar uma vulnerabilidade
 

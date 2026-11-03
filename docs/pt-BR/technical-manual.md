@@ -1,6 +1,6 @@
 # Vulcan Celox: manual técnico
 
-Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.0.0. Para um passeio mais curto, leia [architecture.md](architecture.md).
+Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.2.0. Para um passeio mais curto, leia [architecture.md](architecture.md).
 
 Caminhos escritos como `core/...`, `server/...`, `web/...` e `ui/...` são relativos a `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Objetivos que moldam o código:
 - Nunca apagar nada de forma definitiva.
 - Tudo testável sem janela, sem Lerd real e sem agentes reais.
 
-Estado da entrega: a 1.0.0 sai para macOS 13 ou mais novo, Apple Silicon e Intel. O código de Linux continua no repositório e no CI, mas nenhum pacote de Linux é publicado até passar no aceite em um desktop real.
+Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.1.1. A versão 1.2.0 acrescenta versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
 
 ## 2. Decisões de arquitetura
 
@@ -53,6 +53,7 @@ packaging/LEIA-ME.md         instruções de instalação que vão dentro dos pa
 vulcan_celox/
   __main__.py                linha de comando do pacote Python
   desktop_linux.py           casca Linux: GTK 3 + WebKit2GTK, Chromium --app ou navegador
+  desktop_windows.py         casca do Windows: a mesma do Linux, numa janela de app do Edge ou Chrome
   core/                      lógica sem interface
   core/agents/               sessões de agente: descoberta, leitores, índice, observador, pareamento, uso
   core/backends/             Lerd, Valet e modo local
@@ -63,7 +64,7 @@ scripts/                     validate.sh, test_linux.sh, build_app.sh, install_a
                              make_deb.py, manual_md.py, manual_shots.sh, help_json.py
 tests/                       suíte unittest, fixtures/, golden/, tools/ (Lerd falso)
 docs/en/, docs/pt-BR/        documentação pública, mesmas páginas nas duas línguas
-.github/                     modelos de issue e pull request, workflow de Linux
+.github/                     modelos de issue e pull request, workflows de Linux, Windows e macOS
 ```
 
 `dist/`, `build/` e `executaveis/` são saída de build e ficam fora do git.
@@ -118,6 +119,10 @@ Fechar a última janela não encerra: o app fica na barra de menu. `WebWindowCon
 
 Nos dois últimos modos o token nunca vai para uma linha de comando. Uma página 0600, `<dados>/abrir-janela.html`, redireciona para o app com o token no fragmento da URL, e `web/js/api.mjs` passa o token para o `sessionStorage` e o tira da barra de endereço.
 
+### Windows
+
+`desktop_windows.py` reaproveita a casca do Linux com `VulcanApp` no próprio processo, no modo `app` com Edge ou Chrome, e o modo `browser` como reserva. O token segue o mesmo caminho da página 0600 do Linux. O `.zip` leva um Python embutido e o lançador `Vulcan Celox.cmd`. Os terminais usam ConPTY por `ctypes` (`core/pty_windows.py`), com PowerShell como padrão. Processos são criados por `core/runner.py` com `CREATE_NO_WINDOW`, e URLs, pastas e editores abrem sem passar por `cmd.exe`, para um nome de arquivo não virar comando.
+
 ## 5. Módulos do núcleo
 
 ### Geral
@@ -126,6 +131,8 @@ Nos dois últimos modos o token nunca vai para uma linha de comando. Uma página
 |--------|-----|
 | `core/paths.py` | Pasta de dados e locais das ferramentas. Todo caminho pode ser trocado por variável de ambiente nos testes. |
 | `core/oscompat.py` | O que muda entre macOS e Linux: shell padrão (`$SHELL`, depois zsh, bash, sh), pasta de dados, `open_argv`. |
+| `core/pty_windows.py` | Terminal do Windows: `WinPty` sobre ConPTY por `ctypes`, sem dependência. Abre, lê, escreve, redimensiona e fecha, encerrando toda a árvore de processos. |
+| `core/win32.py` | Chamadas do Windows por `ctypes`: Lixeira, Gerenciador de Credenciais, tabela de processos. |
 | `core/store.py` | JSON atômico (`write_json_atomic`, `read_json`), `Store` com envelope `{schema_version, data}`, permissões privadas (`secure_data_dir`, `make_private`), migração única do protótipo antigo. |
 | `core/runner.py` | Único módulo que usa `subprocess`: `Runner.run`, `run_shell`, `stream`, `open_pipe`, `spawn_pty`, `terminate_pty`, `terminate_many` e o duplo de teste `FakeRunner`. Texto em `input=` vai pelo stdin, nunca pela linha de comando. |
 | `core/trash.py` | `move_to_trash`: Finder no macOS, `gio trash` no Linux, e `<dados>/lixeira/` com data no nome se nenhum funcionar. |
@@ -632,6 +639,8 @@ Os pacotes de Linux deixam `ui/` de fora, e o `.deb` instala em `/opt/vulcan-cel
 
 `.github/workflows/linux-mint.yml` roda no Ubuntu 22.04: `scripts/test_linux.sh`, `scripts/package_linux.py`, conferência das somas, instalação do `.deb`, `--check` e `--doctor`, e instalação pelo `.tar.gz`.
 
+`.github/workflows/windows.yml` roda `tests.test_windows` e a suíte inteira, gera o `.zip` com `scripts/package_windows.py`, extrai e roda `scripts/smoke_windows.py` a partir dele. `.github/workflows/macos.yml` gera o app e roda a suíte no macOS.
+
 Os passos de uma versão estão em [development.md](development.md).
 
 ## 16. Testes e sensores
@@ -662,7 +671,8 @@ Classes base: `tests/helpers.py` (`TempDirTestCase`) e `tests/server_helpers.py`
 |------|----------|
 | Sete arquivos acima de 400 linhas: `web/js/terminals.mjs` (1126), `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Aceito para o 1.0, porque dividir terminal e janela sem teste de navegador traz mais risco que ganho. `tests/test_tamanho_arquivos.py` impede que cresçam e barra arquivo novo acima de 400 |
 | O pacote macOS não embute Python e não é notarizado | Tem só assinatura ad hoc. `--verificar-dependencias` explica e oferece instalar. `packaging/LEIA-ME.md` explica como abrir um app sem certificado da Apple |
-| Linux | Código e CI existem, sem versão publicada até o aceite em um desktop real |
+| Linux | Versões de teste como pre-release; sem Release estável até o aceite num desktop real |
+| Windows | Versões de teste como pre-release, testadas só nas máquinas da CI. Indisponível: Lerd e Valet, o hook opcional, clique em caminhos `C:\...`, a checagem de primeiro plano antes de escrever na aba. Sem instalador nem assinatura |
 | Idioma da interface | A interface e as mensagens de erro estão em português |
 | Os formatos JSONL do Claude Code e do Codex mudam sem aviso | Leitura tolerante: linha estranha vira `parse_errors` e a leitura segue. As fixtures vêm de sessões reais |
 | Pareamento do Codex | Não existe vínculo exato no Codex 0.166.0, nem hook estável. O pareamento é por pasta e horário, então duas sessões do Codex iniciadas na mesma pasta com menos de 60 segundos de diferença podem trocar de aba |

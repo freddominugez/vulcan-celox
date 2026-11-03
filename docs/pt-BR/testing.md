@@ -1,6 +1,6 @@
 # Testes
 
-`bash scripts/validate.sh` é o sensor único: **o código de saída decide**. Na versão 1.0.0 ele rodou 701 testes.
+`bash scripts/validate.sh` é o sensor único: **o código de saída decide**.
 
 ## O que o validate.sh roda
 

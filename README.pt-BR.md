@@ -1,6 +1,6 @@
 # Vulcan Celox
 
-> Antes se chamava Vulcan Terminal. Seus dados continuam onde estavam.
+> Antes se chamava Vulcan Terminal. Seus dados e sua chave passam sozinhos para os nomes novos.
 
 [English](README.md) | **Português**
 
@@ -8,7 +8,7 @@ Um painel desktop para quem programa sozinho com agentes de código. Terminais r
 
 ![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](vulcan_celox/web/img/manual/visao-geral.png)
 
-**Situação: 1.2.0 para macOS; Windows e Linux como versões de teste.** O código do Linux está no repositório e os testes passam no CI, mas ele ainda não foi aceito numa área de trabalho real, então nenhum pacote de Linux é distribuído. A interface vem em inglês, com português disponível no ⌘K.
+**Situação:** a versão estável mais recente é a 1.1.1, para macOS. A versão 1.2.0 está na `main`, com versões de teste para Windows e Linux na página de [Releases](https://github.com/freddominugez/vulcan-celox/releases). Nenhuma das versões de teste foi aceita ainda numa máquina real. A interface vem em inglês, com português disponível no ⌘K.
 
 ## Por que existe
 
@@ -31,11 +31,17 @@ Agentes escrevem código mais rápido do que uma pessoa consegue acompanhar. Dep
 
 ## Instalar
 
+**macOS**
+
 1. Baixe o `.dmg` em [Releases](https://github.com/freddominugez/vulcan-celox/releases).
 2. Arraste o **Vulcan Celox** para Aplicativos.
 3. O app não é assinado pela Apple. Na primeira vez, clique com o botão direito, escolha **Abrir** e confirme.
 
-Requer macOS 13+ (Apple Silicon ou Intel) e Python 3.9+. Se faltar Python, o app oferece instalar. Detalhes e como compilar: [docs/pt-BR/installation.md](docs/pt-BR/installation.md).
+Requer macOS 13+ (Apple Silicon ou Intel) e Python 3.9+. Se faltar Python, o app oferece instalar.
+
+**Windows e Linux (versões de teste).** Baixe o `.zip` para Windows, com Python incluído, ou o `.deb` ou `.tar.gz` para Linux na pre-release em [Releases](https://github.com/freddominugez/vulcan-celox/releases). Lerd e Valet não existem no Windows.
+
+Detalhes, limites e como compilar: [docs/pt-BR/installation.md](docs/pt-BR/installation.md).
 
 ## Princípios
 
