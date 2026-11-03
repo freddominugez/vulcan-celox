@@ -12,6 +12,7 @@ if [ -d "$APP" ]; then
   find "$APP" -depth -delete
 fi
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+touch dist/.metadata_never_index  # a cópia de build não aparece no Spotlight nem no Launchpad
 
 rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' vulcan_celox "$APP/Contents/Resources/"
 

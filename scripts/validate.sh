@@ -19,7 +19,10 @@ export PYTHONDONTWRITEBYTECODE=1
 export TK_SILENCE_DEPRECATION=1
 
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/vulcan-validate.XXXXXX")"
-cleanup() { find "$TMP_ROOT" -depth -delete 2>/dev/null || true; }
+# cópias de teste não ficam registradas no macOS: viravam ícones repetidos no Launchpad
+LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+unregister() { [ -x "$LSREGISTER" ] && "$LSREGISTER" -u "$1" >/dev/null 2>&1 || true; }
+cleanup() { unregister "$ROOT/dist/Vulcan Celox.app"; unregister "$TMP_ROOT/Applications/Vulcan Celox.app"; find "$TMP_ROOT" -depth -delete 2>/dev/null || true; }
 trap cleanup EXIT
 
 RUN_ID=0

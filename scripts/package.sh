@@ -69,3 +69,7 @@ step "SHA256SUMS"
 cat "$OUT/SHA256SUMS"
 ls -lh "$OUT/macos" "$OUT/linux"
 echo "PACOTES OK"
+
+# a cópia de build não fica registrada no macOS: viraria mais um ícone no Launchpad
+LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+[ -x "$LSREGISTER" ] && "$LSREGISTER" -u "$ROOT/dist/Vulcan Celox.app" >/dev/null 2>&1 || true

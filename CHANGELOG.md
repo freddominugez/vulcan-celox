@@ -2,6 +2,12 @@
 
 All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Portuguese version: [CHANGELOG.pt-BR.md](CHANGELOG.pt-BR.md).
 
+## [1.1.1] - 2026-11-03
+
+### Fixed
+- Opening a terminal from the dialog failed with "unknown theme": any click in the dialog took the interface theme as the tab theme.
+- Build and test copies of the app no longer show up as extra icons on macOS.
+
 ## [1.1.0] - 2026-11-03
 
 **Vulcan Terminal is now Vulcan Celox.** Your data, Keychain item and preferences stay where they were. Installing moves the old app to the Trash.

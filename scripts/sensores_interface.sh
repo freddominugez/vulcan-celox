@@ -182,3 +182,16 @@ for route in "#/inicio" "#/overview" "#/terminals" "#/agentes" "#/agentes/$CODE_
   SENSOR_LANGUAGE=en isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/en-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png" --route "$route" --wait 4 --eval "$EN_JS" || { echo "português em $route"; exit 1; }
 done
 
+step "novo terminal pelo diálogo: clique fora do cartão de tema não troca o tema"
+DIALOG_JS="$UNHIDE_JS(function () { var tag = 'diálogo de novo terminal não abriu a aba'; window.__vtErrors.push(tag); var enviado = null;
+  var original = window.fetch; window.fetch = function (u, o) { if (String(u) === '/api/terminals' && o && o.method === 'POST') enviado = JSON.parse(o.body); return original(u, o); };
+  setTimeout(function () { window.vulcanCommand('newTerminalOptions'); }, 800);
+  var fase = 0, t = setInterval(function () {
+    var cartao = document.querySelector('.nt-theme');
+    if (fase === 0 && cartao) { fase = 1; document.querySelector('.dialog .field-label').click(); document.querySelector('.dialog').click();
+      setTimeout(function () { document.querySelector('.dialog button[type=submit]').click(); }, 900); }
+    else if (fase === 1 && enviado) { fase = 2; if (enviado.theme === 'escuro' || enviado.theme === 'claro') window.__vtErrors.push('tema da página foi para a aba: ' + enviado.theme); }
+    else if (fase === 2 && document.querySelector('.tab[data-id]')) { clearInterval(t); window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }
+  }, 150); })();"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-dialogo.png" --route "#/terminals" --wait 7 --eval "$DIALOG_JS"
+

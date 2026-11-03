@@ -24,3 +24,9 @@ class TemaPreferenciaTest(ServerTestCase):
         index = (WEB / "index.html").read_text(encoding="utf-8")
         self.assertLess(index.index('src="js/theme-boot.js"'), index.index('href="styles/tokens.css"'))
         self.assertNotIn(" defer", index[:index.index('href="styles/tokens.css"')])
+
+    def test_js_nao_confunde_tema_da_pagina_com_tema_da_aba(self):
+        # <html data-theme> é o tema da interface: qualquer closest("[data-theme]") acha a página inteira
+        for path in (WEB / "js").rglob("*.mjs"):
+            self.assertNotIn('"[data-theme]"', path.read_text(encoding="utf-8"), path.name)
+

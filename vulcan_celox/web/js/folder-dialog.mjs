@@ -41,7 +41,7 @@ function themeCards(themes, chosen) {
   return themes.list.map((theme) => {
     const used = (tabsByTheme[theme.id] || []).length;
     const status = theme.id === themes.next ? t("próximo da rotação") : used ? (used === 1 ? t("em uso em 1 aba") : t("em uso em {n} abas", { n: used })) : t("livre");
-    return `<button type="button" class="nt-theme t-${esc(theme.id)} ${theme.id === chosen ? "is-on" : ""}" data-theme="${esc(theme.id)}" aria-pressed="${theme.id === chosen}">
+    return `<button type="button" class="nt-theme t-${esc(theme.id)} ${theme.id === chosen ? "is-on" : ""}" data-tab-theme="${esc(theme.id)}" aria-pressed="${theme.id === chosen}">
       <span class="nt-swatch"><span class="nt-prompt">❯</span> ${esc(theme.desc)}</span>
       <span class="nt-cap"><b>${esc(theme.name)}</b><span class="${theme.id === themes.next ? "is-next" : used ? "is-used" : ""}">${status}</span></span></button>`;
   }).join("");
@@ -162,10 +162,10 @@ export async function askFolder({ suggested = "", site = "" } = {}) {
     });
     backdrop.addEventListener("click", async (e) => {
       if (e.target === backdrop || e.target.closest("[data-cancel]")) return finish(null);
-      const themeBtn = e.target.closest("[data-theme]");
+      const themeBtn = e.target.closest("[data-tab-theme]");
       if (themeBtn) {
-        theme = themeBtn.dataset.theme;
-        backdrop.querySelectorAll("[data-theme]").forEach((b) => {
+        theme = themeBtn.dataset.tabTheme;
+        backdrop.querySelectorAll("[data-tab-theme]").forEach((b) => {
           b.classList.toggle("is-on", b === themeBtn);
           b.setAttribute("aria-pressed", String(b === themeBtn));
         });
