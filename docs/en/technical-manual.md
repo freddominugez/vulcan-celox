@@ -640,7 +640,7 @@ Linux packages leave `ui/` out, and the `.deb` installs under `/opt/vulcan-celox
 
 `.github/workflows/linux-mint.yml` runs on Ubuntu 22.04: `scripts/test_linux.sh`, `scripts/package_linux.py`, verification of the sums, installation of the `.deb`, `--check` and `--doctor`, and installation from the `.tar.gz`.
 
-`.github/workflows/windows.yml` runs `tests.test_windows` and the whole suite, builds the `.zip` with `scripts/package_windows.py`, extracts it and runs `scripts/smoke_windows.py` from it. `.github/workflows/macos.yml` builds the app and runs the suite on macOS.
+`.github/workflows/windows.yml` runs `tests.test_windows` and the whole suite, builds the `.zip` with `scripts/package_windows.py`, extracts it and runs `scripts/smoke_windows.py` from it. `.github/workflows/macos.yml` builds the app and runs the suite on macOS, on request, before each release.
 
 Release steps are in [development.md](development.md).
 

@@ -54,7 +54,7 @@ O `--snapshot` desenha uma rota em PNG e falha com erro de JavaScript, e o `--ev
 ## Lançar versão
 
 1. Atualize `vulcan_celox/__init__.py`, o workflow em `.github/workflows/`, os `README` e o registro de mudanças nas duas línguas.
-2. `bash scripts/validate.sh` e `bash scripts/test_linux.sh`.
+2. `bash scripts/validate.sh` e `bash scripts/test_linux.sh`. Depois, rode o workflow de macOS numa máquina limpa com `gh workflow run macos.yml --ref main` e espere passar.
 3. `bash scripts/package.sh`, `bash scripts/install_app.sh`.
 4. Tag, push, Release com os pacotes e o `SHA256SUMS`; depois baixe e confira as somas.
 
