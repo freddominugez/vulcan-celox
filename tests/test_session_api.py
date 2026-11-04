@@ -83,6 +83,15 @@ class SessionApiTest(ServerTestCase):
         closed = {s["id"]: s for s in self.request("GET", "/api/sessions?site=loja")[1]["closed"]}
         self.assertIn(b["id"], closed)
 
+    def test_processo_que_termina_antes_do_registro_encerra_a_sessao(self):
+        session = self.app.terminals.create(str(self.loja), command="exit 3", site="loja")
+        session._reader.join(10.0)  # the reader already delivered the end, to nobody
+        self.assertFalse(session._reader.is_alive())
+        self.app.hub.on_created(session)
+        record = self.app.hub.sessions.get(session.id)
+        self.assertFalse(record.is_open)
+        self.assertEqual(record.exit_code, 3)
+
     def test_ocupado_e_memoria_ao_fechar(self):
         a = self.open_terminal()
         status, busy, _ = self.request("GET", f"/api/terminals/{a['id']}/busy")

@@ -38,6 +38,7 @@ class PtySession:
         self._history = bytearray()
         self._listeners: List[Listener] = []
         self._lock = threading.Lock()
+        self.ended = False  # the reader already delivered the end of the process to the listeners it had
         self.pid, handle = spawn_pty(self.argv, cwd, env, rows, cols)
         self._win = handle if WINDOWS else None  # on Windows the terminal is a ConPTY object, with two descriptors
         self.fd = self._win.read_fd if WINDOWS else handle
@@ -65,6 +66,7 @@ class PtySession:
         finally:
             self._reap()
             with self._lock:
+                self.ended = True  # whoever subscribes from here on does not receive the end: see `ended`
                 listeners = list(self._listeners)
             for listener in listeners:
                 try:
