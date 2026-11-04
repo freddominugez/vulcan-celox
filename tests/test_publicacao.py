@@ -1,4 +1,4 @@
-"""Trilha de publicação e alerta de loop seguem a ordem real e ignoram comandos que falharam."""
+"""Publication trail and loop alert follow the real order and ignore commands that failed."""
 
 import json
 
@@ -93,8 +93,8 @@ class PublicacaoCodexTest(TempDirTestCase):
                 return {"timestamp": at, "type": "event_msg", "payload": {"type": "user_message", "message": "continue"}}
             return {"timestamp": at, "type": "event_msg", "payload": {"type": "item_completed", "item": {
                 "type": "UserMessage", "content": [{"type": "text", "text": "continue"}]}}}
-        s = self.read([user("2026-10-31T10:00:01Z"), user("2026-10-31T10:00:02Z", "item"),  # o mesmo pedido, duas fontes
-                       user("2026-10-31T10:05:00Z"), user("2026-10-31T10:05:01Z", "item")])  # o mesmo texto, outro turno
+        s = self.read([user("2026-10-31T10:00:01Z"), user("2026-10-31T10:00:02Z", "item"),  # the same request, two sources
+                       user("2026-10-31T10:05:00Z"), user("2026-10-31T10:05:01Z", "item")])  # the same text, another turn
         self.assertEqual(s.turns, 2)
 
 

@@ -1,8 +1,5 @@
-"""Aviso do sistema: preferência, comando seguro e texto sem conteúdo da conversa."""
+"""System notification: preference, safe command and text without conversation content."""
 
-import json
-import shutil
-import subprocess
 import unittest
 from pathlib import Path
 from unittest import mock

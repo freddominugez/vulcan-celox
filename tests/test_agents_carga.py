@@ -1,4 +1,4 @@
-"""Desempenho com muitas sessões pesadas, cache do git e poda do índice."""
+"""Performance with many heavy sessions, git cache and index pruning."""
 
 import io
 import json
@@ -35,7 +35,7 @@ class CargaTest(TempDirTestCase):
             for i in range(2000):
                 s = heavy(i)
                 index._write(s, s.file_path, 1.0, 10, 10, {}, [], [])
-        index.sessions()  # aquece o cache do SQLite
+        index.sessions()  # warms up the SQLite cache
         best = min(self._timed(index.sessions) for _ in range(3))
         self.assertLess(best, 0.1, f"listar 2.000 sessões levou {best:.3f} s")
         listed = index.sessions()
@@ -62,8 +62,8 @@ class CargaTest(TempDirTestCase):
         index.close()
 
     def test_indice_antigo_e_reconstruido(self):
-        # índice de formato antigo: resumos com as listas dentro; sessão parada nunca seria regravada.
-        # Desde o esquema 4 o índice antigo é esvaziado e relido, o que também tira as listas
+        # index created before this change: summaries with the lists inside; an idle session would never be rewritten.
+        # Since schema 4 the old index is emptied and re-read, which also removes the lists
         path = self.tmp / "agentes.db"
         index = AgentIndex(path)
         with index.db:
@@ -73,7 +73,7 @@ class CargaTest(TempDirTestCase):
                 index.db.execute("UPDATE sessions SET summary = ? WHERE id = ?", (json.dumps(s.to_dict()), s.id))
             index.db.execute("UPDATE meta SET value = '2' WHERE key = 'schema_version'")
         index.close()
-        index = AgentIndex(path)  # abrir reconstrói
+        index = AgentIndex(path)  # opening rebuilds
         version = index.db.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0]
         self.assertEqual(version, str(SCHEMA_VERSION))
         self.assertEqual(index.sessions(), [])
@@ -83,11 +83,11 @@ class CargaTest(TempDirTestCase):
         runner = FakeRunner(default=Result(0, "true\n"))
         now = [1000.0]
         cache = repos.GitCache(runner, ttl=30, clock=lambda: now[0])
-        sessions = [heavy(i) for i in range(40)]  # 40 sessões em 20 projetos... 40 raízes distintas
+        sessions = [heavy(i) for i in range(40)]  # 40 sessions in 20 projects... 40 distinct roots
         repos.build(sessions, cache)
         calls = len(runner.calls)
         repos.build(sessions, cache)
-        self.assertEqual(len(runner.calls), calls)  # tudo do cache
+        self.assertEqual(len(runner.calls), calls)  # everything from the cache
         now[0] += 31
         repos.build(sessions, cache)
         self.assertEqual(len(runner.calls), 2 * calls)
@@ -108,7 +108,7 @@ class CargaTest(TempDirTestCase):
         self.assertEqual(len(index.events(new.id, 0, 100)[0]), 50)
         kept = index.session(old.id)
         self.assertEqual((kept.turns, len(kept.files), len(kept.commands)), (12, HEAVY_FILES, HEAVY_COMMANDS))
-        self.assertEqual({h["session_id"] for h in index.search("frete")}, {new.id})  # a busca acompanha
+        self.assertEqual({h["session_id"] for h in index.search("frete")}, {new.id})  # the search follows along
         index.close()
 
     def test_opcao_podar_agentes(self):

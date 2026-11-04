@@ -1,4 +1,4 @@
-"""Reconhecimento de caminhos no terminal, rodando o módulo de verdade no node."""
+"""Path recognition in the terminal, running the real module in node."""
 
 import json
 import shutil
@@ -77,7 +77,7 @@ class PathLinksTest(unittest.TestCase):
 
     def test_sem_tecla_nao_consulta_nem_sublinha(self):
         self.assertIsNone(self.data["off"])
-        self.assertEqual(self.data["asked"], 1)  # só a chamada com a tecla pressionada
+        self.assertEqual(self.data["asked"], 1)  # only the call with the key pressed
 
     def test_clique_leva_linha_e_resultado(self):
         self.assertEqual(self.data["activated"], {"path": "/x", "kind": "file", "line": None, "column": None})

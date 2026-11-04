@@ -1,4 +1,4 @@
-"""Configuração da IA: chave no Keychain, validação na Anthropic e escolha do modelo. A chave nunca sai do servidor."""
+"""AI configuration: key in the Keychain, validation at Anthropic and model choice. The key never leaves the server."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ class AiConfig:
     def __init__(self, app) -> None:
         self.app = app
 
-    # ── preferências ─────────────────────────────────────────────────────
+    # ── preferences ─────────────────────────────────────────────────────
     def _prefs(self) -> Dict[str, Any]:
         prefs = self.app.store.load(PREFERENCES, {})
         return prefs if isinstance(prefs, dict) else {}
@@ -47,8 +47,8 @@ class AiConfig:
         return AnthropicClient(key, transport=self.app.ai_transport, base=self.base())
 
     def base(self) -> str:
-        """VULCAN_ANTHROPIC_BASE_URL permite proxy corporativo ou servidor de teste local; http só no loopback,
-        para a chave nunca sair em claro da máquina."""
+        """VULCAN_ANTHROPIC_BASE_URL allows a corporate proxy or a local test server; http only on loopback,
+        so the key never leaves the machine in the clear."""
         base = self.app.env.get("VULCAN_ANTHROPIC_BASE_URL") or API_BASE
         parts = urlsplit(base)
         if parts.scheme == "https" and parts.hostname:

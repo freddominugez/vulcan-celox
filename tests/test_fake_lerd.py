@@ -1,4 +1,4 @@
-"""A API falsa do Lerd que o sensor usa responde como o Lerd e nunca sai do 127.0.0.1."""
+"""The fake Lerd API that the sensor uses answers like Lerd and never leaves 127.0.0.1."""
 
 import json
 import threading

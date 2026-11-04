@@ -1,5 +1,5 @@
-// Tela Depuração: eventos da ponte de dumps do Lerd agrupados por requisição, com filtros, o interruptor
-// da ponte e a origem de cada evento. Global (#/depuracao) ou presa a um site (aba Depuração do site).
+// Debug screen: Lerd dump bridge events grouped by request, with filters, the bridge toggle
+// and the origin of each event. Global (#/depuracao) or tied to a site (the site's Depuração tab).
 
 import { every, get, post, put } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
@@ -16,7 +16,7 @@ function shortFile(path) {
 export class DebugView {
   constructor(root, options) {
     this.root = root;
-    this.site = options.site || null;  // aba do site: filtro de site fixo
+    this.site = options.site || null;  // site tab: fixed site filter
     this.sites = options.sites || [];
     this.filters = { site: this.site ? this.site.name : "", kind: "", q: "", min_ms: "" };
     this.groups = [];
@@ -57,11 +57,11 @@ export class DebugView {
   async load() {
     try {
       const [bridge, data] = await Promise.all([get("/api/debug/bridge"), get(`/api/debug/events?${this.query()}`)]);
-      // Redesenha só quando algo mudou, e nunca com texto selecionado no corpo (copiar um dump)
+      // redraws only when something changed, and never with text selected in the body (copying a dump)
       const signature = JSON.stringify([bridge.enabled, bridge.count, this.query(),
         data.groups.map((g) => g.events.map((e) => e.id || e.ts).join(","))]);
       if (signature === this.signature) return;
-      if (this.selecting()) return;  // fica para a próxima volta, depois que a seleção acabar
+      if (this.selecting()) return;  // left for the next round, after the selection is over
       this.signature = signature;
       this.bridge = bridge;
       this.groups = data.groups;
@@ -102,7 +102,7 @@ export class DebugView {
   }
 
   groupHtml(g) {
-    // SQL repetido na mesma requisição ganha marca com contagem e tempo somado
+    // repeated SQL in the same request gets a mark with count and summed time
     this.repeated = new Map((g.queries || []).filter((q) => q.count > 1).map((q) => [q.sql, q]));
     const reps = [...this.repeated.values()].map((q) => `<div class="debug-repeat"><span class="badge badge-warn">${q.count}×</span>
         <code class="debug-sql">${esc(q.sql)}</code><span class="dim">${t("{ms} ms no total", { ms: q.total_ms })}</span></div>`).join("");
@@ -135,7 +135,7 @@ export class DebugView {
     if (e.kind === "log") return `<span class="debug-level log-level">${esc(d.level || "")}</span> <span class="log-msg">${esc(d.message || "")}</span>`;
     if (e.kind === "request") return `<span class="dim">${esc(String(d.time_ms ?? ""))} ms · ${Math.round((d.memory_peak || 0) / 1048576)} MB</span>`;
     if (e.kind === "view") return `<span>${esc(d.name || d.view || e.label || "")}</span>`;
-    // dump e tipos que o Lerd venha a criar: o texto como veio
+    // dumps and types that Lerd may create: the text as it came
     return `<pre class="debug-dump">${esc(e.text || e.label || JSON.stringify(d, null, 2))}</pre>`;
   }
 

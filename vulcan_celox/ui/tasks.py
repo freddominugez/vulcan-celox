@@ -43,7 +43,7 @@ class TasksPanel(ttk.Frame):
         self.bind("<Destroy>", self._on_destroy)
         self.render()
 
-    # ── construção ───────────────────────────────────────────────────────
+    # ── construction ───────────────────────────────────────────────────
     def _build_add_row(self) -> None:
         row = ttk.Frame(self)
         row.pack(fill="x", pady=(6, 4))
@@ -152,7 +152,7 @@ class TasksPanel(ttk.Frame):
         sel = self.tree.selection()
         return sel[0] if sel else None
 
-    # ── ações ────────────────────────────────────────────────────────────
+    # ── actions ────────────────────────────────────────────────────────
     def add(self):
         title = self.var_title.get().strip()
         if not title:

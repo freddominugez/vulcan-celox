@@ -1,4 +1,4 @@
-"""HTTPS, PHP e Node do site a partir do registro do Lerd, e as ações que os mudam."""
+"""HTTPS, PHP and Node of the site from the Lerd registry, and the actions that change them."""
 
 import json
 import os

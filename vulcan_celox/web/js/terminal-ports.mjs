@@ -1,5 +1,5 @@
-// Selo com as portas que cada aba abriu, na barra de abas e na lista de sessões. O clique abre no navegador do sistema,
-// pela mesma rota dos outros links; a janela do app continua presa à própria origem.
+// Badge with the ports each tab opened, in the tab bar and in the session list. Click opens in the system browser,
+// through the same route as the other links; the app window stays pinned to its own origin.
 
 import { every, get, post } from "./api.mjs";
 import { esc, reportError } from "./dom.mjs";
@@ -15,7 +15,7 @@ function badge(list) {
   return `<button type="button" class="port-badge" data-port="${first}" title="${t("Abrir localhost:{port} no navegador. Portas desta aba: {names}", { port: first, names: esc(names) })}">:${first}${rest}</button>`;
 }
 
-/** Reaplica os selos. Chamado a cada leitura e depois que a barra de abas ou a lista de sessões é redesenhada. */
+/** Reapplies the badges. Called on every read and after the tab bar or the session list is redrawn. */
 export function syncPorts() {
   document.querySelectorAll(".tab[data-id], .tree-node[data-id]").forEach((node) => {
     const list = ports[node.dataset.id] || [];
@@ -36,14 +36,14 @@ async function poll() {
     ports = (await get("/api/terminals/ports")).ports || {};
     syncPorts();
   } catch {
-    /* servidor reiniciando: a próxima volta tenta de novo */
+    /* server restarting: the next round tries again */
   }
 }
 
 export function startPorts() {
   poll();
-  every(POLL_MS, poll);  // parado com a janela oculta
-  // na captura: o clique no selo não seleciona a aba por baixo
+  every(POLL_MS, poll);  // paused while the window is hidden
+  // in the capture phase: clicking the badge does not select the tab underneath
   document.addEventListener("click", (event) => {
     const button = event.target.closest && event.target.closest(".port-badge");
     if (!button) return;

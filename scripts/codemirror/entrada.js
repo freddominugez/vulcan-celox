@@ -1,4 +1,4 @@
-// O que a interface usa do CodeMirror 6. Fica disponível como window.CM.
+// What the interface uses from CodeMirror 6. Available as window.CM.
 export { EditorView, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, Decoration, keymap } from "@codemirror/view";
 export { EditorState, Compartment, StateEffect, StateField } from "@codemirror/state";
 export { defaultKeymap } from "@codemirror/commands";

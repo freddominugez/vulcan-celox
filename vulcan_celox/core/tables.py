@@ -1,4 +1,4 @@
-"""Parser das tabelas ASCII impressas pela CLI do Valet (formato Symfony Console)."""
+"""Parser for the ASCII tables printed by Valet's CLI (Symfony Console format)."""
 
 from __future__ import annotations
 
@@ -20,16 +20,16 @@ def _cells(line: str) -> List[str]:
 
 
 def parse_table(text: str) -> List[Dict[str, str]]:
-    """Converte a primeira tabela encontrada no texto em lista de dicts.
+    """Converts the first table found in the text into a list of dicts.
 
-    Ignora texto antes e depois da tabela. Tabela só com cabeçalho retorna [].
-    Linhas com número de células diferente do cabeçalho são completadas ou truncadas.
+        Ignores text before and after the table. A table with only a header returns [].
+        Rows with a different number of cells than the header are padded or truncated.
     """
     lines = text.splitlines()
     i = 0
     while i < len(lines) and not _is_border(lines[i]):
         i += 1
-    # cabeçalho: primeira linha de dados depois da borda inicial
+    # header: first data line after the initial border
     while i < len(lines) and not _is_row(lines[i]):
         if not _is_border(lines[i]):
             return []

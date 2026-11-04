@@ -1,5 +1,5 @@
-// Detalhe de um site no estilo Herd e a página Terminais: abas superiores Terminal, Tarefas, Post-its e Tags
-// sempre ligadas à sessão de terminal selecionada na barra de sessões.
+// Site detail in the Herd style and the Terminais page: top tabs Terminal, Tarefas, Post-its and Tags
+// always tied to the terminal session selected in the session bar.
 
 import { get, isMac, native, patch, post, put } from "../api.mjs";
 import { confirmDialog } from "../ai.mjs";
@@ -30,7 +30,7 @@ class SessionTabsView {
     this.root.addEventListener("click", (e) => this.onClick(e));
   }
 
-  /** Prefixo da rota, sem aba nem sessão. */
+  /** Route prefix, without tab or session. */
   get base() {
     return "#/terminals";
   }
@@ -100,7 +100,7 @@ class SessionTabsView {
     return false;
   }
 
-  /** Chamado pelo roteador quando só muda a sessão, a aba ou o item em destaque. */
+  /** Called by the router when only the session, tab or highlighted item changes. */
   reveal(route) {
     if (!this.workspace) return;
     const tab = this.tabList.some((t) => t.id === route.tab) ? route.tab : "terminal";
@@ -117,7 +117,7 @@ class SessionTabsView {
   newTerminal(command = null, title = null, options = {}) {
     if (!this.workspace) return null;
     return this.workspace.newTerminal(command, title, options).then((s) => {
-      if (s && this.tab !== "terminal") this.setTab("terminal"); // só troca de aba se o terminal abriu
+      if (s && this.tab !== "terminal") this.setTab("terminal"); // only switches tab if the terminal opened
       this.syncRoute();
       return s;
     });
@@ -144,8 +144,8 @@ class SessionTabsView {
 
 export class SiteView extends SessionTabsView {
   get tabList() {
-    return [...TABS, { id: "harness", label: "Harness", icon: "check-square" },  // Contrato dos agentes
-      { id: "logs", label: "Logs", icon: "text" },  // Laravel.log e logs do Lerd
+    return [...TABS, { id: "harness", label: "Harness", icon: "check-square" },  // contract of the agents
+      { id: "logs", label: "Logs", icon: "text" },  // laravel.log and Lerd logs
       ...(this.options.state.backend && this.options.state.backend.name === "lerd" ? [{ id: "debug", label: t("Depuração"), icon: "bolt" }] : [])];
   }
 
@@ -166,7 +166,7 @@ export class SiteView extends SessionTabsView {
     const progress = (this.options.state.progress.sites || {})[s.name];
     const [label, ...rest] = s.domain.split(".");
     const tld = rest.length ? `.${rest.join(".")}` : "";
-    // Com Lerd ou Valet, os selos viram botões que mudam PHP, Node e HTTPS
+    // with Lerd or Valet, the badges become buttons that change PHP, Node and HTTPS
     const live = Boolean(this.options.state.backend && this.options.state.backend.available && s.kind !== "manual");
     const lerd = live && this.options.state.backend.name === "lerd";
     const starred = (this.options.state.favorites || []).includes(s.name);
@@ -212,7 +212,7 @@ export class SiteView extends SessionTabsView {
     try {
       localStorage.setItem("vulcan-last-site", s.name);
     } catch {
-      /* armazenamento indisponível */
+      /* storage unavailable */
     }
     this.mountWorkspace($("[data-role=body]", this.root), { site: s, scope: "site" });
   }
@@ -254,7 +254,7 @@ export class SiteView extends SessionTabsView {
     return `/api/sites/${encodeURIComponent(this.site.name)}`;
   }
 
-  /** Remover em três níveis: lista ou backend, e opcionalmente a pasta para a Lixeira. */
+  /** Three-level removal: list or backend, and optionally the folder to the Trash. */
   async remove() {
     const s = this.site;
     const manual = s.kind === "manual";
@@ -296,7 +296,7 @@ export class SiteView extends SessionTabsView {
     }
     if (trash) {
       if (window.vulcanCommand) window.vulcanCommand("refresh");
-      await new Promise((r) => setTimeout(r, 1200));  // o backend precisa parar de listar o site
+      await new Promise((r) => setTimeout(r, 1200));  // the backend needs to stop listing the site
       const moved = await post("/api/sites/trash", { name: s.name, confirm: typed });
       toast(t("Pasta movida para a Lixeira: {path}", { path: moved.moved_to }), { kind: "ok", timeout: 6000 });
     } else {
@@ -326,7 +326,7 @@ export class SiteView extends SessionTabsView {
     this.watchShare(tab.id);
   }
 
-  /** Procura a URL pública na saída da aba por até 2 min e mostra o chip para copiar enquanto a aba existir. */
+  /** Looks for the public URL in the tab output for up to 2 min and shows the chip to copy for as long as the tab exists. */
   async watchShare(id) {
     const actions = $(".site-actions", this.root);
     for (let i = 0; i < 80 && !this.destroyed; i += 1) {

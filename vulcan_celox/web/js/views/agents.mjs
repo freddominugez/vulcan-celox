@@ -1,4 +1,4 @@
-// Agentes: sessões do Claude Code e do Codex com KPIs, filtros e trilha de publicação.
+// Agents: Claude Code and Codex sessions with KPIs, filters and publish trail.
 
 import { sessionAttention } from "../attention-state.mjs";
 import { get } from "../api.mjs";
@@ -26,7 +26,7 @@ function remember(key, value) {
   try {
     localStorage.setItem(key, value);
   } catch {
-    /* sem armazenamento: só não lembra */
+    /* no storage: it just does not remember */
   }
 }
 

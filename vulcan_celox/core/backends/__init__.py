@@ -1,4 +1,4 @@
-"""Seleção do backend de ambiente: Lerd, depois Valet, senão modo local."""
+"""Environment backend selection: Lerd, then Valet, otherwise local mode."""
 
 from __future__ import annotations
 

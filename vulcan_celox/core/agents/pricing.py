@@ -1,8 +1,8 @@
-"""Preço por milhão de tokens de cada modelo e custo estimado de um turno.
+"""Price per million tokens of each model and estimated cost of a turn.
 
-Os valores padrão foram conferidos nas páginas oficiais em CONFERIDO_EM (ver FONTES). O usuário pode
-sobrescrever qualquer modelo em <dados>/precos.json; o arquivo dele vence o padrão, modelo por modelo.
-Modelo sem preço fica sem custo (None, nunca 0). Nenhuma consulta de rede: só o que está aqui e no arquivo.
+The default values were checked against the official pages at CONFERIDO_EM (see FONTES). The user can
+override any model in <data>/precos.json; their file wins over the default, model by model.
+A model without a price has no cost (None, never 0). No network lookup: only what is here and in the file.
 """
 
 from __future__ import annotations
@@ -34,14 +34,14 @@ def _p(i, o, r, w5, w1, fonte, acima=None) -> Dict:
 
 
 def _lc(tokens, i, o, r, w5, w1) -> Dict:
-    """Preço de contexto longo: vale quando o prompt do turno passa de `tokens`."""
+    """Long-context price: applies when the turn's prompt exceeds `tokens`."""
     return {"tokens": tokens, "input": i, "output": o, "cache_read": r, "cache_write_5m": w5, "cache_write_1h": w1}
 
 
 A, O = "anthropic", "openai"
-# Anthropic: entrada, saída, leitura de cache, escrita de cache 5 min e 1 h.
-# OpenAI: entrada, saída, entrada em cache, escrita de cache 30 min (vai na coluna 5m) e 12 h (coluna 1h);
-# "-" na página vira None: turno que usou esse tipo de token fica sem custo.
+# Anthropic: input, output, cache read, cache write 5 min and 1 h.
+# OpenAI: input, output, cached input, cache write 30 min (goes in the 5m column) and 12 h (1h column);
+# "-" on the page becomes None: a turn that used that token type has no cost.
 DEFAULT: Dict[str, Dict] = {
     "claude-fable-5-1": _p(10, 50, 0.25, 12.5, 20, A),
     "claude-fable-5": _p(10, 50, 1, 12.5, 20, A),
@@ -86,7 +86,7 @@ def prices_path(data_dir) -> Path:
 
 
 def normalize(model: str) -> str:
-    """Nome do modelo sem a data de versão nem sufixo de variante: claude-opus-5-5-20261001 -> claude-opus-5-5."""
+    """Model name without the version date or variant suffix: claude-opus-5-5-20261001 -> claude-opus-5-5."""
     name = (model or "").strip().lower()
     name = name.split("[", 1)[0].split("@", 1)[0]
     return _DATE_SUFFIX.sub("", name)
@@ -105,7 +105,7 @@ def _valid_entry(entry) -> bool:
 
 
 def load(data_dir) -> Tuple[Dict[str, Dict], Optional[str]]:
-    """Tabela efetiva (padrão + arquivo do usuário) e o aviso para o --doctor, se o arquivo não valeu."""
+    """Effective table (default + user file) and the warning for --doctor, if the file was not valid."""
     table = {k: dict(v) for k, v in DEFAULT.items()}
     path = prices_path(data_dir)
     if not path.exists():
@@ -134,7 +134,7 @@ def lookup(table: Dict[str, Dict], model: str) -> Optional[Dict]:
 
 
 def cost(row: Dict, table: Dict[str, Dict]) -> Optional[float]:
-    """Custo em USD de uma linha de uso, ou None se o modelo (ou um tipo de token usado) não tem preço."""
+    """Cost in USD of a usage row, or None if the model (or a token type used) has no price."""
     entry = lookup(table, row.get("model") or "")
     if entry is None:
         return None
@@ -155,7 +155,7 @@ def cost(row: Dict, table: Dict[str, Dict]) -> Optional[float]:
 
 
 def describe(data_dir) -> Dict:
-    """Resumo para o --doctor: arquivo, moeda, data e fonte dos padrões, quantos modelos e o aviso."""
+    """Summary for --doctor: file, currency, date and source of the defaults, how many models, and the warning."""
     table, warning = load(data_dir)
     return {"arquivo": str(prices_path(data_dir)), "existe": prices_path(data_dir).exists(), "moeda": CURRENCY,
             "conferido_em": CONFERIDO_EM, "fontes": FONTES, "modelos": len(table), "aviso": warning}

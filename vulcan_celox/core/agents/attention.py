@@ -1,7 +1,7 @@
-"""Em que pé está o turno de uma sessão: trabalhando, sua vez ou talvez esperando.
+"""Where a session's turn stands: working, your turn, or maybe waiting.
 
-O leitor guarda só o fato visto no arquivo (`running`, `tool_pending`, `your_turn`) e a hora. O estado mostrado é
-calculado na leitura, porque "faz tempo que a ferramenta não responde" depende do relógio, não do arquivo.
+The reader keeps only the fact seen in the file (`running`, `tool_pending`, `your_turn`) and the time. The displayed state is
+computed at read time, because "the tool has not answered for a while" depends on the clock, not on the file.
 """
 
 from __future__ import annotations
@@ -13,8 +13,8 @@ from typing import Dict, List, Optional
 from vulcan_celox.core.agents.model import AgentSession, epoch
 
 WAITING_AFTER_SECONDS = 20
-RUNNING_MAX_SECONDS = 600  # sem linha nova por mais que isso, a sessão parou: não está trabalhando
-STALE_SECONDS = 6 * 3600  # sinal antigo vira ruído: quem saiu ontem não está esperando resposta
+RUNNING_MAX_SECONDS = 600  # no new line for longer than this: the session stopped, it is not working
+STALE_SECONDS = 6 * 3600  # an old signal becomes noise: someone who left yesterday is not waiting for an answer
 PERMISSION_MAX_SECONDS = 1800
 _MAX_PENDING = 64
 
@@ -24,7 +24,7 @@ def utc_iso(at: float) -> str:
 
 
 class AttentionTracker:
-    """Acompanha o turno a partir dos eventos do leitor e deixa o resultado em `session.attention`."""
+    """Tracks the turn from the reader's events and leaves the result in `session.attention`."""
 
     def __init__(self, session: AgentSession, state: Optional[Dict] = None):
         state = state or {}
@@ -65,8 +65,8 @@ class AttentionTracker:
 
 
 def _from_hook(hook: Optional[Dict], read_at: float, now: float) -> Optional[Dict]:
-    """O aviso do hook vale até o arquivo trazer linha mais nova. Depois de aprovar um comando longo o arquivo fica
-    quieto até ele terminar, então o pedido de permissão tem prazo e some ao focar a aba na interface."""
+    """The hook notice holds until the file brings a newer line. After approving a long command the file stays
+    quiet until it finishes, so the permission request has a deadline and disappears when the tab is focused in the interface."""
     if not hook or hook["at"] <= read_at:
         return None
     limit = PERMISSION_MAX_SECONDS if hook["kind"] == "waiting_permission" else STALE_SECONDS
@@ -76,8 +76,8 @@ def _from_hook(hook: Optional[Dict], read_at: float, now: float) -> Optional[Dic
 
 
 def resolve(raw: Optional[Dict], now: Optional[float] = None, hook: Optional[Dict] = None) -> Optional[Dict]:
-    """Estado para a interface, ou None quando não há nada a dizer. `maybe_waiting` é inferência: a ferramenta pode
-    só estar demorando, então a interface precisa apresentar como possibilidade."""
+    """State for the interface, or None when there is nothing to say. `maybe_waiting` is an inference: the tool may
+    just be slow, so the interface must present it as a possibility."""
     now = time.time() if now is None else now
     raw = raw if isinstance(raw, dict) else {}
     name, since = raw.get("state"), raw.get("since") or ""

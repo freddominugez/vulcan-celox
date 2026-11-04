@@ -4,7 +4,7 @@
 
 ## Contents
 
-- [Getting started](#primeiros-passos): What Vulcan Celox does and how to start in four steps.
+- [Getting started](#primeiros-passos): What Vulcan Celox does and how to start in a few steps.
 - [PHP sites](#projetos-php): Lerd sites: open, switch PHP, HTTPS, logs and terminal.
 - [Lerd](#lerd): The environment that runs the PHP, nginx, database and HTTPS of your sites.
 - [Node projects](#node): Next.js, Vite, local Supabase and Vercel link.
@@ -23,7 +23,7 @@
 
 ## Getting started
 
-*What Vulcan Celox does and how to start in four steps.*
+*What Vulcan Celox does and how to start in a few steps.*
 
 The app has a light and a dark theme. Press ⌘K, search for "Theme" and pick System, Light or Dark. The terminal area stays dark in both, with each tab's own color.
 
@@ -36,7 +36,7 @@ Vulcan Celox is a panel for solo developers who code with coding agents. It puts
 3. **Let the app read the agent sessions.** It reads the Claude Code and Codex files from disk, line by line, with no API key and without writing anything in those folders.
 4. **Open a terminal in a project** with ⌘T. Tasks, sticky notes and tags created there become the session memory in Markdown when the terminal closes.
 
-The **Home** screen checks these steps by itself and stops opening at launch once all four are done. Check **Don't show the guide again** to make the app open straight on the Overview. The guide stays available in the Home item of the sidebar.
+The **Home** screen checks these steps by itself and stops opening at launch once the essential steps are done. The Lerd step is optional: **Install** shows the official command and runs it in a visible terminal, and **I don't use it** dismisses the step. Check **Don't show the guide again** to make the app open straight on the Overview. The guide stays available in the Home item of the sidebar.
 
 <a id="projetos-php"></a>
 
@@ -67,7 +67,7 @@ The sites belong to Lerd. The app only calls Lerd's own CLI and API and never ed
 - **Services:** database, Redis and others, with start and stop.
 - **PHP:** installed versions, extensions, Xdebug and six common php.ini settings, written by `lerd php:ini` itself.
 - **Lerd Node:** versions that Lerd manages for PHP sites with a JavaScript front end.
-- **Start with the app:** the lightning button at the top starts Lerd together with Vulcan Celox.
+- **Start with the app:** the lightning button at the top starts Lerd together with Vulcan Celox. It comes off: Lerd is optional and only needed for PHP and Laravel sites.
 
 Laravel Valet also works as an alternative. Herd is commercial and is not used.
 
@@ -238,7 +238,7 @@ The harness is the contract with verifiable items, the run state and the handoff
 
 **What is Lerd for?**
 
-It is the environment that runs your PHP and Laravel sites on the Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. Vulcan Celox is the panel on top of it.
+It is the environment that runs your PHP and Laravel sites on the Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. It is optional: terminals, agents and Node projects work without it. Install it from Home if you want it.
 
 **Do I need Lerd to use the app?**
 

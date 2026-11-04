@@ -1,4 +1,4 @@
-"""Leitura incremental de JSONL: a partir de um offset em bytes, só linhas completas, nunca o arquivo inteiro."""
+"""Incremental JSONL reading: from a byte offset, complete lines only, never the whole file."""
 
 from __future__ import annotations
 
@@ -16,12 +16,12 @@ _SKIP_CHUNK = 1024 * 1024
 
 
 class LineStream:
-    """Itera (offset_da_linha, objeto). Depois da iteração, `offset` é onde a próxima leitura deve começar.
+    """Iterates (line_offset, object). After the iteration, `offset` is where the next read should start.
 
-    Só consome linhas terminadas em \\n: a última linha de um arquivo que ainda está sendo escrito fica para
-    a próxima leitura. JSON inválido, valor que não é objeto e linha acima de `max_line` são registrados em
-    `errors` como (offset, motivo) e pulados. Se o arquivo ficou menor que o offset, recomeça do zero e
-    marca `reset`.
+    Only consumes lines ending in \\n: the last line of a file still being written is left for
+    the next read. Invalid JSON, a value that is not an object, and a line above `max_line` are recorded in
+    `errors` as (offset, reason) and skipped. If the file became smaller than the offset, it restarts from zero and
+    sets `reset`.
     """
 
     def __init__(self, path: Union[str, Path], offset: int = 0, max_line: int = MAX_LINE):
@@ -32,7 +32,7 @@ class LineStream:
         self.reset = False
         self.missing = False
         self.size = 0
-        self.on_oversized: Optional[Callable[[int, bytes], None]] = None  # começo da linha descartada
+        self.on_oversized: Optional[Callable[[int, bytes], None]] = None  # start of the discarded line
 
     def __iter__(self) -> Iterator[Tuple[int, dict]]:
         try:
@@ -51,7 +51,7 @@ class LineStream:
                     return
                 if not raw.endswith(b"\n"):
                     if len(raw) <= self.max_line:
-                        return  # linha incompleta: tenta de novo na próxima leitura
+                        return  # incomplete line: try again on the next read
                     if not self._skip_rest(fh):
                         return  # linha grande ainda sendo escrita
                     self.errors.append((start, f"linha acima de {self.max_line} bytes descartada"))
@@ -81,7 +81,7 @@ class LineStream:
 
     @staticmethod
     def _skip_rest(fh) -> bool:
-        """Avança até depois do próximo \\n. False se o arquivo acabou antes (linha incompleta)."""
+        """Advances past the next \\n. False if the file ended before (incomplete line)."""
         while True:
             chunk = fh.readline(_SKIP_CHUNK)
             if not chunk:
@@ -91,7 +91,7 @@ class LineStream:
 
 
 class _CountedPipe:
-    """Saída de um processo com a interface que LineStream usa: tell() conta os bytes lidos."""
+    """Output of a process with the interface LineStream uses: tell() counts the bytes read."""
 
     def __init__(self, raw):
         self.raw, self.position = raw, 0
@@ -106,8 +106,8 @@ class _CountedPipe:
 
 
 class ZstdLineStream(LineStream):
-    """Um.jsonl.zst lido em stream por `zstd -dcq`, sempre do início: arquivo comprimido não cresce. O offset
-    é na saída descomprimida. Sem o comando, ou com arquivo corrompido, registra o erro e devolve o que conseguiu."""
+    """A .jsonl.zst read as a stream by `zstd -dcq`, always from the start: a compressed file does not grow. The offset
+    is in the decompressed output. Without the command, or with a corrupted file, it records the error and returns what it got."""
 
     def __init__(self, path: Union[str, Path], zstd: Optional[str], max_line: int = MAX_LINE):
         super().__init__(path, 0, max_line)
@@ -133,7 +133,7 @@ class ZstdLineStream(LineStream):
 
 def iter_lines(path: Union[str, Path], offset: int = 0, errors: list = None,
                max_line: int = MAX_LINE) -> Iterator[Tuple[int, dict, int]]:
-    """Forma curta: (ordinal, objeto, offset_seguinte). Erros vão para a lista `errors`, se dada."""
+    """Short form: (ordinal, object, next_offset). Errors go to the `errors` list, if given."""
     stream = LineStream(path, offset, max_line)
     for ordinal, (_start, obj) in enumerate(stream):
         yield ordinal, obj, stream.offset

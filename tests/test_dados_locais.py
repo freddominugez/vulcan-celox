@@ -1,4 +1,4 @@
-"""Processo e dados locais."""
+"""Local process and data."""
 
 import os
 import shutil
@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only, MODOS, WINDOWS
 from vulcan_celox.core.agents.index import AgentIndex
 from vulcan_celox.core.doc_prompts import session_doc_prompt
 from vulcan_celox.core.sessions import SessionRecord
@@ -26,12 +26,14 @@ def mode(path) -> int:
 class LancadorLinuxTest(TempDirTestCase):
     def test_token_fora_da_linha_de_comando(self):
         launcher = write_launcher(self.tmp / "dados", 5000, TOKEN, "#/overview")
-        self.assertEqual(mode(launcher), 0o600)
+        if not WINDOWS:
+            self.assertEqual(mode(launcher), 0o600)
         self.assertIn(TOKEN, launcher.read_text(encoding="utf-8"))
         argv = app_window_argv("/usr/bin/chromium", launcher, self.tmp / "perfil")
         self.assertFalse(any(TOKEN in a for a in argv), argv)
         self.assertIn(f"--app={launcher.as_uri()}", argv)
 
+    @unix_only(MODOS)
     def test_lancador_regravado_continua_privado(self):
         first = write_launcher(self.tmp / "dados", 5000, TOKEN, "#/overview")
         os.chmod(first, 0o644)
@@ -42,6 +44,7 @@ class LancadorLinuxTest(TempDirTestCase):
 
 
 class PermissoesTest(TempDirTestCase):
+    @unix_only(MODOS)
     def test_pasta_de_dados_privada(self):
         data = self.tmp / "dados"
         (data / "sessoes" / "loja").mkdir(parents=True)
@@ -58,8 +61,9 @@ class PermissoesTest(TempDirTestCase):
         write_text_atomic(data / "sessoes" / "loja" / "nova.md", "y")
         self.assertEqual(mode(data / "sessoes" / "loja" / "nova.md"), 0o600)
 
+    @unix_only(MODOS)
     def test_script_executavel_continua_executavel(self):
-        # o hook de pareamento e o ajudante do php.ini são executados direto
+        # the pairing hook and the php.ini helper are run directly; found while testing the php.ini helper
         data = self.tmp / "dados"
         (data / "hooks").mkdir(parents=True)
         script = data / "hooks" / "vulcan-pareamento.py"
@@ -68,12 +72,14 @@ class PermissoesTest(TempDirTestCase):
         secure_data_dir(data)
         self.assertEqual(mode(script), 0o700)
 
+    @unix_only(MODOS)
     def test_pasta_de_projeto_continua_legivel(self):
         secure_data_dir(self.tmp / "dados")
         projeto = self.tmp / "projeto"
         write_text_atomic(projeto / "TAREFAS.md", "z")
         self.assertEqual(mode(projeto / "TAREFAS.md"), 0o644)
 
+    @unix_only(MODOS)
     def test_symlink_na_pasta_de_dados_nao_e_seguido(self):
         data = self.tmp / "dados"
         data.mkdir()
@@ -90,8 +96,9 @@ class PermissoesTest(TempDirTestCase):
         index = AgentIndex(data / "agentes.db")
         try:
             self.assertEqual(index.db.execute("PRAGMA journal_mode").fetchone()[0].lower(), "wal")
-            self.assertEqual(mode(data / "agentes.db"), 0o600)
-            other = sqlite3.connect(str(data / "agentes.db"), timeout=1)  # leitor de fora (ex.: --doctor)
+            if not WINDOWS:
+                self.assertEqual(mode(data / "agentes.db"), 0o600)
+            other = sqlite3.connect(str(data / "agentes.db"), timeout=1)  # reader from outside (e.g. --doctor)
             with index.lock:
                 index.db.execute("BEGIN IMMEDIATE")
                 index.db.execute("UPDATE meta SET value = value WHERE key = 'revision'")
@@ -107,7 +114,7 @@ class MascaraAntesDoCorteTest(TempDirTestCase):
         secret = "sk-ant-api03-" + "A" * 40
         prefix = "export KEY= " + "x" * 100 + " "
         transcript = prefix + secret + " " + "y" * 50
-        limit = len(transcript) - len(prefix) - 3  # o corte cai depois de "sk-": sobraria "ant-api03-AAA..."
+        limit = len(transcript) - len(prefix) - 3  # the cut falls after "sk-": "ant-api03-AAA..." would be left
         record = SessionRecord(id="aba1", title="loja", cwd="/r/loja", created_at="2026-10-31T10:00:00Z")
         prompt = session_doc_prompt(record, [], [], {}, transcript, limit=limit)
         self.assertNotIn("A" * 40, prompt.user)

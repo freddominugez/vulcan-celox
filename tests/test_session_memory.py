@@ -59,7 +59,7 @@ class RenderTest(TempDirTestCase):
         self.assertEqual(format_duration("2026-09-13T20:30:00Z", None), "em andamento")
         record, *_ = example()
         path = memory_path(Path("/dados"), record)
-        self.assertEqual(str(path), "/dados/sessoes/loja/2026-09-13-2030-migrations-abc123def456.md")
+        self.assertEqual(path.as_posix(), "/dados/sessoes/loja/2026-09-13-2030-migrations-abc123def456.md")
 
 
 def wait_for(fn, timeout=6.0):
@@ -102,8 +102,9 @@ class MemoryIntegrationTest(ServerTestCase):
         info = self.request("POST", "/api/terminals", body={"site": "loja", "command": "echo tchau; exit 0"})[1]
         record = wait_for(lambda: (r := self.app.hub.sessions.get(info["id"])) and not r.is_open and r)
         self.assertTrue(record)
-        text = wait_for(lambda: Path(record.memory_file).read_text(encoding="utf-8") if record.memory_file else "")
-        self.assertIn("tchau", text)
+        lido = lambda: Path(record.memory_file).read_text(encoding="utf-8") if record.memory_file else ""
+        wait_for(lambda: "tchau" in lido(), timeout=15)  # the session closes before the memory is rewritten
+        self.assertIn("tchau", lido())
 
     def test_editar_tarefa_de_sessao_encerrada_atualiza(self):
         info = self.request("POST", "/api/terminals", body={"site": "loja"})[1]

@@ -1,4 +1,4 @@
-"""Casca do Vulcan Celox no Windows: a mesma do Linux, em modo janela de app do Edge ou Chrome."""
+"""Vulcan Celox shell on Windows: the same as on Linux, in Edge or Chrome app window mode."""
 
 from __future__ import annotations
 

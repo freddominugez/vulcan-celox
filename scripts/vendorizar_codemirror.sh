@@ -1,7 +1,7 @@
 #!/bin/bash
-# Regenera web/vendor/codemirror.js a partir das versões fixas em scripts/codemirror/. Roda uma vez, à mão,
-# só para trocar de versão: o app não tem build, e o arquivo gerado é o que vai para o repositório.
-# Precisa de Node e rede. Instala numa pasta temporária, sem rodar scripts de instalação dos pacotes.
+# Regenerates web/vendor/codemirror.js from the versions pinned in scripts/codemirror/. Runs once, by hand,
+# only to change version: the app has no build, and the generated file is what goes into the repository.
+# Needs Node and network. Installs into a temporary folder, without running the packages' install scripts.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

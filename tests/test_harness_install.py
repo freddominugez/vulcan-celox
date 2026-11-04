@@ -1,10 +1,10 @@
-"""Instalar o formato mínimo e novo contrato pela interface."""
+"""Installing the minimal format and a new contract through the interface."""
 
 import json
 import os
 import shutil
 
-from tests.helpers import FIXTURES
+from tests.helpers import FIXTURES, WINDOWS
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core import harness
 
@@ -14,7 +14,7 @@ ESPERADOS = {".vulcan/tasks/primeira-tarefa.md", ".vulcan/state/execution.json",
 
 
 def files(root):
-    return {str(p.relative_to(root)) for p in root.rglob("*") if p.is_file()}
+    return {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()}
 
 
 class HarnessInstallTest(ServerTestCase):
@@ -32,7 +32,7 @@ class HarnessInstallTest(ServerTestCase):
         status, plan, _ = self.request("GET", "/api/sites/vazio/harness/install")
         self.assertEqual(status, 200)
         self.assertEqual({f["caminho"] for f in plan["arquivos"]}, ESPERADOS)
-        self.assertEqual(files(self.tmp / "vazio"), set())  # ver o plano não grava nada
+        self.assertEqual(files(self.tmp / "vazio"), set())  # viewing the plan writes nothing
         status, data, _ = self.post("vazio", {"confirm": True})
         self.assertEqual(status, 200, data)
         root = self.tmp / "vazio"
@@ -59,16 +59,17 @@ class HarnessInstallTest(ServerTestCase):
         self.assertTrue(text.startswith(original))
         self.assertEqual(text.count(harness.BLOCK_START), 1)
         self.assertFalse((root / "AGENTS.md").exists())
-        self.assertEqual(os.stat(root / "CLAUDE.md").st_mode & 0o777, 0o640)
-        # usuário escreve depois do bloco; segunda instalação troca só o bloco e não duplica
-        (root / "CLAUDE.md").write_text(text + "\nNota depois do bloco.\n", encoding="utf-8")
+        if not WINDOWS:
+            self.assertEqual(os.stat(root / "CLAUDE.md").st_mode & 0o777, 0o640)
+        # the user writes after the block; the second install replaces only the block and does not duplicate
+        (root / "CLAUDE.md").write_bytes((text + "\nNota depois do bloco.\n").encode("utf-8"))
         before = (root / "CLAUDE.md").read_text(encoding="utf-8")
         (root / ".vulcan/handoff.md").write_text("meu handoff", encoding="utf-8")
         self.assertEqual(self.post("comclaude", {"confirm": True})[0], 200)
         after = (root / "CLAUDE.md").read_text(encoding="utf-8")
         self.assertEqual(after, before)
         self.assertEqual(after.count(harness.BLOCK_START), 1)
-        self.assertEqual((root / ".vulcan/handoff.md").read_text(), "meu handoff")  # nunca sobrescreve
+        self.assertEqual((root / ".vulcan/handoff.md").read_text(), "meu handoff")  # never overwrites
 
     def test_bloco_antigo_e_trocado_e_o_resto_fica(self):
         old = f"antes\n{harness.BLOCK_START}\nvelho\n{harness.BLOCK_END}\ndepois\n"
@@ -141,6 +142,6 @@ class NewTaskTest(ServerTestCase):
         self.assertEqual(self.post("app", self.body(itens=[]))[0], 400)
         self.assertEqual(self.post("app", self.body(itens=[{"faixa": "azul", "objetivo": "x", "sensor": "y"}]))[0], 400)
         self.assertEqual(self.post("app", self.body())[0], 200)
-        self.assertEqual(self.post("app", self.body())[0], 409)  # mesmo id
+        self.assertEqual(self.post("app", self.body())[0], 409)  # same id
         self.assertEqual(self.post("proprio", self.body())[0], 409)
         self.assertEqual(self.post("nada", self.body())[0], 404)

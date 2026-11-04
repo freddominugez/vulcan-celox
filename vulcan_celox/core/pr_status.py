@@ -1,4 +1,4 @@
-"""Estado real do PR pelo `gh` do próprio usuário. Só roda com a preferência ligada, porque consulta a rede."""
+"""Real PR state through the user's own `gh`. Only runs with the preference on, because it queries the network."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ BAD = {"FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED", "STARTUP
 
 
 def gh_bin(env: Mapping[str, str], extra: Sequence[str] = GH_PLACES) -> Optional[str]:
-    """O app aberto pelo Finder tem PATH curto, por isso também olha nos lugares de costume. VULCAN_GH_BIN manda."""
+    """An app opened from Finder has a short PATH, so it also looks in the usual places. VULCAN_GH_BIN wins."""
     if "VULCAN_GH_BIN" in env:
         chosen = env["VULCAN_GH_BIN"]
         return chosen or None
@@ -57,7 +57,7 @@ class PrStatus:
         self.cache: Dict[str, Tuple[float, Dict]] = {}
 
     def status(self, cwd: str) -> Dict[str, Any]:
-        """{source: "gh", ...} ou {source: "heuristic", reason}. Quem chama confere a preferência antes."""
+        """{source: "gh", ...} or {source: "heuristic", reason}. The caller checks the preference first."""
         now = self.clock()
         with self.lock:
             cached = self.cache.get(cwd)

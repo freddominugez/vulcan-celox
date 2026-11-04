@@ -1,18 +1,20 @@
 import unittest
 from pathlib import Path
 
+from tests.helpers import unix_only
 from vulcan_celox.core.keychain import SecretToolStore, default_keystore, KeychainStore
 from vulcan_celox.core.oscompat import default_data_dir, default_shell, is_macos, open_argv
 from vulcan_celox.core.runner import FakeRunner, Result
 
-KEY = "sk-ant-api03-" + "q1W2e3" * 8  # sintética
+KEY = "sk-ant-api03-" + "q1W2e3" * 8  # synthetic
 
 
 class PlatformTest(unittest.TestCase):
+    @unix_only("no Windows o shell padrão é o PowerShell (tests/test_windows.py)")
     def test_shell_padrao(self):
         exists = lambda p: p in {"/bin/bash", "/bin/sh", "/opt/fish"}
         self.assertEqual(default_shell({"SHELL": "/opt/fish"}, exists), "/opt/fish")
-        self.assertEqual(default_shell({"SHELL": "/bin/zsh"}, exists), "/bin/bash")  # zsh ausente
+        self.assertEqual(default_shell({"SHELL": "/bin/zsh"}, exists), "/bin/bash")  # zsh absent
         self.assertEqual(default_shell({}, lambda p: False), "/bin/sh")
 
     def test_pasta_de_dados(self):

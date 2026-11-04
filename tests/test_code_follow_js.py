@@ -1,4 +1,4 @@
-"""Lógica de seguir o agente e de achar o trecho, rodando os módulos de verdade no node."""
+"""Logic for following the agent and finding the snippet, running the real modules in node."""
 
 import json
 import shutil

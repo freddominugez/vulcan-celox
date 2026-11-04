@@ -1,4 +1,4 @@
-"""Tela Ambiente: serviços, versões de PHP, php.ini, extensões, Node e logs do backend."""
+"""Ambiente screen: services, PHP versions, php.ini, extensions, Node and backend logs."""
 
 from __future__ import annotations
 
@@ -21,8 +21,8 @@ from vulcan_celox.core.php_ini import ENV_CHANGES, KEYS, check, parse_directives
 from vulcan_celox.server.local_http import HttpError, Request
 
 NODE = re.compile(r"^(\d+(\.\d+){0,2}|lts)$")
-SERVICE_TIMEOUT = 300.0  # um start pode baixar a imagem do serviço
-CLI_CACHE_S = 60.0  # A tela Ambiente atualiza a cada 15 s; php:list e xdebug status mudam só com ação
+SERVICE_TIMEOUT = 300.0  # a start may download the service image
+CLI_CACHE_S = 60.0  # the Ambiente screen refreshes every 15 s; php:list and xdebug status change only on an action
 _now = time.monotonic
 
 
@@ -66,12 +66,12 @@ def register_env_api(app) -> None:
         return _result(b.runner.run(b.argv("service", action, name), timeout=SERVICE_TIMEOUT))
 
     def in_tab(b, title: str, *args: str):
-        """Comando demorado do Lerd numa aba de terminal, com a saída à vista."""
+        """Long-running Lerd command in a terminal tab, with the output in view."""
         home = app.env.get("HOME") or str(Path.home())
         session = app.spawn_terminal(home, title, None, command=shlex.join(b.argv(*args)))
         return 201, session.info()
 
-    # saídas de leitura da CLI guardadas por CLI_CACHE_S; qualquer POST desta tela limpa tudo
+    # CLI read outputs cached for CLI_CACHE_S; any POST from this screen clears everything
     cache: Dict[tuple, Any] = {}
     cache_lock = threading.Lock()
 
@@ -91,7 +91,7 @@ def register_env_api(app) -> None:
             cache.clear()
 
     def invalidates(handler):
-        """Ação que muda versões, php.ini ou Xdebug: limpa o cache antes e depois (a validação relê a lista)."""
+        """Action that changes versions, php.ini or Xdebug: clears the cache before and after (validation rereads the list)."""
         def wrapped(req: Request):
             forget()
             try:
@@ -100,7 +100,7 @@ def register_env_api(app) -> None:
                 forget()
         return wrapped
 
-    # ── versões de PHP ────────────────────────────────────────
+    # ── PHP versions ───────────────────────────────────────────────────────
     def installed_php(b):
         return parse_php_list(cli_output(b, "php:list"))
 
@@ -129,7 +129,7 @@ def register_env_api(app) -> None:
             return in_tab(b, tr("PHP {version} · atualizar", version=version), "php:update", version)
         return _result(b.runner.run(b.argv("use", version), timeout=120))
 
-    # ── Xdebug por versão ─────────────────────────────────────
+    # ── Xdebug per version ─────────────────────────────────────────────────
     @srv.route("GET", "/api/environment/xdebug")
     def xdebug_state(_req: Request):
         b = lerd()
@@ -140,7 +140,7 @@ def register_env_api(app) -> None:
         versions = []
         for v in sorted(set(cli) | set(fpms)):
             row = dict(cli.get(v) or {"enabled": False, "mode": "", "on_demand": False})
-            if v in fpms:  # /api/status manda no ligado/desligado; o modo só a CLI conta
+            if v in fpms:  # /api/status decides on/off; only the CLI reports the mode
                 row["enabled"] = bool(fpms[v].get("xdebug_enabled"))
             versions.append({"version": v, **row})
         return {"versions": versions, "port": XDEBUG_PORT}
@@ -159,33 +159,33 @@ def register_env_api(app) -> None:
         if version not in {v["version"] for v in installed_php(b)}:
             raise HttpError(400, "versão não instalada")
         title = f"PHP {version} · Xdebug {'ligar' if enabled else 'desligar'}"
-        return in_tab(b, title, *xdebug_argv(version, enabled, mode, on_demand))  # reconstrói a imagem: demora
+        return in_tab(b, title, *xdebug_argv(version, enabled, mode, on_demand))  # rebuilds the image: slow
 
-    # ── php.ini de usuário ────────────────────────────────────
+    # ── user php.ini ───────────────────────────────────────────────────────
     def ini_target(version: str) -> str:
         if version != "shared" and version not in SUPPORTED_PHP:
             raise HttpError(400, "versão de PHP desconhecida")
         return version
 
     def ini_path(version: str) -> Path:
-        """Arquivo de usuário do Lerd: o 1.37.1 usa 98-user.ini e shared/95-shared.ini (a documentação cita outros
-        nomes, por isso a leitura aceita os dois); a gravação sempre recebe o caminho do próprio Lerd."""
+        """Lerd user file: 1.37.1 uses 98-user.ini and shared/95-shared.ini (the documentation mentions other
+        names, so reading accepts both); writing always receives Lerd's own path."""
         folder = paths.lerd_data_dir(app.env) / "php" / version
         names = ("95-shared.ini", "95-lerd-shared.ini") if version == "shared" else ("98-user.ini", "98-lerd-user.ini")
         return next((folder / n for n in names if (folder / n).is_file()), folder / names[0])
 
     def editor_wrapper() -> str:
-        """Script que o Lerd chama como EDITOR: roda este app em modo ajudante de php.ini."""
+        """Script that Lerd calls as EDITOR: runs this app in php.ini helper mode."""
         target = Path(app.data_dir) / "hooks" / "php-ini-editor.sh"
         root = str(Path(__file__).resolve().parent.parent.parent)
-        # -I: sem a pasta atual nem PYTHONPATH em sys.path; a biblioteca entra pelo caminho absoluto
+        # -I: neither the current folder nor PYTHONPATH in sys.path; the library comes in through the absolute path
         code = (f"import sys; sys.path.insert(0, {root!r}); "
                 "from vulcan_celox.core.php_ini import main; sys.exit(main(sys.argv[1:]))")
         text = f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -I -c {shlex.quote(code)} \"$@\"\n"
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.is_file() or target.read_text(encoding="utf-8") != text:
             target.write_text(text, encoding="utf-8")
-        os.chmod(target, 0o700)  # sempre: sem o bit de execução o Lerd não consegue chamar o editor
+        os.chmod(target, 0o700)  # always: without the execute bit Lerd cannot call the editor
         return str(target)
 
     @srv.route("GET", r"/api/environment/php/(?P<version>shared|[0-9.]{3,4})/ini")
@@ -222,16 +222,16 @@ def register_env_api(app) -> None:
     def ini_open(req: Request):
         b = lerd()
         version = ini_target(req.params["version"])
-        return in_tab(b, f"php.ini {version}", "php:ini", version)  # editor do usuário, numa aba
+        return in_tab(b, f"php.ini {version}", "php:ini", version)  # user's editor, in a tab
 
-    # ── extensões, só leitura ─────────────────────────────────
+    # ── extensions, read-only ──────────────────────────────────────────
     @srv.route("GET", r"/api/environment/php/(?P<version>[0-9.]{3,4})/extensions")
     def extensions(req: Request):
         b = lerd()
         version = req.params["version"]
         if version not in SUPPORTED_PHP:
             raise HttpError(400, "versão de PHP desconhecida")
-        # fora de um site, o Lerd escolhe a versão pelo .php-version da pasta: uma pasta neutra por versão
+        # outside a site, Lerd picks the version from the folder's .php-version: one neutral folder per version
         probe = Path(app.data_dir) / "php-probe" / version
         probe.mkdir(parents=True, exist_ok=True)
         (probe / ".php-version").write_text(version + "\n", encoding="utf-8")
@@ -246,7 +246,7 @@ def register_env_api(app) -> None:
         b = lerd()
         status = b.api_get("/api/status")
         status = status if isinstance(status, dict) else {}
-        installed = b.api_get("/api/node-versions")  # a mesma rota que o painel do Lerd usa
+        installed = b.api_get("/api/node-versions")  # the same route the Lerd panel uses
         return {"default": str(status.get("node_default") or ""), "manager": str(status.get("node_manager") or ""),
                 "installed": [str(v) for v in installed] if isinstance(installed, list) else []}
 

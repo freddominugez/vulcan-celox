@@ -1,4 +1,4 @@
-// Logo em PNG, sem recoloração: cada tema mostra o arquivo aprovado para ele.
+// PNG logo, no recoloring: each theme shows the file approved for it.
 
 export function brandLogo() {
   return `<div class="brand-logo">

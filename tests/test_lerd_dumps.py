@@ -1,7 +1,7 @@
-"""Cliente da ponte de dumps do Lerd (API com X-Lerd-CSRF).
+"""Client for the Lerd dumps bridge (API with X-Lerd-CSRF).
 
-`lerd-api-dumps.json` são eventos reais do Lerd 1.37.1 gravados em 2026-10-31 (um site PHP simples e um Laravel 13
-de teste, depois desfeitos), anonimizados: dump, request, query, log e view.
+`lerd-api-dumps.json` are real Lerd 1.37.1 events recorded on 2026-10-31 (a simple PHP site and a test Laravel 13,
+later undone), anonymized: dump, request, query, log and view.
 """
 
 import http.server
@@ -66,7 +66,7 @@ class LerdFalso(http.server.BaseHTTPRequestHandler):
             self.reply(200, [])
 
     def do_POST(self):
-        if self.headers.get("X-Lerd-CSRF") != "1":  # como o Lerd 1.37.1
+        if self.headers.get("X-Lerd-CSRF") != "1":  # like Lerd 1.37.1
             return self.reply(403, {"error": "cross-origin request blocked"})
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)) or b"{}")
         if self.path == "/api/dumps/toggle":
@@ -102,7 +102,7 @@ class ApiTest(ServerTestCase):
         self.assertTrue(all(e["kind"] == "query" and "sessions" in e["data"]["sql"] for e in data["events"]))
         sent = LerdFalso.state["queries"][-1]
         self.assertEqual((sent["site"], sent["kind"]), (["loja"], ["query"]))
-        self.assertNotIn("q", sent)  # a API do Lerd ignora busca de texto: o app filtra
+        self.assertNotIn("q", sent)  # the Lerd API ignores text search: the app filters
 
     def test_ponte_liga_desliga_e_limpa_com_o_cabecalho(self):
         self.assertFalse(self.request("GET", "/api/debug/bridge")[1]["enabled"])

@@ -1,4 +1,4 @@
-// Branches e worktrees: o que ficou sem commit, sem push ou parado, cruzando as sessões com o git real.
+// Branches and worktrees: what is left uncommitted, unpushed or stalled, crossing the sessions with real git.
 
 import { api, every, post } from "../api.mjs";
 import { esc, icon, reportError, shortPath } from "../dom.mjs";
@@ -6,7 +6,7 @@ import { t } from "../i18n.mjs";
 import { agentMark, copy, keepScroll, relTime } from "../agents-ui.mjs";
 import { loadPr, prEnabled, prHtml } from "../pr-status.mjs";
 
-const REFRESH_MS = 30000;  // git é caro: a tela se atualiza a cada 30 s ou pelo botão Atualizar
+const REFRESH_MS = 30000;  // git is expensive: the screen refreshes every 30 s or via the Atualizar button
 
 const BAD = ["sem commit", "sem push", "sem upstream"];
 const STATE_LABEL = { "sem commit": t("sem commit"), "sem push": t("sem push"), "sem upstream": t("sem upstream"), "PR aberto": t("PR aberto"), publicado: t("publicado"), "nada editado": t("nada editado"), "sem git": t("sem git") };
@@ -31,10 +31,10 @@ export class AgentsBranchesView {
   }
 
   async load(fresh = false) {
-    if (this.loading) return;  // uma consulta por vez
+    if (this.loading) return;  // one query at a time
     this.loading = true;
     try {
-      const data = await api(`/api/agents/repos${fresh ? "?fresh=1" : ""}`, { timeout: 120000 });  // git em vários repositórios
+      const data = await api(`/api/agents/repos${fresh ? "?fresh=1" : ""}`, { timeout: 120000 });  // git across several repositories
       this.projects = data.projects;
       keepScroll(this.root, () => this.render());
       this.fillPr();
@@ -45,7 +45,7 @@ export class AgentsBranchesView {
     }
   }
 
-  /** Só com a preferência ligada: uma consulta por pasta, com cache de 60 s no servidor. */
+  /** Only with the preference on: one query per folder, with a 60 s cache on the server. */
   fillPr() {
     this.root.querySelectorAll("[data-pr-row]").forEach(async (slot) => {
       const data = await loadPr({ path: slot.dataset.prRow });

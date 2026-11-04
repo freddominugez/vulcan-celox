@@ -1,9 +1,9 @@
-"""Xdebug por versão na tela Ambiente (estado, ligar com modo e sob demanda, desligar)."""
+"""Xdebug per version on the Environment screen (state, turn on with mode and on demand, turn off)."""
 
 import os
 from unittest import mock
 
-from tests.helpers import FIXTURES
+from tests.helpers import FIXTURES, unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.environment import parse_xdebug_status, xdebug_argv, xdebug_mode_ok
 from vulcan_celox.core.runner import Result
@@ -11,7 +11,7 @@ from vulcan_celox.core.runner import Result
 
 class ParserTest(ServerTestCase):
     def test_saida_real(self):
-        # tests/fixtures/lerd-xdebug-status.txt: `lerd xdebug status` do Lerd 1.37.1 nesta máquina, Xdebug desligado
+        # tests/fixtures/lerd-xdebug-status.txt: `lerd xdebug status` from Lerd 1.37.1 on this machine, Xdebug off
         self.assertEqual(parse_xdebug_status((FIXTURES / "lerd-xdebug-status.txt").read_text(encoding="utf-8")),
                          {"8.5": {"enabled": False, "mode": "", "on_demand": False}})
 
@@ -65,6 +65,7 @@ class ApiTest(ServerTestCase):
         self.assertEqual(by["8.5"]["mode"], "coverage")
         self.assertFalse(by["8.4"]["enabled"])
 
+    @unix_only(SEM_LERD)
     def test_ligar_numa_aba(self):
         status, info, _ = self.request("POST", "/api/environment/php/8.4/xdebug",
                                        {"enabled": True, "mode": "coverage", "on_demand": True})
@@ -78,4 +79,4 @@ class ApiTest(ServerTestCase):
     def test_invalidos(self):
         self.assertEqual(self.request("POST", "/api/environment/php/8.4/xdebug", {"enabled": True, "mode": "debug;id"})[0], 400)
         self.assertEqual(self.request("POST", "/api/environment/php/8.4/xdebug", {"enabled": "sim"})[0], 400)
-        self.assertEqual(self.request("POST", "/api/environment/php/8.2/xdebug", {"enabled": True})[0], 400)  # não instalada
+        self.assertEqual(self.request("POST", "/api/environment/php/8.2/xdebug", {"enabled": True})[0], 400)  # not installed

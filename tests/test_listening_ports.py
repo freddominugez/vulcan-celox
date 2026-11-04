@@ -1,12 +1,10 @@
-"""Portas por aba: só os processos do PTY e descendentes. A saída do lsof foi gravada de um `lsof -F pcn` de verdade."""
+"""Ports per tab: only the PTY processes and descendants. The lsof output was recorded from a real `lsof -F pcn`."""
 
 import tempfile
 import unittest
 from pathlib import Path
-from unittest import mock
 
 from tests.server_helpers import ServerTestCase
-from vulcan_celox.core import listening_ports
 from vulcan_celox.core.listening_ports import PortWatcher, descendants, parse_lsof
 from vulcan_celox.core.runner import FakeRunner, Result
 

@@ -1,7 +1,7 @@
-"""Histórico unificado dos dois agentes: busca por conteúdo em pedidos, respostas, comandos e arquivos.
+"""Unified history of both agents: content search over requests, answers, commands and files.
 
-Tabela FTS5 `history` com conteúdo externo na tabela `events`, mantida por gatilhos, ignorando acentos.
-Sem FTS5 no SQLite, a busca cai para LIKE (sem ignorar acentos) e o --doctor avisa.
+FTS5 table `history` with external content in the `events` table, kept by triggers, ignoring accents.
+Without FTS5 in SQLite, the search falls back to LIKE (not ignoring accents) and --doctor warns.
 """
 
 from __future__ import annotations
@@ -34,14 +34,14 @@ def fts5_available() -> bool:
 
 
 def ensure(db: sqlite3.Connection) -> bool:
-    """Cria a tabela de busca e os gatilhos. Devolve False se o SQLite não tiver FTS5."""
+    """Creates the search table and the triggers. Returns False if SQLite has no FTS5."""
     try:
         existed = db.execute("SELECT 1 FROM sqlite_master WHERE name = 'history'").fetchone() is not None
         db.executescript(FTS)
     except sqlite3.OperationalError:
         return False
     if not existed and db.execute("SELECT 1 FROM events LIMIT 1").fetchone():
-        db.execute("INSERT INTO history(history) VALUES ('rebuild')")  # índice antigo, sem a tabela de busca
+        db.execute("INSERT INTO history(history) VALUES ('rebuild')")  # old index, without the search table
     db.commit()
     return True
 

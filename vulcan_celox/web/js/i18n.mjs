@@ -1,12 +1,12 @@
-// Idioma da interface. O texto-fonte no código é o português; `t()` devolve a tradução do dicionário. Só texto literal entra
-// em t(), para o teste conseguir conferir o dicionário: valores variáveis vão em {nome}, já escapados por quem chama.
+// Interface language. The source text in the code is Portuguese; `t()` returns the translation from the dictionary. Only literal text goes into
+// t(), so the test can check the dictionary: variable values go in {nome}, already escaped by the caller.
 
 import { token } from "./api.mjs";
 
 let language = "en";
 let dictionary = {};
 
-// fora do navegador (módulos rodando no teste) fica o texto-fonte
+// outside the browser (modules running in the test) the source text is kept
 if (typeof document !== "undefined") {
   try {
     const response = await fetch("/api/i18n", { headers: { "X-Vulcan-Token": token } });
@@ -15,7 +15,7 @@ if (typeof document !== "undefined") {
     dictionary = data.dictionary || {};
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
   } catch {
-    /* servidor fora do ar: a tela de erro aparece com o texto-fonte */
+    /* server down: the error screen shows with the source text */
   }
 }
 
@@ -28,7 +28,7 @@ export function t(text, values) {
   return values ? out.replace(/\{(\w+)\}/g, (all, name) => (name in values ? String(values[name]) : all)) : out;
 }
 
-/** Textos fixos do index.html: data-i18n no texto, data-i18n-title, -aria-label e -placeholder nos atributos. */
+/** Fixed texts of index.html: data-i18n on the text, data-i18n-title, -aria-label and -placeholder on the attributes. */
 export function translateStatic(root = document) {
   root.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   for (const attr of ["title", "aria-label", "placeholder"]) {

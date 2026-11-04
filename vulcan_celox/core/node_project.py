@@ -1,9 +1,9 @@
-"""Leitor de projeto Node. Só leitura.
+"""Node project reader. Read-only.
 
-Lê o `package.json` da raiz, o lockfile (para saber o gerenciador), a versão do Node pedida, o Supabase local
-(`supabase/config.toml`) e o vínculo com a Vercel (`.vercel/project.json`, só `projectId` e `orgId`). Nunca abre
-`.env`: variáveis de ambiente do projeto podem ter segredo. Cada arquivo tem limite de 1 MB; `package.json`
-inválido vira `estado: ilegivel` com o erro, nunca projeto vazio.
+Reads the root `package.json`, the lockfile (to know the package manager), the requested Node version, local Supabase
+(`supabase/config.toml`) and the Vercel link (`.vercel/project.json`, only `projectId` and `orgId`). Never opens
+`.env`: a project's environment variables may hold secrets. Each file has a 1 MB limit; an invalid `package.json`
+becomes `estado: ilegivel` with the error, never an empty project.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ LOCKFILES = (
     ("yarn.lock", "yarn"),
     ("package-lock.json", "npm"),
 )
-# (dependência, nome exibido, porta padrão do servidor de desenvolvimento)
+# (dependency, display name, default dev server port)
 FRAMEWORKS = (
     ("next", "Next.js", 3000),
     ("nuxt", "Nuxt", 3000),
@@ -127,7 +127,7 @@ def _toml_value(raw: str) -> Any:
 
 
 def supabase(root: Path) -> Optional[Dict[str, Any]]:
-    """Só o que a tela usa: `project_id` e a porta da API. O resto do config.toml não é interpretado."""
+    """Only what the screen uses: `project_id` and the API port. The rest of config.toml is not interpreted."""
     path = root / "supabase" / "config.toml"
     if not path.is_file():
         return None
@@ -163,7 +163,7 @@ def vercel(root: Path) -> Optional[Dict[str, Any]]:
         return {"estado": "ilegivel", "erro": tr(str(exc))}
     if not isinstance(data, dict):
         return {"estado": "ilegivel", "erro": tr("project.json não é um objeto")}
-    # só identificadores; o arquivo não guarda token, mas nada além destes campos sai daqui
+    # identifiers only; the file holds no token, but nothing beyond these fields leaves here
     return {"estado": "ok", "projectId": str(data.get("projectId") or "")[:80] or None,
             "orgId": str(data.get("orgId") or "")[:80] or None}
 
@@ -200,7 +200,7 @@ def read(root: Path) -> Dict[str, Any]:
 
 
 def run_command(pm: str, script: str) -> str:
-    """Linha digitada no terminal para rodar um script. Valores já validados: gerenciador conhecido e nome seguro."""
+    """Line typed in the terminal to run a script. Values already validated: known manager and safe name."""
     if pm not in {p for _, p in LOCKFILES}:
         raise ValueError("gerenciador desconhecido")
     if not SCRIPT_NAME.match(script):
@@ -212,7 +212,7 @@ _LOCAL_URL = re.compile(r"https?://(?:localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)
 
 
 def local_url(text: str) -> Optional[str]:
-    """Primeira URL local vista na saída de um servidor de desenvolvimento (Next, Vite, Nuxt, Astro...)."""
+    """First local URL seen in a dev server's output (Next, Vite, Nuxt, Astro...)."""
     clean = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", text)
     match = _LOCAL_URL.search(clean)
     if not match:

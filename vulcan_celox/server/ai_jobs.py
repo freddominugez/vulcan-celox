@@ -1,4 +1,4 @@
-"""Tarefas de IA em segundo plano: uma por alvo, com estado consultável pela interface."""
+"""Background AI tasks: one per target, with state the interface can query."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class AiJobs:
         self._jobs: Dict[str, Dict[str, Any]] = {}
 
     def start(self, kind: str, target: str, label: str, work: Callable[[], Tuple[str, str]]) -> Dict[str, Any]:
-        """`work` devolve (arquivo gravado, mensagem). AiError vira mensagem legível; o resto, um erro genérico."""
+        """`work` returns (written file, message). AiError becomes a readable message; anything else, a generic error."""
         with self._lock:
             for job in self._jobs.values():
                 if job["status"] == "running" and job["kind"] == kind and job["target"] == target:
@@ -40,7 +40,7 @@ class AiJobs:
             values = {"status": "failed", "message": tr(exc.message)}
         except HttpError as exc:
             values = {"status": "failed", "message": tr(exc.message)}
-        except Exception as exc:  # noqa: BLE001 - a interface precisa saber que falhou, sem derrubar o servidor
+        except Exception as exc:  # noqa: BLE001 - the interface needs to know it failed, without bringing the server down
             values = {"status": "failed", "message": tr("erro inesperado ({kind})", kind=type(exc).__name__)}
         with self._lock:
             self._jobs[job_id].update(values, finished_at=time.time())

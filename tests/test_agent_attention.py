@@ -1,5 +1,5 @@
-"""Estado do turno lido dos dois agentes. As linhas são sintéticas, no formato visto em sessões reais do Claude Code e
-do Codex 0.166.0, porque as fixtures anonimizadas não guardam `stop_reason` nem `turn_duration`."""
+"""Turn state read from both agents. The lines are synthetic, in the format seen in real Claude Code and
+Codex 0.166.0 sessions, because the anonymized fixtures do not keep `stop_reason` or `turn_duration`."""
 
 import json
 import unittest

@@ -1,4 +1,4 @@
-// Textos do visor de código: por que algo não aparece e os avisos sobre o diff.
+// Code viewer texts: why something does not appear, and the warnings about the diff.
 
 import { esc, icon } from "../../dom.mjs";
 import { clock } from "../../agents-ui.mjs";
@@ -20,7 +20,7 @@ export const REASONS = {
   invalid: [t("Caminho inválido"), t("Escolha um arquivo na árvore.")],
 };
 
-// o CodeMirror guarda as frases em inglês e o editor de código não importa i18n.mjs: em inglês não há troca
+// CodeMirror keeps its phrases in English and the code editor does not import i18n.mjs: in English there is no swap
 const PHRASES_PT = {
   Find: "Buscar", next: "próximo", previous: "anterior", all: "todos", "match case": "maiúsculas", regexp: "regex",
   "by word": "palavra inteira", close: "fechar", "current match": "atual", "on line": "na linha",

@@ -1,5 +1,5 @@
-// Conteúdo da Ajuda: um lugar só, `help/conteudo.json`, lido pela tela Ajuda e pelo gerador do
-// docs/pt-BR/user-guide.md (scripts/manual_md.py). Aqui ficam só a carga e o desenho do texto.
+// Help content: a single place, `help/conteudo.json`, read by the Help screen and by the generator of
+// docs/pt-BR/user-guide.md (scripts/manual_md.py). Only loading and text rendering live here.
 
 import { esc } from "./dom.mjs";
 import { currentLanguage } from "./i18n.mjs";
@@ -15,7 +15,7 @@ export async function loadHelp() {
   return cache;
 }
 
-/** Texto com `código` e **negrito**, sempre escapado antes. */
+/** Text with `code` and **bold**, always escaped first. */
 export function inline(text) {
   return esc(text).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
 }
@@ -29,7 +29,7 @@ export function blockHtml(b) {
   return "";
 }
 
-/** Texto puro de um bloco, para a busca. */
+/** Plain text of a block, for search. */
 export function blockText(b) {
   if (b.p) return b.p;
   if (b.ul) return b.ul.join(" ");
@@ -43,7 +43,7 @@ export function fold(text) {
   return String(text).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
-// seção da Ajuda de cada tela; toda rota da barra lateral precisa estar aqui
+// Help section for each screen; every sidebar route must be listed here
 export const ROUTE_SECTION = {
   inicio: "primeiros-passos",
   overview: "projetos-php",

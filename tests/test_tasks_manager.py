@@ -27,7 +27,7 @@ class TasksManagerCoreTest(TempDirTestCase):
         self.assertEqual(self.a.assignee, "Ana Souza")
         self.assertEqual(self.titles(assignee="ana souza"), ["atrasada", "longe"])
         self.assertEqual(self.titles(assignee=NO_ASSIGNEE), ["semana"])
-        self.assertEqual(self.titles(due="late"), ["atrasada"])  # concluída não conta como atrasada
+        self.assertEqual(self.titles(due="late"), ["atrasada"])  # a completed one does not count as late
         self.assertEqual(self.titles(due="today"), ["hoje"])
         self.assertEqual(self.titles(due="week"), ["hoje", "semana"])
         self.nb.update_task(self.c.id, assignee="Carla")

@@ -1,9 +1,9 @@
-"""PHP e Node da aba iguais aos do site (lerd which) e aviso quando a aba não usa os shims do Lerd."""
+"""The tab's PHP and Node match the site's (lerd which) and a warning when the tab does not use the Lerd shims."""
 
 import os
 from unittest import mock
 
-from tests.helpers import FIXTURES
+from tests.helpers import FIXTURES, unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.runner import Result
 from vulcan_celox.core.site_runtime import parse_php_version, parse_which, shim_status
@@ -22,6 +22,7 @@ class ParserTest(ServerTestCase):
         self.assertEqual(parse_php_version("PHP 8.3.12 (cli) (built: Sep 24 2026)\nCopyright (c) The PHP Group"), "8.3.12")
         self.assertEqual(parse_php_version("zsh: command not found: php"), "")
 
+    @unix_only(SEM_LERD)
     def test_shims(self):
         home = self.tmp
         shims = home / ".local" / "share" / "lerd" / "bin"

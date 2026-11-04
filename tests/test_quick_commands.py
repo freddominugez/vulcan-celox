@@ -1,8 +1,6 @@
-"""Comandos do projeto em um clique, a partir do que existe na pasta, mais os do usuário."""
+"""One-click project commands, from what exists in the folder, plus the user's own."""
 
 import json
-import os
-from unittest import mock
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase

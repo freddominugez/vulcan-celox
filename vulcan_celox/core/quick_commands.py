@@ -1,4 +1,4 @@
-"""Comandos do projeto em um clique: o que a pasta tem, o que o Lerd oferece e os do usuário."""
+"""One-click project commands: what the folder has, what Lerd offers, and the user's own."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def _scripts(path: Path) -> List[str]:
 
 
 def project_commands(folder: str, lerd: bool = False, custom: Optional[List[Dict]] = None) -> List[Dict]:
-    """[{label, command, custom?}] na ordem em que aparecem; os do usuário vêm no fim."""
+    """[{label, command, custom?}] in order of appearance; the user's come last."""
     path = Path(folder)
     out: List[Dict] = [{"label": "git status", "command": "git status -sb"}]
     if (path / "artisan").is_file():
@@ -41,7 +41,7 @@ def project_commands(folder: str, lerd: bool = False, custom: Optional[List[Dict
     return out
 
 
-# Comandos que ficam rodando até alguém parar (servidor de desenvolvimento, fila, logs, túnel)
+# commands that keep running until someone stops them (dev server, queue, logs, tunnel)
 LONG_RUNNING = [re.compile(p) for p in (
     r"\b(npm|pnpm|yarn|bun)\s+(run\s+)?dev\b", r"\bartisan\s+serve\b", r"\bqueue:(work|listen)\b",
     r"\breverb:start\b", r"\bartisan\s+horizon\b", r"\blerd\s+logs\b.*\s(-f|--follow)\b", r"\blerd\s+share\b",
@@ -54,11 +54,11 @@ def is_long_running(command: Optional[str]) -> bool:
 
 
 def recent_commands(records, site: str, limit: int = 20) -> List[Dict[str, str]]:
-    """Últimos comandos digitados nas sessões do site, do mais novo ao mais velho, sem repetir seguidos."""
+    """Last commands typed in the site's sessions, newest to oldest, without consecutive repeats."""
     rows = [(str(c.get("ts") or ""), i, str(c.get("cmd") or "").strip())
             for r in records if r.site == site for i, c in enumerate(r.commands) if isinstance(c, dict)]
     out: List[Dict[str, str]] = []
-    # mesmo segundo: o digitado depois (posição maior na sessão) é o mais novo
+    # same second: the one typed later (higher position in the session) is the newest
     for at, _i, command in sorted((r for r in rows if r[2]), key=lambda r: (r[0], r[1]), reverse=True):
         if out and out[-1]["command"] == command:
             continue

@@ -1,13 +1,14 @@
-"""Compartilhar o site por túnel numa aba e achar a URL pública na saída.
+"""Sharing the site through a tunnel in a tab and finding the public URL in the output.
 
-As saídas abaixo são ilustrativas (formato das ferramentas), não capturas: abrir um túnel público de verdade
-expõe o site do usuário na internet e não entra nos testes.
+The outputs below are illustrative (tool format), not captures: opening a real public tunnel
+exposes the user's site on the internet and has no place in the tests.
 """
 
 import os
 import shlex
 from unittest import mock
 
+from tests.helpers import unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
 from vulcan_celox.server.sites_api import extract_public_url
@@ -42,7 +43,7 @@ class CompartilharApiTest(ServerTestCase):
         env = super().env()
         self.lerd = self.tmp / "bin" / "lerd"
         self.lerd.parent.mkdir(parents=True, exist_ok=True)
-        # um "lerd share" falso que imprime a URL do túnel e fica rodando, como o de verdade
+        # a fake "lerd share" that prints the tunnel URL and keeps running, like the real one
         self.lerd.write_text("#!/bin/sh\necho 'Forwarding https://ab12.ngrok-free.app -> http://loja.test'\nsleep 30\n")
         os.chmod(self.lerd, 0o755)
         env.update({"VULCAN_LERD_BIN": str(self.lerd), "SHELL": "/bin/sh", "PATH": os.environ.get("PATH", "")})
@@ -61,6 +62,7 @@ class CompartilharApiTest(ServerTestCase):
         self.app.terminals.close_all()
         super().tearDown()
 
+    @unix_only(SEM_LERD)
     def test_aba_com_o_share_e_url_publica(self):
         status, info, _ = self.request("POST", "/api/sites/loja/share", body={"tool": "cloudflare"})
         self.assertEqual(status, 201, info)
@@ -69,7 +71,7 @@ class CompartilharApiTest(ServerTestCase):
         self.assertTrue(wait_for(lambda: self.request("GET", f"/api/terminals/{info['id']}/public-url")[1]["url"]))
         self.assertEqual(self.request("GET", f"/api/terminals/{info['id']}/public-url")[1]["url"],
                          "https://ab12.ngrok-free.app")
-        self.request("DELETE", f"/api/terminals/{info['id']}")  # fechar a aba encerra o túnel
+        self.request("DELETE", f"/api/terminals/{info['id']}")  # closing the tab ends the tunnel
         self.assertFalse(pty.alive)
 
     def test_ferramenta_invalida(self):

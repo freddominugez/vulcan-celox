@@ -1,4 +1,4 @@
-"""Ações rápidas do site (banco, diagnóstico, painel do Lerd)."""
+"""Quick site actions (database, diagnostics, Lerd dashboard)."""
 
 import os
 import shlex

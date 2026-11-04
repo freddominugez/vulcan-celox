@@ -1,4 +1,4 @@
-"""Exceções e logs de erro do site durante a sessão de agente, com resumo mascarado."""
+"""Exceptions and error logs of the site during the agent session, with a masked summary."""
 
 import json
 
@@ -19,12 +19,12 @@ class JanelaTest(TempDirTestCase):
                   log("2026-10-31T09:59:00Z"), log("2026-10-31T10:20:00Z", level="info"),
                   log("2026-10-31T11:00:30Z"), log("2026-10-31T11:10:00Z")]
         found = events_for_session(events, "loja", "2026-10-31T10:00:00.000Z", "2026-10-31T11:00:00.000Z")
-        # dentro da janela (com folga de um minuto no fim), só do site e só nível de erro
+        # inside the window (with a one-minute margin at the end), only from the site and only error level
         self.assertEqual([e["ts"] for e in found], ["2026-10-31T10:00:00.100Z", "2026-10-31T11:00:30Z"])
 
     def test_fuso_diferente_e_eventos_reais(self):
         found = events_for_session(EVENTS, "loja", "2026-10-31T18:00:00-03:00", "2026-10-31T18:05:00-03:00")
-        self.assertTrue(found)  # 21:01Z cai entre 21:00Z e 21:05Z
+        self.assertTrue(found)  # 21:01Z falls between 21:00Z and 21:05Z
         self.assertTrue(all(e["kind"] == "log" and e["site"] == "loja" for e in found))
         self.assertEqual(events_for_session(EVENTS, "loja", "", ""), [])
 

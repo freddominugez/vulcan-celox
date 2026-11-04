@@ -1,6 +1,6 @@
-"""Heurísticas como dados: ferramenta para efeito, o que é teste, o que é publicação, onde fica a worktree.
+"""Heuristics as data: tool to effect, what is a test, what is a publish, where the worktree lives.
 
-Adicionar uma ferramenta ou um comando de teste é uma linha nas tabelas abaixo, não um `if` nos leitores.
+Adding a tool or a test command is one line in the tables below, not an `if` in the readers.
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ TEST_PATTERNS = [re.compile(p) for p in (
     r"\bcargo\s+test\b", r"\bmake\s+test\b", r"\brspec\b", r"\bvalidate\.sh\b", r"\btest_linux\.sh\b",
 )]
 _GIT = r"\bgit\s+(?:-C\s+\S+\s+|-c\s+\S+\s+)*"
-# do mais alto para o mais baixo; o primeiro que casar vale
+# from highest to lowest; the first match wins
 PUBLISH_PATTERNS = (
     ("pr_open", re.compile(r"\bgh\s+pr\s+create\b")),
     ("pushed", re.compile(_GIT + r"push\b")),
@@ -83,7 +83,7 @@ def publish_level(text: str) -> Optional[str]:
 
 
 def publish_sequence(text: str) -> List[str]:
-    """Níveis de publicação na ordem dos trechos: `git commit && git push` dá [committed, pushed]."""
+    """Publish levels in the order of the snippets: `git commit && git push` gives [committed, pushed]."""
     return [level for level in (publish_level(seg) for seg in _SEGMENTS.split(text or "")) if level]
 
 
@@ -98,7 +98,7 @@ def classify_command(text: str) -> str:
 
 
 def test_key(text: str) -> Optional[str]:
-    """O trecho que roda o teste, sem `cd ... &&` antes nem `| tail` depois: mesma chave = mesmo teste."""
+    """The snippet that runs the test, without a leading `cd ... &&` or trailing `| tail`: same key = same test."""
     for segment in _SEGMENTS.split(text or ""):
         if is_test(segment):
             return " ".join(segment.split())
@@ -110,7 +110,7 @@ WORKTREE = re.compile(r"^(?P<root>.+?)/\.(?:claude|codex)/worktrees/(?P<name>[^/
 
 
 def split_worktree(cwd: str) -> Tuple[str, Optional[str]]:
-    """(raiz do repositório, nome da worktree ou None)."""
+    """(repository root, worktree name or None)."""
     match = WORKTREE.match(cwd or "")
     if match:
         return match.group("root"), match.group("name")
@@ -118,7 +118,7 @@ def split_worktree(cwd: str) -> Tuple[str, Optional[str]]:
 
 
 def worktree_path(cwd: str) -> Optional[str]:
-    """Raiz da worktree que contém o cwd (`.../.claude/worktrees/<nome>`), mesmo se o cwd for uma subpasta."""
+    """Root of the worktree containing the cwd (`.../.claude/worktrees/<name>`), even if the cwd is a subfolder."""
     match = WORKTREE.match(cwd or "")
     return match.group(0) if match else None
 

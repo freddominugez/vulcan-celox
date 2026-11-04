@@ -1,7 +1,7 @@
-"""Log do Laravel (storage/logs/laravel.log) para a aba Logs do site.
+"""Laravel log (storage/logs/laravel.log) for the site's Logs tab.
 
-Leitura incremental pelo offset, só linhas completas, como os JSONL dos agentes: nenhum `tail -F` fica vivo
-por aba. Linhas que não começam com data (stack trace) entram na entrada anterior.
+Incremental reading by offset, complete lines only, like the agents' JSONL: no `tail -F` stays alive
+per tab. Lines that do not start with a date (stack trace) go into the previous entry.
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 LINE = re.compile(r"^\[(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}[^\]]*)\]\s+([\w.-]+)\.([A-Z]+):\s?(.*)$")
-TAIL_BYTES = 64 * 1024  # primeira leitura: só o fim do arquivo
+TAIL_BYTES = 64 * 1024  # first read: only the end of the file
 MAX_READ = 512 * 1024
 LEVELS = ("EMERGENCY", "ALERT", "CRITICAL", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG")
 
@@ -42,7 +42,7 @@ def filter_entries(entries: List[Dict[str, str]], level: str = "", query: str = 
 
 
 def read_log(path, offset: Optional[int] = None) -> Dict[str, Any]:
-    """Entradas novas desde `offset` (None: o fim do arquivo). `reset` quando o arquivo encolheu (rotação)."""
+    """New entries since `offset` (None: the end of the file). `reset` when the file shrank (rotation)."""
     path = Path(path)
     try:
         size = os.path.getsize(path)
@@ -55,13 +55,13 @@ def read_log(path, offset: Optional[int] = None) -> Dict[str, Any]:
         fh.seek(start)
         data = fh.read(MAX_READ)
     skip = 0
-    if fresh and start > 0:  # começou no meio de uma linha: pula até a próxima
+    if fresh and start > 0:  # started in the middle of a line: skip to the next one
         cut = data.find(b"\n")
         skip = cut + 1 if cut >= 0 else len(data)
     end = data.rfind(b"\n")
     if end < skip:
         complete, consumed = b"", skip
     else:
-        complete, consumed = data[skip:end + 1], end + 1  # a linha sem fim fica para a próxima leitura
+        complete, consumed = data[skip:end + 1], end + 1  # the unterminated line is left for the next read
     lines = complete.decode("utf-8", errors="replace").splitlines()
     return {"exists": True, "entries": parse_entries(lines), "offset": start + consumed, "reset": reset}

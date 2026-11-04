@@ -1,4 +1,4 @@
-"""Estado real do PR, opcional: com a preferência desligada nenhum comando roda e nada sai da máquina."""
+"""Real PR state, optional: with the preference off no command runs and nothing leaves the machine."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def register_pr_api(app) -> PrStatus:
             folder = session.cwd or session.project_root
         else:
             folder = req.arg("path") or ""
-        # só pasta conhecida: o gh roda nela, e a resposta depende do que está no .git de lá
+        # known folder only: gh runs in it, and the answer depends on what is in its .git
         if not folder or not known_root(app, folder):
             return {"source": "heuristic", "reason": "unknown_folder"}
         return status.status(folder)

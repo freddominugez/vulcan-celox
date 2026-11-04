@@ -1,5 +1,5 @@
-"""Arquivo novo de código não passa de 400 linhas, e os antigos desta lista não crescem (dívida registrada em
-docs/pt-BR/technical-manual.md). Quem reduzir um deles baixa o número aqui."""
+"""A new code file does not exceed 400 lines, and the old ones on this list do not grow (debt recorded in
+docs/pt-BR/technical-manual.md). Whoever shrinks one of them lowers the number here."""
 
 import unittest
 from pathlib import Path
@@ -9,7 +9,6 @@ LIMIT = 400
 SUFFIXES = {".py", ".mjs", ".swift", ".sh"}
 FOLDERS = ("vulcan_celox", "scripts", "tests", "packaging")
 LEGACY = {
-    "vulcan_celox/web/js/terminals.mjs": 1126,
     "packaging/macos/main.swift": 687,
     "vulcan_celox/ui/app.py": 594,
     "vulcan_celox/web/js/views/tasks.mjs": 523,

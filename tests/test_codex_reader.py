@@ -1,4 +1,4 @@
-"""Leitor do Codex com fixture real anonimizada (0.166.0) e fixture sintética de versão anterior."""
+"""Codex reader with an anonymized real fixture (0.166.0) and a synthetic fixture of an earlier version."""
 
 import json
 import unittest
@@ -20,7 +20,7 @@ def ev(at, kind, payload):
 
 
 class CodexFixtureRealTest(unittest.TestCase):
-    """Valores conferidos por um script de contagem independente do leitor."""
+    """Values checked by a counting script independent of the reader."""
 
     def setUp(self):
         self.s = read_session("codex", REAL).session
@@ -29,7 +29,7 @@ class CodexFixtureRealTest(unittest.TestCase):
         s = self.s
         self.assertEqual((s.id, s.agent, s.cwd, s.project_name), (SID, "codex", "/Users/dev/clerk", "clerk"))
         self.assertEqual((s.model, s.cli_version), ("gpt-6.1-sol", "0.166.0"))
-        self.assertIsNone(s.git_branch)  # o 0.166.0 não grava git: o app resolve pelo cwd
+        self.assertIsNone(s.git_branch)  # 0.166.0 does not record git: the app resolves it from the cwd
         self.assertEqual(s.parse_errors, 0)
 
     def test_pedidos_comandos_e_arquivos_do_item_completed(self):
@@ -82,7 +82,7 @@ class CodexVersaoAnteriorTest(TempDirTestCase):
         self.assertEqual(kinds, {"Cupom.php": "new", "web.php": "edit", "velho.php": "delete"})
         self.assertEqual([c.kind for c in s.commands], ["test", "publish"])
         self.assertEqual(s.published, "committed")
-        self.assertEqual(s.turns, 1)  # user_message e UserMessage iguais contam uma vez
+        self.assertEqual(s.turns, 1)  # user_message and UserMessage equal count once
         self.assertEqual(s.first_user_message, "crie o cupom")
         self.assertEqual(s.last_activity_at, "2026-10-20T10:31:00Z")
 
@@ -93,7 +93,7 @@ class CodexVersaoAnteriorTest(TempDirTestCase):
         self.assertEqual((s.turns, s.first_user_message), (1, "arrume o README"))
 
     def test_origem_da_sessao(self):
-        """Subagente e app desktop são marcados; terminal e versão antiga ficam sem marca."""
+        """Subagent and desktop app are marked; terminal and old version stay unmarked."""
         def origin(meta):
             path = self.tmp / "rollout-o.jsonl"
             path.write_text(json.dumps({"type": "session_meta", "payload": dict({"id": "o", "cwd": "/r"}, **meta)}) + "\n", encoding="utf-8")

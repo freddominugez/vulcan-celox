@@ -1,5 +1,5 @@
-"""Sessões do Codex comprimidas (.jsonl.zst). Fixture sintética: o Codex só comprime em manutenção e não há
-arquivo real nesta máquina. A maior parte usa um `zstd` falso (cat); um teste usa o de verdade, quando existe."""
+"""Compressed Codex sessions (.jsonl.zst). Synthetic fixture: Codex only compresses during maintenance and there is no
+real file on this machine. Most tests use a fake `zstd` (cat); one uses the real one, when it exists."""
 import json
 import os
 import shutil
@@ -7,7 +7,7 @@ import subprocess
 import unittest
 from unittest import mock
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only
 from vulcan_celox.core.agents import discovery, status
 from vulcan_celox.core.agents.index import AgentIndex
 from vulcan_celox.core.agents.reading import read_session
@@ -45,7 +45,7 @@ class DescobertaTest(Base):
     def test_com_e_sem_zstd(self):
         path = self.write()
         roots = [self.tmp / "codex"]
-        self.assertEqual(discovery.codex_session_files(roots), ([], 1))  # sem zstd: ignorado e contado
+        self.assertEqual(discovery.codex_session_files(roots), ([], 1))  # without zstd: ignored and counted
         self.assertEqual(discovery.codex_session_files(roots, self.fake), ([path], 0))
 
     def test_copia_em_jsonl_vence_a_comprimida(self):
@@ -53,6 +53,7 @@ class DescobertaTest(Base):
         self.write()
         self.assertEqual(discovery.codex_session_files([self.tmp / "codex"], self.fake), ([plain], 0))
 
+    @unix_only("o zstd falso é um script de shell Unix")
     def test_achar_o_zstd(self):
         self.assertEqual(discovery.zstd_bin({"VULCAN_ZSTD_BIN": self.fake}), self.fake)
         self.assertIsNone(discovery.zstd_bin({"VULCAN_ZSTD_BIN": ""}))
@@ -71,6 +72,7 @@ class DescobertaTest(Base):
 
 
 class LeituraTest(Base):
+    @unix_only("o zstd falso é um script de shell Unix")
     def test_le_em_stream(self):
         with mock.patch.dict(os.environ, {"VULCAN_ZSTD_BIN": self.fake}):
             res = read_session("codex", self.write())
@@ -116,23 +118,25 @@ class IndiceTest(Base):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+    @unix_only("o zstd falso é um script de shell Unix")
     def test_jsonl_que_vira_zst_continua_uma_sessao_so(self):
         plain = self.write("")
         AgentWatcher(self.index, self.env).run_once()
         self.assertEqual([s.id for s in self.index.sessions()], [SID])
         comp = self.write()
-        os.rename(plain, str(plain) + ".movido")  # o Codex comprime e tira o .jsonl
+        os.rename(plain, str(plain) + ".movido")  # Codex compresses and drops the .jsonl
         AgentWatcher(self.index, self.env).run_once()
         found = self.index.sessions()
         self.assertEqual([s.id for s in found], [SID])
         self.assertEqual(found[0].file_path, str(comp))
 
+    @unix_only("o zstd falso é um script de shell Unix")
     def test_reler_a_comprimida_nao_duplica(self):
         path = self.write()
         self.assertEqual(self.index.update_file("codex", path), SID)
         before = len(self.index.search("cupom"))
-        self.assertIsNone(self.index.update_file("codex", path))  # nada mudou
+        self.assertIsNone(self.index.update_file("codex", path))  # nothing changed
         with open(path, "a", encoding="utf-8") as fh:
-            fh.write("\n")  # arquivo trocado: relê do início, sem somar eventos
+            fh.write("\n")  # file replaced: re-reads from the start, without summing events
         self.assertEqual(self.index.update_file("codex", path), SID)
         self.assertEqual(len(self.index.search("cupom")), before)

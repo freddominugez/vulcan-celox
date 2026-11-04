@@ -1,4 +1,4 @@
-"""Memórias e encerramento."""
+"""Memories and shutdown."""
 
 import sqlite3
 import threading
@@ -30,9 +30,9 @@ class FlushTest(ServerTestCase):
         for n in range(5):
             hub.mark_dirty(f"aba00000000{n}")
         with mock.patch.object(hub, "write_memory", flaky):
-            hub._flush_once()  # o que o laço da thread chama a cada 15 s
+            hub._flush_once()  # what the thread loop calls every 15 s
         self.assertEqual(sorted(calls), [f"aba00000000{n}" for n in range(5)])
-        self.assertIn("aba000000002", hub._dirty)  # fica para a próxima volta
+        self.assertIn("aba000000002", hub._dirty)  # left for the next round
         self.assertIn("closed database", hub.last_error or "")
         info = doctor.collect(self.env())
         self.assertIn("closed database", info["memory_last_error"] or "")
@@ -83,4 +83,4 @@ class TimerTest(ServerTestCase):
             t.join()
         pending = [t for t in threading.enumerate() if isinstance(t, threading.Timer) and not t.finished.is_set()
                    and getattr(t.function, "__self__", None) is hub]
-        self.assertLessEqual(len(pending), 1)  # um só timer deste hub continua valendo; os outros foram cancelados
+        self.assertLessEqual(len(pending), 1)  # only one timer of this hub is still valid; the others were cancelled

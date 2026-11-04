@@ -80,7 +80,7 @@ class App(tk.Tk):
         self.set_message(f"error: {val}", error=True)
 
     def call_in_ui(self, fn: Callable[[], None]) -> None:
-        """Agenda fn na thread da UI (seguro a partir de outras threads)."""
+        """Schedules fn on the UI thread (safe to call from other threads)."""
         self._ui_queue.put(fn)
 
     def run_in_background(self, work: Callable[[], object], done: Callable[[object], None]) -> None:
@@ -141,7 +141,7 @@ class App(tk.Tk):
         return self._search_window
 
     def navigate(self, hit) -> None:
-        """Leva ao item escolhido na busca."""
+        """Goes to the item chosen in the search."""
         if hit.kind == "tag":
             win = self.open_tags()
             if win.tree.exists(hit.key):
@@ -231,7 +231,7 @@ class App(tk.Tk):
         self.lbl_message.pack(side="left", padx=12, pady=4)
 
     def build_site_panel(self, parent: ttk.Frame, site_name: Optional[str]) -> None:
-        """Abas do painel de um site."""
+        """Tabs of a site's panel."""
         self.tabs = ttk.Notebook(parent)
         self.tabs.pack(fill="both", expand=True)
         self.tasks_panel = TasksPanel(self.tabs, self.notebook, site_name, on_message=self.set_message)
@@ -295,7 +295,7 @@ class App(tk.Tk):
         if kind in ("tasks", "tags", "all"):
             self.index_debouncer.touch()
 
-    # ── índice Markdown ──────────────────────────────────────────────────
+    # ── Markdown index ─────────────────────────────────────────────────
     def write_indexes(self) -> bool:
         content = render_global(self.notebook.tasks, self.notebook.tags)
         changed = write_if_changed(global_index_path(self.data_dir), content)
@@ -413,7 +413,7 @@ class App(tk.Tk):
                                lambda r: self.set_message(" ".join(argv[1:]) if getattr(r, "ok", False)
                                                           else f"could not open: {getattr(r, 'output', r)}"))
 
-    # ── serviços ─────────────────────────────────────────────────────────
+    # ── services ───────────────────────────────────────────────────────
     def service(self, action: str) -> None:
         self.set_message(f"{self.backend.name} {action}…")
         fn = getattr(self.backend, action)
@@ -469,14 +469,14 @@ class App(tk.Tk):
             assert list(board.cards) == [note.id]
             board.var_query.set("")
             board.render()
-            board.cards[second.id]._delete()  # vazio: apaga sem confirmação
+            board.cards[second.id]._delete()  # empty: deletes without confirmation
             assert self.notebook.note(second.id) is None
 
         def tasks_flow():
             panel = self.tasks_panel
             panel.var_title.set("tarefa do selftest")
             panel.var_due.set("2026-13-40")
-            assert panel.add() is None  # prazo inválido vira mensagem, não modal
+            assert panel.add() is None  # invalid deadline becomes a message, not a modal
             panel.var_due.set("2026-09-30")
             panel._queue_tag(f"tarefa-{time.time_ns()}")
             task = panel.add()
@@ -504,7 +504,7 @@ class App(tk.Tk):
             assert self.notebook.task(task.id) is not None
             panel.var_status.set("To do")
             panel.render()
-            assert not panel.tree.exists(task.id)  # está concluída
+            assert not panel.tree.exists(task.id)  # it is completed
             panel.var_status.set("Done")
             panel.render()
             assert panel.tree.exists(task.id)
@@ -517,7 +517,7 @@ class App(tk.Tk):
             assert "## Índice" in text and "tarefa editada" in text, text[:200]
             assert "vulcan:tarefas:inicio" in self.copy_markdown(None)
             if self.env.get(paths.ENV_HOME):
-                # só com diretório de dados isolado: cria um projeto manual descartável
+                # only with an isolated data directory: creates a throwaway manual project
                 project = os.path.join(str(self.data_dir), "selftest-projeto")
                 os.makedirs(project, exist_ok=True)
                 self.manual_sites["selftest-projeto"] = project
@@ -559,7 +559,7 @@ SELFTEST_WATCHDOG_SECONDS = 30
 
 
 def _selftest_watchdog() -> None:
-    # Um diálogo modal inesperado trava o mainloop: o selftest precisa falhar, não pendurar.
+    # An unexpected modal dialog blocks the mainloop: the selftest must fail, not hang.
     sys.stderr.write(f"SELFTEST FALHOU: travou por mais de {SELFTEST_WATCHDOG_SECONDS} s "
                      "(diálogo modal ou loop bloqueado)\n")
     sys.stderr.flush()

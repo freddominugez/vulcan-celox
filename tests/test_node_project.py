@@ -1,4 +1,4 @@
-"""Leitor de projeto Node, só leitura e sem abrir.env."""
+"""Node project reader, read-only and without opening .env."""
 
 import builtins
 import os

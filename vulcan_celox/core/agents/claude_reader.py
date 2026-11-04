@@ -1,4 +1,4 @@
-"""Leitor incremental dos JSONL do Claude Code (docs/en/agent-file-formats.md, seção 1)."""
+"""Incremental reader for Claude Code JSONL (docs/en/agent-file-formats.md, section 1)."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from vulcan_celox.core.agents.attention import AttentionTracker
 from vulcan_celox.core.agents.builder import SessionBuilder
 from vulcan_celox.core.agents.model import AgentSession, as_int, as_str
 
-# texto de usuário que é o próprio Claude Code falando, não um pedido
+# user text that is Claude Code itself speaking, not a request
 NOT_A_PROMPT = ("<command-name>", "<command-message>", "<command-args>", "<local-command-", "<system-reminder>",
                 "Caveat:", "[Request interrupted")
 _RECENT_IDS = 64
@@ -32,9 +32,9 @@ class ClaudeReader:
         self.cur_usage: Dict = dict(state.get("cur_usage") or {})
         self.recent_ids = list(state.get("recent_ids") or [])
         self.done_tokens: Dict = dict(state.get("done_tokens") or {})
-        # publicação do Bash espera o tool_result: só conta se não voltou com is_error
+        # a Bash publish waits for the tool_result: it only counts if it did not come back with is_error
         self.pending_pub: Dict[str, list] = dict(state.get("pending_pub") or {})
-        self.cur_row: Dict = dict(state.get("cur_row") or {})  # linha de uso do turno aberto
+        self.cur_row: Dict = dict(state.get("cur_row") or {})  # usage row for the open turn
         self.usage_rows: list = []
 
     def state(self) -> Dict:
@@ -62,7 +62,7 @@ class ClaudeReader:
         at = as_str(obj.get("timestamp"))
         self.b.seen_at(at)
         if obj.get("isSidechain"):
-            return  # sub-agente no formato antigo: é atividade, mas não conteúdo da sessão principal
+            return  # sub-agent in the old format: it is activity, but not content of the main session
         self.b.set_cwd(obj.get("cwd"))
         self.b.set_branch(obj.get("gitBranch"))
         if isinstance(obj.get("version"), str):
@@ -132,7 +132,7 @@ class ClaudeReader:
                 self.b.publish(pending[0])
 
     def _tokens(self, mid, usage, model=None, at: str = "") -> None:
-        """Um turno vira várias linhas com o mesmo message.id e o mesmo usage: conta uma vez por id."""
+        """A turn becomes several lines with the same message.id and the same usage: count once per id."""
         if not isinstance(mid, str) or not isinstance(usage, dict) or mid in self.recent_ids:
             return
         if mid != self.cur_id:
@@ -149,8 +149,8 @@ class ClaudeReader:
         self._usage_row(usage, model)
 
     def _usage_row(self, usage: dict, model) -> None:
-        """Uma linha por turno para o agent_usage. A mesma chave regrava a linha (upsert no índice).
-        `<synthetic>` é mensagem do próprio Claude Code (erro, interrupção): não é cobrada e fica de fora."""
+        """One row per turn for agent_usage. The same key rewrites the row (upsert in the index).
+        `<synthetic>` is a message from Claude Code itself (error, interruption): it is not billed and is left out."""
         if not isinstance(model, str) or not model or model.startswith("<"):
             return
         write = as_int(usage.get("cache_creation_input_tokens"))

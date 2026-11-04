@@ -1,4 +1,4 @@
-"""Diagnóstico das fontes de agentes para o --doctor e para a tela de histórico. Só lê; nunca cria o índice."""
+"""Diagnostics of the agent sources for --doctor and the history screen. Read-only; never creates the index."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ CLAUDE_DEFAULT_CLEANUP_DAYS = 30
 
 
 def claude_cleanup_days(root: Path) -> Dict[str, Any]:
-    """cleanupPeriodDays do settings.json do Claude Code (padrão 30 quando ausente). Só leitura."""
+    """cleanupPeriodDays from Claude Code's settings.json (default 30 when absent). Read-only."""
     value: Optional[int] = None
     try:
         data = json.loads((root / "settings.json").read_text(encoding="utf-8"))
@@ -43,7 +43,7 @@ def indexed_counts(data_dir: Path) -> Dict[str, int]:
 
 
 def last_error(data_dir: Path) -> Optional[str]:
-    """Último erro do observador de agentes, gravado no índice pelo app."""
+    """Last error of the agent watcher, stored in the index by the app."""
     path = index_path(data_dir)
     if not path.is_file():
         return None
@@ -75,7 +75,7 @@ def collect(env: Optional[Mapping[str, str]] = None, data_dir: Optional[Path] = 
         "codex_dirs": [str(p) for p in codex_roots], "codex_found": any(p.is_dir() for p in codex_roots),
         "claude_session_files": len(discovery.claude_session_files(claude)),
         "codex_session_files": len(codex_files), "codex_zst_ignored": zst,
-        "codex_zst_reader": zstd,  # Com o comando, os.jsonl.zst são lidos; sem ele, ignorados e contados
+        "codex_zst_reader": zstd,  # with the command, the .jsonl.zst files are read; without it, they are ignored and counted
         "claude_cleanup": claude_cleanup_days(claude),
         "fts5": history.fts5_available(),
     }

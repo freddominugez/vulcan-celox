@@ -1,4 +1,4 @@
-/* Aba Código da sessão de agente */
+/* Código tab of the agent session */
 .ag-page.is-code { max-width: none; height: 100%; overflow: hidden; }
 .ag-page.is-code .ag-facts, .ag-page.is-code .ag-harness, .ag-page.is-code .ag-actions, .ag-page.is-code .ag-alert { display: none; }
 .ag-page.is-code .ag-banner { padding: 10px 14px; gap: 4px; }

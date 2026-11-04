@@ -1,4 +1,4 @@
-// Tags de uma sessão de terminal: as da própria sessão e os itens da sessão agrupados por tag.
+// Tags of a terminal session: the session's own and its items grouped by tag.
 
 import { get, patch } from "../api.mjs";
 import { $, esc, flashFocus, icon, reportError } from "../dom.mjs";
@@ -29,7 +29,7 @@ export class SessionTagsView {
       this.tags = tags.tags;
       this.tasks = tasks.tasks;
       this.notes = notes.notes;
-      if (!this.root.isConnected) return; // a tela foi trocada enquanto carregava
+      if (!this.root.isConnected) return; // the screen was switched while loading
       this.render();
     } catch (err) {
       reportError(err);

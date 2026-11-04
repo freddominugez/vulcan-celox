@@ -1,4 +1,4 @@
-"""Sessões de terminal com memória: registro persistente e reconstrução dos comandos digitados."""
+"""Terminal sessions with memory: persistent record and reconstruction of the typed commands."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ class SessionRecord:
     closed_at: Optional[str] = None
     exit_code: Optional[int] = None
     memory_file: Optional[str] = None
-    theme: Optional[str] = None  # Identidade de cor da aba, a mesma da sessão de agente pareada
+    theme: Optional[str] = None  # tab color identity, the same as the paired agent session
 
     @property
     def is_open(self) -> bool:
@@ -48,10 +48,10 @@ class SessionRecord:
 
 
 class InputTracker:
-    """Reconstrói linhas de shell a partir dos bytes enviados ao PTY.
+    """Rebuilds shell lines from the bytes sent to the PTY.
 
-    Aproximação consciente: comandos recuperados do histórico com as setas não são
-    visíveis na entrada e ficam só no registro de saída.
+        A conscious approximation: commands recalled from history with the arrow keys are not
+        visible in the input and stay only in the output log.
     """
 
     def __init__(self):
@@ -77,7 +77,7 @@ class InputTracker:
                 continue
             if ch == "\x1b":
                 end = self._escape_end(text, i)
-                if end is None:  # sequência incompleta: espera o próximo pedaço
+                if end is None:  # incomplete sequence: wait for the next chunk
                     self._pending = text[i:]
                     break
                 i = end
@@ -89,7 +89,7 @@ class InputTracker:
                     self._line.pop()
             elif ch in "\x15\x03":  # Ctrl+U apaga a linha, Ctrl+C cancela
                 self._line.clear()
-            elif ch == "\x17":  # Ctrl+W apaga a última palavra
+            elif ch == "\x17":  # Ctrl+W deletes the last word
                 while self._line and self._line[-1] == " ":
                     self._line.pop()
                 while self._line and self._line[-1] != " ":
@@ -112,14 +112,14 @@ class InputTracker:
         if i + 1 >= len(text):
             return None
         nxt = text[i + 1]
-        if nxt == "[":  # CSI: parâmetros até um byte final entre @ e ~
+        if nxt == "[":  # CSI: parameters up to a final byte between @ and ~
             j = i + 2
             while j < len(text):
                 if "@" <= text[j] <= "~":
                     return j + 1
                 j += 1
             return None
-        if nxt == "O":  # SS3 (setas em modo aplicação)
+        if nxt == "O":  # SS3 (arrows in application mode)
             return i + 3 if i + 2 < len(text) else None
         return i + 2  # Alt+tecla
 
@@ -221,7 +221,7 @@ class SessionStore:
                 self._save()
 
     def close_orphans(self, live_ids) -> List[SessionRecord]:
-        """Sessões marcadas como abertas cujo PTY não existe mais (app anterior encerrado)."""
+        """Sessions marked as open whose PTY no longer exists (previous app terminated)."""
         live = set(live_ids)
         closed = []
         with self._lock:

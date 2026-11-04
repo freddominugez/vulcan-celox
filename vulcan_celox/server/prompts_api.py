@@ -1,4 +1,4 @@
-"""Rotas dos prompts por botão: lista renderizada com a sessão, criação de prompt e de categoria."""
+"""Button prompt routes: list rendered with the session, prompt creation and category creation."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Optional
 
 from vulcan_celox.core import procinfo, prompts
 from vulcan_celox.core.agents.model import AgentSession
-from vulcan_celox.core.i18n import tr
 from vulcan_celox.server.agents_api import card
 from vulcan_celox.server.known_roots import known_root
 from vulcan_celox.server.local_http import HttpError, Request
@@ -16,7 +15,7 @@ SCOPES = ("global", "project")
 
 
 def is_prompt_file(path: Path, global_dir: Path) -> bool:
-    """Só arquivos .md da pasta global de prompts ou de alguma <projeto>/.vulcan/prompts/ podem ser abertos."""
+    """Only .md files from the global prompts folder or from some <project>/.vulcan/prompts/ may be opened."""
     try:
         real = path.resolve()
     except OSError:
@@ -35,8 +34,8 @@ class PromptsService:
         prompts.seed_global(self.global_dir)
 
     def session_for(self, req: Request) -> Optional[AgentSession]:
-        """Sessão pedida; senão a pareada com a aba (terminal); senão a mais recente da pasta do terminal (cwd);
-        senão a sessão atual."""
+        """Requested session; otherwise the one paired with the tab (terminal); otherwise the most recent in the terminal's folder (cwd);
+        otherwise the current session."""
         agents = self.app.agents
         sid = req.arg("session")
         if sid:
@@ -51,7 +50,7 @@ class PromptsService:
                 return paired
         cwd = (req.arg("cwd") or "").rstrip("/")
         if cwd:
-            for s in agents.decorate(agents.index.sessions()):  # da mais recente para a mais antiga
+            for s in agents.decorate(agents.index.sessions()):  # from newest to oldest
                 if cwd in (s.project_root.rstrip("/"), s.cwd.rstrip("/")) or s.cwd.startswith(cwd + "/"):
                     return s
         return agents.current_session()
@@ -100,7 +99,7 @@ class PromptsService:
             raise HttpError(400, "a pasta não é de um site, projeto Node ou sessão de agente conhecida")
         folder = prompts.project_dir(root)
         if not folder.is_dir() and body.get("confirm_project_dir") is not True:
-            # escrita em pasta de projeto só com opt-in: a interface pergunta antes de criar .vulcan/prompts
+            # writing to a project folder only with opt-in: the interface asks before creating .vulcan/prompts
             raise HttpError(409, "confirme a criação da pasta de prompts do projeto",
                             {"needs_confirmation": True, "dir": str(folder)})
         return folder
@@ -125,8 +124,8 @@ def register_prompts_api(app) -> PromptsService:
 
     @srv.route("POST", "/api/prompts/send")
     def send(req: Request):
-        """Cola o texto do prompt na aba pareada à sessão, sem Enter. Sem aba pareada viva, 409
-        com o que a interface precisa para oferecer retomar a sessão num terminal."""
+        """Pastes the prompt text into the tab paired with the session, without Enter. With no live paired tab, 409
+        with what the interface needs to offer resuming the session in a terminal."""
         body = req.json()
         pid, sid, values = body.get("prompt"), body.get("session"), body.get("values") or {}
         if not isinstance(pid, str) or not pid:
@@ -158,7 +157,7 @@ def register_prompts_api(app) -> PromptsService:
         if terminal is None or not terminal.alive:
             raise HttpError(409, "a sessão não tem terminal aberto e pareado",
                             {"needs_terminal": True, "session": session.id})
-        # O pareamento expira com o agente. Outra sessão mais nova na aba, ou a aba de volta ao shell,
+        # the pairing expires with the agent. Another, newer session in the tab, or the tab back at the shell,
         # e o prompt cairia no lugar errado.
         newest = agents.paired_with(terminal.id)
         foreground = terminal.foreground() if hasattr(terminal, "foreground") else None
@@ -166,7 +165,7 @@ def register_prompts_api(app) -> PromptsService:
                 (foreground is not None and not procinfo.agent_running(foreground, session.agent)):
             raise HttpError(409, "o agente desta sessão não está mais rodando na aba pareada",
                             {"needs_terminal": True, "session": session.id})
-        if terminal.write(data) is False:  # colagem sem Enter: quem envia é o usuário, no terminal
+        if terminal.write(data) is False:  # paste without Enter: the user is the one who sends it, in the terminal
             raise HttpError(503, "a aba não leu a colagem a tempo; confira o terminal", {"terminal": terminal.id})
         return {"terminal": terminal.id, "title": getattr(terminal, "title", ""), "session": session.id}
 

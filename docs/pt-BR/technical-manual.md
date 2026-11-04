@@ -1,6 +1,6 @@
 # Vulcan Celox: manual técnico
 
-Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.2.0. Para um passeio mais curto, leia [architecture.md](architecture.md).
+Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.2.1. Para um passeio mais curto, leia [architecture.md](architecture.md).
 
 Caminhos escritos como `core/...`, `server/...`, `web/...` e `ui/...` são relativos a `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Objetivos que moldam o código:
 - Nunca apagar nada de forma definitiva.
 - Tudo testável sem janela, sem Lerd real e sem agentes reais.
 
-Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.1.1. A versão 1.2.0 acrescenta versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
+Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.1.1. Desde a 1.2.0 há versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
 
 ## 2. Decisões de arquitetura
 
@@ -669,7 +669,7 @@ Classes base: `tests/helpers.py` (`TempDirTestCase`) e `tests/server_helpers.py`
 
 | Item | Situação |
 |------|----------|
-| Sete arquivos acima de 400 linhas: `web/js/terminals.mjs` (1126), `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Aceito para o 1.0, porque dividir terminal e janela sem teste de navegador traz mais risco que ganho. `tests/test_tamanho_arquivos.py` impede que cresçam e barra arquivo novo acima de 400 |
+| Seis arquivos acima de 400 linhas: `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Aceito para o 1.0, porque dividir terminal e janela sem teste de navegador traz mais risco que ganho. `tests/test_tamanho_arquivos.py` impede que cresçam e barra arquivo novo acima de 400 |
 | O pacote macOS não embute Python e não é notarizado | Tem só assinatura ad hoc. `--verificar-dependencias` explica e oferece instalar. `packaging/LEIA-ME.md` explica como abrir um app sem certificado da Apple |
 | Linux | Versões de teste como pre-release; sem Release estável até o aceite num desktop real |
 | Windows | Versões de teste como pre-release, testadas só nas máquinas da CI. Indisponível: Lerd e Valet, o hook opcional, clique em caminhos `C:\...`, a checagem de primeiro plano antes de escrever na aba. Sem instalador nem assinatura |

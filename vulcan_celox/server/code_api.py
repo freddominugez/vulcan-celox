@@ -1,4 +1,4 @@
-"""Rotas do visor de código da sessão. Só leitura: não existe rota de escrita em /api/code."""
+"""Routes of the session code viewer. Read-only: there is no write route under /api/code."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ SESSION_RE = re.compile("^" + SESSION_ID + "$")
 SCOPES = ("edit", "turn", "git")
 EDITS_PAGE = 200
 EDITS_MAX = 500
-ALL_EDITS = 5000  # uma sessão com mais que isso mostra as primeiras na árvore e no diff por turno
+ALL_EDITS = 5000  # a session with more than this shows the first ones in the tree and in the per-turn diff
 MAX_DIFF = code_diff.MAX_OUTPUT
 MAX_CANDIDATES = 50
 RESOLVE_TTL = 5.0
@@ -52,7 +52,7 @@ class CodeService:
         return session
 
     def roots(self, session: AgentSession) -> List[str]:
-        """Pastas da sessão; vazia ou que toca os dados dos agentes (a pasta pessoal, por exemplo) não vale."""
+        """Session folders; one that is empty or touches the agents' data (the home folder, for example) does not count."""
         roots = [r for r in dict.fromkeys([session.project_root, session.cwd]) if r and not touches_agent_data(r, self.app.env)]
         if not roots:
             raise HttpError(403, "a pasta desta sessão não pode ser aberta no visor", {"reason": "root_refused"})
@@ -66,11 +66,11 @@ class CodeService:
 
     @staticmethod
     def absolute(session: AgentSession, path: str) -> str:
-        """O caminho como o agente gravou pode ser relativo à pasta da sessão (Codex)."""
+        """The path as the agent recorded it may be relative to the session folder (Codex)."""
         return os.path.normpath(os.path.join(session.cwd or session.project_root or "/", path))
 
     def checked(self, session: AgentSession, path: str):
-        """Caminho real dentro da raiz e sem nome sensível: vale para os três escopos, porque o diff tem o conteúdo."""
+        """Real path inside the root and without a sensitive name: applies to all three scopes, because the diff carries the content."""
         try:
             real = code_files.resolve_inside(self.absolute(session, path), self.roots(session))
         except code_files.CodeReadError as err:
@@ -141,7 +141,7 @@ class CodeService:
 
     @staticmethod
     def _compose(session: AgentSession, rows: List[Dict]) -> Dict[str, Any]:
-        """Uma edição, ou os trechos de várias em ordem: juntar trechos não finge ser o arquivo inteiro."""
+        """One edit, or the snippets of several in order: joining snippets does not pretend to be the whole file."""
         details = [edit_log.edit_detail(session.agent, session.file_path, r) for r in rows]
         usable = [d for d in details if d["available"]]
         if not usable:
@@ -166,7 +166,7 @@ class CodeService:
         return tab.cwd, paired
 
     def resolve_one(self, cwd: str, paired: Optional[AgentSession], candidate: str) -> Optional[Dict[str, Any]]:
-        """Só responde se existir e estiver dentro de raiz conhecida. Sensível volta marcado, para o clique avisar."""
+        """Answers only if it exists and is inside a known root. Sensitive files come back flagged, so the click can warn."""
         base = (paired.cwd if paired and paired.cwd else "") or cwd
         try:
             real = Path(base, candidate).resolve()
@@ -188,7 +188,7 @@ class CodeService:
         return out
 
     def _known_cwd(self, cwd: str) -> bool:
-        """A pasta da própria aba vale, salvo se ela contém os dados dos agentes (a pasta pessoal, por exemplo)."""
+        """The tab's own folder counts, unless it contains the agents' data (the home folder, for example)."""
         return bool(cwd) and not touches_agent_data(cwd, self.app.env)
 
     def resolve(self, terminal: str, candidates: List[str]) -> Dict[str, Any]:

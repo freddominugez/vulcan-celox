@@ -1,5 +1,5 @@
-// Botão "Sessão atual" da barra superior: os prompts usam os dados desta sessão.
-// Padrão: a mais recente (ativa primeiro); um clique troca. Avisa as telas com o evento "vulcan-current-changed".
+// "Sessão atual" button in the top bar: prompts use the data of this session.
+// Default: the most recent (active first); one click switches. Notifies the screens with the "vulcan-current-changed" event.
 
 import { get, put } from "./api.mjs";
 import { esc, icon, reportError, toast } from "./dom.mjs";
@@ -29,7 +29,7 @@ export class CurrentSession {
       this.render();
       if (changed) window.dispatchEvent(new CustomEvent("vulcan-current-changed", { detail: data }));
     } catch {
-      /* sem servidor agora: tenta no próximo ciclo */
+      /* no server right now: try again next cycle */
     }
   }
 

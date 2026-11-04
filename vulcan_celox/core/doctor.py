@@ -1,4 +1,4 @@
-"""Diagnóstico sem interface: backend detectado, estado do ambiente e sites."""
+"""Interface-free diagnostics: detected backend, environment state and sites."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def collect(env: Optional[Mapping[str, str]] = None, runner=None) -> Dict[str, A
         "details": status.details,
         "sites": [{"name": s.name, "domain": s.domain, "url": s.url, "kind": s.kind,
                    "php": s.php, "secured": s.secured, "path": s.path} for s in sites],
-        "lerd_contornos": lerd_quirks.status(version) if backend.name == "lerd" else None,
+        "lerd_contornos": lerd_quirks.status(version) if backend.name == "lerd" else None,  # see lerd_quirks.py
         "agents": agents_status(env, paths.data_dir(env)),
         "precos": pricing.describe(paths.data_dir(env)),
         "uso_30_dias": usage.doctor_summary(paths.data_dir(env)),

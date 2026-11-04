@@ -1,8 +1,8 @@
-"""Contornos do app para defeitos do Lerd achados nas provas.
+"""App workarounds for Lerd defects found in testing.
 
-Cada entrada diz o defeito, o que o app faz no lugar e a versão do Lerd que corrige (None enquanto não sair). O
-comportamento do app não muda com a versão: limpar pela API com o cabeçalho e ler os nomes reais dos
-php.ini continuam certos depois da correção. A tabela serve para o --doctor dizer o que ainda é necessário.
+Each entry states the defect, what the app does instead and the Lerd version that fixes it (None until it ships). The
+app's behavior does not change with the version: clearing through the API with the header and reading the real php.ini
+names remain correct after the fix. The table lets --doctor say what is still needed.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ class Quirk:
     id: str
     defeito: str
     contorno: str
-    corrigido_em: Optional[str] = None  # versão do Lerd com a correção; None enquanto não sair
+    corrigido_em: Optional[str] = None  # Lerd version with the fix; None until it ships
 
 
 QUIRKS: Tuple[Quirk, ...] = (
@@ -40,7 +40,7 @@ def version_tuple(version: Optional[str]) -> Optional[Tuple[int, int, int]]:
 
 
 def is_needed(quirk: Quirk, version: Optional[str]) -> bool:
-    """Versão desconhecida ou anterior à correção: o contorno segue necessário."""
+    """Unknown version or one before the fix: the workaround is still needed."""
     current, fixed = version_tuple(version), version_tuple(quirk.corrigido_em)
     return fixed is None or current is None or current < fixed
 

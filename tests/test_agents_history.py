@@ -1,4 +1,4 @@
-"""Histórico unificado dos agentes com busca por conteúdo, e bloco agents do --doctor."""
+"""Unified agent history with content search, and the agents block of --doctor."""
 
 import json
 import shutil
@@ -87,7 +87,7 @@ class HistoryTest(TempDirTestCase):
                                     "UPDATE meta SET value='1' WHERE key='schema_version';")
         self.index.close()
         self.index = AgentIndex(self.db_path)
-        AgentWatcher(self.index, self.env).run_once()  # esquema antigo: o índice é relido
+        AgentWatcher(self.index, self.env).run_once()  # old schema: the index is re-read
         self.assertEqual(self.index.search("seguro")[0]["session_id"], FRETE_SID)
         version = self.index.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[0]
         self.assertEqual(version, str(SCHEMA_VERSION))
@@ -101,7 +101,7 @@ class HistoryTest(TempDirTestCase):
     def test_status_e_doctor(self):
         (self.tmp / "claude" / "settings.json").write_text(json.dumps({"cleanupPeriodDays": 90}))
         (self.tmp / "codex" / "sessions" / "x.jsonl.zst").write_bytes(b"z")
-        self.env["VULCAN_ZSTD_BIN"] = ""  # sem o comando: ignorado e contado (com ele: tests/test_codex_zst.py)
+        self.env["VULCAN_ZSTD_BIN"] = ""  # without the command: ignored and counted (with it: tests/test_codex_zst.py)
         info = status.collect(self.env, self.tmp / "dados")
         self.assertEqual(info["claude_cleanup"], {"days": 90, "configured": True})
         self.assertEqual((info["claude_session_files"], info["codex_session_files"], info["codex_zst_ignored"]), (2, 1, 1))
@@ -118,7 +118,7 @@ class HistoryTest(TempDirTestCase):
 
 
 class HistoryApiTest(test_agents_api.AgentsServerCase):
-    """Reaproveita o servidor com fixtures do C6; só as rotas de histórico."""
+    """Reuses the server with fixtures from the routes test; only the history routes."""
 
     def test_rota_de_historico(self):
         data = self.get("/api/agents/history?q=frete&kind=pedidos")

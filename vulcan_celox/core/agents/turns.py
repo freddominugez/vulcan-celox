@@ -1,4 +1,4 @@
-"""A sessão agrupada por pedido: o que o agente fez em cada um. Vem dos eventos e das edições já indexados."""
+"""The session grouped by request: what the agent did in each. Comes from the already indexed events and edits."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ def _empty(number: int, at: str, ask: str) -> Dict[str, Any]:
 
 
 def group(events, rows: List[Dict]) -> List[Dict[str, Any]]:
-    """Mesma contagem do leitor: cada evento de usuário abre um turno. O que vem antes do primeiro pedido é o turno 0."""
+    """Same count as the reader: each user event opens a turn. What comes before the first request is turn 0."""
     turns: List[Dict[str, Any]] = []
     current: Optional[Dict[str, Any]] = None
     for event in events:

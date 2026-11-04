@@ -1,5 +1,6 @@
-"""Rota do harness do site e resumo na sessão de agente."""
+"""Site harness route and summary in the agent session."""
 
+from pathlib import Path
 import json
 import shutil
 
@@ -28,7 +29,7 @@ class HarnessApiTest(ServerTestCase):
         repo = self.get("/api/sites/repo/harness")
         self.assertEqual((repo["tipo"], repo["estado"], repo["proximo"]), ("repo", "ok", "C3"))
         self.assertFalse(repo["pode_instalar"])
-        self.assertTrue(repo["contrato"]["absoluto"].endswith("specs/exemplo-uso-e-custo/contract.md"))
+        self.assertTrue(Path(repo["contrato"]["absoluto"]).as_posix().endswith("specs/exemplo-uso-e-custo/contract.md"))
         self.assertEqual(repo["resumo"], "exemplo-uso-e-custo: 2 de 5 itens feitos, próximo C3")
         minimo = self.get("/api/sites/minimo/harness")
         self.assertEqual((minimo["tipo"], minimo["status"]), ("minimo", "RUNNING"))

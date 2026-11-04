@@ -1,4 +1,4 @@
-"""Favoritos no topo da barra lateral e busca por nome e domínio."""
+"""Favorites at the top of the sidebar and search by name and domain."""
 
 from types import SimpleNamespace
 

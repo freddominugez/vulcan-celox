@@ -1,4 +1,4 @@
-// Estado do PR: pelo gh, se o usuário ligou, ou a estimativa pelos comandos da sessão, sempre dizendo qual é a fonte.
+// PR state: via gh, if the user enabled it, or estimated from the session commands, always stating the source.
 
 import { get, patch, post } from "./api.mjs";
 import { esc, reportError } from "./dom.mjs";
@@ -22,7 +22,7 @@ export function startPrStatus() {
     const link = event.target.closest && event.target.closest("[data-pr-url]");
     if (!link) return;
     event.preventDefault();
-    post("/api/open", { kind: "url", target: link.dataset.prUrl }).catch(reportError);  // a janela segue presa à origem
+    post("/api/open", { kind: "url", target: link.dataset.prUrl }).catch(reportError);  // the window stays pinned to the origin
   });
 }
 
@@ -39,7 +39,7 @@ const WHY = {
   unknown_folder: t("Estimado pelos comandos."),
 };
 
-/** Texto puro do estado, para qualquer tela. */
+/** Plain text of the state, for any screen. */
 export function prText(data) {
   if (data.source !== "gh") return WHY[data.reason] || WHY.off;
   if (!data.number) return t("Sem PR nesta branch, segundo o GitHub.");

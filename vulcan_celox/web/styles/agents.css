@@ -1,5 +1,5 @@
-/* Telas de agentes, conforme docs/MOCKUP-AGENTES.html, sobre os tokens de app.css.
-   --t, --t-bg e --t-ink são a identidade da sessão; os temas nomeados só trocam essas três. */
+/* Agent screens, following docs/MOCKUP-AGENTES.html, on top of the app.css tokens.
+   --t, --t-bg and --t-ink are the session identity; the named themes only swap these three. */
 
 .t-neutro { --t: var(--neutral-t); --t-bg: var(--neutral-t-bg); --t-ink: var(--neutral-t-ink); }
 
@@ -20,7 +20,7 @@
 .ag-kpi.is-warn .ag-kpi-v { color: var(--warn); }
 .ag-bar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-/* cartões */
+/* cards */
 .ag-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
 .ag-card {
   display: flex; flex-direction: column; padding: 0; overflow: hidden; text-align: left; color: var(--fg);
@@ -49,7 +49,7 @@
 .ag-ask { font-size: 13.5px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
 .ag-stats { color: var(--fg-3); font-size: var(--fs-sm); }
 
-/* trilha de publicação */
+/* publish trail */
 .ag-track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 .ag-step { display: flex; flex-direction: column; gap: 5px; color: var(--fg-3); font-size: var(--fs-xs); }
 .ag-bar { height: 4px; border-radius: 2px; background: var(--line-strong); }
@@ -114,7 +114,7 @@
   .ag-card { transition: none; }
 }
 
-/* histórico de agentes */
+/* agent history */
 .ag-search { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--bg-raise); }
 .ag-search:focus-within { border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-soft); }
 .ag-search > .i { width: 18px; height: 18px; color: var(--fg-3); }
@@ -136,7 +136,7 @@
 .ag-note p { margin: 2px 0 0; color: var(--fg-2); }
 .ag-note code { font-size: 11.5px; }
 
-/* branches e worktrees */
+/* branches and worktrees */
 .ag-br-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) auto; gap: 12px; align-items: center; padding: 9px 14px; border-top: 1px solid var(--line-soft); }
 .ag-br-row:first-of-type { border-top: 0; }
 .ag-br-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -153,7 +153,7 @@
   .ag-br-actions { justify-content: flex-start; }
 }
 
-/* sessão atual na barra superior */
+/* current session in the top bar */
 .current-session { position: relative; flex: none; min-width: 0; }
 .cs-btn { display: inline-flex; align-items: center; gap: 7px; height: 28px; max-width: 340px; padding: 0 9px 0 9px; border-radius: 14px;
   border: 1px solid color-mix(in srgb, var(--t) 45%, var(--line-strong)); background: color-mix(in srgb, var(--t) 10%, var(--bg-raise)); color: var(--fg); }
@@ -243,7 +243,7 @@
   .cs-btn { max-width: 230px; }
 }
 
-/* barra de prompts na área de terminal */
+/* prompt bar in the terminal area */
 .prompt-bar { display: flex; align-items: center; gap: 6px; flex: none; padding: 5px 10px; overflow-x: auto; scrollbar-width: none;
   border-bottom: 1px solid var(--line-soft); background: var(--bg-side); }
 .prompt-bar::-webkit-scrollbar { display: none; }
@@ -260,14 +260,14 @@
 .pb-more { flex: none; font-size: var(--fs-xs); color: var(--fg-3); padding: 0 6px; }
 .pb-more:hover { color: var(--fg); }
 
-/* abas com tema de sessão: a cor da aba é a mesma da sessão de agente pareada */
+/* tabs with session theme: the tab color is the same as the paired agent session */
 .tab.has-theme > .i { color: var(--t); }
 .tab.has-theme.is-active { background: var(--t-bg); }
 .tab.has-theme.is-active::before { background: var(--t); }
 .tab.has-theme.is-active .tab-label { color: var(--on-dark); }
 .pane.has-theme, .pane.has-theme .xterm-host, .pane.has-theme .xterm, .pane.has-theme .xterm-viewport { background: var(--t-bg); }
 
-/* diálogo "Abrir terminal em" com agente e tema */
+/* "Abrir terminal em" dialog with agent and theme */
 .folder-dialog { width: min(560px, 100%); }
 .nt-agents { margin-bottom: 10px; }
 .nt-themes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; }
@@ -287,12 +287,12 @@
 .nt-pair code { font: 11px var(--mono); padding: 0 4px; border-radius: 4px; background: var(--bg-input); color: var(--fg); }
 .nt-skip { font-size: var(--fs-sm); }
 @media (max-width: 620px) { .nt-themes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* árvore de sessões com tema e agente pareado */
+/* session tree with theme and paired agent */
 .tree-node.has-theme > .tree-row .tree-link > .i { color: var(--t); }
 .tree-agents { display: inline-flex; gap: 2px; flex: none; }
 .tree-agents .agent-mark { width: 13px; height: 13px; font-size: 8px; }
 
-/* painel inferior de terminal */
+/* bottom terminal panel */
 .app { grid-template-rows: var(--toolbar) minmax(0, 1fr) auto; }
 .app > .sidebar { grid-row: 1 / 4; }
 .term-panel { grid-column: 2; position: relative; display: flex; flex-direction: column; min-height: 38px; height: 280px;
@@ -310,7 +310,7 @@
 .term-panel:not(.is-open) .tp-body { display: none; }
 .tp-body > .term-workspace { flex: 1; min-height: 0; }
 
-/* dividir: duas colunas, cada uma com o tema da sua aba; abaixo de 760 px de área, uma coluna (a focada) */
+/* split: two columns, each with its tab's theme; below 760 px of area, one column (the focused one) */
 .ws-body { container-type: inline-size; container-name: workspace; }
 @container workspace (max-width: 760px) {
   .panes.is-split { grid-template-columns: minmax(0, 1fr); }
@@ -318,7 +318,7 @@
 }
 .panes.is-split > .pane.has-theme.is-focused { box-shadow: inset 0 2px 0 var(--t); }
 
-/* busca no terminal */
+/* terminal search */
 .term-search { display: flex; align-items: center; gap: 6px; flex: none; padding: 5px 10px; border-bottom: 1px solid var(--line-soft); background: var(--bg-side); }
 .term-search[hidden] { display: none; }
 .term-search > .i { width: 14px; height: 14px; color: var(--fg-3); }
@@ -328,8 +328,8 @@
 .ag-banner .btn.ag-primary { background: var(--t); border-color: transparent; color: var(--t-bg); font-weight: 600; }
 .ag-banner .btn.ag-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--t) 85%, var(--on-accent) 15%); }
 
-/* Uso e custo. Cores por agente validadas contra a superfície escura var(--skeleton-a) (skill de visualização:
-   faixa de luminosidade, croma, separação para daltonismo e contraste). O texto fica nas cores de texto. */
+/* Usage and cost. Per-agent colors validated against the dark surface var(--skeleton-a) (visualization skill:
+   luminosity range, chroma, color-blindness separation and contrast). Text stays in the text colors. */
 .us-note { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 9px 12px; border: 1px solid var(--line);
   border-radius: var(--r-lg); background: var(--bg-raise); color: var(--fg-2); font-size: var(--fs-sm); }
 .us-note > .i { width: 15px; height: 15px; color: var(--fg-3); margin-top: 1px; flex-shrink: 0; }
@@ -355,7 +355,7 @@
 .us-link:hover span:nth-child(2) { color: var(--accent-text); text-decoration: underline; }
 @media (max-width: 900px) { .us-tables { grid-template-columns: 1fr; } }
 
-/* Harness do site. Estados com cor e rótulo (a legenda diz o número de cada um). */
+/* Site Harness. States with color and label (the legend gives the number of each). */
 .ag-harness { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; color: var(--fg-2); font-size: var(--fs-sm);
   text-decoration: none; padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px; }
 .ag-harness:hover { color: var(--fg); border-color: var(--line-strong); }
@@ -394,14 +394,14 @@
 .hs-form-items { display: flex; flex-direction: column; gap: 6px; }
 .hs-form-item { display: grid; grid-template-columns: 28px 110px minmax(0, 2fr) minmax(0, 1fr); gap: 6px; align-items: center; }
 
-/* quem espera por você: anel na aba e no painel; a cor não é o único sinal (o rótulo vai no título e no leitor de tela) */
+/* whoever is waiting for you: ring on the tab and panel; color is not the only signal (the label goes in the title and the screen reader) */
 .tab.has-attention { box-shadow: inset 0 0 0 2px var(--accent); }
 .tab.has-attention .tab-label::after { content: " •"; color: var(--accent-text); }
 .xterm-host.has-attention { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ag-pill.is-attention { color: var(--accent-text); border-color: currentColor; }
 @media (prefers-reduced-motion: no-preference) { .tab.has-attention { transition: box-shadow 180ms ease; } }
 
-/* Linha do tempo por pedido */
+/* Timeline by request */
 .turns { display: flex; flex-direction: column; }
 .turn { padding: 10px 14px; border-bottom: 1px solid var(--line-soft); scroll-margin-top: 8px; }
 .turn:last-child { border-bottom: 0; }
@@ -415,11 +415,11 @@
 .turn-diff:hover .ag-path { text-decoration: underline; }
 .turn-diff .i { width: 12px; height: 12px; flex: none; margin-left: auto; color: var(--fg-3); }
 
-/* Portas por aba e estado do PR */
+/* Ports per tab and PR state */
 .port-badge { flex: none; height: 16px; margin-left: 6px; padding: 0 5px; border: 1px solid var(--line-strong); border-radius: 8px; background: transparent; color: var(--fg-2); font: 500 10.5px/14px var(--mono); cursor: pointer; }
 .port-badge:hover { border-color: var(--accent-line); color: var(--fg); }
 .pr-line { display: block; margin-top: 6px; font-size: var(--fs-sm); }
 .pr-line.is-err { color: var(--err, var(--accent)); }
 
-/* A cor de cada aba é pensada sobre fundo escuro: no tema claro, o texto solto usa a cor normal */
+/* Each tab's color is designed for a dark background: in the light theme, loose text uses the normal color */
 :root[data-theme="claro"] .cs-branch, :root[data-theme="claro"] .nt-cap span.is-next { color: var(--fg-2); }

@@ -1,4 +1,4 @@
-"""Variáveis dos prompts a partir da sessão de agente."""
+"""Prompt variables from the agent session."""
 
 import unittest
 
@@ -58,9 +58,9 @@ class ChooseTest(unittest.TestCase):
         old = session(id="a", last_activity_at="2026-10-31T08:00:00Z")
         active = session(id="b", last_activity_at="2026-10-31T07:00:00Z", is_active=True)
         recent = session(id="c", last_activity_at="2026-10-31T09:00:00Z")
-        listing = [recent, old, active]  # o índice lista da mais recente para a mais antiga
-        self.assertEqual(prompts.choose_current(listing, None).id, "b")       # ativa primeiro
-        self.assertEqual(prompts.choose_current([recent, old], None).id, "c")  # sem ativa: a mais recente
-        self.assertEqual(prompts.choose_current(listing, "a").id, "a")        # escolhida pelo usuário
-        self.assertEqual(prompts.choose_current(listing, "sumiu").id, "b")    # escolhida sumiu: automático
+        listing = [recent, old, active]  # the index lists from most recent to oldest
+        self.assertEqual(prompts.choose_current(listing, None).id, "b")       # active first
+        self.assertEqual(prompts.choose_current([recent, old], None).id, "c")  # no active one: the most recent
+        self.assertEqual(prompts.choose_current(listing, "a").id, "a")        # chosen by the user
+        self.assertEqual(prompts.choose_current(listing, "sumiu").id, "b")    # the chosen one vanished: automatic
         self.assertIsNone(prompts.choose_current([], None))

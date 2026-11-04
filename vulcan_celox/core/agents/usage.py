@@ -1,7 +1,7 @@
-"""Agregação do uso por turno (agent_usage) em tokens e custo estimado por grupo.
+"""Aggregation of usage per turn (agent_usage) into tokens and estimated cost per group.
 
-Datas no fuso local desta máquina. O custo é estimativa no preço de API (pricing.py); assinatura cobra de
-outro jeito. Linha de modelo sem preço entra nos tokens, não no custo, e marca o grupo como parcial.
+Dates in this machine's local timezone. The cost is an estimate at API price (pricing.py); a subscription bills
+differently. A row for a model without a price counts in tokens, not in cost, and marks the group as partial.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from vulcan_celox.core.i18n import tr
 
 GROUPS = ("day", "project", "model", "agent", "session")
 TOKEN_FIELDS = ("input", "output", "cache_read", "cache_write_5m", "cache_write_1h", "reasoning")
-BILLED = ("input", "output", "cache_read", "cache_write_5m", "cache_write_1h")  # reasoning já está em output
+BILLED = ("input", "output", "cache_read", "cache_write_5m", "cache_write_1h")  # reasoning is already in output
 DEFAULT_DAYS = 30
 MAX_DAYS = 400
 MAX_GROUPS = 2000
@@ -33,7 +33,7 @@ def parse_day(text: Optional[str]) -> Optional[date]:
 
 
 def period(day_from: Optional[str], day_to: Optional[str], today: Optional[date] = None) -> Tuple[date, date]:
-    """Período em dias locais. Padrão: os últimos 30 dias até hoje. ValueError se inválido."""
+    """Period in local days. Default: the last 30 days up to today. ValueError if invalid."""
     today = today or datetime.now().astimezone().date()
     end = parse_day(day_to) if day_to else today
     if day_to and end is None:
@@ -49,7 +49,7 @@ def period(day_from: Optional[str], day_to: Optional[str], today: Optional[date]
 
 
 def utc_bounds(start: date, end: date) -> Tuple[str, str]:
-    """Filtro largo em UTC para o SQL (um dia de folga de cada lado); o exato é por dia local no Python."""
+    """Wide UTC filter for SQL (one day of slack on each side); the exact one is by local day in Python."""
     lo = datetime(start.year, start.month, start.day, tzinfo=timezone.utc) - timedelta(days=1)
     hi = datetime(end.year, end.month, end.day, tzinfo=timezone.utc) + timedelta(days=2)
     return lo.strftime("%Y-%m-%d"), hi.strftime("%Y-%m-%d")
@@ -81,7 +81,7 @@ def _add(acc: Dict, row: Dict, cost: Optional[float]) -> None:
 
 
 def _finish(acc: Dict) -> Dict:
-    # custo null quando nada do grupo tem preço; parcial quando só parte tem
+    # cost null when nothing in the group has a price; partial when only some does
     acc["cost"] = round(acc["cost"], 6) if acc["priced"] or not acc["unpriced"] else None
     acc["cost_partial"] = bool(acc["unpriced"] and acc["priced"])
     for a in acc["agents"].values():
@@ -147,7 +147,7 @@ CSV_HEADER = ("grupo", "chave", "agente", "projeto", "turnos", "input", "output"
 
 
 def to_csv(report: Dict) -> str:
-    """CSV de um relatório: só ids, projetos, modelos e números; nenhum texto de sessão."""
+    """CSV of a report: only ids, projects, models and numbers; no session text."""
     out = io.StringIO()
     w = csv.writer(out, lineterminator="\n")
     w.writerow(CSV_HEADER)
@@ -162,7 +162,7 @@ def to_csv(report: Dict) -> str:
 
 
 def doctor_summary(data_dir, days: int = DEFAULT_DAYS) -> Dict:
-    """Tokens e custo dos últimos `days` dias por agente, lidos do índice só leitura (para o --doctor)."""
+    """Tokens and cost for the last `days` days per agent, read from the read-only index (for --doctor)."""
     from vulcan_celox.core.agents.index import index_path
     path = index_path(data_dir)
     start, end = period(None, None)

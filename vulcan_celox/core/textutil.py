@@ -1,4 +1,4 @@
-"""Normalização de texto para busca (sem acento, sem diferenciar caixa) e título curto de um pedido."""
+"""Text normalization for search (accent-insensitive, case-insensitive) and a short title for a request."""
 
 from __future__ import annotations
 
@@ -23,8 +23,8 @@ _SENTENCE_END = re.compile(r"(?<=[.!?])\s")
 
 
 def headline(text: Optional[str], limit: int = HEADLINE_MAX) -> str:
-    """Uma linha curta para título a partir de um pedido colado: sem as crases do bloco (duas ou mais: há colagem real
-    com uma a menos), a primeira frase quando ela tem tamanho de título, senão cortada numa palavra."""
+    """A short line for a title from a pasted request: without the block's backticks (two or more: there is a real paste
+        with one fewer), the first sentence when it is title-sized, otherwise cut at a word."""
     line = _FENCE_END.sub("", _FENCE_START.sub("", " ".join((text or "").split()))).strip()
     match = _SENTENCE_END.search(line)
     if match and 20 <= match.start() <= limit:

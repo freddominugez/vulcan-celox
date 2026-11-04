@@ -1,4 +1,4 @@
-/* Paleta Vulcan Celox e os tokens que a interface usa. Único lugar com cor solta; os outros CSS só usam var(). */
+/* Vulcan Celox palette and the tokens the interface uses. The only place with loose color; the other CSS files only use var(). */
 
 @font-face {
   font-family: "Inter";
@@ -20,7 +20,7 @@
   --cx-normal: 180ms;
   --cx-ease: cubic-bezier(.2, 0, 0, 1);
 
-  /* Área do terminal e faixa da sessão ficam escuras nos dois temas: a cor de cada aba é pensada sobre fundo escuro */
+  /* The terminal area and the session strip stay dark in both themes: each tab's color is designed for a dark background */
   --bg-term: #0A1120;
   --on-dark: #F5F7FB;
   --on-dark-2: rgba(245, 247, 251, 0.75);
@@ -245,7 +245,7 @@
   --code-removed: rgba(255, 155, 146, 0.16);
 }
 
-/* A área do terminal é escura nos dois temas: o que aparece dentro dela (estado vazio, memória, botões) usa os valores escuros. */
+/* The terminal area is dark in both themes: what appears inside it (empty state, memory, buttons) uses the dark values. */
 .ws-body {
   color-scheme: dark;
   background: var(--bg-term);

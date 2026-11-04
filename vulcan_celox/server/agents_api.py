@@ -1,4 +1,4 @@
-"""Rotas das sessões de agente (Claude Code e Codex): lista com KPIs, detalhe com eventos e revisão do índice."""
+"""Agent session routes (Claude Code and Codex): list with KPIs, detail with events, and index revision."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from vulcan_celox.core.agents.model import AgentSession, local_day
 from vulcan_celox.core.agents.watcher import AgentWatcher
 from vulcan_celox.server.local_http import HttpError, RawResponse, Request
 
-SESSION_ID = r"(?P<sid>[A-Za-z0-9][A-Za-z0-9._-]{0,79})"  # começa por letra ou dígito: nada de opção
+SESSION_ID = r"(?P<sid>[A-Za-z0-9][A-Za-z0-9._-]{0,79})"  # starts with a letter or digit: never an option
 UNPUBLISHED = ("none", "committed")
 RESUME_COMMANDS = {"claude": "claude --resume {id}", "codex": "codex resume {id}"}
 CONTEXT_TTL = 30.0
@@ -58,13 +58,13 @@ def detail(s: AgentSession) -> Dict[str, Any]:
 
 def kpis(sessions: Iterable[AgentSession], today: Optional[str] = None,
          edited_today: Optional[int] = None) -> Dict[str, int]:
-    """`edited_today` vem do índice quando a lista é leve (sem arquivos); senão é contado aqui."""
+    """`edited_today` comes from the index when the list is light (no files); otherwise it is counted here."""
     sessions = list(sessions)
     today = today or datetime.now().astimezone().date().isoformat()
     of_today = [s for s in sessions if local_day(s.last_activity_at) == today]
     return {
         "active": sum(1 for s in sessions if s.is_active),
-        # pela data de cada arquivo: uma sessão longa que só teve uma atividade hoje não soma o que fez antes
+        # by each file's date: a long session with only one activity today does not add up what it did before
         "files_edited_today": edited_today if edited_today is not None
         else sum(1 for s in sessions for f in s.edited_files() if local_day(f.last_at) == today),
         "unpublished": sum(1 for s in sessions if is_unpublished(s)),
@@ -99,7 +99,7 @@ def _int(req: Request, name: str, default: int, low: int, high: int) -> int:
 
 
 class BoundedCache:
-    """Dicionário com lock e limite: várias threads HTTP leem e gravam; o mais antigo sai primeiro."""
+    """Dictionary with a lock and a size limit: several HTTP threads read and write; the oldest goes out first."""
 
     def __init__(self, limit: int = 256):
         self.limit = limit
@@ -123,7 +123,7 @@ class BoundedCache:
 
 
 class AgentsService:
-    """Índice e observador das sessões de agente, ligados ao ciclo de vida do app."""
+    """Index and watcher of the agent sessions, tied to the app lifecycle."""
 
     def __init__(self, app):
         self.env = app.env
@@ -149,9 +149,9 @@ class AgentsService:
     def refresh(self) -> List[str]:
         return self.watcher.run_once()
 
-    # ── pareamento com as abas ───────────────────────────────────
+    # ── pairing with tabs ───────────────────────────────────
     def pairs(self) -> Dict[str, Dict]:
-        """Pares sessão de agente -> aba; refeito só quando índice, abas ou arquivos do hook mudam."""
+        """Agent session -> tab pairs; rebuilt only when the index, tabs or hook files change."""
         folder = pairing.pairings_dir(self.app.data_dir)
         try:
             folder_mtime = folder.stat().st_mtime
@@ -171,13 +171,13 @@ class AgentsService:
         return pairing.apply(sessions, self.pairs())
 
     def paired_with(self, terminal_id: str) -> Optional[AgentSession]:
-        """A sessão de agente mais recente pareada com a aba."""
-        for s in self.decorate(self.index.sessions()):  # da mais recente para a mais antiga
+        """The most recent agent session paired with the tab."""
+        for s in self.decorate(self.index.sessions()):  # from newest to oldest
             if s.pairing_id == terminal_id:
                 return s
         return None
 
-    # ── sessão atual ─────────────────────────────────────────────
+    # ── current session ─────────────────────────────────────────────
     def chosen_id(self) -> Optional[str]:
         data = self.store.load("agents_current", {})
         value = data.get("session_id") if isinstance(data, dict) else None
@@ -187,7 +187,7 @@ class AgentsService:
         self.store.save("agents_current", {"session_id": session_id})
 
     def context(self, session: Optional[AgentSession]) -> Dict[str, str]:
-        """Contexto dos prompts com cache de 30 s por sessão: a barra se atualiza sem rodar git toda vez."""
+        """Prompt context cached for 30 s per session: the bar updates without running git every time."""
         if session is None:
             return {}
         key = f"{session.id}|{session.cwd}|{session.git_branch}"
@@ -199,11 +199,11 @@ class AgentsService:
         return ctx
 
     def harness_line(self, s: AgentSession) -> Optional[Dict[str, str]]:
-        """Resumo de uma linha do harness do projeto da sessão, com o site para o link da aba."""
+        """One-line summary of the session project's harness, with the site for the tab link."""
         key = f"harness:{s.project_root or s.cwd}"
         cached = self._context_cache.get(key)
         if cached and time.monotonic() - cached[0] < CONTEXT_TTL:
-            return cached[1]  # a lista de sites passa pelo Lerd: 30 s de cache por pasta
+            return cached[1]  # the site list goes through Lerd: 30 s cache per folder
         value = self._harness_line(s)
         self._context_cache.put(key, (time.monotonic(), value))
         return value
@@ -211,7 +211,7 @@ class AgentsService:
     def _harness_line(self, s: AgentSession) -> Optional[Dict[str, str]]:
         try:
             site = harness.find_project(s.project_root or s.cwd, self.app.sites())
-        except Exception:  # noqa: BLE001  backend fora do ar: a sessão abre sem o resumo
+        except Exception:  # noqa: BLE001  backend down: the session opens without the summary
             return None
         if site is None:
             return None
@@ -246,7 +246,7 @@ def register_agents_api(app) -> AgentsService:
 
     @srv.route("GET", "/api/agents/attention")
     def attention_items(_req: Request):
-        """Sessões que terminaram o turno ou podem estar esperando, para os sinais da interface."""
+        """Sessions that finished their turn or may be waiting, for the interface signals."""
         items = []
         for s in service.decorate(service.index.sessions()):
             state = attention.resolve(s.attention, hook=s.attention_hook)
@@ -257,7 +257,7 @@ def register_agents_api(app) -> AgentsService:
 
     @srv.route("POST", "/api/agents/notice")
     def notice(req: Request):
-        """Aviso do sistema fora da casca do macOS. Texto limitado e passado depois de `--`: não vira opção do comando."""
+        """System notice outside the macOS shell. Text is limited and passed after `--`: it never becomes a command option."""
         body = req.json()
         title, text = clean_line(body.get("title")), clean_line(body.get("text"))
         if not title or sys.platform == "darwin" or not shutil.which("notify-send"):
@@ -271,7 +271,7 @@ def register_agents_api(app) -> AgentsService:
         chosen = [s for s in all_sessions if matches(s, req)]
         projects: Dict[str, int] = {}
         for s in all_sessions:
-            if s.project_name:  # sessão sem pasta: um nome vazio no filtro viraria "Todos os projetos"
+            if s.project_name:  # session without a folder: an empty name in the filter would become "Todos os projetos"
                 projects[s.project_name] = projects.get(s.project_name, 0) + 1
         today = datetime.now().astimezone().date().isoformat()
         edited_today = service.index.edited_on_day(today, None if len(chosen) == len(all_sessions) else [s.id for s in chosen])
@@ -293,7 +293,7 @@ def register_agents_api(app) -> AgentsService:
         table, _ = pricing.load(service.app.data_dir)
         costs = [pricing.cost(r, table) for r in rows]
         known = [c for c in costs if c is not None]
-        # custo estimado da sessão no preço da API: None sem nenhum turno com preço
+        # estimated session cost at API pricing: None when no turn has a price
         data["cost"] = {"value": round(sum(known), 6) if known else None, "partial": bool(known) and len(known) < len(costs),
                         "turns": len(rows)}
         data["harness"] = service.harness_line(s)
@@ -311,7 +311,7 @@ def register_agents_api(app) -> AgentsService:
                 "claude_cleanup": claude_cleanup_days(discovery.claude_root(service.env))}
 
     def usage_report(req: Request, default_group: str = "day") -> Dict[str, Any]:
-        """Tokens e custo estimado por grupo no período (dias locais), com o total."""
+        """Tokens and estimated cost per group in the period (local days), with the total."""
         group = req.arg("group") or default_group
         if group not in usage.GROUPS:
             raise HttpError(400, f"group deve ser {', '.join(usage.GROUPS)}")
@@ -320,12 +320,12 @@ def register_agents_api(app) -> AgentsService:
         except ValueError as exc:
             raise HttpError(400, str(exc)) from None
         since, until = usage.utc_bounds(start, end)
-        revision = service.index.revision()  # antes dos dados: uma gravação no meio faz a tela ler de novo
+        revision = service.index.revision()  # before the data: a write in between makes the screen read again
         table, warning = pricing.load(service.app.data_dir)
         report = usage.aggregate(service.index.usage_rows(since, until), table, group, start, end)
         report["prices_warning"] = warning
         report["revision"] = revision
-        report["scanned"] = service.watcher.settled()  # antes da 1a varredura terminar o índice está incompleto
+        report["scanned"] = service.watcher.settled()  # until the first scan finishes the index is incomplete
         return report
 
     service.usage_report = usage_report
@@ -342,17 +342,17 @@ def register_agents_api(app) -> AgentsService:
 
     @srv.route("GET", "/api/agents/repos")
     def repo_states(req: Request):
-        # git só leitura, com timeout por comando e cache de 30 s por pasta; uma montagem por vez
+        # read-only git, with a per-command timeout and a 30 s cache per folder; one assembly at a time
         with service.repos_lock:
             if req.arg("fresh") in ("1", "true"):
-                service.git_cache.clear()  # botão Atualizar
+                service.git_cache.clear()  # Refresh button
             projects = repos.build(service.index.sessions(), service.git_cache)
         return {"projects": projects, "revision": service.index.revision()}
 
     @srv.route("POST", rf"/api/agents/sessions/{SESSION_ID}/resume")
     def resume(req: Request):
-        """Retoma a sessão numa aba nova: pasta da sessão, tema da aba pareada (ou o próximo da rotação) e o comando
-        do agente digitado. O id vem do índice e passa pelo padrão SESSION_ID; nada do cliente vira comando."""
+        """Resumes the session in a new tab: session folder, paired tab theme (or the next in the rotation) and the command
+        of the agent typed in. The id comes from the index and goes through the SESSION_ID pattern; nothing from the client becomes a command."""
         sid = req.params["sid"]
         s = service.index.session(sid)
         if s is None:

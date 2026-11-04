@@ -1,4 +1,4 @@
-"""Servidor HTTP local de teste que imita a API do painel do Lerd."""
+"""Local HTTP test server that imitates the Lerd dashboard API."""
 
 import socket
 import threading

@@ -1,4 +1,4 @@
-"""Sessões de terminal reais (PTY) com histórico para reconexão."""
+"""Real terminal sessions (PTY) with history for reconnection."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from vulcan_celox.core.runner import WINDOWS, set_winsize, spawn_pty, terminate_
 
 HISTORY_LIMIT = 256 * 1024
 READ_CHUNK = 65536
-WRITE_TIMEOUT = 5.0  # segundos sem a aba ler nada: a escrita desiste
+WRITE_TIMEOUT = 5.0  # seconds without the tab reading anything: the write gives up
 
 Listener = Callable[[Optional[bytes]], None]  # None = processo terminou
 
@@ -26,7 +26,7 @@ class PtySession:
                  site: Optional[str] = None, rows: int = 24, cols: int = 80, session_id: Optional[str] = None,
                  theme: Optional[str] = None, command: Optional[str] = None):
         self.id = session_id or new_session_id()
-        self.command = command  # comando inicial da aba (None = só o shell)
+        self.command = command  # initial command of the tab (None = just the shell)
         self.theme = theme
         self.argv = list(argv)
         self.cwd = cwd
@@ -39,16 +39,16 @@ class PtySession:
         self._listeners: List[Listener] = []
         self._lock = threading.Lock()
         self.pid, handle = spawn_pty(self.argv, cwd, env, rows, cols)
-        self._win = handle if WINDOWS else None  # no Windows o terminal é um objeto ConPTY, com dois descritores
+        self._win = handle if WINDOWS else None  # on Windows the terminal is a ConPTY object, with two descriptors
         self.fd = self._win.read_fd if WINDOWS else handle
-        # Mestre não bloqueante e uma escrita por vez. Uma colagem grande não se mistura com teclas do
-        # WebSocket, e uma aba que não lê a entrada não prende a thread que escreve.
+        # non-blocking master and one write at a time. A large paste does not mix with the WebSocket
+        # keystrokes, and a tab that does not read its input does not hold the writing thread.
         if not WINDOWS:
             os.set_blocking(self.fd, False)
         self._write_lock = threading.Lock()
         self._closed = False
-        # self-pipe: close() acorda a thread leitora, que é a única a fechar o fd do PTY. Fechar o fd
-        # de outra thread deixava o número livre para outra aba enquanto o leitor ainda podia ler dele.
+        # self-pipe: close() wakes the reader thread, which is the only one to close the PTY fd. Closing the fd
+        # from another thread left the number free for another tab while the reader could still read from it.
         self._wake_r, self._wake_w = os.pipe()
         self._fds_closed = False
         self._reader = threading.Thread(target=self._read_loop, name=f"pty-{self.id}", daemon=True)
@@ -71,12 +71,12 @@ class PtySession:
                     listener(None)
                 except Exception:  # noqa: BLE001
                     pass
-            self._close_fds()  # também quando o processo sai sozinho
+            self._close_fds()  # also when the process exits on its own
 
     def _pump(self) -> None:
         while True:
             try:
-                if not WINDOWS:  # no Windows select não serve para pipe: a leitura bloqueia até o console fechar
+                if not WINDOWS:  # on Windows select does not work for pipes: the read blocks until the console closes
                     ready, _, _ = select.select([self.fd, self._wake_r], [], [], 0.5)
                     if self._wake_r in ready or (not ready and self._closed):
                         break
@@ -97,7 +97,7 @@ class PtySession:
             for listener in listeners:
                 try:
                     listener(chunk)
-                except Exception:  # noqa: BLE001 (um cliente com problema não derruba a sessão)
+                except Exception:  # noqa: BLE001 (a misbehaving client does not bring down the session)
                     self.unsubscribe(listener)
 
     def _close_fds(self) -> None:
@@ -105,7 +105,7 @@ class PtySession:
             if self._fds_closed:
                 return
             self._fds_closed = True
-        with self._write_lock:  # quem escreve vê _fds_closed e sai; o número do fd não fica livre no meio da escrita
+        with self._write_lock:  # the writer sees _fds_closed and leaves; the fd number does not become free in the middle of a write
             pass
         if self._win is not None:
             self._win.release()
@@ -129,7 +129,7 @@ class PtySession:
             self.exit_code = self.exit_code if self.exit_code is not None else -1
 
     def write(self, data: bytes, timeout: float = WRITE_TIMEOUT) -> bool:
-        """Escreve tudo ou desiste depois de `timeout` segundos sem a aba ler nada. True só se escreveu tudo."""
+        """Writes everything or gives up after `timeout` seconds without the tab reading anything. True only if everything was written."""
         with self._write_lock:
             view = memoryview(data)
             deadline = time.monotonic() + timeout
@@ -151,7 +151,7 @@ class PtySession:
                     return False
                 if written:
                     view = view[written:]
-                    deadline = time.monotonic() + timeout  # o prazo conta só o tempo parado
+                    deadline = time.monotonic() + timeout  # the deadline counts only the stalled time
                     continue
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
@@ -163,8 +163,8 @@ class PtySession:
             return True
 
     def foreground(self) -> Optional[List[procinfo.Proc]]:
-        """Processos do grupo em primeiro plano da aba; None quando não dá para saber."""
-        if not self.alive or self._fds_closed or self._win is not None:  # o Windows não tem grupo em primeiro plano
+        """Foreground group processes of the tab; None when it cannot be known."""
+        if not self.alive or self._fds_closed or self._win is not None:  # Windows has no foreground group
             return None
         return procinfo.group_processes(procinfo.foreground_pgid(self.fd))
 
@@ -180,8 +180,8 @@ class PtySession:
                 pass
 
     def subscribe(self, listener: Listener, prime: Optional[Callable[[bytes], None]] = None) -> bytes:
-        """Registra o ouvinte e devolve o histórico atual, sem perder bytes entre os dois. `prime` recebe o histórico
-        dentro do lock: o que ele enfileirar vem antes de qualquer bloco novo entregue ao ouvinte."""
+        """Registers the listener and returns the current history, without losing bytes between the two. `prime` receives the history
+                inside the lock: whatever it enqueues comes before any new block delivered to the listener."""
         with self._lock:
             self._listeners.append(listener)
             history = bytes(self._history)
@@ -205,7 +205,7 @@ class PtySession:
         self._finish_close(terminate_pty(self.pid) if self.exit_code is None else None)
 
     def _finish_close(self, status: Optional[int]) -> None:
-        """Depois do processo encerrado: registra o código, acorda a leitora e espera ela fechar o fd."""
+        """After the process ends: records the code, wakes the reader and waits for it to close the fd."""
         self._closed = True
         if self.exit_code is None:
             if status is not None:
@@ -214,7 +214,7 @@ class PtySession:
             if self.exit_code is None:
                 self.exit_code = -1
         if self._win is not None:
-            self._win.close_console()  # é isto que encerra a leitura bloqueante
+            self._win.close_console()  # this is what ends the blocking read
         with self._lock:
             wake = not self._fds_closed
         if wake:
@@ -250,7 +250,7 @@ def terminal_env(base: Mapping[str, str]) -> Dict[str, str]:
     env["TERM_PROGRAM"] = "VulcanCelox"
     env.setdefault("LANG", "pt_BR.UTF-8")
     for key in ("VULCAN_TOKEN", "VULCAN_WATCH_PARENT"):
-        env.pop(key, None)  # o token do servidor nunca vaza para o shell do usuário
+        env.pop(key, None)  # the server's token never leaks into the user's shell
     return env
 
 
@@ -270,7 +270,7 @@ class TerminalManager:
 
     def create(self, cwd: str, command: Optional[str] = None, title: str = "", site: Optional[str] = None,
                rows: int = 24, cols: int = 80, theme: Optional[str] = None) -> PtySession:
-        session_id = new_session_id()  # antes do processo nascer: o id vai no ambiente do shell
+        session_id = new_session_id()  # before the process is born: the id goes into the shell's environment
         env = terminal_env(self.base_env)
         # pareamento: o Claude Code ou o Codex iniciado nesta aba herda o id dela e o tema
         env["VULCAN_SESSION_ID"] = session_id
@@ -286,7 +286,7 @@ class TerminalManager:
         return session
 
     def unique_title(self, title: str) -> str:
-        """'loja', 'loja 2', 'loja 3'... entre as sessões abertas."""
+        """'loja', 'loja 2', 'loja 3'... among the open sessions."""
         taken = {s.title for s in self.list()}
         if title not in taken:
             return title
@@ -312,7 +312,7 @@ class TerminalManager:
         return True
 
     def close_all(self) -> None:
-        """Encerra todas as abas juntas: sinal para todas e uma espera só."""
+        """Ends all tabs together: a signal to all and a single wait."""
         with self._lock:
             sessions = list(self._sessions.values())
             self._sessions.clear()

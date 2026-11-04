@@ -1,4 +1,4 @@
-"""Geração do índice Markdown de tarefas (TAREFAS.md)."""
+"""Generation of the Markdown task index (TAREFAS.md)."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ TABLE_HEAD = ("| Prioridade | Título | Tags | Prazo | Concluída em |\n"
 
 
 def anchor(text: str) -> str:
-    """Âncora no padrão do GitHub: minúsculas, sem pontuação, espaços viram hífens."""
+    """GitHub-style anchor: lowercase, no punctuation, spaces become hyphens."""
     slug = text.strip().lower()
     slug = re.sub(r"[^\w\- ]", "", slug)
     return slug.replace(" ", "-")
@@ -52,7 +52,7 @@ def _progress_line(prefix: str, tasks: List[Task]) -> str:
 
 
 def render_site_sections(tasks: List[Task], tags: Dict[str, Tag], heading_level: int = 3) -> List[str]:
-    """Blocos A fazer / Em andamento / Concluídas de um conjunto de tarefas."""
+    """A fazer / Em andamento / Concluídas blocks of a set of tasks."""
     hashes = "#" * heading_level
     lines: List[str] = []
     for status, title in SECTIONS:
@@ -91,7 +91,7 @@ def render_global(tasks: Iterable[Task], tags: Dict[str, Tag]) -> str:
 
 
 def write_if_changed(path: Path, content: str) -> bool:
-    """Grava de forma atômica só quando o conteúdo mudou. Retorna True se gravou."""
+    """Writes atomically, only when the content changed. Returns True if it wrote."""
     path = Path(path)
     try:
         if path.read_text(encoding="utf-8") == content:
@@ -106,14 +106,14 @@ def global_index_path(data_dir: Path) -> Path:
     return Path(data_dir) / INDEX_FILENAME
 
 
-# ── índice dentro da pasta do projeto (opt-in) ───────────────────────────────
+# ── index inside the project folder (opt-in) ───────────────────────────────
 BLOCK_START = "<!-- vulcan:tarefas:inicio -->"
 BLOCK_END = "<!-- vulcan:tarefas:fim -->"
 SETTINGS_FILE = "settings"
 
 
 class ProjectPathMissing(Exception):
-    """A pasta do projeto não existe mais."""
+    """The project folder no longer exists."""
 
 
 def render_project_block(site: Optional[str], tasks: Iterable[Task], tags: Dict[str, Tag]) -> str:
@@ -126,7 +126,7 @@ def render_project_block(site: Optional[str], tasks: Iterable[Task], tags: Dict[
 
 
 def apply_block(existing: str, block: str) -> str:
-    """Troca o bloco marcado; sem marcadores válidos, acrescenta o bloco ao final."""
+    """Replaces the marked block; without valid markers, appends the block at the end."""
     start = existing.find(BLOCK_START)
     end = existing.find(BLOCK_END, start + len(BLOCK_START)) if start != -1 else -1
     if start != -1 and end != -1:
@@ -150,7 +150,7 @@ def write_project_index(project_path: str, site: Optional[str], tasks: Iterable[
 
 
 class ProjectIndexSettings:
-    """Quais sites mantêm TAREFAS.md na própria pasta (persistido em settings.json)."""
+    """Which sites keep TAREFAS.md in their own folder (persisted in settings.json)."""
 
     def __init__(self, store):
         self.store = store
@@ -173,9 +173,9 @@ class ProjectIndexSettings:
 
 def sync_project_indexes(settings: ProjectIndexSettings, site_paths: Dict[str, str],
                          tasks: Iterable[Task], tags: Dict[str, Tag]) -> List[str]:
-    """Atualiza os TAREFAS.md de projeto habilitados. Retorna avisos.
+    """Updates the TAREFAS.md of enabled projects. Returns warnings.
 
-    Site habilitado cuja pasta sumiu é desligado; site fora da lista atual é ignorado.
+        An enabled site whose folder vanished is turned off; a site outside the current list is ignored.
     """
     tasks = list(tasks)
     warnings: List[str] = []

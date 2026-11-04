@@ -1,4 +1,4 @@
-"""Widgets reutilizáveis: chips de tag, campo de tag com autocomplete, área rolável."""
+"""Reusable widgets: tag chips, tag field with autocomplete, scrollable area."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from vulcan_celox.ui import theme
 
 
 def text_color_for(bg: str) -> str:
-    """Preto ou branco conforme a luminância do fundo (#rrggbb)."""
+    """Black or white depending on the background luminance (#rrggbb)."""
     try:
         r, g, b = (int(bg[i:i + 2], 16) for i in (1, 3, 5))
     except (ValueError, IndexError):
@@ -74,7 +74,7 @@ class TagEntry(ttk.Combobox):
 
 
 class ScrollFrame(ttk.Frame):
-    """Frame com rolagem vertical; conteúdo em self.inner."""
+    """Vertically scrolling frame; content goes in self.inner."""
 
     def __init__(self, master, bg: str = theme.BG):
         super().__init__(master)
@@ -91,7 +91,7 @@ class ScrollFrame(ttk.Frame):
             widget.bind("<MouseWheel>", self._wheel)
 
     def _wheel(self, event) -> None:
-        # Tk 9 usa múltiplos de 120 por passo; Tk 8.6 no macOS entrega passos pequenos
+        # Tk 9 uses multiples of 120 per step; Tk 8.6 on macOS delivers small steps
         delta = event.delta
         steps = -int(delta / 120) if abs(delta) >= 120 else -delta
         if steps:

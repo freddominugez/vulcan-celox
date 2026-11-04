@@ -1,8 +1,9 @@
-"""Diff contra o git sem deixar o repositório executar nada: o conteúdo de HEAD sai por `cat-file blob`, que não passa
-por diff.external, textconv nem filtros, e o arquivo atual é lido direto. O repositório analisado é de terceiros."""
+"""Diff against git without letting the repository run anything: the HEAD content comes from `cat-file blob`, which does not go
+through diff.external, textconv or filters, and the current file is read directly. The analyzed repository is third-party."""
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -14,7 +15,7 @@ MAX_OUTPUT = 2 * 1024 * 1024
 
 
 def _capture(argv, limit: int) -> Tuple[Optional[int], bytes]:
-    """(código de saída ou None se o git não rodou, até limit + 1 bytes da saída). Nunca guarda mais que isso."""
+    """(exit code or None if git did not run, up to limit + 1 bytes of output). Never keeps more than that."""
     try:
         proc = open_pipe(argv)
     except OSError:
@@ -24,7 +25,7 @@ def _capture(argv, limit: int) -> Tuple[Optional[int], bytes]:
 
 
 def _toplevel(folder: str) -> Tuple[Optional[str], str]:
-    """(raiz do repositório, motivo se não houver)."""
+    """(repository root, reason if there is none)."""
     code, raw = _capture([*SAFE_GIT, "-C", folder, "rev-parse", "--show-toplevel"], 8192)
     if code is None:
         return None, "no_git"
@@ -34,7 +35,7 @@ def _toplevel(folder: str) -> Tuple[Optional[str], str]:
 
 
 def _head_blob(toplevel: str, rel: str) -> Tuple[Optional[bytes], bool]:
-    """(conteúdo em HEAD ou None se não existe lá, cortado?)."""
+    """(content at HEAD or None if it does not exist there, truncated?)."""
     code, raw = _capture([*SAFE_GIT, "-C", toplevel, "cat-file", "blob", f"HEAD:{rel}"], MAX_OUTPUT)
     if len(raw) > MAX_OUTPUT:
         return raw[:MAX_OUTPUT], True
@@ -42,10 +43,10 @@ def _head_blob(toplevel: str, rel: str) -> Tuple[Optional[bytes], bool]:
 
 
 def git_sides(real: Path) -> Dict[str, Any]:
-    """Lados do diff de um arquivo contra HEAD. `real` já passou pela checagem de raiz e de nome sensível."""
+    """Sides of a file's diff against HEAD. `real` has already passed the root and sensitive-name check."""
     folder = real.parent
     while not folder.is_dir() and folder != folder.parent:
-        folder = folder.parent  # o arquivo pode ter sido apagado junto com a pasta
+        folder = folder.parent  # the file may have been deleted along with the folder
     toplevel, reason = _toplevel(str(folder))
     if toplevel is None:
         return {"available": False, "reason": reason}
@@ -65,6 +66,9 @@ def git_sides(real: Path) -> Dict[str, Any]:
             return {"available": False, "reason": "missing"}
         return {"available": True, "status": "deleted", "old": raw.decode("utf-8", "replace"), "new": "",
                 "complete": not truncated, "truncated": truncated}
-    return {"available": True, "status": "new" if raw is None else "modified",
-            "old": "" if raw is None else raw.decode("utf-8", "replace"), "new": current["text"],
+    old, new = "" if raw is None else raw.decode("utf-8", "replace"), current["text"]
+    if os.name == "nt" and raw is not None:
+        # with core.autocrlf (Git default on Windows), HEAD stores \n and the working tree \r\n: without this, every line changes
+        old, new = old.replace("\r\n", "\n"), new.replace("\r\n", "\n")
+    return {"available": True, "status": "new" if raw is None else "modified", "old": old, "new": new,
             "complete": not truncated, "truncated": truncated}

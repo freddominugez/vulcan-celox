@@ -1,4 +1,4 @@
-"""Rotas das sessões de terminal: listagem por site, detalhe, título e tags."""
+"""Terminal session routes: listing by site, detail, title and tags."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from vulcan_celox.server.notebook_api import site_key
 
 
 def session_summary(app, record, agent_tags: Optional[Dict[str, list]] = None) -> Dict[str, Any]:
-    """`agent_tags` ({aba: [{id, agent}]}) vem calculado uma vez por lista; sem ele, calcula aqui."""
+    """`agent_tags` ({tab: [{id, agent}]}) is computed once per list; without it, it is computed here."""
     if agent_tags is None:
         agent_tags = app.hub.agent_tags()
     tasks = [t for t in app.notebook.tasks if t.terminal == record.id]
@@ -40,7 +40,7 @@ def has_doc(record) -> bool:
 
 
 def session_tree(app, closed_limit: int = 30) -> Dict[str, Any]:
-    """Sessões abertas e as encerradas mais recentes, cada uma com seus itens, para a barra lateral."""
+    """Open sessions and the most recently closed ones, each with its items, for the sidebar."""
     split = app.hub.sessions.split("*")
     tasks_by: Dict[str, list] = {}
     notes_by: Dict[str, list] = {}
@@ -123,7 +123,7 @@ def register_sessions_api(app) -> None:
                 if mode == "delete":
                     nb.tasks.remove(task)
                 else:
-                    task.terminal = None  # continua no site, sem sessão
+                    task.terminal = None  # stays on the site, without a session
             for note in notes:
                 if mode == "delete":
                     nb.notes.remove(note)

@@ -1,9 +1,9 @@
-"""Gera docs/pt-BR/user-guide.md (português) e docs/en/user-guide.md (inglês) a partir de vulcan_celox/web/help/conteudo*.json.
+"""Generates docs/pt-BR/user-guide.md (Portuguese) and docs/en/user-guide.md (English) from vulcan_celox/web/help/conteudo*.json.
 
-Uso: python3 scripts/manual_md.py                gera os dois
-     python3 scripts/manual_md.py saida.md       só o português, em saida.md
-     python3 scripts/manual_md.py saida.md --en  só o inglês, em saida.md
-O conteúdo da Ajuda do app e o manual em Markdown saem do mesmo arquivo; o validate.sh compara os dois.
+Usage: python3 scripts/manual_md.py                generates both
+     python3 scripts/manual_md.py saida.md       Portuguese only, into saida.md
+     python3 scripts/manual_md.py saida.md --en  English only, into saida.md
+The app's Help content and the Markdown manual come from the same file; validate.sh compares the two.
 """
 
 import json

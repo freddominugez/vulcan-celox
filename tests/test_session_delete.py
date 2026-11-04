@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+from tests.helpers import WINDOWS
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.session_memory import doc_path
 
@@ -39,9 +40,10 @@ class SessionDeleteTest(ServerTestCase):
         self.assertIsNone(self.app.hub.sessions.get(sid))
         self.assertFalse(Path(memory).exists())
         self.assertFalse(doc.exists())
-        # testes usam runner falso: sem Lixeira do sistema, os arquivos vão para lixeira/ na pasta de dados
+        # tests use a fake runner: without the system Trash, files go to lixeira/ in the data folder
         trash = Path(self.app.data_dir) / "lixeira"
-        self.assertEqual(len(list(trash.iterdir())), 2)
+        if not WINDOWS:  # on Windows the system Trash is called directly, without the runner
+            self.assertEqual(len(list(trash.iterdir())), 2)
         tasks = self.request("GET", "/api/tasks?site=loja")[1]["tasks"]
         self.assertEqual([(t["title"], t["terminal"]) for t in tasks], [("tarefa da sessão", "")])
         self.assertEqual(self.request("GET", "/api/notes?site=loja")[1]["notes"][0]["terminal"], "")

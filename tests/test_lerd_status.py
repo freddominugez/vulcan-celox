@@ -23,7 +23,7 @@ class LerdStatusTest(TempDirTestCase):
         for trecho in ("Lerd 1.34.3", "nginx ok", "DNS .test ok", "PHP 8.5"):
             self.assertIn(trecho, status.summary)
         self.assertEqual(status.details["php_running"], ["8.5"])
-        self.assertEqual(len([c for c in fake.calls if c.argv[-1] == "--version"]), 1)  # versão em cache
+        self.assertEqual(len([c for c in fake.calls if c.argv[-1] == "--version"]), 1)  # cached version
 
     def test_api_fora(self):
         backend, _ = self._backend(closed_port_url())

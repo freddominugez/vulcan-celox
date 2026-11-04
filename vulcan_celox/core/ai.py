@@ -1,4 +1,4 @@
-"""Cliente mínimo da Anthropic Messages API, só com stdlib. O transporte HTTP é injetável para os testes."""
+"""Minimal client for the Anthropic Messages API, stdlib only. The HTTP transport is injectable for tests."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ API_VERSION = "2023-06-01"
 DEFAULT_MODEL = "claude-sonnet-5-5"
 USER_AGENT = "VulcanCelox"
 
-# (método, url, cabeçalhos, corpo, timeout) -> (status, corpo)
+# (method, url, headers, body, timeout) -> (status, body)
 Transport = Callable[[str, str, Dict[str, str], Optional[bytes], float], Tuple[int, bytes]]
 
 
@@ -102,7 +102,7 @@ class AnthropicClient:
         payload = {"model": model, "max_tokens": max_tokens, "system": system,
                    "messages": [{"role": "user", "content": prompt}]}
         data = self._call("POST", "/v1/messages", payload, timeout)
-        if data.get("stop_reason") == "refusal":  # O texto parcial não pode virar documento
+        if data.get("stop_reason") == "refusal":  # the partial text must not become a document
             details = data.get("stop_details") if isinstance(data.get("stop_details"), dict) else {}
             category = tr(" (categoria: {category})", category=details["category"]) if details.get("category") else ""
             raise AiError(tr("a Anthropic recusou o pedido{category}; tente outro modelo ou reduza o texto enviado", category=category))

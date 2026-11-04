@@ -1,5 +1,5 @@
-"""Idioma: inglês por padrão, português disponível. O texto-fonte é o português; o dicionário é web/i18n/en.json, o mesmo da
-interface. `tr()` traduz texto do servidor; chave com {nome} também casa com o texto já preenchido."""
+"""Language: English by default, Portuguese available. The source text is Portuguese; the dictionary is web/i18n/en.json, the same as the
+interface's. `tr()` translates server text; a key with {nome} also matches already-filled text."""
 
 from __future__ import annotations
 
@@ -40,13 +40,13 @@ def language() -> str:
 
 
 def resolve(prefs: Mapping, env: Mapping[str, str]) -> str:
-    """VULCAN_LANGUAGE manda (sensores e testes); depois a preferência."""
+    """VULCAN_LANGUAGE wins (sensors and tests); then the preference."""
     chosen = env.get("VULCAN_LANGUAGE") or prefs.get("language") or DEFAULT
     return chosen if chosen in LANGUAGES else DEFAULT
 
 
 def tr(text: str, **values) -> str:
-    """Texto na língua atual. Com valores, preenche {nome}; sem valores, reconhece também texto já preenchido."""
+    """Text in the current language. With values, fills {nome}; without values, it also recognizes already-filled text."""
     if _language == "pt":
         return text.format(**values) if values else text
     table = dictionary()

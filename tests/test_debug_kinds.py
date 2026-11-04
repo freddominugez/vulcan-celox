@@ -1,4 +1,4 @@
-"""Queries (repetidas, tempo mínimo), logs com nível e tipos desconhecidos."""
+"""Queries (repeated, minimum time), logs with level and unknown types."""
 
 import json
 
@@ -24,7 +24,7 @@ class QueriesTest(TempDirTestCase):
     def test_repetidas_nos_eventos_reais(self):
         req = [e for e in EVENTS if e["kind"] == "query" and e["request"] == "GET /exemplo"]
         users = next(g for g in group_queries(req) if g["sql"] == "select * from users where id = ?")
-        self.assertEqual(users["count"], 2)  # a rota de teste roda a mesma query duas vezes
+        self.assertEqual(users["count"], 2)  # the test route runs the same query twice
 
     def test_tempo_minimo_so_nas_queries(self):
         events = [query("a", 80), query("b", 10), {"kind": "log", "data": {"level": "error"}}, query("c", 50)]

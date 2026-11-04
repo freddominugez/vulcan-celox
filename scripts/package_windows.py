@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Gera o .zip portátil do Windows: o app, o Python embutido e um lançador. Roda em qualquer sistema.
+"""Builds the portable Windows .zip: the app, the embedded Python and a launcher. Runs on any system.
 
-Uso: package_windows.py <saida>. Não tem instalador nem assinatura: quem baixa extrai a pasta e abre Vulcan Celox.cmd.
+Usage: package_windows.py <output>. No installer or signature: whoever downloads it extracts the folder and opens Vulcan Celox.cmd.
 """
 
 from __future__ import annotations
@@ -55,7 +55,7 @@ def build(output: Path) -> Path:
         fetch_python(embed)
         with zipfile.ZipFile(embed) as archive:
             archive.extractall(stage / "python")
-        # o Python embutido ignora o ambiente: é este arquivo que diz onde está o app
+        # the embedded Python ignores the environment: this file is what says where the app is
         pth = next((stage / "python").glob("python*._pth"))
         pth.write_text(pth.read_text(encoding="utf-8") + "\n..\\app\n", encoding="utf-8")
         shutil.copytree(ROOT / "vulcan_celox", stage / "app" / "vulcan_celox", ignore=FORA)

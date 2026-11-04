@@ -1,5 +1,6 @@
-"""Sessão agrupada por pedido, nos dois agentes. Fixtures sintéticas."""
+"""Session grouped by request, for both agents. Synthetic fixtures."""
 
+import os
 import json
 
 from tests.test_agents_api import AgentsServerCase
@@ -34,10 +35,10 @@ class TurnsApiTest(AgentsServerCase):
         self.assertEqual((data["total"], data["next"]), (2, None))
         um, dois = data["turns"]
         self.assertEqual((um["turn"], um["ask"], um["edits"], um["commands_total"]), (1, "primeiro", 1, 1))
-        self.assertEqual(um["files"], [{"path": "/sintetico/projeto/a.py", "kind": "edit", "seq": 1}])
+        self.assertEqual(um["files"], [{"path": os.path.normpath("/sintetico/projeto/a.py"), "kind": "edit", "seq": 1}])
         self.assertEqual(um["commands"][0]["text"], "pytest")
         self.assertEqual(um["commands"][0]["kind"], "test")
-        self.assertEqual(dois["files"], [{"path": "/sintetico/projeto/b.py", "kind": "read", "seq": None}])
+        self.assertEqual(dois["files"], [{"path": os.path.normpath("/sintetico/projeto/b.py"), "kind": "read", "seq": None}])
 
     def test_edicao_falha_nao_leva_ao_diff(self):
         self.write(user("x"), tool_use("t1", "Edit", file_path="/p/a.py", old_string="x", new_string="y"), tool_result("t1", error=True))
@@ -73,7 +74,7 @@ class TurnsApiTest(AgentsServerCase):
         self.app.agents.refresh()
         turn = self.turns(sid=CODEX)["turns"][0]
         self.assertEqual(turn["ask"], "faça")
-        self.assertEqual({f["path"] for f in turn["files"]}, {"/sintetico/projeto/a.py", "/sintetico/projeto/b.py", "/sintetico/projeto/c.py"})
+        self.assertEqual({f["path"] for f in turn["files"]}, {os.path.normpath(f"/sintetico/projeto/{n}.py") for n in "abc"})
         self.assertTrue(all(f["seq"] for f in turn["files"]))
 
     def test_pareada_diz_se_o_agente_esta_vivo(self):

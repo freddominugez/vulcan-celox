@@ -1,4 +1,4 @@
-"""Memória, índice geral, árvore de sessões e documentação com IA mostram o agente pareado."""
+"""Memory, general index, session tree and AI documentation show the paired agent."""
 
 from pathlib import Path
 

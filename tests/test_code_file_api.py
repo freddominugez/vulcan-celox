@@ -1,9 +1,10 @@
-"""Leitura segura do visor de código: raiz da sessão, links, pasta do agente, tamanho, binário, nome sensível."""
+"""Safe reading in the code viewer: session root, links, agent folder, size, binary, sensitive name."""
 
 import json
 import os
 from urllib.parse import quote
 
+from tests.helpers import unix_only
 from tests.test_agents_api import AgentsServerCase
 
 SID = "44444444-5555-4666-8777-888888888888"
@@ -14,7 +15,7 @@ class CodeFileApiTest(AgentsServerCase):
         super().setUp()
         self.project = self.tmp / "projeto"
         self.project.mkdir()
-        (self.project / "a.php").write_text("<?php echo '<b>oi</b>';\n", encoding="utf-8")
+        (self.project / "a.php").write_bytes(b"<?php echo '<b>oi</b>';\n")
         self.add_session(self.project, SID)
 
     def add_session(self, cwd, sid):
@@ -103,6 +104,7 @@ class CodeFileApiTest(AgentsServerCase):
         (self.project / "sub").mkdir()
         self.assert_refused("sub", 403, "unreadable")
 
+    @unix_only("mkfifo não existe no Windows")
     def test_fifo_nao_trava(self):
         os.mkfifo(self.project / "fila")
         self.assert_refused("fila", 403, "unreadable")

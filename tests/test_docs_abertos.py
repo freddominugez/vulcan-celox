@@ -1,4 +1,4 @@
-"""Documentação pública nas duas línguas, com links internos válidos."""
+"""Public documentation in both languages, with valid internal links."""
 import re
 import unittest
 from pathlib import Path

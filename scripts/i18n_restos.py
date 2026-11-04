@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lista texto em português fora de t() nos módulos da interface. Uso: i18n_restos.py [arquivos]; sem argumento, todos."""
+"""Lists Portuguese text outside t() in the interface modules. Usage: i18n_restos.py [files]; with no argument, all of them."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 WEB = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web"
-# módulos sem texto de interface: o t() não entra, e o teste os lê no node
+# modules without interface text: t() is not used there, and the test reads them in node
 FORA = {"i18n.mjs", "theme-boot.js"}
 ACENTO = re.compile(r"[ãõáéíóúâêôçàÃÕÁÉÍÓÚÂÊÔÇ]")
 PALAVRA = re.compile(r"\b(para|sem|com|não|nao|você|arquivo|arquivos|pasta|sessão|sessões|tarefa|tarefas|abrir|fechar|copiar|salvar|criar|buscar|nenhum|nenhuma|aba|abas|editar|remover|novo|nova|comando|comandos|site|sites|pedido|pedidos|agente|agentes|ligar|desligar|atualizar|carregar|voltar|ainda|erro|falhou|agora|hoje|ontem|dias)\b", re.I)

@@ -1,4 +1,4 @@
-// Ouvintes globais da casca.
+// Global listeners of the shell; split out of app.mjs.
 
 import { onJobsChange } from "./ai.mjs";
 import { startNotices } from "./attention-notify.mjs";
@@ -35,7 +35,7 @@ export function bindGlobalEvents() {
     const dash = event.target.closest("[data-action='dashboard']");
     if (dash && dash.closest("#side-env")) post("/api/open", { kind: "dashboard" }).catch(reportError);
     if (event.target.closest("#open-palette")) palette.open();
-    if (event.target.closest("#help-here")) runCommand("help");  // Ajuda já na seção da tela atual
+    if (event.target.closest("#help-here")) runCommand("help");  // Help already at the section of the current screen
     if (event.target.closest("#add-node")) {
       addNodeDialog().then((added) => {
         if (!added) return;
@@ -74,7 +74,7 @@ export function bindGlobalEvents() {
   applySites();
   const nodeToggle = $("[data-side-toggle='section:node']");
   const applyNode = () => {
-    const open = !app.tree.isOpen("section:node-closed");  // seção nova: aberta para quem já tinha preferências salvas
+    const open = !app.tree.isOpen("section:node-closed");  // new section: open for those who already had saved preferences
     nodeToggle.setAttribute("aria-expanded", String(open));
     $("#side-node").classList.toggle("is-collapsed", !open);
   };
@@ -84,7 +84,7 @@ export function bindGlobalEvents() {
   });
   applyNode();
   window.addEventListener("vulcan-node-changed", () => loadNodeProjects());
-  // Aba aberta por um script do projeto aparece no painel de baixo, sem sair da tela
+  // tab opened by a project script appears in the bottom panel, without leaving the screen
   window.addEventListener("vulcan-show-terminal", async (event) => {
     const id = event.detail && event.detail.id;
     if (!id) return;
@@ -117,7 +117,7 @@ export function bindGlobalEvents() {
   });
 
   document.addEventListener("keydown", (event) => {
-    // macOS: ⌘; Linux: Ctrl+Shift (Ctrl sozinho pertence ao terminal)
+    // macOS: ⌘; Linux: Ctrl+Shift (Ctrl alone belongs to the terminal)
     const mod = isMac ? event.metaKey : event.ctrlKey && event.shiftKey;
     if (!mod) {
       if (event.key === "Escape" && !$("#palette").hidden) palette.close();
@@ -125,7 +125,7 @@ export function bindGlobalEvents() {
     }
     const digit = /^Digit([1-9])$/.exec(event.code || "");
     const key = digit && !isMac ? digit[1] : event.key.toLowerCase();
-    // na casca nativa os menus já tratam estes atalhos; no navegador tratamos aqui
+    // in the native shell the menus already handle these shortcuts; in the browser we handle them here
     if (key === "k") { event.preventDefault(); palette.open(); }
     if (key === "p" && event.shiftKey) { event.preventDefault(); navigate("#/prompts"); }
     if (key === "j") { event.preventDefault(); runCommand("togglePanel"); }
@@ -146,10 +146,10 @@ export function bindGlobalEvents() {
         navigate(`#/agentes/${encodeURIComponent(latest.session)}`);
       }
     }
-    // ⌘? abre a Ajuda já na seção da tela atual
+    // ⌘? opens Help already at the section of the current screen
     if (key === "?" || (key === "/" && event.shiftKey)) { event.preventDefault(); navigate(`#/ajuda/${sectionFor(app.route)}`); }
-    if (key === "e" && event.shiftKey) { event.preventDefault(); navigate("#/depuracao"); }
-    // ⌘F (Ctrl+Shift+F no Linux) busca no terminal quando há um terminal na tela; senão fica com o comportamento normal
+    if (key === "e" && event.shiftKey) { event.preventDefault(); navigate("#/depuracao"); }  // shortcut for the Depuração screen
+    // ⌘F (Ctrl+Shift+F on Linux) searches the terminal when there is one on screen; otherwise normal behavior
     if (key === "f" && (!isMac || !event.shiftKey) && document.querySelector(".term-workspace .tab")) {
       event.preventDefault();
       runCommand("find");

@@ -1,4 +1,4 @@
-"""Rotas dos terminais (REST e WebSocket) e o envio por cliente."""
+"""Terminal routes (REST and WebSocket) and per-client sending; split from app.py."""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ from vulcan_celox.server.websocket import OP_BINARY, OP_TEXT, WebSocket, WebSock
 AGENT_COMMANDS = {"claude": "claude", "codex": "codex"}  # argv fixo: nada vindo do cliente vira comando
 
 class ClientSender:
-    """Fila e thread de envio de um cliente WebSocket. A thread leitora do PTY só enfileira: um cliente
-    lento ou travado nunca para a leitura, os outros clientes nem o processo. Quem passa do limite é desligado."""
+    """Queue and sender thread of a WebSocket client. The PTY reader thread only enqueues: a slow or stuck client
+    never stops the reading, the other clients or the process. A client that exceeds the limit is disconnected."""
 
     LIMIT = 4 * 1024 * 1024
 
@@ -34,7 +34,7 @@ class ClientSender:
         self._thread.start()
 
     def push(self, item) -> None:
-        """bytes (saída do terminal) ou str (mensagem de texto)."""
+        """bytes (terminal output) or str (text message)."""
         if self.dropped:
             return
         size = len(item)
@@ -65,7 +65,7 @@ class ClientSender:
                 return
 
     def kill(self) -> None:
-        """Desliga o cliente: o envio preso e o laço de leitura do WebSocket saem com erro."""
+        """Disconnects the client: the stuck send and the WebSocket read loop exit with an error."""
         try:
             self.sock.shutdown(socket.SHUT_RDWR)
         except OSError:
@@ -77,7 +77,7 @@ class ClientSender:
 
 
 def terminal_size(rows, cols):
-    """Linhas e colunas do resize, de 1 a 1000; None se o valor não servir."""
+    """Rows and columns of the resize, from 1 to 1000; None if the value is unusable."""
     try:
         rows, cols = int(rows), int(cols)
     except (TypeError, ValueError):
@@ -114,7 +114,7 @@ def register_terminal_api(app) -> None:
         command = (body.get("command") or "").strip() or None
         theme = body.get("theme")
         if theme == "auto":
-            theme = app.theme_rotation.take()  # o botão Novo terminal gasta a rotação; tema escolhido não
+            theme = app.theme_rotation.take()  # the Novo terminal button uses up the rotation; a chosen theme does not
         elif theme is not None and not themes.is_theme(theme):
             raise HttpError(400, "tema desconhecido")
         agent = body.get("agent")
@@ -191,7 +191,7 @@ def register_terminal_api(app) -> None:
             else:
                 sender.push(chunk)
 
-        # o histórico entra na fila dentro do lock do PTY: vem antes de qualquer saída nova
+        # the history is queued inside the PTY lock: it comes before any new output
         session.subscribe(forward, prime=lambda history: sender.push(history) if history else None)
         try:
             if not session.alive:

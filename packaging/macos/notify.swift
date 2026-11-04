@@ -1,5 +1,5 @@
-// Aviso do sistema e número no ícone do Dock, pedidos pela interface.
-// A assinatura é ad hoc, então o macOS pode recusar a autorização: fica o número no Dock e a interface é avisada.
+// System notification and Dock icon badge, requested by the interface.
+// The signature is ad hoc, so macOS may refuse authorization: the Dock badge stays and the interface is informed.
 
 import AppKit
 import UserNotifications
@@ -37,8 +37,8 @@ enum SystemNotice {
     }
 }
 
-/// O sensor visual roda com a janela fora da tela, às vezes com o Mac de tela apagada: o WebKit suspenderia a página
-/// e nenhum timer rodaria. No app de verdade vale o padrão do sistema, que poupa energia com a janela oculta.
+/// The visual sensor runs with the window offscreen, sometimes with the Mac screen off: WebKit would suspend the page
+/// and no timer would run. In the real app the system default applies, which saves energy with the window hidden.
 func configureWebPreferences(_ preferences: WKPreferences, inspect: Bool) {
     preferences.setValue(inspect, forKey: "developerExtrasEnabled")
     if CommandLine.arguments.contains("--snapshot"), #available(macOS 14.0, *) {
@@ -46,9 +46,9 @@ func configureWebPreferences(_ preferences: WKPreferences, inspect: Bool) {
     }
 }
 
-// MARK: - Idioma da casca
+// MARK: - Shell language
 
-/// Idioma da casca: VULCAN_LANGUAGE, senão `language` em preferences.json na pasta de dados; padrão en.
+/// Shell language: VULCAN_LANGUAGE, otherwise `language` in preferences.json in the data folder; default en.
 private let shellLanguage: String = {
     let env = ProcessInfo.processInfo.environment
     if let chosen = env["VULCAN_LANGUAGE"], ["en", "pt"].contains(chosen) { return chosen }
@@ -62,7 +62,7 @@ private let shellLanguage: String = {
     return "en"
 }()
 
-/// O mesmo dicionário da interface (texto-fonte em português -> inglês), lido uma vez dos Resources do bundle.
+/// The same dictionary as the interface (Portuguese source text -> English), read once from the bundle's Resources.
 private let shellDictionary: [String: String] = {
     guard let url = Bundle.main.resourceURL?.appendingPathComponent("vulcan_celox/web/i18n/en.json"),
           let data = try? Data(contentsOf: url),
@@ -70,7 +70,7 @@ private let shellDictionary: [String: String] = {
     return table
 }()
 
-/// Texto na língua atual; `{nome}` é preenchido com `values`. Em português devolve o texto-fonte.
+/// Text in the current language; `{nome}` is filled with `values`. In Portuguese it returns the source text.
 func L(_ text: String, _ values: [String: String] = [:]) -> String {
     var out = shellLanguage == "pt" ? text : (shellDictionary[text] ?? text)
     for (name, value) in values { out = out.replacingOccurrences(of: "{\(name)}", with: value) }

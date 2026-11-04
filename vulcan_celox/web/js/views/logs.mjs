@@ -1,11 +1,11 @@
-// Aba Logs do site: storage/logs/laravel.log lido aos pedaços, com nível, busca e pausa; e atalhos que
-// abrem os logs do Lerd (PHP-FPM, nginx, serviços) numa aba do terminal.
+// Site Logs tab: storage/logs/laravel.log read in chunks, with level, search and pause; and shortcuts that
+// open the Lerd logs (PHP-FPM, nginx, services) in a terminal tab.
 
 import { every, get, post } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
 import { t } from "../i18n.mjs";
 
-const LIMIT = 2000;  // entradas na tela; as mais antigas saem
+const LIMIT = 2000;  // entries on screen; the oldest drop off
 const LEVELS = ["", "ERROR", "WARNING", "INFO", "DEBUG"];
 const TONE = { EMERGENCY: "err", ALERT: "err", CRITICAL: "err", ERROR: "err", WARNING: "warn", NOTICE: "warn", INFO: "info", DEBUG: "dim" };
 

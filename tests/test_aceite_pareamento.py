@@ -1,16 +1,16 @@
-"""Aceite de ponta a ponta do caminho aba, sessão e prompt, com PTY e shell reais.
+"""End-to-end acceptance of the tab, session and prompt path, with a real PTY and shell.
 
-Só o agente é falso: um executável chamado `claude` que grava a sessão como o Claude Code e guarda o que chega pelo
-terminal. Nunca roda o Claude Code de verdade e nunca toca em ~/.claude. O servidor, o índice, o pareamento por pasta
-e horário, a leitura do processo em primeiro plano e a colagem são os de produção.
+Only the agent is fake: an executable named `claude` that writes the session the way Claude Code does and records what
+arrives through the terminal. It never runs the real Claude Code and never touches ~/.claude. The server, the index, the pairing by folder
+and time, the foreground process reading and the paste are the production ones.
 """
 
 import datetime
-import json
 import os
 import sys
 import time
 
+from tests.helpers import unix_only
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
 from vulcan_celox.core import procinfo, prompts
@@ -34,6 +34,7 @@ with open(os.path.join(base, "recebido"), "ab", buffering=0) as out:
 """
 
 
+@unix_only("agente falso com termios, e o Windows não tem checagem de primeiro plano")
 class AceiteTest(ServerTestCase):
     def env(self):
         env = super().env()
@@ -44,7 +45,7 @@ class AceiteTest(ServerTestCase):
         return env
 
     def tearDown(self):
-        (self.tmp / "parar").touch()  # o agente falso sai sozinho
+        (self.tmp / "parar").touch()  # the fake agent exits on its own
         self.app.terminals.close_all()
         super().tearDown()
 
@@ -74,16 +75,16 @@ class AceiteTest(ServerTestCase):
         agent.write_text(FAKE_AGENT.format(python=sys.executable, base=str(self.tmp), sid=SID, cwd=cwd, at=at))
         agent.chmod(0o755)
 
-        # sem agente na aba: nem sessão existe ainda
+        # no agent in the tab: no session exists yet
         self.assertIsNone(self.card())
         self.assertTrue(terminal.write(f"'{agent}'\n".encode()))
 
-        # a sessão aparece pareada com a aba, sem hook: pasta e horário
+        # the session shows up paired with the tab, without a hook: folder and time
         session = wait_for(lambda: (self.card() or {}).get("pairing_id") and self.card(), timeout=15)
         self.assertTrue(session, "a sessão não apareceu pareada")
         self.assertEqual(session["pairing_id"], tab["id"])
 
-        # o agente em primeiro plano recebe a colagem, sem Enter. Uma só: o envio repetido só acontece se recusado
+        # the foreground agent receives the paste, without Enter. Only one: the repeated send only happens if refused
         results = []
         self.assertTrue(wait_for(lambda: results.append(self.send()) or results[-1][0] == 200, timeout=10), results)
         self.assertTrue(wait_for(lambda: prompts.PASTE_END in self.received(), timeout=10), self.received())
@@ -94,7 +95,7 @@ class AceiteTest(ServerTestCase):
         self.assertNotIn(b"\r", data)
         self.assertNotIn(b"\n", data)
 
-        # o agente fecha, a aba volta ao shell: o pareamento expira e nada vai para o shell
+        # the agent closes, the tab goes back to the shell: the pairing expires and nothing goes to the shell
         (self.tmp / "parar").touch()
         self.assertTrue(wait_for(lambda: not procinfo.agent_running(terminal.foreground() or [("claude", "claude")], "claude"),
                                  timeout=15), terminal.foreground())
@@ -103,4 +104,4 @@ class AceiteTest(ServerTestCase):
         self.assertEqual(self.received(), data)
         self.assertTrue(terminal.alive)
         time.sleep(0.2)
-        self.assertNotIn(SID.encode(), terminal.history())  # o shell não recebeu o texto
+        self.assertNotIn(SID.encode(), terminal.history())  # the shell did not receive the text

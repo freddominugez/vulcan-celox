@@ -1,7 +1,7 @@
-"""Processos do grupo em primeiro plano de um terminal.
+"""Foreground group processes of a terminal.
 
-Serve para saber se o agente de uma sessão ainda roda na aba pareada: depois que o Claude Code ou o Codex sai, a
-aba vira shell comum e um prompt colado nela cairia no shell. Linux lê /proc; macOS roda `ps` pelo runner.
+Used to know whether a session's agent still runs in the paired tab: after Claude Code or Codex exits, the
+tab becomes a plain shell and a pasted prompt would land in the shell. Linux reads /proc; macOS runs `ps` through the runner.
 """
 
 from __future__ import annotations
@@ -12,9 +12,9 @@ from typing import List, Optional, Tuple
 
 from vulcan_celox.core.runner import Runner
 
-Proc = Tuple[str, str]  # (nome do executável, linha de comando)
+Proc = Tuple[str, str]  # (executable name, command line)
 
-# executáveis de cada agente; o Claude Code nativo roda de ~/.local/share/claude/versions/<versão>
+# executables of each agent; native Claude Code runs from ~/.local/share/claude/versions/<version>
 AGENT_EXECUTABLES = {
     "claude": {"claude"},
     "codex": {"codex"},
@@ -43,7 +43,7 @@ def _from_proc(pgid: int, root: Path) -> List[Proc]:
                 continue
             raw = (entry / "cmdline").read_bytes()
         except (OSError, ValueError, IndexError):
-            continue  # processo saiu no meio da leitura
+            continue  # the process exited mid-read
         procs.append((comm, raw.replace(b"\0", b" ").decode("utf-8", "replace").strip()))
     return procs
 
@@ -62,7 +62,7 @@ def _from_ps(pgid: int, runner) -> Optional[List[Proc]]:
 
 
 def group_processes(pgid: Optional[int], runner=None, proc_root: Path = Path("/proc")) -> Optional[List[Proc]]:
-    """Processos do grupo `pgid`. None quando não dá para saber (sem /proc e sem ps)."""
+    """Processes of group `pgid`. None when it cannot be known (no /proc and no ps)."""
     if not pgid or pgid <= 0:
         return None
     try:
@@ -74,8 +74,8 @@ def group_processes(pgid: Optional[int], runner=None, proc_root: Path = Path("/p
 
 
 def agent_running(procs: List[Proc], agent: str) -> bool:
-    """Algum processo é o agente: nome do executável, ou um componente do caminho dos dois primeiros argumentos
-    (`node /opt/homebrew/bin/codex`, `/Users/x/.local/share/claude/versions/2.1.3`)."""
+    """Some process is the agent: executable name, or a path component of the first two arguments
+        (`node /opt/homebrew/bin/codex`, `/Users/x/.local/share/claude/versions/2.1.3`)."""
     names = AGENT_EXECUTABLES.get(agent, {agent})
     for comm, args in procs:
         candidates = {os.path.basename(comm.lstrip("-"))}
@@ -87,7 +87,7 @@ def agent_running(procs: List[Proc], agent: str) -> bool:
 
 
 def tab_runs_agent(terminal, agent: str) -> bool:
-    """O agente ainda roda em primeiro plano nesta aba? Sem como saber, a aba viva vale."""
+    """Is the agent still running in the foreground in this tab? When there is no way to know, a live tab counts."""
     if terminal is None or not getattr(terminal, "alive", False):
         return False
     foreground = terminal.foreground() if hasattr(terminal, "foreground") else None

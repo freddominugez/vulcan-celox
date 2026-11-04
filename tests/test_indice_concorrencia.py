@@ -1,4 +1,4 @@
-"""Índice de agentes sem bloqueio."""
+"""Agent index without blocking."""
 
 import json
 import os
@@ -50,7 +50,7 @@ class IndiceTest(TempDirTestCase):
         with mock.patch.object(index_mod, "read_session", slow):
             worker = threading.Thread(target=self.index.update_file, args=("claude", self.file))
             worker.start()
-            time.sleep(0.2)  # a leitura já começou
+            time.sleep(0.2)  # the read has already started
             started = time.monotonic()
             self.index.revision()
             self.index.sessions()
@@ -64,14 +64,14 @@ class IndiceTest(TempDirTestCase):
         self.index.update_file("claude", self.file)
         replacement = self.folder / "novo.tmp"
         replacement.write_text("".join(line(f"b{i}", i) for i in range(6)))
-        os.replace(replacement, self.file)  # outro inode, maior que o offset salvo
+        os.replace(replacement, self.file)  # another inode, larger than the saved offset
         self.index.update_file("claude", self.file)
         self.assertEqual(self.texts(), [f"b{i}" for i in range(6)])
 
     def test_reset_nao_duplica_parse_errors(self):
         self.file.write_text("{ruim\n" + line("a", 1) + line("b", 2))
         self.index.update_file("claude", self.file)
-        self.file.write_text("{ruim\n")  # menor: relê do zero
+        self.file.write_text("{ruim\n")  # smaller: re-reads from scratch
         self.index.update_file("claude", self.file)
         count = self.index.db.execute("SELECT COUNT(*) FROM parse_errors WHERE file_path = ?",
                                       (str(self.file),)).fetchone()[0]

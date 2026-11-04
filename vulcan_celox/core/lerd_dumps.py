@@ -1,8 +1,8 @@
-"""Eventos da ponte de dumps do Lerd: dump(), queries, logs, views e requisições, lidos pela API dele.
+"""Events from Lerd's dump bridge: dump(), queries, logs, views and requests, read through its API.
 
-Formato conferido em 2026-10-31 no Lerd 1.37.1 (protocolo v1): id, ts, kind, ctx {type, site, branch, domain,
-request, pid, rid}, src {file, line}, e `text` (dump) ou `data` (query, log, view, request). Campos novos ou ausentes
-não quebram a leitura.
+Format checked on 2026-10-31 against Lerd 1.37.1 (protocol v1): id, ts, kind, ctx {type, site, branch, domain,
+request, pid, rid}, src {file, line}, and `text` (dump) or `data` (query, log, view, request). New or missing fields
+do not break the reading.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.redact import redact
 
-API_FILTERS = ("site", "branch", "kind", "limit")  # os que a API do Lerd aceita; busca de texto é feita no app
+API_FILTERS = ("site", "branch", "kind", "limit")  # the ones Lerd's API accepts; text search is done in the app
 
 
 def _dict(value) -> Dict[str, Any]:
@@ -43,7 +43,7 @@ def parse_events(rows: Any) -> List[Dict[str, Any]]:
 
 
 def event_text(event: Dict[str, Any]) -> str:
-    """Texto pesquisável do evento: o dump, o SQL, a mensagem do log ou a view."""
+    """Searchable text of the event: the dump, the SQL, the log message or the view."""
     data = event.get("data") or {}
     parts = [event.get("text", ""), event.get("label", ""), event.get("request", ""), event.get("file", "")]
     for key in ("sql", "message", "name", "view", "context"):
@@ -54,14 +54,14 @@ def event_text(event: Dict[str, Any]) -> str:
 
 def filter_events(events: List[Dict[str, Any]], site: str = "", branch: str = "", kind: str = "",
                   q: str = "") -> List[Dict[str, Any]]:
-    """Filtro combinado; a busca de texto passa pelo dump, SQL, mensagem, view, requisição e arquivo."""
+    """Combined filter; the text search covers the dump, SQL, message, view, request and file."""
     text = (q or "").strip().lower()
     return [e for e in events if (not site or e["site"] == site) and (not branch or e["branch"] == branch)
             and (not kind or e["kind"] == kind) and (not text or text in event_text(e).lower())]
 
 
 def group_by_request(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Eventos agrupados por requisição (rid do Lerd; sem rid, pela linha da requisição), a mais nova primeiro."""
+    """Events grouped by request (Lerd's rid; without a rid, by the request line), newest first."""
     groups: Dict[tuple, Dict[str, Any]] = {}
     for e in events:
         key = (e["site"], e["branch"], e["rid"] or f"{e['request']}|{e['ts'][:19]}")
@@ -85,7 +85,7 @@ def _ms(event: Dict[str, Any]) -> float:
 
 
 def group_queries(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Queries idênticas (mesmo SQL) somadas: contagem e tempo total, as mais caras primeiro."""
+    """Identical queries (same SQL) summed: count and total time, most expensive first."""
     found: Dict[str, Dict[str, Any]] = {}
     for e in events:
         if e.get("kind") != "query":
@@ -98,7 +98,7 @@ def group_queries(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 def filter_min_ms(events: List[Dict[str, Any]], min_ms: float) -> List[Dict[str, Any]]:
-    """Tempo mínimo vale só para queries; os outros tipos passam."""
+    """Minimum time applies only to queries; the other types pass."""
     if not min_ms:
         return list(events)
     return [e for e in events if e.get("kind") != "query" or _ms(e) >= min_ms]
@@ -112,13 +112,13 @@ def log_tone(level: str) -> str:
     return LOG_TONES.get(str(level or "").lower(), "info")
 
 
-# O que deu erro no site enquanto um agente trabalhava nele
+# what failed on the site while an agent was working on it
 SUMMARY_MAX = 20
-SESSION_GRACE = timedelta(minutes=1)  # a última requisição costuma vir logo depois da última resposta do agente
+SESSION_GRACE = timedelta(minutes=1)  # the last request usually comes right after the agent's last reply
 
 
 def parse_ts(value: str) -> Optional[datetime]:
-    """ISO 8601 com Z ou fuso; frações de qualquer tamanho (o fromisoformat do 3.9 só aceita 3 ou 6 dígitos)."""
+    """ISO 8601 with Z or timezone; fractions of any length (Python 3.9's fromisoformat only accepts 3 or 6 digits)."""
     text = (value or "").strip()
     if len(text) < 19:
         return None
@@ -155,7 +155,7 @@ def events_for_session(events: Iterable[Dict[str, Any]], site: str, started_at: 
 
 
 def site_for_path(sites: Iterable[Tuple[str, str]], path: str) -> Optional[str]:
-    """Site cuja pasta contém a pasta da sessão; o mais específico ganha."""
+    """Site whose folder contains the session folder; the most specific wins."""
     if not path:
         return None
     target = os.path.abspath(path)
@@ -170,7 +170,7 @@ def site_for_path(sites: Iterable[Tuple[str, str]], path: str) -> Optional[str]:
 
 
 def session_summary(events: List[Dict[str, Any]], site: str) -> str:
-    """Texto para colar no agente; passa pelo redact e para em SUMMARY_MAX eventos."""
+    """Text to paste into the agent; goes through redact and stops at SUMMARY_MAX events."""
     lines = [tr("Estas exceções e erros aconteceram no site {site} enquanto você trabalhava:", site=site)]
     for e in events[:SUMMARY_MAX]:
         data = e.get("data") or {}

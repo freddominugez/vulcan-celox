@@ -1,34 +1,35 @@
-"""PTY e WebSocket."""
+"""PTY and WebSocket."""
 
 import os
 import re
 import socket
+import sys
 import time
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import WINDOWS, TempDirTestCase, py_argv
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
 from tests.test_websocket import RawClient
 from vulcan_celox.core.pty_session import PtySession, TerminalManager
 from vulcan_celox.server.websocket import OP_BINARY, read_frame
 
-ENV = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": "/tmp", "TERM": "xterm-256color"}
+ENV = dict(os.environ) if WINDOWS else {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": "/tmp", "TERM": "xterm-256color"}
 
 
 class FdTest(TempDirTestCase):
     def test_close_espera_a_thread_leitora(self):
-        s = PtySession(["/bin/sh", "-c", "sleep 30"], str(self.tmp), ENV)
+        s = PtySession(py_argv("import time; time.sleep(30)"), str(self.tmp), ENV)
         s.close()
         self.assertFalse(s._reader.is_alive(), "close voltou com a thread leitora ainda usando o fd")
 
     def test_processo_que_sai_sozinho_fecha_o_fd(self):
-        s = PtySession(["/bin/sh", "-c", "exit 3"], str(self.tmp), ENV)
+        s = PtySession(py_argv("import sys; sys.exit(3)"), str(self.tmp), ENV)
         self.assertTrue(wait_for(lambda: not s.alive))
         self.assertTrue(wait_for(lambda: not s._reader.is_alive()))
         with self.assertRaises(OSError):
             os.fstat(s.fd)
         self.assertEqual(s.exit_code, 3)
-        s.close()  # depois de sair sozinho, fechar continua seguro
+        s.close()  # after exiting on its own, closing stays safe
 
     def test_abrir_e_fechar_muitas_abas_sem_misturar(self):
         manager = TerminalManager(ENV)
@@ -42,14 +43,14 @@ class FdTest(TempDirTestCase):
 
 class OrdemTest(TempDirTestCase):
     def test_historico_do_prime_vem_antes_de_qualquer_bloco_novo(self):
-        s = PtySession(["/bin/sh", "-c", "while :; do echo tique; done"], str(self.tmp), ENV)
+        s = PtySession(py_argv("while True: print('tique')"), str(self.tmp), ENV)
         try:
             self.assertTrue(wait_for(lambda: len(s.history()) > 1000))
             order = []
 
             def prime(history):
                 order.append(("historico", len(history)))
-                time.sleep(0.3)  # a leitora segue recebendo bytes, mas não pode entregar nada antes disto
+                time.sleep(0.3)  # the reader keeps receiving bytes, but must not deliver anything before this
 
             s.subscribe(lambda chunk: order.append(("bloco", len(chunk or b""))), prime=prime)
             self.assertTrue(wait_for(lambda: len(order) > 3))
@@ -77,7 +78,8 @@ class WebSocketTest(ServerTestCase):
         env = super().env()
         env["SHELL"] = "/bin/sh"
         env["PATH"] = os.environ.get("PATH", "")
-        return env
+        # on Windows, a program without SYSTEMROOT and company does not even load; the real app inherits all of this
+        return {**os.environ, **env} if WINDOWS else env
 
     def tearDown(self):
         self.app.terminals.close_all()
@@ -89,16 +91,20 @@ class WebSocketTest(ServerTestCase):
         return info["id"]
 
     def test_cliente_que_nao_le_nao_trava_o_terminal(self):
-        tid = self.open("head -c 30000000 /dev/zero | tr '\\0' 'x'; echo; echo FIM-$((6*7))")
+        code = "import sys; sys.stdout.write('x' * 1000000); print(); print('FIM-' + str(6 * 7))"
+        tid = self.open(f"& '{sys.executable}' -c \"{code}\"" if WINDOWS
+                        else "head -c 30000000 /dev/zero | tr '\\0' 'x'; echo; echo FIM-$((6*7))")
         parado = RawClient(self.app.server.port, f"/ws/terminals/{tid}?token={self.token}")
-        parado.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)  # nunca lê
+        parado.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)  # never reads
         pty = self.app.terminals.get(tid)
         self.assertTrue(wait_for(lambda: b"FIM-42" in pty.history(), timeout=30),
-                        "o processo ficou preso porque um cliente não lia")
+                        ("o processo ficou preso porque um cliente não lia", pty.history()[-400:]))
         parado.sock.close()
 
     def test_reconectar_entrega_o_historico_antes_da_saida_nova(self):
-        tid = self.open("i=0; while [ $i -lt 400000 ]; do i=$((i+1)); echo n$i; done")
+        code = "for i in range(1, 400001): print('n' + str(i))"
+        tid = self.open(f"& '{sys.executable}' -c \"{code}\"" if WINDOWS
+                        else "i=0; while [ $i -lt 400000 ]; do i=$((i+1)); echo n$i; done")
         time.sleep(0.3)
         for _ in range(15):
             client = RawClient(self.app.server.port, f"/ws/terminals/{tid}?token={self.token}")

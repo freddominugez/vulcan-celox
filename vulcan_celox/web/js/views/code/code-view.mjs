@@ -1,5 +1,5 @@
-// Aba Código da sessão de agente: árvore, arquivo e diff. Só leitura. Fica montada enquanto a sessão está aberta, para a
-// atualização automática não apagar a seleção nem a rolagem do visor.
+// Agent session Código tab: tree, file and diff. Read-only. Stays mounted while the session is open, so the
+// automatic update does not wipe the viewer's selection or scroll.
 
 import { ApiError, get, isMac, post } from "../../api.mjs";
 import { esc, icon, reportError } from "../../dom.mjs";
@@ -24,7 +24,7 @@ function segmented(label, options, current, attr) {
 export class CodeView {
   constructor(session, target = null) {
     this.session = session;
-    this.target = target;  // arquivo e linha pedidos pelo clique no terminal
+    this.target = target;  // file and line requested by the click in the terminal
     this.el = document.createElement("div");
     this.el.className = "code-shell";
     this.el.innerHTML = `<nav class="code-side" aria-label="${t("Arquivos da sessão")}"></nav>
@@ -46,7 +46,7 @@ export class CodeView {
     this.ticket = 0;
     this.followTurn = 0;
     this.el.addEventListener("click", (e) => this.onClick(e));
-    // só gestos do usuário pausam; a rolagem que o próprio visor faz não dispara nenhum destes
+    // only user gestures pause; scrolling done by the viewer itself triggers none of these
     this.onGesture = (e) => { if (!e.target.closest("[data-code=resume]")) this.interacted(); };
     this.el.addEventListener("pointerdown", this.onGesture);
     this.bodyEl.addEventListener("wheel", this.onGesture, { passive: true });
@@ -56,7 +56,7 @@ export class CodeView {
     this.update();
   }
 
-  /** Chamado ao abrir e a cada mudança no índice. */
+  /** Called on open and on every index change. */
   async update(session) {
     if (session) this.session = session;
     let tree;
@@ -84,13 +84,13 @@ export class CodeView {
     const files = this.tree.files;
     const wanted = this.target && this.target.path;
     if (wanted) {
-      this.follow.userInteracted();  // quem clicou quer ler este trecho, não seguir o agente
+      this.follow.userInteracted();  // whoever clicked wants to read this range, not follow the agent
       if (!files.some((f) => f.path === wanted)) {
         this.extra = this.extraFile(wanted);
         this.tree.files = [...files, this.extra];
         this.renderSide();
       }
-      if (this.target.seq) {  // vindo de um pedido da Linha do tempo: o diff daquele pedido
+      if (this.target.seq) {  // coming from a Linha do tempo request: that request's diff
         this.scope = "turn";
         await this.select(wanted, "diff", this.target.seq);
       } else {
@@ -107,14 +107,14 @@ export class CodeView {
     return this.revealLatest();
   }
 
-  /** Arquivo clicado no terminal que a sessão não tocou: o servidor continua decidindo se abre. */
+  /** File clicked in the terminal that the session did not touch: the server still decides whether to open it. */
   extraFile(path) {
     const root = this.tree.root.replace(/\/$/, "");
     const rel = path.startsWith(`${root}/`) ? path.slice(root.length + 1) : path;
     return { path, rel, kind: "read", inside: true, exists: true, sensitive: false, edits: 0, last_seq: 0, failed: 0, language: "" };
   }
 
-  /** O último arquivo editado que o visor pode abrir. */
+  /** The last edited file the viewer can open. */
   latest() {
     const files = this.tree.files.filter((f) => f.inside && !f.sensitive);
     return files.sort((a, b) => b.last_seq - a.last_seq)[0];
@@ -124,7 +124,7 @@ export class CodeView {
     return this.follow && this.follow.state === "following" && !this.destroyed;
   }
 
-  /** Vai até a edição mais nova. Depois de cada espera confere de novo: o usuário pode ter pausado no meio. */
+  /** Goes to the newest edit. After each wait it checks again: the user may have paused midway. */
   async followLatest() {
     const latest = this.latest();
     if (!latest) return;
@@ -148,24 +148,24 @@ export class CodeView {
     return this.following() || (this.follow && this.follow.state === "off");
   }
 
-  /** Atualiza o texto no mesmo editor, sem perder a posição. */
+  /** Updates the text in the same editor, without losing the position. */
   async refreshFile(turn) {
     try {
       const data = await get(`/api/code/file?session=${encodeURIComponent(this.session.id)}&path=${encodeURIComponent(this.path)}`);
       if (turn === this.followTurn && this.following() && this.viewer && this.viewer.setText) this.viewer.setText(data.text);
     } catch (err) {
-      if (turn === this.followTurn && this.following()) await this.show();  // apagado ou recusado: mostra o estado vazio
+      if (turn === this.followTurn && this.following()) await this.show();  // deleted or refused: shows the empty state
     }
   }
 
-  /** Rola até o trecho da última edição do arquivo aberto. */
+  /** Scrolls to the range of the last edit of the open file. */
   async revealLatest() {
     const file = this.file();
     if (!this.following() || !file || !file.edits || !this.viewer || this.viewer.kind !== "file") return;
     try {
       const data = await get(`/api/code/session/${encodeURIComponent(this.session.id)}/diff?path=${encodeURIComponent(this.path)}&scope=edit`);
       if (this.following() && data.available && this.viewer && this.viewer.reveal) this.viewer.reveal(data.new);
-    } catch (_) { /* sem o trecho: fica no começo do arquivo */ }
+    } catch (_) { /* without the range: stays at the top of the file */ }
   }
 
   interacted() {
@@ -317,7 +317,7 @@ export class CodeView {
   }
 
   onClick(event) {
-    // pelo teclado o botão recebe clique sem pointerdown: escolher arquivo ou modo também pausa
+    // via keyboard the button gets a click without pointerdown: choosing a file or mode also pauses
     if (event.target.closest("button") && !event.target.closest("[data-code]")) this.interacted();
     const pick = event.target.closest("[data-path]");
     if (pick) return this.select(pick.dataset.path);
@@ -334,7 +334,7 @@ export class CodeView {
     const layout = event.target.closest("[data-layout]");
     if (layout) {
       this.layout = layout.dataset.layout;
-      try { localStorage.setItem(LAYOUT_KEY, this.layout); } catch (_) { /* sem armazenamento: vale só agora */ }
+      try { localStorage.setItem(LAYOUT_KEY, this.layout); } catch (_) { /* no storage: applies only now */ }
       return this.show();
     }
     const step = event.target.closest("[data-step]");
@@ -358,7 +358,7 @@ export class CodeView {
     return undefined;
   }
 
-  /** ⌘F abre a busca do visor mesmo com o foco fora dele. */
+  /** ⌘F opens the viewer search even with focus outside it. */
   key(event) {
     const mod = isMac ? event.metaKey : event.ctrlKey;
     if (!mod || event.key.toLowerCase() !== "f" || !this.el.isConnected || !this.viewer || this.bodyEl.contains(document.activeElement)) return;
@@ -366,7 +366,7 @@ export class CodeView {
     openSearch(this.CM, this.viewer);
   }
 
-  /** A aba voltou a aparecer: o editor mede de novo o que estava fora da tela. */
+  /** The tab appeared again: the editor remeasures what was off screen. */
   attached() {
     if (this.viewer) this.viewer.editor.requestMeasure();
   }

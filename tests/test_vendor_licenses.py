@@ -1,4 +1,4 @@
-"""Todo arquivo em web/vendor tem entrada MIT em LICENSES.md e vem de um pacote conhecido."""
+"""Every file in web/vendor has an MIT entry in LICENSES.md and comes from a known package."""
 
 import json
 import re
@@ -8,7 +8,7 @@ from pathlib import Path
 VENDOR = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web" / "vendor"
 SCRIPTS = VENDOR.parents[2] / "scripts" / "codemirror"
 PACKAGE = {"xterm.js": "@xterm/xterm", "xterm.css": "@xterm/xterm", "codemirror.js": "@codemirror/view", "InterVariable.woff2": "Inter"}
-LICENSE_OF = {"Inter": "OFL-1.1"}  # só a fonte tem outra licença; todo o resto precisa ser MIT
+LICENSE_OF = {"Inter": "OFL-1.1"}  # only the font has another license; everything else must be MIT
 
 
 class VendorLicensesTest(unittest.TestCase):
@@ -53,7 +53,7 @@ class CodemirrorVendorTest(unittest.TestCase):
         self.assertTrue(self.bundle.startswith(b"/* CodeMirror 6"), "gerado em IIFE, sem build no app")
 
     def test_nao_carrega_na_abertura_do_app(self):
-        # 767 KB só entram quando a aba Código abre
+        # 767 KB are only loaded when the Code tab opens
         index = (VENDOR.parent / "index.html").read_text(encoding="utf-8")
         self.assertNotIn("codemirror", index)
 

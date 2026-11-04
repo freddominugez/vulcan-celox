@@ -60,7 +60,7 @@ class PostItCard(tk.Frame):
         self.tag_entry = TagEntry(bottom, names_provider=board.tag_names, on_submit=self._add_tag, width=9)
         self.tag_entry.pack(side="right")
 
-    # ── edição ───────────────────────────────────────────────────────────
+    # ── editing ────────────────────────────────────────────────────────
     def _on_modified(self, _event=None) -> None:
         if self.text.edit_modified():
             self.board.queue_text(self.note_id, self.text.get("1.0", "end-1c"))
@@ -175,7 +175,7 @@ class NotesBoard(ttk.Frame):
 
     def _on_notebook_change(self, kind: str) -> None:
         if self._saving or kind not in ("notes", "tags", "all"):
-            return  # gravação do próprio texto: não redesenha para não perder o cursor
+            return  # write of the text itself: does not redraw so the cursor is not lost
         try:
             if not self.winfo_exists():
                 return
@@ -188,7 +188,7 @@ class NotesBoard(ttk.Frame):
             self.flush()
             self._unsubscribe()
 
-    # ── ações ────────────────────────────────────────────────────────────
+    # ── actions ────────────────────────────────────────────────────────
     def new_note(self) -> Note:
         self.flush()
         tag_id = self._selected_tag_id()

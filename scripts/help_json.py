@@ -1,4 +1,4 @@
-"""Grava o conteúdo da Ajuda no layout do repositório: um bloco por linha, listas com um item por linha."""
+"""Writes the Help content in the repository layout: one block per line, lists with one item per line."""
 
 import json
 import sys

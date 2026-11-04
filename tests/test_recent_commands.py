@@ -1,4 +1,4 @@
-"""Últimos comandos do site, das sessões registradas, para reexecutar."""
+"""Latest commands of the site, from the registered sessions, to re-run."""
 
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.quick_commands import recent_commands

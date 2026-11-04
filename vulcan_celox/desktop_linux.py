@@ -1,7 +1,7 @@
-"""Casca do Vulcan Celox no Linux: sobe o servidor no próprio processo e abre a interface.
+"""Vulcan Celox shell on Linux: starts the server in the same process and opens the interface.
 
-Ordem: janela GTK 3 com WebKit2GTK (PyGObject), janela de app do Chromium/Chrome/Brave/Edge ou o navegador
-padrão (xdg-open). Uso: vulcan-celox [--check] [--mode gtk|app|browser]
+Order: a GTK 3 window with WebKit2GTK (PyGObject), an app window of Chromium/Chrome/Brave/Edge, or the
+default browser (xdg-open). Usage: vulcan-celox [--check] [--mode gtk|app|browser]
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ IDLE_EXIT_SECONDS = 150.0
 
 
 def gtk_webkit_version() -> Optional[str]:
-    """Versão do WebKit2GTK utilizável com GTK 3, ou None."""
+    """WebKit2GTK version usable with GTK 3, or None."""
     try:
         import gi
         gi.require_version("Gtk", "3.0")
@@ -44,7 +44,7 @@ def gtk_webkit_version() -> Optional[str]:
 
 
 def windows_browser(env, exists=os.path.exists) -> Optional[str]:
-    """No Windows o Edge já vem instalado, mas fora do PATH."""
+    """On Windows, Edge comes preinstalled but is not on PATH."""
     if sys.platform != "win32":
         return None
     for base in ("PROGRAMFILES(X86)", "PROGRAMFILES", "LOCALAPPDATA"):
@@ -58,7 +58,7 @@ def windows_browser(env, exists=os.path.exists) -> Optional[str]:
 
 def choose_mode(env, which: Callable[[str], Optional[str]] = shutil.which,
                 gtk: Callable[[], Optional[str]] = gtk_webkit_version) -> Tuple[str, Optional[str]]:
-    """(modo, detalhe): ("gtk", versão) | ("app", navegador) | ("browser", None)."""
+    """(mode, detail): ("gtk", version) | ("app", browser) | ("browser", None)."""
     forced = env.get("VULCAN_LINUX_MODE")
     if forced not in (None, "", "gtk", "app", "browser"):
         forced = None
@@ -74,7 +74,7 @@ def choose_mode(env, which: Callable[[str], Optional[str]] = shutil.which,
 
 
 def is_app_uri(uri: Optional[str], port: int) -> bool:
-    """A janela só mostra o próprio app: http://127.0.0.1:<porta> ou about:blank."""
+    """The window only shows the app itself: http://127.0.0.1:<port> or about:blank."""
     if uri == "about:blank":
         return True
     try:
@@ -85,7 +85,7 @@ def is_app_uri(uri: Optional[str], port: int) -> bool:
 
 
 def bootstrap_script(token: str, port: int) -> str:
-    """Define window.VULCAN só quando a página carregada é a do app: outra origem não vê o token."""
+    """Defines window.VULCAN only when the loaded page is the app's: another origin never sees the token."""
     origin = json.dumps(f"http://127.0.0.1:{port}")
     return (f"if (location.origin === {origin}) {{ window.VULCAN = {{ token: {json.dumps(token)}, native: false, "
             "bridge: true, kind: 'main' }; }")
@@ -95,8 +95,8 @@ LAUNCHER_NAME = "abrir-janela.html"
 
 
 def write_launcher(data_dir, port: int, token: str, route: str = "#/overview"):
-    """Página 0600 na pasta de dados que leva o navegador ao app com o token no fragmento.
-    O token não aparece na linha de comando do navegador nem do xdg-open, que outros usuários da máquina leem."""
+    """A 0600 page in the data folder that takes the browser to the app with the token in the fragment.
+    The token does not appear in the browser or xdg-open command line, which other users on the machine can read."""
     from pathlib import Path
     folder = Path(data_dir)
     folder.mkdir(parents=True, exist_ok=True)
@@ -107,20 +107,20 @@ def write_launcher(data_dir, port: int, token: str, route: str = "#/overview"):
     fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
         fh.write(html)
-    os.chmod(str(path), 0o600)  # arquivo antigo com outro modo
+    os.chmod(str(path), 0o600)  # old file with a different mode
     return path
 
 
 def app_window_argv(browser: str, launcher, profile) -> list:
-    """Chromium em modo app aberto pelo lançador: nenhum argumento leva o token."""
+    """Chromium in app mode opened through the launcher: no argument carries the token."""
     return [browser, f"--app={launcher.as_uri()}", f"--user-data-dir={profile}",
             "--no-first-run", "--no-default-browser-check", "--class=VulcanCelox"]
 
 
 def should_exit_idle(last_request: float, started: float, now: float, timeout: float = IDLE_EXIT_SECONDS) -> bool:
-    """No modo navegador não há janela para observar: encerra quando a interface para de consultar o servidor."""
+    """In browser mode there is no window to watch: exits when the interface stops polling the server."""
     reference = last_request or started
-    grace = timeout * 2 if not last_request else timeout  # dá tempo de o navegador abrir
+    grace = timeout * 2 if not last_request else timeout  # leaves time for the browser to open
     return now - reference > grace
 
 
@@ -147,7 +147,7 @@ def run_app_window(app, token: str, browser: str) -> int:
     os.makedirs(profile, exist_ok=True)
     closed = threading.Event()
     codes = []
-    # perfil próprio: o processo do navegador vive só enquanto a janela do app estiver aberta
+    # own profile: the browser process lives only while the app window is open
     launcher = write_launcher(app.data_dir, app.server.port, token)
     Runner().stream(app_window_argv(browser, launcher, profile),
                     on_exit=lambda code: (codes.append(code), closed.set()))
@@ -156,12 +156,12 @@ def run_app_window(app, token: str, browser: str) -> int:
 
 
 def run_browser(app, token: str) -> int:
-    url = write_launcher(app.data_dir, app.server.port, token).as_uri()  # sem o token na linha de comando
+    url = write_launcher(app.data_dir, app.server.port, token).as_uri()  # without the token on the command line
     opener = shutil.which("xdg-open")
     if sys.platform == "win32":
         Runner().stream(["explorer.exe", url])
     elif opener:
-        Runner().stream([opener, url])  # em segundo plano: alguns xdg-open só retornam quando o navegador fecha
+        Runner().stream([opener, url])  # in the background: some xdg-open only return when the browser closes
     print(f"{APP_NAME} running at http://127.0.0.1:{app.server.port} (open this file if the browser did not open):\n{url}",
           flush=True)
     started = time.monotonic()
@@ -217,7 +217,7 @@ def run_gtk(app, token: str, version: str) -> int:
         return window
 
     def on_policy(_view, decision, decision_type) -> bool:
-        """Navegação fora do app é cancelada; link externo clicado abre no navegador padrão."""
+        """Navigation away from the app is cancelled; a clicked external link opens in the default browser."""
         if decision_type not in (WebKit2.PolicyDecisionType.NAVIGATION_ACTION,
                                  WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION):
             return False
@@ -225,7 +225,7 @@ def run_gtk(app, token: str, version: str) -> int:
         request = action.get_request() if action is not None else decision.get_request()
         uri = request.get_uri() if request is not None else None
         if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION and is_app_uri(uri, port):
-            return False  # segue o padrão (usar)
+            return False  # follows the default (use)
         decision.ignore()
         clicked = action is not None and action.get_navigation_type() == WebKit2.NavigationType.LINK_CLICKED
         opener = shutil.which("xdg-open")
@@ -235,7 +235,7 @@ def run_gtk(app, token: str, version: str) -> int:
 
     def on_message(view, window, body) -> None:
         if not is_app_uri(view.get_uri(), port):
-            return  # mensagem de página que não é do app
+            return  # message from a page that is not the app's
         kind = body.get("type")
         if kind == "setTitle":
             window.set_title(str(body.get("title") or APP_NAME))

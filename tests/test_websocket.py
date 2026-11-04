@@ -6,6 +6,7 @@ import socket
 import time
 import unittest
 
+from tests.helpers import WINDOWS
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.server.websocket import (OP_BINARY, OP_CLOSE, OP_TEXT, accept_key, encode_frame,
                                               read_frame)
@@ -86,16 +87,17 @@ class WebSocketIntegrationTest(ServerTestCase):
         self.assertEqual(client.status, 101)
         self.assertEqual(client.headers["sec-websocket-accept"], client.expected_accept)
         client.send(json.dumps({"type": "resize", "rows": 40, "cols": 120}).encode(), OP_TEXT)
-        client.send(b"echo vulcan$((1+1)); stty size\n")
-        out = client.read_until(b"40 120")
+        client.send(b"echo ('vul' + 'can' + (1+1)); \"$($Host.UI.RawUI.WindowSize.Height) $($Host.UI.RawUI.WindowSize.Width)\"\r"
+                    if WINDOWS else b"echo vulcan$((1+1)); stty size\n")
+        out = client.read_until(b"40 120", timeout=20)
         self.assertIn(b"vulcan2", out)
         client.close()
 
-        # reconexão recebe o histórico
+        # reconnection receives the history
         again = RawClient(self.app.server.port, f"/ws/terminals/{info['id']}?token={self.token}")
         self.assertIn(b"vulcan2", again.read_until(b"vulcan2"))
-        again.send(b"exit\n")
-        self.assertIn(b'"type": "exit"', again.read_until(b'"type": "exit"'))
+        again.send(b"exit\r")
+        self.assertIn(b'"type": "exit"', again.read_until(b'"type": "exit"', timeout=20))
         again.sock.close()
 
         self.assertEqual(self.request("PATCH", f"/api/terminals/{info['id']}", body={"title": "novo"})[1]["title"],
@@ -113,7 +115,7 @@ class WebSocketIntegrationTest(ServerTestCase):
         sock.sendall((f"GET /ws/terminals/{info['id']}?token={self.token} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n"
                       "Upgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: eA==\r\n"
                       "Sec-WebSocket-Version: 13\r\nOrigin: https://evil.example\r\n\r\n").encode())
-        self.assertIn(b" 403 ", sock.recv(200))  # Origem estranha cai antes do upgrade
+        self.assertIn(b" 403 ", sock.recv(200))  # a foreign origin is dropped before the upgrade
         sock.close()
 
     def test_criar_com_pasta_invalida_e_site_inexistente(self):

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import tkinter as tk
 from tkinter import ttk
 from typing import Callable, Dict, List, Optional
 
@@ -18,7 +17,7 @@ def site_iid(name: str) -> str:
 
 
 class Sidebar(ttk.Frame):
-    """Emite on_select(site_name | None) quando a seleção muda (None = Global)."""
+    """Emits on_select(site_name | None) when the selection changes (None = Global)."""
 
     def __init__(self, master, on_select: Callable[[Optional[str]], None],
                  on_add: Callable[[], None], on_remove: Callable[[], None],
@@ -89,7 +88,7 @@ class Sidebar(ttk.Frame):
     def site(self, name: Optional[str]) -> Optional[Site]:
         return self._sites.get(name) if name else None
 
-    # ── seleção ──────────────────────────────────────────────────────────
+    # ── selection ──────────────────────────────────────────────────────
     def selected_key(self) -> Optional[str]:
         sel = self.tree.selection()
         if not sel or sel[0] == GLOBAL_IID or not sel[0].startswith("site:"):

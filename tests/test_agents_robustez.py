@@ -1,4 +1,4 @@
-"""Leitura robusta. Linha com tipo inesperado não trava a sessão; datas fora do padrão; sidechain."""
+"""Robust reading. A line with an unexpected type does not break the session; non-standard dates; sidechain."""
 
 import io
 import json
@@ -61,7 +61,7 @@ class RobustezTest(TempDirTestCase):
     def test_linhas_hostis_do_codex_nao_quebram_a_leitura(self):
         path = write(self.tmp / "rollout-2026-10-31T10-00-00-019a0000-0000-7000-8000-000000000001.jsonl", HOSTIS_CODEX)
         s = read_session("codex", path).session
-        self.assertEqual(s.id, "019a0000-0000-7000-8000-000000000001")  # id não texto é ignorado
+        self.assertEqual(s.id, "019a0000-0000-7000-8000-000000000001")  # a non-text id is ignored
         self.assertEqual(s.turns, 1)
         self.assertEqual(s.first_user_message, "pedido válido")
         self.assertEqual([f.path for f in s.files], ["/r/a.php", "/r/b.php"])
@@ -93,7 +93,7 @@ class RobustezTest(TempDirTestCase):
         with mock.patch.object(index, "update_file", side_effect=OSError("disco ocupado")):
             self.assertEqual(watcher.run_once(), [])
         self.assertIn("disco ocupado", watcher.last_error)
-        self.assertEqual(watcher.run_once(), ["aaaa"])  # o arquivo não ficou marcado como lido
+        self.assertEqual(watcher.run_once(), ["aaaa"])  # the file was not marked as read
         self.assertEqual(len(index.sessions()), 1)
         index.close()
         self.assertTrue(path.is_file())
@@ -114,7 +114,7 @@ class RobustezTest(TempDirTestCase):
         s = read_session("claude", write(self.tmp / "c.jsonl", [GOOD, side])).session
         self.assertEqual(s.files, [])
         self.assertIsNone(s.tokens)
-        self.assertEqual(s.last_activity_at, "2026-10-31T10:00:09Z")  # atividade, mas não conteúdo da sessão
+        self.assertEqual(s.last_activity_at, "2026-10-31T10:00:09Z")  # activity, but not session content
 
     def test_datas_com_fracao_fora_do_padrao(self):
         for raw, expected in (("2026-10-31T10:00:00.123Z", 123000), ("2026-10-31T10:00:00.123456789Z", 123456),

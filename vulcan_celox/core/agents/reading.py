@@ -1,4 +1,4 @@
-"""Leitura incremental de um arquivo de sessão: continua do offset com o estado salvo do leitor."""
+"""Incremental reading of a session file: continues from the offset with the reader's saved state."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ def _readers() -> Dict:
     try:
         from vulcan_celox.core.agents import codex_reader
         readers["codex"] = (codex_reader.new_session, codex_reader.CodexReader)
-    except ImportError:  # pragma: no cover  (o leitor do Codex faz parte do pacote)
+    except ImportError:  # pragma: no cover  (the Codex reader has been part of the package since its introduction)
         pass
     return readers
 
@@ -46,7 +46,7 @@ def read_session(agent: str, path, session: Optional[AgentSession] = None, state
         size = os.path.getsize(path)
     except OSError:
         size = 0
-    compressed = path.name.endswith(".zst")  # Sempre do início; o offset não é do arquivo em disco
+    compressed = path.name.endswith(".zst")  # always from the start; the offset does not belong to the file on disk
     if session is None or size < offset or compressed:
         reset = session is not None
         session, state, offset = new_session(path), None, 0
@@ -59,10 +59,10 @@ def read_session(agent: str, path, session: Optional[AgentSession] = None, state
         try:
             reader.feed(obj)
             tracker.feed(start, obj, session.turns)
-        except Exception as exc:  # noqa: BLE001  uma linha estranha não pode travar a sessão inteira
+        except Exception as exc:  # noqa: BLE001  one strange line must not block the whole session
             feed_errors.append((start, f"linha ignorada: {type(exc).__name__}: {exc}"))
     if stream.reset and not reset:
-        # o arquivo encolheu entre o stat acima e a abertura: o estado antigo não vale, relê do zero
+        # the file shrank between the stat above and the open: the old state is invalid, reread from scratch
         result = read_session(agent, path, None, None, 0, max_line)
         result.reset = True
         return result

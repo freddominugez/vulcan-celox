@@ -28,7 +28,7 @@ class SessionPromptTest(unittest.TestCase):
         self.assertEqual(prompt.system, SESSION_SYSTEM)
         for expected in ("php artisan migrate", "[fazendo] Rodar seeders", "(prazo 2026-09-20)", "Usar fila redis",
                          "Tags da sessão: deploy", "Migrated: 2026_09_14_create_orders", "últimos 60000 caracteres",
-                         "Pasta: ~/Lerd/loja"):
+                         "Pasta: " + os.path.join("~", "Lerd", "loja")):
             self.assertIn(expected, prompt.user)
         self.assertNotIn("segredo123", prompt.user)
         self.assertNotIn(os.path.expanduser("~") + "/Lerd", prompt.user)

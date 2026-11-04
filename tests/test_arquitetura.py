@@ -1,4 +1,4 @@
-"""Regras de arquitetura verificadas por varredura do código-fonte (D4, D5, D7)."""
+"""Architecture rules checked by scanning the source code."""
 
 import ast
 import unittest
@@ -40,7 +40,7 @@ class ArquiteturaTest(unittest.TestCase):
                 self.assertNotIn(termo, texto, f"{path.relative_to(PKG)} contém {termo}")
 
     def test_scripts_sem_apagamento_definitivo(self):
-        """A regra vale também para os scripts de desenvolvimento e os de instalação."""
+        """The rule also holds for the development scripts and the installation ones."""
         root = PKG.parent
         for folder in ("scripts", "packaging"):
             for path in sorted((root / folder).rglob("*")):

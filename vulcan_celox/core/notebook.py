@@ -24,11 +24,11 @@ class _All:
         return "ALL"
 
 
-ALL = _All()  # filtro "todos os sites" (None já significa Global)
+ALL = _All()  # filter "all sites" (None already means Global)
 
 
 class DuplicateTag(ValueError):
-    """Já existe tag com esse nome (comparação sem diferenciar maiúsculas)."""
+    """A tag with that name already exists (case-insensitive comparison)."""
 
 
 class InvalidDue(ValueError):
@@ -91,7 +91,7 @@ def task_summary(tasks: List[Task], today: Optional[date] = None) -> Dict[str, i
 
 
 def chip_specs(item, tags: Dict[str, Tag]) -> List[Tuple[str, str, str]]:
-    """(id, nome, cor) das tags do item, na ordem do item, ignorando ids órfãos."""
+    """(id, name, color) of the item's tags, in the item's order, ignoring orphan ids."""
     return [(t, tags[t].name, tags[t].color) for t in item.tags if t in tags]
 
 
@@ -106,7 +106,7 @@ class Notebook:
         self._listeners: List[Callable[[str], None]] = []
         self.load()
 
-    # ── persistência ─────────────────────────────────────────────────────
+    # ── persistence ─────────────────────────────────────────────────────
     def load(self) -> None:
         self.tags = {}
         for raw in self.store.load("tags", []):
@@ -186,7 +186,7 @@ class Notebook:
         self.changed("tags")
 
     def delete_tag(self, tag_id: str) -> int:
-        """Remove a tag e a referência a ela em notas e tarefas. Retorna itens afetados."""
+        """Removes the tag and the reference to it in notes and tasks. Returns affected items."""
         if tag_id not in self.tags:
             return 0
         del self.tags[tag_id]
@@ -215,7 +215,7 @@ class Notebook:
     def remove_tag_from_item(self, item, tag_id: str) -> None:
         self.set_item_tags(item, [t for t in item.tags if t != tag_id])
 
-    # ── notas (básico; recursos completos em notes_*) ────────────────────
+    # ── notes (basics; full features in notes_*) ────────────────────
     def add_note(self, site: Optional[str], text: str = "", color: str = "amarelo",
                  tags: Optional[List[str]] = None, terminal: Optional[str] = None) -> Note:
         same_site = [n.order for n in self.notes if n.site == site]
@@ -228,7 +228,7 @@ class Notebook:
 
     def notes_for(self, site, query: str = "", tag_id: Optional[str] = None,
                   terminal: Optional[str] = None) -> List[Note]:
-        """Notas do site (None = Global, ALL = todos): fixadas primeiro, depois pela ordem manual."""
+        """Notes of the site (None = Global, ALL = all): pinned first, then by manual order."""
         items = [n for n in self.notes if site is ALL or n.site == site]
         if terminal:
             items = [n for n in items if n.terminal == terminal]
@@ -264,7 +264,7 @@ class Notebook:
         self.changed("notes")
 
     def reorder_note(self, note_id: str, new_index: int = 0, target_id: Optional[str] = None) -> None:
-        """Move para `new_index` na lista do site ou, com `target_id`, para a posição daquele post-it."""
+        """Moves to `new_index` in the site's list or, with `target_id`, to that post-it's position."""
         note = self.note(note_id)
         if note is None:
             raise KeyError(note_id)
@@ -356,7 +356,7 @@ class Notebook:
         return task
 
     def move_task(self, task_id: str, delta: int) -> None:
-        """Move na ordem manual dentro do mesmo site."""
+        """Moves in the manual order within the same site."""
         task = self._task_or_raise(task_id)
         ordered = sorted((t for t in self.tasks if t.site == task.site), key=lambda t: t.order)
         i = ordered.index(task)
@@ -417,9 +417,9 @@ class Notebook:
         return {k: len(payload[k]) for k in ("tags", "notes", "tasks")}
 
     def import_(self, path) -> Dict[str, int]:
-        """Mescla por id: itens existentes são atualizados, novos são acrescentados.
+        """Merges by id: existing items are updated, new ones are appended.
 
-        Tag importada com nome igual ao de uma tag local (id diferente) é unificada na local.
+                A tag imported with the same name as a local tag (different id) is merged into the local one.
         """
         data = read_json_readonly(Path(path))
         if not isinstance(data, dict) or data.get("app") != "vulcan-celox":
@@ -459,9 +459,9 @@ class Notebook:
         self.changed("all")
         return counts
 
-    # ── migração do protótipo ────────────────────────────────────────────
+    # ── prototype migration ────────────────────────────────────────
     def migrate_legacy_notes(self) -> int:
-        """Converte `legacy_notes` ({site: [{texto, cor}]}) em Note com tag do nome do site."""
+        """Converts `legacy_notes` ({site: [{texto, cor}]}) into Note with a tag named after the site."""
         if self.store.migration_done(LEGACY_MIGRATION):
             return 0
         legacy = self.store.load("legacy_notes", {})

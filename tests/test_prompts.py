@@ -1,4 +1,4 @@
-"""Prompts em Markdown com cabeçalho, globais e por projeto, renderizados com as variáveis da sessão."""
+"""Markdown prompts with a header, global and per project, rendered with the session variables."""
 
 from tests.helpers import TempDirTestCase
 from vulcan_celox.core import prompts
@@ -22,7 +22,7 @@ class SeedTest(TempDirTestCase):
         self.assertTrue(all("—" not in p.body for p in loaded))
         edited = loaded[0].path
         edited.write_text(edited.read_text(encoding="utf-8") + "\nmeu ajuste\n", encoding="utf-8")
-        self.assertEqual(prompts.seed_global(root), [])  # pasta já existe: nunca sobrescreve
+        self.assertEqual(prompts.seed_global(root), [])  # folder already exists: never overwrites
         self.assertIn("meu ajuste", edited.read_text(encoding="utf-8"))
 
 
@@ -47,8 +47,8 @@ class LoadTest(TempDirTestCase):
         self.assertEqual(set(by_id), {"seguranca", "loop", "sem-cabecalho"})
         self.assertEqual((by_id["seguranca"].title, by_id["seguranca"].category, by_id["seguranca"].pin),
                          ("Regras do branch", "Segurança", True))
-        self.assertEqual(by_id["loop"].category, "Testes")             # pela subpasta
-        self.assertEqual(by_id["sem-cabecalho"].title, "Sem cabecalho")  # do nome do arquivo
+        self.assertEqual(by_id["loop"].category, "Testes")             # by the subfolder
+        self.assertEqual(by_id["sem-cabecalho"].title, "Sem cabecalho")  # from the file name
         self.assertEqual(by_id["sem-cabecalho"].category, "Outros")
         self.assertEqual(sorted(w.split(":")[0] for w in warnings), ["quebrado.md", "sem-fim.md"])
 
@@ -112,7 +112,7 @@ class CreateTest(TempDirTestCase):
 
 
 class CardTest(TempDirTestCase):
-    """O cartão diz o que o prompt faz, sem `{{nome}}`."""
+    """The card says what the prompt does, without `{{nome}}`."""
 
     def load(self, text):
         path = self.tmp / "p.md"
@@ -130,7 +130,7 @@ class CardTest(TempDirTestCase):
 
     def test_sem_descricao_usa_a_primeira_frase(self):
         p = self.load("---\ntitle: Limites\nicone: <script>\n---\nTrabalhe só dentro de {{cwd}}. No máximo 5 arquivos.\n")
-        self.assertEqual(p.icon, "")  # nome de ícone inválido é descartado
+        self.assertEqual(p.icon, "")  # an invalid icon name is discarded
         self.assertEqual(prompts.summary(p, {}), "Trabalhe só dentro de …")
         self.assertEqual(prompts.summary(p, {"cwd": "/a/b"}), "Trabalhe só dentro de /a/b.")
         self.assertNotIn("{{", prompts.summary(p, {}))

@@ -1,7 +1,7 @@
-"""Monta uma sessão sintética para os sensores da aba Código e, com `crescer`, grava edições novas no JSONL com o tempo.
+"""Builds a synthetic session for the Code tab sensors and, with `crescer`, writes new edits to the JSONL over time.
 
-Uso: code_fixture.py <pasta>            cria <pasta>/claude e <pasta>/projeto
-     code_fixture.py <pasta> crescer N  grava a edição N (edita <pasta>/projeto/passo-N.py)
+Usage: code_fixture.py <folder>            creates <folder>/claude and <folder>/projeto
+     code_fixture.py <folder> crescer N  writes edit N (edits <folder>/projeto/passo-N.py)
 """
 
 import json

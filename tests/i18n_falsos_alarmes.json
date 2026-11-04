@@ -17,7 +17,7 @@
  "site-add.mjs": 4,
  "site.mjs": 3,
  "tasks.mjs": 1,
- "terminals.mjs": 1,
+ "terminal-content.mjs": 1,
  "theme.mjs": 1,
  "view-mount.mjs": 1
 }

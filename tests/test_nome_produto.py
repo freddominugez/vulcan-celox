@@ -1,4 +1,4 @@
-"""O produto é Vulcan Celox em todo lugar, inclusive nos nomes técnicos. Só a migração cita os nomes antigos."""
+"""The product is Vulcan Celox everywhere, including in technical names. Only the migration cites the old names."""
 
 import re
 import subprocess
@@ -12,7 +12,7 @@ from vulcan_celox.core import keychain
 ROOT = Path(__file__).resolve().parent.parent
 PACOTE = ROOT / "vulcan_celox"
 OLD_NAMES = re.compile("Vulcan " + "Terminal|vulcan" + "_terminal|vulcan-" + "terminal|Vulcan" + "Terminal|VULCAN_" + "TERMINAL|com\\.byvulcan\\." + "terminal")
-# migração e aviso ao instalar precisam citar o nome antigo
+# migration and the install notice need to cite the old name
 PODE_CITAR = {"core/oscompat.py", "core/keychain.py"}
 
 

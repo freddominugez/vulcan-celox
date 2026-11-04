@@ -1,4 +1,4 @@
-"""Estado do ambiente do Lerd para a tela Ambiente: componentes de /api/status e serviços de /api/services."""
+"""Lerd environment state for the Environment screen: components from /api/status and services from /api/services."""
 
 from __future__ import annotations
 
@@ -6,13 +6,13 @@ import re
 from typing import Any, Dict, List
 
 SERVICE_ACTIONS = ("start", "stop", "restart")
-# versões com imagem publicada pelo Lerd (docs/usage/php-versions.md: 7.4 e 8.0 a 8.6; 8.6 é prévia)
+# versions with an image published by Lerd (docs/usage/php-versions.md: 7.4 and 8.0 to 8.6; 8.6 is a preview)
 SUPPORTED_PHP = ("7.4", "8.0", "8.1", "8.2", "8.3", "8.4", "8.5")
 _PHP_LINE = re.compile(r"^\s*(\*)?\s*(\d+\.\d+)\b")
 
 
 def lerd_components(status: Any) -> List[Dict[str, Any]]:
-    """DNS, nginx, cada PHP-FPM e o watcher, com ok e um rótulo curto."""
+    """DNS, nginx, each PHP-FPM and the watcher, with ok and a short label."""
     if not isinstance(status, dict):
         return []
     out: List[Dict[str, Any]] = []
@@ -31,7 +31,7 @@ def lerd_components(status: Any) -> List[Dict[str, Any]]:
 
 
 def lerd_services(rows: Any) -> List[Dict[str, Any]]:
-    """Serviços instalados (mysql, postgres, redis, mailpit...) no formato que o painel do Lerd lê."""
+    """Installed services (mysql, postgres, redis, mailpit...) in the format the Lerd panel reads."""
     out = []
     for row in rows if isinstance(rows, list) else []:
         if not isinstance(row, dict) or not row.get("name"):
@@ -44,7 +44,7 @@ def lerd_services(rows: Any) -> List[Dict[str, Any]]:
 
 
 def parse_php_list(text: str) -> List[Dict[str, Any]]:
-    """Saída de `lerd php:list`: uma versão por linha, a padrão marcada com *."""
+    """Output of `lerd php:list`: one version per line, the default marked with *."""
     out = []
     for line in (text or "").splitlines():
         match = _PHP_LINE.match(line)
@@ -54,7 +54,7 @@ def parse_php_list(text: str) -> List[Dict[str, Any]]:
 
 
 def parse_php_m(text: str) -> Dict[str, List[str]]:
-    """`php -m`: módulos PHP e módulos Zend, sem os cabeçalhos."""
+    """`php -m`: PHP modules and Zend modules, without the headers."""
     out: Dict[str, List[str]] = {"php": [], "zend": []}
     section = "php"
     for line in (text or "").splitlines():
@@ -69,7 +69,7 @@ def parse_php_m(text: str) -> Dict[str, List[str]]:
 
 
 def parse_ext_list(text: str) -> Dict[str, Any]:
-    """`lerd php:ext list`: extensões declaradas e, por versão, o que carregou ou o aviso do Lerd."""
+    """`lerd php:ext list`: declared extensions and, per version, what loaded or Lerd's warning."""
     declared: List[str] = []
     per_version: Dict[str, str] = {}
     mode = None
@@ -88,7 +88,7 @@ def parse_ext_list(text: str) -> Dict[str, Any]:
     return {"declared": declared, "per_version": per_version}
 
 
-# ── Xdebug por versão ─────────────────────────────────────────
+# ── Xdebug per version ─────────────────────────────────────────
 XDEBUG_MODES = ("debug", "coverage", "develop", "profile", "trace", "gcstats")  # os que `lerd xdebug on --mode` aceita
 XDEBUG_PORT = 9003
 

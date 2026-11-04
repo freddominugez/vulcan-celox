@@ -47,8 +47,8 @@ class LinuxPackageTest(unittest.TestCase):
                     if not source.is_file() or "ui" in relative.parts or "__pycache__" in relative.parts or source.suffix == ".pyc":
                         continue
                     current = source.read_bytes()
-                    self.assertEqual(data.extractfile("./opt/vulcan-celox/lib/vulcan_celox/" + str(relative)).read(), current)
-                    self.assertEqual(archive.extractfile(prefix + "lib/vulcan_celox/" + str(relative)).read(), current)
+                    self.assertEqual(data.extractfile("./opt/vulcan-celox/lib/vulcan_celox/" + relative.as_posix()).read(), current)
+                    self.assertEqual(archive.extractfile(prefix + "lib/vulcan_celox/" + relative.as_posix()).read(), current)
                     checked += 1
                 self.assertGreater(checked, 60)
                 launcher = data.getmember("./usr/bin/vulcan-celox")

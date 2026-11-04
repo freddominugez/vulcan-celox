@@ -1,12 +1,12 @@
-"""API falsa do Lerd para o sensor: responde como a do Lerd 1.37.1 com as fixtures reais de tests/fixtures.
+"""Fake Lerd API for the sensor: answers like Lerd 1.37.1 with the real fixtures from tests/fixtures.
 
-Só stdlib, só 127.0.0.1, porta escolhida pelo sistema (impressa na primeira linha). POST exige `X-Lerd-CSRF: 1`,
-como o Lerd. Nunca fala com o Lerd de verdade.
+Stdlib only, 127.0.0.1 only, port chosen by the system (printed on the first line). POST requires `X-Lerd-CSRF: 1`,
+like Lerd. Never talks to the real Lerd.
 
-uso: python3 -I tests/tools/fake_lerd_api.py [--site-path nome=pasta] [--dumps-at AAAA-MM-DDTHH:MM] [--sites-alternam S]
+usage: python3 -I tests/tools/fake_lerd_api.py [--site-path name=folder] [--dumps-at AAAA-MM-DDTHH:MM] [--sites-alternam S]
 
---sites-alternam S: a cada S segundos um site extra aparece ou some da lista (a tela não pode perder o
-texto digitado quando a lista de sites muda).
+--sites-alternam S: every S seconds an extra site appears or disappears from the list (the screen must not lose the
+typed text when the site list changes).
 """
 
 import argparse
@@ -26,7 +26,7 @@ def build(site_paths, dumps_at):
     for site in data["/api/sites"]:
         if site.get("name") in site_paths:
             site["path"] = site_paths[site["name"]]
-    if dumps_at:  # põe os eventos dentro da janela de uma sessão de agente das fixtures
+    if dumps_at:  # puts the events inside the window of an agent session from the fixtures
         for event in data["/api/dumps"]:
             event["ts"] = dumps_at + event["ts"][16:]
     data["/api/dumps/status"] = {"enabled": True, "listening": True, "addr": "tcp:127.0.0.1:9913",

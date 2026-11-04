@@ -1,8 +1,8 @@
-"""Os seis ajustes comuns do php.ini de usuário do Lerd, gravados pelo próprio `lerd php:ini`.
+"""The six common settings of the Lerd user php.ini, written by `lerd php:ini` itself.
 
-Prova de 2026-10-31 nesta máquina (registrada no progresso): com EDITOR apontando para um ajudante, o Lerd passou
-~/.local/share/lerd/php/8.5/98-user.ini ao editor e reaplicou o PHP 8.5; memory_limit foi de 128M a 256M e voltou.
-`lerd-98-user.ini` é o arquivo real de usuário do Lerd 1.37.1 (só comentários).
+Proof from 2026-10-31 on this machine (recorded in the progress notes): with EDITOR pointing to a helper, Lerd passed
+~/.local/share/lerd/php/8.5/98-user.ini to the editor and reapplied PHP 8.5; memory_limit went from 128M to 256M and came back.
+`lerd-98-user.ini` is the real Lerd 1.37.1 user file (comments only).
 """
 
 import json
@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from tests.helpers import FIXTURES, TempDirTestCase
+from tests.helpers import FIXTURES, TempDirTestCase, unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.php_ini import KEYS, parse_directives, set_directive
 
@@ -22,9 +22,9 @@ class DiretivaTest(TempDirTestCase):
     def test_arquivo_real_so_com_comentarios(self):
         self.assertEqual(parse_directives(REAL), {})
         text = set_directive(REAL, "memory_limit", "512M")
-        self.assertTrue(text.startswith(REAL.rstrip("\n")))  # comentários e ordem preservados
+        self.assertTrue(text.startswith(REAL.rstrip("\n")))  # comments and order preserved
         self.assertEqual(parse_directives(text), {"memory_limit": "512M"})
-        self.assertIn("; memory_limit = 512M", text)  # o exemplo comentado continua
+        self.assertIn("; memory_limit = 512M", text)  # the commented example remains
 
     def test_troca_a_linha_existente_sem_tocar_nas_outras(self):
         text = "; topo\nmemory_limit = 128M\n; meio\ndate.timezone = America/Sao_Paulo\n"
@@ -81,7 +81,7 @@ class ApiTest(ServerTestCase):
     def test_ler(self):
         data = self.request("GET", "/api/environment/php/8.5/ini")[1]
         self.assertEqual(data["values"], {"memory_limit": "128M"})
-        self.assertTrue(data["path"].endswith("php/8.5/98-user.ini"))
+        self.assertTrue(Path(data["path"]).as_posix().endswith("php/8.5/98-user.ini"))
         self.assertEqual(self.request("GET", "/api/environment/php/shared/ini")[1]["values"], {})
 
     def test_gravar_pelo_lerd_com_o_ajudante(self):
@@ -98,13 +98,15 @@ class ApiTest(ServerTestCase):
                 self.assertEqual(self.request("POST", "/api/environment/php/8.5/ini", body=body)[0], 400)
         self.assertEqual(self.request("GET", "/api/environment/php/9.9/ini")[0], 400)
 
+    @unix_only(SEM_LERD)
     def test_abrir_no_editor_numa_aba(self):
         status, info, _ = self.request("POST", "/api/environment/php/8.5/ini/open")
         self.assertEqual(status, 201, info)
         self.assertIn(f"{self.lerd} php:ini 8.5", " ".join(self.app.terminals.get(info["id"]).argv))
 
+    @unix_only(SEM_LERD)
     def test_ajudante_ignora_a_pasta_atual(self):
-        # `python -m` punha a pasta atual em sys.path; um re.py ou json.py ali era importado
+        # `python -m` put the current folder in sys.path; a re.py or json.py there was imported
         self.request("POST", "/api/environment/php/8.5/ini", body={"values": {"memory_limit": "512M"}})
         wrapper = self.fake.calls[-1].env["EDITOR"]
         script = Path(wrapper).read_text(encoding="utf-8")

@@ -1,4 +1,4 @@
-"""Avisos pelo terminal, rodando o módulo de verdade no node."""
+"""Terminal notices, running the real module in node."""
 
 import json
 import shutil
@@ -51,7 +51,7 @@ class TerminalAttentionTest(unittest.TestCase):
             self.assertIsNone(self.data[key], key)
 
     def test_texto_e_dado(self):
-        self.assertEqual(self.data["html"], "<img src=x onerror=alert(1)>")  # a interface mostra por textContent
+        self.assertEqual(self.data["html"], "<img src=x onerror=alert(1)>")  # the interface shows it via textContent
         self.assertEqual(self.data["long"], 200)
         self.assertEqual(self.data["empty"], "")
         self.assertNotIn("\u001b", self.data["control"])

@@ -1,4 +1,4 @@
-"""Monta o que vai para a IA: documentação de uma sessão e documentação geral. Tudo passa por `redact` no fim."""
+"""Builds what goes to the AI: documentation of a session and general documentation. Everything goes through `redact` at the end."""
 
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ def _items_block(tasks: List[Task], notes: List[Note], tags: Dict[str, Tag], not
 
 def session_doc_prompt(record, tasks: List[Task], notes: List[Note], tags: Dict[str, Tag], transcript: str,
                        limit: int = TRANSCRIPT_LIMIT, agents=None) -> Prompt:
-    # máscara antes do corte: um segredo cortado ao meio perderia o prefixo que a máscara reconhece
+    # mask before truncating: a secret cut in half would lose the prefix that the mask recognizes
     transcript, early = redact(transcript)
     truncated = len(transcript) > limit
     tail = transcript[-limit:] if truncated else transcript
@@ -129,7 +129,7 @@ class SessionEntry:
 
 
 def general_doc_prompt(entries: List[SessionEntry], tags: Dict[str, Tag], budget: int = GENERAL_BUDGET) -> Prompt:
-    """Sessões da mais recente para a mais antiga; quando o orçamento acaba, as demais vão só com uma linha."""
+    """Sessions from newest to oldest; when the budget runs out, the rest go with just one line."""
     parts: List[str] = []
     brief: List[str] = []
     used = 0

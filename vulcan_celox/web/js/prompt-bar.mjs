@@ -1,5 +1,5 @@
-// Barra de prompts fixados na área de terminal: com a aba pareada a uma sessão de agente, um
-// clique cola o texto no terminal sem Enter; sem par ou com variável faltando, copia.
+// Bar of pinned prompts in the terminal area: with the tab paired to an agent session, one
+// click pastes the text into the terminal without Enter; with no pair or a missing variable, it copies.
 
 import { get, post, put } from "./api.mjs";
 import { esc, icon, toast } from "./dom.mjs";
@@ -20,7 +20,7 @@ export class PromptBar {
     window.addEventListener("vulcan-current-changed", this.onCurrent);
   }
 
-  /** Chamado a cada desenho das abas: só consulta o servidor quando a aba muda ou depois de 10 s. */
+  /** Called on every tab redraw: only queries the server when the tab changes or after 10 s. */
   async update(cwd, terminal = null, force = false) {
     if (!cwd) {
       this.cwd = null;
@@ -46,17 +46,17 @@ export class PromptBar {
     if (tabChanged) this.followPairedSession(terminal);
   }
 
-  /** Focar uma aba pareada torna a sessão de agente dela a sessão atual. */
+  /** Focusing a paired tab makes its agent session the current session. */
   async followPairedSession(terminal) {
     const s = this.data && this.data.session;
     if (!s || s.pairing_id !== terminal) return;
     try {
       const current = await get("/api/agents/current");
-      if (current.session && current.session.id === s.id) return;  // já é a atual: nada a fazer
+      if (current.session && current.session.id === s.id) return;  // already the current one: nothing to do
       const data = await put("/api/agents/current", { session_id: s.id });
       window.dispatchEvent(new CustomEvent("vulcan-current-changed", { detail: data }));
     } catch {
-      /* sem sessão atual agora: a barra continua com a sessão pareada */
+      /* no current session right now: the bar keeps the paired session */
     }
   }
 
@@ -77,7 +77,7 @@ export class PromptBar {
       ${paired ? `<a class="pb-chip pb-code" href="#/agentes/${encodeURIComponent(s.id)}/codigo" title="${t("Ver o código que esta sessão está mexendo")}">${icon("code")}<span>${t("Código")}</span></a>` : ""}`;
   }
 
-  /** Colar direto só quando a sessão é a pareada com esta aba e nenhuma variável falta. */
+  /** Paste directly only when the session is the one paired with this tab and no variable is missing. */
   canSend(p) {
     const s = this.data && this.data.session;
     return Boolean(s && s.pairing_id && s.pairing_id === this.terminal && !p.missing.length);
@@ -96,7 +96,7 @@ export class PromptBar {
         setTimeout(() => chip.classList.remove("is-done"), 1200);
         return;
       } catch {
-        /* sem aba viva: cai na cópia */
+        /* no live tab: falls back to copying */
       }
     }
     const ok = await copy(p.rendered, t("Copiado: {title}. Cole no terminal com ⌘V.", { title: p.title }));

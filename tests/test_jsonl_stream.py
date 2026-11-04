@@ -1,4 +1,4 @@
-"""Leitura incremental de JSONL tolerante a linha cortada, lixo, linha grande e encolhimento."""
+"""Incremental JSONL reading tolerant of a cut line, garbage, a large line and shrinking."""
 
 import json
 import unittest

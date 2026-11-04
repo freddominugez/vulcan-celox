@@ -1,8 +1,9 @@
-"""Remover site em três níveis (lista, backend, pasta para a Lixeira), nunca apagando em definitivo."""
+"""Removing a site at three levels (list, backend, folder to the Trash), never deleting permanently."""
 
 import os
 from unittest import mock
 
+from tests.helpers import WINDOWS
 from tests.server_helpers import ServerTestCase
 
 
@@ -18,20 +19,20 @@ class ManualTest(ServerTestCase):
         status, data, _ = self.request("POST", "/api/sites/rascunho/remove", body={"level": "list"})
         self.assertEqual(status, 200, data)
         self.assertEqual(self.app.store.load("sites", {}), {})
-        self.assertTrue(self.pasta.is_dir())  # a pasta continua
-        # nome digitado errado não faz nada
+        self.assertTrue(self.pasta.is_dir())  # the folder remains
+        # a misspelled name does nothing
         self.assertEqual(self.request("POST", "/api/sites/trash", body={"name": "rascunho", "confirm": "Rascunho"})[0], 400)
         self.assertTrue(self.pasta.is_dir())
         status, data, _ = self.request("POST", "/api/sites/trash", body={"name": "rascunho", "confirm": "rascunho"})
         self.assertEqual(status, 200, data)
         self.assertFalse(self.pasta.exists())
         moved = data["moved_to"]
-        self.assertTrue(os.path.isdir(moved) or moved == str(self.pasta))  # Lixeira do sistema ou lixeira/ do app
-        system_trash = any("osascript" in c.argv[0] or "gio" in c.argv[0] for c in self.fake.calls)
-        self.assertTrue(system_trash or "/lixeira/" in moved, moved)  # sem Finder nem gio: lixeira/ do app
+        self.assertTrue(os.path.isdir(moved) or moved == str(self.pasta))  # system Trash or the app's lixeira/
+        system_trash = WINDOWS or any("osascript" in c.argv[0] or "gio" in c.argv[0] for c in self.fake.calls)
+        self.assertTrue(system_trash or "/lixeira/" in moved, moved)  # without Finder or gio: the app's lixeira/
 
     def test_lixeira_so_para_site_removido_pelo_app(self):
-        # ainda na lista: recusa
+        # still in the list: refuses
         self.assertEqual(self.request("POST", "/api/sites/trash", body={"name": "rascunho", "confirm": "rascunho"})[0], 409)
         self.assertEqual(self.request("POST", "/api/sites/trash", body={"name": "outro", "confirm": "outro"})[0], 409)
         self.assertTrue(self.pasta.is_dir())
@@ -69,9 +70,9 @@ class LerdTest(ServerTestCase):
         status, data, _ = self.request("POST", "/api/sites/loja/remove", body={"level": "backend"})
         self.assertEqual(status, 200, data)
         self.assertEqual(list(self.fake.calls[-1].argv)[1:], ["unlink", "loja"])
-        # enquanto o backend ainda lista o site, a pasta não vai para a Lixeira
+        # while the backend still lists the site, the folder does not go to the Trash
         self.assertEqual(self.request("POST", "/api/sites/trash", body={"name": "loja", "confirm": "loja"})[0], 409)
-        self.rows.clear()  # o Lerd já não lista o site
+        self.rows.clear()  # Lerd no longer lists the site
         status, data, _ = self.request("POST", "/api/sites/trash", body={"name": "loja", "confirm": "loja"})
         self.assertEqual(status, 200, data)
         self.assertFalse(self.pasta.exists())

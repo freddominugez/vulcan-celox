@@ -1,4 +1,4 @@
-"""Descoberta de sites: parked e linked do Valet mais sites manuais do app."""
+"""Site discovery: Valet's parked and linked plus the app's manual sites."""
 
 from __future__ import annotations
 
@@ -44,10 +44,10 @@ def read_valet_config(valet_home: Optional[Path]) -> Dict:
 
 
 def discover_sites(valet_home: Optional[Path], manual: Optional[Mapping[str, str]] = None) -> List[Site]:
-    """Une parked (subpastas de config.paths), linked (symlinks em Sites/) e manuais.
+    """Merges parked (subfolders of config.paths), linked (symlinks in Sites/) and manual.
 
-    Dedupe por domínio com prioridade linked > parked > manual. Caminhos
-    inexistentes, pastas ocultas e symlinks quebrados são ignorados.
+        Dedupe by domain with priority linked > parked > manual. Nonexistent
+        paths, hidden folders and broken symlinks are ignored.
     """
     config = read_valet_config(valet_home)
     tld = str(config.get("tld") or DEFAULT_TLD)

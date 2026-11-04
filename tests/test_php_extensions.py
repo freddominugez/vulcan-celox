@@ -1,8 +1,8 @@
-"""Extensões de PHP por versão, só leitura.
+"""PHP extensions per version, read-only.
 
-`lerd-php-m-8.5.txt` e `lerd-php-ext-list-vazio.txt` são saídas reais do Lerd 1.37.1 nesta máquina (php -m no
-contêiner do 8.5, por `lerd php -m` numa pasta com .php-version). `lerd-php-ext-list-docs.txt` é o exemplo da
-documentação do Lerd (usage/php-extensions.md), porque aqui nenhuma extensão personalizada está declarada.
+`lerd-php-m-8.5.txt` and `lerd-php-ext-list-vazio.txt` are real Lerd 1.37.1 outputs on this machine (php -m in the
+8.5 container, via `lerd php -m` in a folder with .php-version). `lerd-php-ext-list-docs.txt` is the example from the
+Lerd documentation (usage/php-extensions.md), because here no custom extension is declared.
 """
 
 import os
@@ -54,5 +54,5 @@ class ApiTest(ServerTestCase):
         self.assertEqual(data["note"], "mongodb, swoole")
         probe = [c for c in self.fake.calls if c.argv[1:] == ("php", "-m")][0]
         with open(os.path.join(probe.cwd, ".php-version")) as fh:
-            self.assertEqual(fh.read().strip(), "8.4")  # a versão vem do .php-version da pasta neutra
+            self.assertEqual(fh.read().strip(), "8.4")  # the version comes from the neutral folder's .php-version
         self.assertEqual(self.request("GET", "/api/environment/php/9.9/extensions")[0], 400)

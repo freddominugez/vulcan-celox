@@ -1,6 +1,6 @@
 #!/bin/bash
-# Gera os pacotes de distribuição em executaveis/: macOS (.dmg e .zip, binário universal) e Linux (.tar.gz e .deb).
-# Roda no macOS (precisa de swiftc, lipo, codesign, hdiutil). Os pacotes gerados ficam fora do git.
+# Builds the distribution packages in executaveis/: macOS (.dmg and .zip, universal binary) and Linux (.tar.gz and .deb).
+# Runs on macOS (needs swiftc, lipo, codesign, hdiutil). The generated packages stay out of git.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -63,13 +63,13 @@ cp -R "$STAGE/share/icons/hicolor" "$DEB/usr/share/icons/"
 sed "s|@VERSION@|$VERSION|" packaging/linux/deb/control > "$WORK/control"
 /usr/bin/python3 scripts/make_deb.py "$DEB" "$WORK/control" packaging/linux/deb/postinst "$OUT/linux/vulcan-celox_${VERSION}_all.deb"
 
-# ── somas ─────────────────────────────────────────────────────────────────
+# ── checksums ─────────────────────────────────────────────────────────────
 step "SHA256SUMS"
 (cd "$OUT" && shasum -a 256 macos/*.dmg macos/*.zip linux/*.tar.gz linux/*.deb > SHA256SUMS)
 cat "$OUT/SHA256SUMS"
 ls -lh "$OUT/macos" "$OUT/linux"
 echo "PACOTES OK"
 
-# a cópia de build não fica registrada no macOS: viraria mais um ícone no Launchpad
+# the build copy is not registered with macOS: it would become one more icon in Launchpad
 LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
 [ -x "$LSREGISTER" ] && "$LSREGISTER" -u "$ROOT/dist/Vulcan Celox.app" >/dev/null 2>&1 || true

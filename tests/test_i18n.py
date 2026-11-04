@@ -1,4 +1,4 @@
-"""Interface em inglês: todo texto tem tradução, nada escapa do t(), e o servidor responde no idioma escolhido."""
+"""English interface: every text has a translation, nothing escapes t(), and the server answers in the chosen language."""
 
 import importlib.util
 import json
@@ -14,7 +14,7 @@ WEB = ROOT / "vulcan_celox" / "web"
 EN = json.loads((WEB / "i18n" / "en.json").read_text(encoding="utf-8"))
 JS = [p for p in WEB.rglob("*.mjs") if "vendor" not in p.parts]
 T = re.compile(r"""\bt\(\s*"((?:[^"\\]|\\.)*)\"""")
-# tr() e HttpError com texto literal; o f-string vira {nome} no dicionário
+# tr() and HttpError with literal text; the f-string becomes {nome} in the dictionary
 SERVER = re.compile(r"""(?:\btr\(\s*|HttpError\(\d+,\s*)(f?)"((?:[^"\\]|\\.)*)\"""")
 
 
@@ -60,7 +60,7 @@ class DicionarioTest(unittest.TestCase):
 
 class SemTextoSoltoTest(unittest.TestCase):
     def test_nada_escapa_do_t(self):
-        """scripts/i18n_restos.py aponta classes, seletores e comentários; a lista congelada são esses falsos alarmes."""
+        """scripts/i18n_restos.py points out classes, selectors and comments; the frozen list is those false alarms."""
         spec = importlib.util.spec_from_file_location("restos", ROOT / "scripts" / "i18n_restos.py")
         restos = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(restos)

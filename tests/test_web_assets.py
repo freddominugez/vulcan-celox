@@ -1,4 +1,4 @@
-"""A interface web só referencia arquivos locais que existem e são servidos."""
+"""The web interface only references local files that exist and are served."""
 
 import re
 import subprocess
@@ -21,7 +21,7 @@ def local_refs():
     refs.update(r for r in REF.findall(html) if not r.startswith(("http", "data:")))
     for module in WEB.glob("js/**/*.mjs"):
         for rel in IMPORT.findall(module.read_text(encoding="utf-8")):
-            refs.add(str((module.parent / rel).resolve().relative_to(WEB.resolve())))
+            refs.add((module.parent / rel).resolve().relative_to(WEB.resolve()).as_posix())
     return sorted(refs)
 
 
@@ -49,14 +49,14 @@ class WebAssetsTest(ServerTestCase):
 
     @unittest.skipUnless(JSC.is_file() and not shutil.which("node"), "jsc ausente ou node disponível")
     def test_sintaxe_dos_modulos_com_javascriptcore(self):
-        # sem node no macOS: o jsc do sistema roda o módulo; fora do navegador ele para em ReferenceError
-        # (window, document), mas um erro de sintaxe aparece como SyntaxError antes de executar
+        # without node on macOS: the system jsc runs the module; outside the browser it stops at ReferenceError
+        # (window, document), but a syntax error shows up as SyntaxError before running
         for module in WEB.glob("js/**/*.mjs"):
             proc = subprocess.run([str(JSC), "-m", str(module)], capture_output=True, text=True, timeout=20)
             self.assertNotIn("SyntaxError", proc.stdout + proc.stderr, module.name)
 
 
-# Campo sem contorno de foco precisa de outro sinal de foco, no próprio campo ou no contêiner
+# a field without a focus outline needs another focus signal, on the field itself or on the container
 FOCO_SUBSTITUTO = {
     ".ag-search input": ".ag-search:focus-within",
     ".term-search-input": ".term-search-input:focus",
@@ -87,9 +87,11 @@ class FocoVisivelTest(unittest.TestCase):
                 self.assertIn(FOCO_SUBSTITUTO[selector], css)
 
     def test_teclado_nas_abas_e_tarefas(self):
-        terminals = (WEB / "js" / "terminals.mjs").read_text(encoding="utf-8")
-        self.assertIn('role="tab" tabindex=', terminals)
-        self.assertIn("onTabKey", terminals)
+        tabs = (WEB / "js" / "terminal-tabs.mjs").read_text(encoding="utf-8")
+        self.assertIn('role="tab" tabindex=', tabs)
+        self.assertIn("export function onTabKey", tabs)
+        workspace = (WEB / "js" / "terminal-workspace.mjs").read_text(encoding="utf-8")
+        self.assertIn('addEventListener("keydown", (e) => this.onTabKey(e))', workspace)
         tasks = (WEB / "js" / "views" / "tasks.mjs").read_text(encoding="utf-8")
         self.assertIn('class="task-title" data-action="edit" tabindex="0"', tasks)
 
@@ -121,7 +123,7 @@ console.log(JSON.stringify({ hidden, visible, after: calls, overlap }));
 
 
 class PollingTest(unittest.TestCase):
-    """Repetição encadeada, sem sobreposição, pausada com a janela oculta."""
+    """Chained repetition, without overlap, paused while the window is hidden."""
 
     @unittest.skipUnless(shutil.which("node"), "node ausente")
     def test_every(self):
@@ -134,7 +136,7 @@ class PollingTest(unittest.TestCase):
         self.assertEqual(result["hidden"], 0)
         self.assertGreaterEqual(result["visible"], 2)
         self.assertEqual(result["overlap"], 0)
-        self.assertEqual(result["after"], result["visible"])  # parou de verdade
+        self.assertEqual(result["after"], result["visible"])  # really stopped
 
 
 REMOUNT_SCRIPT = """
@@ -148,13 +150,13 @@ console.log(JSON.stringify(out));
 
 class AtalhosLinuxTest(unittest.TestCase):
     def test_busca_aceita_o_shift_do_linux(self):
-        """No Linux o modificador é Ctrl+Shift; exigir "sem Shift" fazia o atalho nunca disparar."""
+        """On Linux the modifier is Ctrl+Shift; requiring "no Shift" made the shortcut never fire."""
         src = (WEB / "js" / "global-events.mjs").read_text(encoding="utf-8")
         self.assertIn('key === "f" && (!isMac || !event.shiftKey)', src)
 
 
 class RemountTest(unittest.TestCase):
-    """Só remonta com a lista de sites nova a tela que recebeu essa lista."""
+    """Only the screen that received the new site list is remounted with it."""
 
     @unittest.skipUnless(shutil.which("node"), "node ausente")
     def test_regra(self):

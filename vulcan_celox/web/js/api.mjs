@@ -1,11 +1,11 @@
-// Cliente da API local. O token chega pela casca nativa (window.VULCAN) ou pelo hash em modo navegador.
+// Local API client. The token comes from the native shell (window.VULCAN) or from the hash in browser mode.
 
 function stored(value) {
-  // sessionStorage pode estar bloqueado no modo navegador: o token só não sobrevive ao recarregar
+  // sessionStorage may be blocked in browser mode: the token just does not survive a reload
   try {
     if (value === undefined) return sessionStorage.getItem("vulcan-token") || "";
     sessionStorage.setItem("vulcan-token", value);
-  } catch (_) { /* sem armazenamento */ }
+  } catch (_) { /* no storage */ }
   return value || "";
 }
 
@@ -14,7 +14,7 @@ function readToken() {
   const match = /token=([^&]+)/.exec(location.hash) || /token=([^&]+)/.exec(location.search);
   if (match) {
     stored(match[1]);
-    // tira o token da barra e do histórico; o lançador do Linux manda a rota em route=
+    // removes the token from the address bar and history; the Linux launcher sends the route in route=
     const route = /route=([^&]+)/.exec(location.hash);
     history.replaceState(null, "", `${location.pathname}#${route ? route[1] : "/overview"}`);
     return match[1];
@@ -24,7 +24,7 @@ function readToken() {
 
 export const token = readToken();
 export const isNative = Boolean(window.VULCAN && window.VULCAN.native);
-/** Há ponte com a casca (Swift no macOS, GTK no Linux): seletor de pasta, janelas destacadas. */
+/** There is a bridge to the shell (Swift on macOS, GTK on Linux): folder picker, detached windows. */
 export const hasBridge = Boolean(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.vulcan);
 export const isMac = /Mac/.test(navigator.platform || navigator.userAgent);
 
@@ -32,14 +32,14 @@ export class ApiError extends Error {
   constructor(status, message, data = null) {
     super(message);
     this.status = status;
-    this.data = data;  // corpo do erro, com os campos a mais do servidor (ex.: needs_terminal)
+    this.data = data;  // error body, with the extra fields from the server (e.g. needs_terminal)
   }
 }
 
 const TIMEOUT_MS = 20000;
 
 export async function api(path, { method = "GET", body, timeout = TIMEOUT_MS } = {}) {
-  // prazo: um servidor ocupado não deixa consultas empilhadas para sempre
+  // deadline: a busy server does not leave queries piling up forever
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), timeout);
   let response;
@@ -74,8 +74,8 @@ export const patch = (path, body = {}) => api(path, { method: "PATCH", body });
 export const put = (path, body = {}) => api(path, { method: "PUT", body });
 export const del = (path) => api(path, { method: "DELETE" });
 
-/** Repete `fn` a cada `ms` depois que a anterior terminou, e não consulta com a janela oculta.
- *  Devolve a função que para. */
+/** Repeats `fn` every `ms` after the previous one finished, and does not poll while the window is hidden.
+  *  Returns the function that stops it. */
 export function every(ms, fn) {
   let timer = null;
   let stopped = false;
@@ -85,7 +85,7 @@ export function every(ms, fn) {
       try {
         await fn();
       } catch {
-        /* quem chama trata o erro; a repetição continua */
+        /* the caller handles the error; the repetition continues */
       }
     }
     if (!stopped) timer = setTimeout(tick, ms);

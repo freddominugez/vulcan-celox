@@ -1,4 +1,4 @@
-"""A versão citada na documentação pública não pode divergir de __version__."""
+"""The version cited in the public documentation cannot diverge from __version__."""
 import re
 import unittest
 from pathlib import Path

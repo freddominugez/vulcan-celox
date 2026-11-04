@@ -1,4 +1,4 @@
-"""Windows: uma parte confere as escolhas em qualquer sistema; a outra só roda no Windows, com ConPTY de verdade."""
+"""Windows: one part checks the choices on any system; the other only runs on Windows, with a real ConPTY."""
 
 import os
 import shutil

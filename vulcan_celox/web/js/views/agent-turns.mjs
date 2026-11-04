@@ -1,4 +1,4 @@
-// Linha do tempo da sessão agrupada por pedido: o que o agente mexeu e rodou em cada um.
+// Session timeline grouped by request: what the agent touched and ran in each one.
 
 import { esc, icon } from "../dom.mjs";
 import { t } from "../i18n.mjs";
@@ -11,7 +11,7 @@ function fileRow(sessionId, root, file) {
   const [dir, name] = splitPath(relPath(file.path, root));
   const label = `<span class="ag-kind k-${esc(file.kind)}">${esc(FILE_KINDS[file.kind] || file.kind)}</span>
     <span class="ag-path" title="${esc(file.path)}"><span class="dim">${esc(dir)}</span>${esc(name)}</span>`;
-  // o caminho do agente pode ser relativo: o servidor resolve; quem não editou não tem diff de turno
+  // the agent's path may be relative: the server resolves it; one that did not edit has no turn diff
   return file.seq
     ? `<li><a class="turn-diff" href="#/agentes/${encodeURIComponent(sessionId)}/codigo/${encodeURIComponent(file.path)}/t${file.seq}" title="${t("Ver o diff deste pedido")}">${label}${icon("chevron-right")}</a></li>`
     : `<li>${label}</li>`;
@@ -34,7 +34,7 @@ export function renderTurns(sessionId, root, data) {
     </section>`).join("")}</div>${data.next !== null ? `<button class="ag-more" data-action="more">${t("Carregar mais")}</button>` : ""}`;
 }
 
-/** Foco no pedido anterior ou seguinte, a partir do que está em foco ou visível. */
+/** Focus on the previous or next request, from what is focused or visible. */
 export function stepTurn(root, direction) {
   const all = [...root.querySelectorAll(".turn")];
   if (!all.length) return false;

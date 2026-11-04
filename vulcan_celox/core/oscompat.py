@@ -1,4 +1,4 @@
-"""Diferenças entre macOS e Linux concentradas num lugar: shell padrão, pasta de dados e como abrir coisas."""
+"""Differences between macOS and Linux gathered in one place: default shell, data folder and how to open things."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ def is_windows(system: Optional[str] = None) -> bool:
 
 
 def default_shell(env: Optional[Mapping[str, str]] = None, exists=os.path.exists) -> str:
-    """$SHELL se existir; senão o primeiro entre zsh, bash e sh. No Windows, PowerShell e por último o cmd."""
+    """$SHELL if it exists; otherwise the first of zsh, bash and sh. On Windows, PowerShell and lastly cmd."""
     env = os.environ if env is None else env
     if is_windows():
         return shutil.which("pwsh.exe") or shutil.which("powershell.exe") or env.get("COMSPEC") or "cmd.exe"
@@ -45,7 +45,7 @@ def shell_command_argv(shell: str, command: str) -> List[str]:
 
 
 def interactive_argv(shell: str, command: Optional[str]) -> List[str]:
-    """Shell interativo; com comando, roda ele e continua no shell, como no Terminal."""
+    """Interactive shell; with a command, it runs it and stays in the shell, as in Terminal."""
     name = _shell_name(shell)
     if name.startswith(("powershell", "pwsh")):
         return [shell, "-NoLogo"] + (["-NoExit", "-Command", command] if command else [])
@@ -56,17 +56,17 @@ def interactive_argv(shell: str, command: Optional[str]) -> List[str]:
     return [shell, "-l", "-i", "-c", f"{command}; exec {shell} -l"]
 
 
-# nome da pasta até a 1.1: quem já usa o app tem os dados lá
+# folder name up to 1.1: whoever already uses the app has the data there
 OLD_MACOS_FOLDER = "VulcanTerminal"
 OLD_LINUX_FOLDER = "vulcan-" + "terminal"
 
 
 def _folders(env: Mapping[str, str], system: Optional[str]) -> Tuple[Path, Path]:
-    """(pasta de dados, pasta com o nome antigo)."""
+    """(data folder, folder with the old name)."""
     home = Path(env.get("HOME") or Path.home())
     if is_windows(system):
         folder = Path(env.get("APPDATA") or home / "AppData" / "Roaming") / "VulcanCelox"
-        return folder, folder  # o nome antigo nunca existiu no Windows: não há o que migrar
+        return folder, folder  # the old name never existed on Windows: nothing to migrate
     if is_macos(system):
         support = home / "Library" / "Application Support"
         return support / "VulcanCelox", support / OLD_MACOS_FOLDER
@@ -76,9 +76,9 @@ def _folders(env: Mapping[str, str], system: Optional[str]) -> Tuple[Path, Path]
 
 
 def migrate_old_folder(env: Optional[Mapping[str, str]] = None, system: Optional[str] = None) -> None:
-    """Primeira abertura depois do novo nome: a pasta muda de nome inteira e fica um link no lugar antigo, porque o hook
-    já instalado no agente aponta para lá. Com as duas pastas, ou sem permissão, não mexe em nada. Só o início do app chama
-    isto: calcular o caminho nunca move nada."""
+    """First launch after the new name: the whole folder is renamed and a link stays in the old place, because the hook
+        already installed in the agent points there. With both folders, or without permission, it touches nothing. Only the app's startup calls
+        this: computing the path never moves anything."""
     new, old = _folders(os.environ if env is None else env, system)
     try:
         if old.is_dir() and not old.is_symlink() and not new.exists():
@@ -94,7 +94,7 @@ def default_data_dir(env: Optional[Mapping[str, str]] = None, system: Optional[s
 
 
 def _windows_open_argv(kind: str, target: str, editor: Optional[str], which) -> List[str]:
-    """Sem passar por cmd.exe nem por .cmd: & num nome de arquivo viraria um segundo comando."""
+    """Without going through cmd.exe or .cmd: & in a file name would become a second command."""
     if kind == "url":
         return ["rundll32.exe", "url.dll,FileProtocolHandler", target]
     if kind != "editor":
@@ -111,7 +111,7 @@ def _windows_open_argv(kind: str, target: str, editor: Optional[str], which) -> 
 
 def open_argv(kind: str, target: str, env: Optional[Mapping[str, str]] = None, system: Optional[str] = None,
               which=shutil.which) -> List[str]:
-    """Comando para abrir URL, pasta, arquivo ou pasta no editor."""
+    """Command to open a URL, folder, file or folder in the editor."""
     env = os.environ if env is None else env
     editor = env.get("VULCAN_EDITOR")
     if is_windows(system):

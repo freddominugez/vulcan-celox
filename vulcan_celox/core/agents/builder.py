@@ -1,4 +1,4 @@
-"""Monta um AgentSession a partir de fatos já extraídos pelos leitores; estado serializável para leitura incremental."""
+"""Builds an AgentSession from facts already extracted by the readers; serializable state for incremental reading."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class SessionBuilder:
     # ── tempo e identidade ─────────────────────────────────────────────────
     def seen_at(self, at) -> None:
         if not isinstance(at, str) or not at:
-            return  # data numérica ou ausente: não serve para ordenar com as ISO
+            return  # numeric or missing date: cannot be sorted together with the ISO ones
         s = self.session
         if not s.started_at or at < s.started_at:
             s.started_at = at
@@ -105,12 +105,12 @@ class SessionBuilder:
             self._files[path] = known
             self.session.files.append(known)
         if kind != "read":
-            self.pub = 0  # há mudança sem commit de novo
+            self.pub = 0  # there is a new change without a commit
         self._refresh_published()
         self.events.append(SessionEvent(at, "file", path, kind))
 
     def command(self, text, at, exit_code: Optional[int] = None, publish: bool = True) -> None:
-        """Registra o comando. Publica na hora se `publish` e se não falhou; o Claude adia até o tool_result."""
+        """Records the command. Publishes right away if `publish` and it did not fail; Claude defers until the tool_result."""
         text = as_str(text).strip()
         at = as_str(at)
         if not text:
@@ -128,7 +128,7 @@ class SessionBuilder:
         self.events.append(SessionEvent(at, "command", clip(text), kind))
 
     def publish(self, text: str) -> None:
-        """Aplica commit, push e PR na ordem em que aparecem; cada etapa exige a anterior desde a última edição."""
+        """Applies commit, push and PR in the order they appear; each step requires the previous one since the last edit."""
         s = self.session
         for level in rules.publish_sequence(text):
             if level == "committed":

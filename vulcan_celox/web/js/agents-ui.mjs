@@ -1,4 +1,4 @@
-// Peças comuns das telas de agentes: marca do agente, tempo relativo, trilha de publicação e revisão do índice.
+// Shared pieces of the agent screens: agent badge, relative time, publish trail and index revision.
 
 import { every, get, hasBridge, native } from "./api.mjs";
 import { esc, toast } from "./dom.mjs";
@@ -44,7 +44,7 @@ export function tokens(usage) {
   return String(n);
 }
 
-/** Trilha em 4 etapas: editou, commit, push, PR. A etapa que falta depois da edição fica em alerta. */
+/** 4-step trail: edited, commit, push, PR. The step missing after the edit is flagged. */
 export function track(s) {
   const n = s.files_edited || PUB[s.published] > 1 ? PUB[s.published] : 0;
   const label = n ? STEPS[n - 1] : t("nada editado");
@@ -65,10 +65,10 @@ export function splitPath(path) {
   return i < 0 ? ["", path] : [path.slice(0, i + 1), path.slice(i + 1)];
 }
 
-/** Cópia síncrona dentro do clique: o WebKit só libera a área de transferência durante o gesto do usuário. */
+/** Synchronous copy inside the click: WebKit only releases the clipboard during the user gesture. */
 function copySync(text) {
-  // o campo temporário precisa de foco (com o terminal focado, só selecionar não copia);
-  // depois o foco volta para onde estava, e o usuário cola direto no terminal
+  // the temporary field needs focus (with the terminal focused, selecting alone does not copy);
+  // then focus returns to where it was, and the user pastes straight into the terminal
   const previous = document.activeElement;
   const area = document.createElement("textarea");
   area.value = text;
@@ -89,11 +89,11 @@ function copySync(text) {
   return ok;
 }
 
-/** Copia e avisa. Chamar direto no tratador do clique, antes de qualquer await. */
+/** Copies and notifies. Call directly in the click handler, before any await. */
 export async function copy(text, message) {
-  // no app (macOS e Linux) a casca copia: NSPasteboard ou Gtk.Clipboard, sem depender do WebKit
+  // in the app (macOS and Linux) the shell copies: NSPasteboard or Gtk.Clipboard, without depending on WebKit
   let ok = hasBridge && native({ type: "copy", text });
-  if (!ok) ok = copySync(text);  // no navegador: o síncrono primeiro, porque depois de um await o clique já passou
+  if (!ok) ok = copySync(text);  // in the browser: the sync path first, because after an await the click is already gone
   if (!ok && navigator.clipboard && navigator.clipboard.writeText) {
     try {
       await navigator.clipboard.writeText(text);
@@ -114,7 +114,7 @@ export function emptyAgents(roots) {
   </div>`;
 }
 
-/** Redesenha sem perder a rolagem: as telas de agentes se atualizam sozinhas a cada mudança do índice. */
+/** Redraws without losing scroll: the agent screens refresh themselves on every index change. */
 export function keepScroll(root, draw) {
   const page = root.querySelector(".page");
   const top = page ? page.scrollTop : 0;
@@ -123,7 +123,7 @@ export function keepScroll(root, draw) {
   if (next) next.scrollTop = top;
 }
 
-/** Consulta a revisão do índice a cada 2 s e chama onChange quando muda. */
+/** Polls the index revision every 2 s and calls onChange when it changes. */
 export class RevisionWatch {
   constructor(onChange, interval = 2000) {
     this.onChange = onChange;
@@ -145,7 +145,7 @@ export class RevisionWatch {
         this.revision = data.revision;
       }
     } catch {
-      /* servidor ocupado: tenta no próximo ciclo */
+      /* server busy: try again next cycle */
     }
   }
 

@@ -1,7 +1,10 @@
+import tempfile
 import threading
 import time
 import unittest
+from pathlib import Path
 
+from tests.helpers import WINDOWS, py_argv
 from vulcan_celox.core.runner import FakeRunner, Result, Runner
 
 
@@ -10,10 +13,17 @@ class RunnerTest(unittest.TestCase):
         self.runner = Runner()
 
     def test_echo(self):
-        r = self.runner.run(["/bin/echo", "ola"])
+        r = self.runner.run(py_argv("print('ola')"))
         self.assertEqual(r.code, 0)
         self.assertEqual(r.stdout.strip(), "ola")
         self.assertFalse(r.timed_out)
+
+    def test_arquivo_que_nao_e_programa_retorna_126(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            falso = Path(pasta) / "nao-e-programa"
+            falso.write_bytes(b"isto nao executa\n")
+            falso.chmod(0o755)
+            self.assertEqual(self.runner.run([str(falso)]).code, 126)
 
     def test_inexistente_retorna_127(self):
         r = self.runner.run(["/nao/existe/comando-vulcan"])
@@ -21,13 +31,17 @@ class RunnerTest(unittest.TestCase):
 
     def test_timeout(self):
         start = time.monotonic()
-        r = self.runner.run(["/bin/sleep", "10"], timeout=0.3)
+        r = self.runner.run(py_argv("import time; time.sleep(10)"), timeout=0.3)
         self.assertEqual(r.code, -1)
         self.assertTrue(r.timed_out)
         self.assertLess(time.monotonic() - start, 4)
 
     def test_run_shell_usa_shell_padrao(self):
         from vulcan_celox.core.runner import SHELL
+        if WINDOWS:
+            r = self.runner.run_shell("echo ('mar' + 'ca')")
+            self.assertEqual((r.code, r.stdout.strip()), (0, "marca"), SHELL)
+            return
         r = self.runner.run_shell("echo $0")
         self.assertEqual(r.code, 0)
         self.assertIn(SHELL.rsplit("/", 1)[-1], r.stdout)
@@ -35,7 +49,7 @@ class RunnerTest(unittest.TestCase):
     def test_stream_entrega_linhas_em_ordem(self):
         lines, codes = [], []
         done = threading.Event()
-        h = self.runner.stream(["/bin/sh", "-c", "for i in 1 2 3; do echo $i; done"],
+        h = self.runner.stream(py_argv("for i in (1, 2, 3): print(i)"),
                                on_line=lines.append,
                                on_exit=lambda c: (codes.append(c), done.set()))
         self.assertTrue(done.wait(5))
@@ -45,7 +59,7 @@ class RunnerTest(unittest.TestCase):
 
     def test_cancel_encerra_rapido(self):
         done = threading.Event()
-        h = self.runner.stream(["/bin/sleep", "30"], on_exit=lambda _c: done.set())
+        h = self.runner.stream(py_argv("import time; time.sleep(30)"), on_exit=lambda _c: done.set())
         time.sleep(0.1)
         start = time.monotonic()
         h.cancel()

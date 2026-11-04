@@ -1,5 +1,5 @@
-// Shell da interface: roteamento, barra superior e comandos nativos. Estado e barra lateral em app-state.mjs e
-// sidebar.mjs; paleta em palette.mjs; montagem das telas em view-mount.mjs; ouvintes em global-events.mjs.
+// Interface shell: routing, top bar and native commands. State and sidebar in app-state.mjs and
+// sidebar.mjs; palette in palette.mjs; screen mounting in view-mount.mjs; listeners in global-events.mjs.
 
 import { api, every, get, isMac, isNative, native, patch, token } from "./api.mjs";
 import { $, $$, debounce, esc, icon, reportError, toast } from "./dom.mjs";
@@ -29,7 +29,7 @@ function parseRoute(hash) {
   if (parts[0] === "agentes") {
     if (parts[1] === "historico") return { name: "agentes-historico" };
     if (parts[1] === "branches") return { name: "agentes-branches" };
-    // #/agentes/uso/AAAA-MM-DD fixa o fim do período (snapshot com fixtures datadas)
+    // #/agentes/uso/AAAA-MM-DD pins the end of the period (snapshot with dated fixtures)
     if (parts[1] === "uso") return { name: "agentes-uso", until: /^\d{4}-\d{2}-\d{2}$/.test(parts[2] || "") ? parts[2] : null };
     return parts[1] ? { name: "agente", id: parts[1], tab: parts[2] || null, path: parts[3] || null, line: Number(parts[4]) || null, seq: /^t\d+$/.test(parts[4] || "") ? Number(parts[4].slice(1)) : null } : { name: "agentes" };
   }
@@ -53,7 +53,7 @@ export function route() {
   const previous = app.route;
   app.route = parseRoute(location.hash);
   if (app.route.name === "popout") return;
-  // mesma tela de sessões: só troca sessão, aba ou item, sem remontar terminais
+  // same sessions screen: only switches session, tab or item, without remounting terminals
   const same = app.view && app.view.reveal && previous.name === app.route.name
     && (app.route.name !== "site" || previous.site === app.route.site);
   if (same) {
@@ -83,7 +83,7 @@ export async function loadNodeProjects(draw = true) {
   try {
     app.nodeProjects = (await get("/api/node-projects")).projects;
   } catch {
-    /* lista de projetos Node é secundária: mantém a última */
+    /* Node project list is secondary: keep the last one */
   }
   if (draw && app.state) renderSidebar();
 }
@@ -117,24 +117,11 @@ export async function refreshState() {
   }
 }
 
-// ── início automático do ambiente ───────────────────────────────────────────
-const cap = (text) => `${text[0].toUpperCase()}${text.slice(1)}`;
-
+// ── automatic environment start ─────────────────────────────────────────────
 function reportAutostart(auto) {
   if (!auto) return;
-  const before = app.autostartPhase;
+  // no floating message: the top bar, the Lerd screen and Home show the state
   app.autostartPhase = auto.phase;
-  if (before === auto.phase) return;
-  if (auto.phase === "starting") toast(t("{message} junto com o app…", { message: cap(auto.message) }), { timeout: 60000 });
-  // só avisa o fim de um início que esta janela viu acontecer
-  if (before && ["starting", "checking"].includes(before) && auto.phase === "ready" && !/já estava|was already/.test(auto.message)) {
-    toast(`${cap(auto.message)}.`, { kind: "ok", timeout: 5000 });
-  }
-  if (auto.phase === "failed") {
-    toast(cap(auto.message), {
-      kind: "error", timeout: 15000, action: { label: t("Tentar de novo"), run: () => service("start") },
-    });
-  }
 }
 
 export async function toggleAutostart() {
@@ -150,7 +137,7 @@ export async function toggleAutostart() {
   }
 }
 
-// ── versão instalada mais nova que a aberta ────────────────────────────────
+// ── installed version newer than the open one ─────────────────────────────
 let outdatedWarned = false;
 async function checkBuild() {
   if (outdatedWarned) return;
@@ -163,7 +150,7 @@ async function checkBuild() {
       action: isNative ? { label: t("Reabrir agora"), run: () => native({ type: "relaunch" }) } : null,
     });
   } catch {
-    /* sem resposta: tenta de novo no próximo ciclo */
+    /* no response: try again next cycle */
   }
 }
 
@@ -174,6 +161,11 @@ function renderToolbar() {
   const state = app.state;
   $("#crumb").textContent = viewTitle();
   if (!state) return;
+  if (!state.backend.available) {  // Lerd is optional: nothing about it in the bar until it exists
+    $("#env").innerHTML = "";
+    reportDragRegions();
+    return;
+  }
   const d = state.status.details || {};
   const running = state.status.running;
   const auto = state.autostart || {};
@@ -182,7 +174,7 @@ function renderToolbar() {
     ? [`nginx ${d.nginx ? "ok" : t("parado")}`, d.tld ? `.${d.tld} ${d.dns_ok ? "ok" : t("falhou")}` : null, d.php_default ? `PHP ${d.php_default}` : null]
     : [state.status.summary];
   $("#env").innerHTML = `
-    <span class="env-pill ${running ? "is-ok" : "is-off"}" title="${esc(state.status.summary)}">
+    <span class="env-pill ${running ? "is-ok" : "is-off"}" title="${esc(auto.phase === "failed" ? auto.message : state.status.summary)}">
       <span class="dot ${running ? "dot-ok" : starting ? "dot-idle" : "dot-err"} ${app.busyService || starting ? "is-busy" : ""}"></span>
       <span class="env-name">${esc(state.backend.label)}</span>
       ${pieces.filter(Boolean).map((p) => `<span class="env-piece">${esc(p)}</span>`).join("")}
@@ -204,7 +196,7 @@ export async function service(action) {
   renderToolbar();
   toast(labels[action], { timeout: 60000 });
   try {
-    // lerd start pode baixar imagens e subir a VM do Podman (até 300 s no servidor)
+    // lerd start may pull images and start the Podman VM (up to 300 s on the server)
     const result = await api(`/api/services/${action}`, { method: "POST", body: {}, timeout: 330000 });
     toast(result.ok ? t("Ambiente atualizado.") : t("Falhou: {detail}", { detail: result.output.split("\n").pop() || t("sem detalhes") }),
       { kind: result.ok ? "ok" : "error", timeout: 6000 });
@@ -216,7 +208,7 @@ export async function service(action) {
   }
 }
 
-// ── paleta de comandos ──────────────────────────────────────────────────────
+// ── command palette ─────────────────────────────────────────────────────────
 
 // ── comandos (menus nativos e atalhos) ──────────────────────────────────────
 function currentSite() {
@@ -233,7 +225,7 @@ export async function runCommand(name) {
     if (handled !== null && handled !== undefined) return handled;
     if (name.startsWith("tab:") || name === "popoutTerminal") return null;
   }
-  // nas telas sem terminal o terminal novo abre no painel inferior, sem trocar de tela
+  // on screens without a terminal the new terminal opens in the bottom panel, without switching screens
   if ((name === "newTerminal" || name === "newTerminalOptions") && app.panel && app.panel.available) {
     return app.panel.newTerminal(name === "newTerminalOptions" ? { ask: true } : {});
   }
@@ -248,7 +240,7 @@ export async function runCommand(name) {
 }
 window.vulcanCommand = runCommand;
 
-// ── área de arrastar da janela nativa ───────────────────────────────────────
+// ── native window drag area ─────────────────────────────────────────────────
 export const reportDragRegions = debounce(() => {
   if (!isNative) return;
   const rect = (el) => {
@@ -260,14 +252,14 @@ export const reportDragRegions = debounce(() => {
   native({ type: "dragRegions", drag, noDrag });
 }, 60);
 
-// ── inicialização ───────────────────────────────────────────────────────────
+// ── initialization ──────────────────────────────────────────────────────────
 
 async function initialRoute(state) {
-  // O Início abre o app até os quatro passos estarem feitos ou o usuário pular o guia
+  // Home opens the app until the four steps are done or the user skips the guide
   try {
     if ((await get("/api/guide")).show_on_open) return "#/inicio";
   } catch {
-    /* sem guia: segue a regra antiga */
+    /* no guide: follow the old rule */
   }
   let last = null;
   try {
@@ -305,7 +297,7 @@ function boot() {
     if (!explicit && app.state) navigate(await initialRoute(app.state), { replace: true });
     else route();
   });
-  every(5000, refreshState);  // encadeado e pausado com a janela oculta
+  every(5000, refreshState);  // chained and paused while the window is hidden
   every(60000, checkBuild);
   setTimeout(checkBuild, 8000);
   new ResizeObserver(reportDragRegions).observe(document.body);

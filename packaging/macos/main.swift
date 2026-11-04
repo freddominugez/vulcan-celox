@@ -1,12 +1,12 @@
-// Vulcan Celox: casca nativa macOS (AppKit + WKWebView).
-// Inicia o servidor Python embutido, abre a interface web e cuida de janelas,
-// menus, item na barra de menu e do modo --snapshot usado como sensor visual.
+// Vulcan Celox: native macOS shell (AppKit + WKWebView).
+// Starts the embedded Python server, opens the web interface and handles windows,
+// menus, the menu bar item and the --snapshot mode used as a visual sensor.
 
 import AppKit
 import Security
 import WebKit
 
-// MARK: - Configuração
+// MARK: - Configuration
 
 struct LaunchOptions {
     var snapshotPath: String?
@@ -40,16 +40,16 @@ func randomToken() -> String {
     return bytes.map { String(format: "%02x", $0) }.joined()
 }
 
-let bgColor = NSColor.windowBackgroundColor  // acompanha o sistema até a página pintar o tema
+let bgColor = NSColor.windowBackgroundColor  // follows the system until the page paints the theme
 
-// MARK: - Servidor Python
+// MARK: - Python server
 
 final class BackendServer {
     let token = randomToken()
     private(set) var port: Int?
     private var process: Process?
 
-    /// Roda um executável sem janela e devolve o código de saída (nil se não conseguiu rodar).
+        /// Runs a windowless executable and returns the exit code (nil if it could not run).
     static func exitStatus(_ path: String, _ arguments: [String]) -> Int32? {
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: path)
@@ -61,8 +61,8 @@ final class BackendServer {
         return proc.terminationStatus
     }
 
-    /// Python 3.9+ que funciona de verdade. O /usr/bin/python3 do macOS é só um atalho que abre o instalador da
-    /// Apple quando as Command Line Tools faltam: só é testado se `xcode-select -p` confirmar que elas existem.
+        /// Python 3.9+ that really works. macOS's /usr/bin/python3 is only a stub that opens the installer for
+        /// Apple's Command Line Tools when they are missing: it is only tested if `xcode-select -p` confirms they exist.
     static func usablePython() -> String? {
         let env = ProcessInfo.processInfo.environment
         var candidates: [String] = []
@@ -87,7 +87,7 @@ final class BackendServer {
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: pythonPath())
         proc.arguments = ["-m", "vulcan_celox", "--serve"]
-        // com -m a pasta atual vai para o começo do sys.path: roda dentro dos recursos do bundle
+                // with -m the current folder goes to the start of sys.path: runs inside the bundle resources
         proc.currentDirectoryURL = URL(fileURLWithPath: resources)
         var env = ProcessInfo.processInfo.environment
         env["PYTHONPATH"] = resources
@@ -131,7 +131,7 @@ final class BackendServer {
     func stop() {
         guard let proc = process, proc.isRunning else { return }
         proc.terminate()
-        // espera com prazo: o servidor grava as memórias e fecha as abas; a janela nunca congela
+                // waits with a deadline: the server saves the memories and closes the tabs; the window never freezes
         let deadline = Date().addingTimeInterval(6)
         while proc.isRunning && Date() < deadline { usleep(50_000) }
         if proc.isRunning { kill(proc.processIdentifier, SIGKILL) }
@@ -148,12 +148,12 @@ final class BackendServer {
     }
 }
 
-// MARK: - WebView com área de arrastar a janela
+// MARK: - WebView with a window drag area
 
 final class AppWebView: WKWebView {
-    /// Retângulos (em pontos, origem no topo) onde o clique arrasta a janela.
+        /// Rectangles (in points, origin at the top) where a click drags the window.
     var dragRegions: [CGRect] = []
-    /// Retângulos interativos dentro da área de arrastar.
+        /// Interactive rectangles inside the drag area.
     var noDragRegions: [CGRect] = []
 
     private func topLeftPoint(_ event: NSEvent) -> CGPoint {
@@ -175,7 +175,7 @@ final class AppWebView: WKWebView {
     }
 }
 
-// MARK: - Janelas
+// MARK: - Windows
 
 final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHandler, WKNavigationDelegate {
     let window: NSWindow
@@ -193,7 +193,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         let controller = WKUserContentController()
         let origin = "http://127.0.0.1:\(app.server.port ?? 0)"
         self.appOrigin = origin
-        // o token só existe na página do próprio app: outra origem que chegue a carregar aqui não o vê
+                // the token only exists on the app's own page: another origin that manages to load here does not see it
         let bootstrap = """
         if (location.origin === "\(origin)") {
           window.VULCAN = { token: "\(app.server.token)", native: true, kind: "\(kind)" };
@@ -204,7 +204,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         """
         controller.addUserScript(WKUserScript(source: bootstrap, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         config.userContentController = controller
-        let inspect = ProcessInfo.processInfo.environment["VULCAN_INSPECT"] == "1"  // inspetor só para desenvolvimento
+        let inspect = ProcessInfo.processInfo.environment["VULCAN_INSPECT"] == "1"  // inspector for development only
         configureWebPreferences(config.preferences, inspect: inspect)
         webView = AppWebView(frame: NSRect(origin: .zero, size: size), configuration: config)
         webView.setValue(false, forKey: "drawsBackground")
@@ -216,7 +216,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         window.title = title
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
-        window.appearance = nil  // segue o sistema: prefers-color-scheme do WebView depende disto
+        window.appearance = nil  // follows the system: the WebView's prefers-color-scheme depends on this
         window.backgroundColor = bgColor
         window.minSize = NSSize(width: 760, height: 480)
         window.isReleasedWhenClosed = false
@@ -238,7 +238,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         evaluate("window.vulcanCommand && window.vulcanCommand(\(jsString(name)))")
     }
 
-    /// A janela só mostra o próprio app; link externo abre no navegador padrão.
+        /// The window only shows the app itself; external links open in the default browser.
     func isAppURL(_ url: URL?) -> Bool {
         guard let url = url else { return false }
         if url.absoluteString == "about:blank" { return true }
@@ -288,7 +288,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         case "pickFolder":
             pickFolder(id: body["id"] as? String ?? "", start: body["start"] as? String)
         case "copy":
-            // área de transferência pela casca: não depende do gesto do usuário nem da permissão do WebKit
+                        // clipboard through the shell: does not depend on the user gesture or on WebKit permission
             if let text = body["text"] as? String {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(text, forType: .string)
@@ -298,7 +298,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         }
     }
 
-    /// Seletor de pasta nativo; responde à interface com o evento `vulcan-folder-picked` (caminho nulo se cancelar).
+        /// Native folder picker; answers the interface with the `vulcan-folder-picked` event (null path if cancelled).
     private func pickFolder(id: String, start: String?) {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
@@ -354,7 +354,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         self.options = options
     }
 
-    /// Abre uma instância nova do app instalado e encerra esta (a interface pediu, após o usuário clicar).
+        /// Opens a new instance of the installed app and quits this one (the interface asked, after the user clicked).
     func relaunch() {
         let config = NSWorkspace.OpenConfiguration()
         config.createsNewApplicationInstance = true
@@ -394,14 +394,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        false  // continua na barra de menu, como o Herd
+        false  // stays in the menu bar, like Herd
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         server.stop()
     }
 
-    // MARK: janelas
+    // MARK: windows
     func openMain() {
         if let main = main {
             main.window.makeKeyAndOrderFront(nil)
@@ -510,7 +510,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menubar.addItem(windowItem)
         NSApp.windowsMenu = windowMenu
 
-        // Menu Ajuda do macOS; ⌘? abre a Ajuda na seção da tela atual
+                // macOS Help menu; ⌘? opens Help at the section of the current screen
         let helpItem = NSMenuItem()
         let helpMenu = NSMenu(title: L("Ajuda"))
         helpMenu.addItem(item("Ajuda do Vulcan Celox", #selector(goHelp), "?"))
@@ -548,7 +548,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = status
     }
 
-    // MARK: ações
+        // MARK: actions
     func withMain(_ body: @escaping (WebWindowController) -> Void) {
         if main == nil { openMain() }
         guard let main = main else { return }
@@ -584,11 +584,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSWorkspace.shared.open(URL(string: "http://127.0.0.1:7073/")!)
     }
 
-    // MARK: snapshot (sensor visual)
+    // MARK: snapshot (visual sensor)
     func runSnapshot() {
         let controller = WebWindowController(app: self, route: options.route, size: options.size,
                                              kind: "main", title: "Vulcan Celox")
-        controller.window.setFrameOrigin(NSPoint(x: -20000, y: -20000))  // fora da tela
+        controller.window.setFrameOrigin(NSPoint(x: -20000, y: -20000))  // offscreen
         controller.window.orderFront(nil)
         main = controller
         controller.onLoad = { [weak self] in
@@ -597,7 +597,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { controller.evaluate(js) }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + self.options.wait) {
-              // o sensor visual também falha se a interface lançou erro de JavaScript
+                            // the visual sensor also fails if the interface threw a JavaScript error
               if !controller.isAppURL(controller.webView.url) {
                   fputs("snapshot: a janela saiu do app para \(controller.webView.url?.absoluteString ?? "nada")\n", stderr)
                   self.server.stop()
@@ -642,10 +642,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 }
 
-// MARK: - Dependências
+// MARK: - Dependencies
 
-/// Sem Python utilizável: explica e oferece instalar. Nada é instalado sem a confirmação do usuário
-/// (o instalador da Apple e o Terminal com o Homebrew pedem a própria confirmação).
+/// No usable Python: explains and offers to install. Nothing is installed without the user's confirmation
+/// (Apple's installer and Terminal with Homebrew ask for their own confirmation).
 func offerPythonInstall() {
     NSApplication.shared.activate(ignoringOtherApps: true)
     let brew = ["/opt/homebrew/bin/brew", "/usr/local/bin/brew"].first { FileManager.default.isExecutableFile(atPath: $0) }
@@ -658,7 +658,7 @@ func offerPythonInstall() {
     alert.addButton(withTitle: L("Cancelar"))
     let response = alert.runModal()
     if response == .alertFirstButtonReturn {
-        // abre o diálogo do sistema "Instalar ferramentas de linha de comando"
+                // opens the system dialog "Install command line developer tools"
         _ = BackendServer.exitStatus("/usr/bin/xcode-select", ["--install"])
     } else if let brew = brew, response == .alertSecondButtonReturn {
         let script = "tell application \"Terminal\"\nactivate\ndo script \"\(brew) install python\"\nend tell"
@@ -666,7 +666,7 @@ func offerPythonInstall() {
     }
 }
 
-/// `vulcan-celox --verificar-dependencias`: diz qual Python será usado (0) ou o que falta (1).
+/// `vulcan-celox --verificar-dependencias`: says which Python will be used (0) or what is missing (1).
 func checkDependenciesAndExit() -> Never {
     if let python = BackendServer.usablePython() {
         print(L("Vulcan Celox: dependências ok (Python: {python})", ["python": python]))

@@ -1,5 +1,5 @@
-// Aviso do sistema quando um agente espera e a janela está sem foco. O texto é genérico: agente, projeto e estado,
-// nunca o conteúdo da conversa nem o que um programa escreveu no terminal.
+// System notification when an agent is waiting and the window is unfocused. The text is generic: agent, project and state,
+// never the conversation content nor what a program wrote to the terminal.
 
 import { isNative, native, patch, post } from "./api.mjs";
 import { ATTENTION_LABELS, attentionCount, onAttention } from "./attention-state.mjs";

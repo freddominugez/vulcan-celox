@@ -1,4 +1,4 @@
-"""A camada ui só pode depender de vulcan_celox e da biblioteca padrão."""
+"""The ui layer may only depend on vulcan_celox and the standard library."""
 
 import ast
 import importlib.util

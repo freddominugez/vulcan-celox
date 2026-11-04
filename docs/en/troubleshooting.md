@@ -9,8 +9,9 @@ First step for almost everything: `python3 -m vulcan_celox --doctor`.
 | Windows warns about an unknown publisher | The package is not signed: **More info**, then **Run anyway** |
 | The Windows window opens in a normal browser tab | Edge or Chrome was not found, so the app fell back to the default browser. Install either one |
 | Opening in a browser asks for a token | The interface needs the token the native app creates. Open it through the app |
-| Lerd is stopped | **Ligar** on the Lerd screen or play at the top. The first start can take a minute. The bolt button starts it with the app |
+| Lerd is stopped | **Ligar** on the Lerd screen or play at the top. The first start can take a minute, and the app waits for it to answer. The bolt button starts it with the app; it comes off, because Lerd is optional |
 | `.test` DNS problem | Lerd's steps that need the administrator password were not finished. In a terminal: `sudo /opt/homebrew/bin/podman-mac-helper install`, then `lerd install`. The password is your Mac user's. The app never asks for it or stores it |
+| Claude Code closes right after opening in a tab | Its folder trust question has "No, exit" selected, so Enter closes it. Press the down arrow to "Yes, I trust this folder", then Enter. Codex has no such question |
 | An agent is missing | Only Claude Code and Codex are read. `.jsonl.zst` sessions need `zstd`; `--doctor` counts the skipped ones |
 | Old Claude sessions disappeared from Claude Code | Claude Code removes them after a while (30 days by default). The app's index keeps what it already read |
 | Index looks wrong | `python3 -m vulcan_celox --reindexar-agentes`. The index is disposable |
