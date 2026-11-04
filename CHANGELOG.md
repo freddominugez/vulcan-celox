@@ -12,6 +12,7 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 - CI covers lint and the whole suite on Windows. The macOS workflow runs on request before each release, and each pull request runs the sensors on a Mac. A test keeps the version cited in the documentation equal to the code.
 
 ### Fixed
+- A tab whose command ended right after it opened could stay listed as open.
 - "Could not start Lerd" with a progress line as the reason. The app now waits for the environment to answer after `lerd start`, and a progress line is never shown as a failure.
 - The automatic start no longer shows a floating message: the state stays in the top bar, and a failure on the Lerd and Home screens.
 - A command typed by the app into a PowerShell tab did not run. Other Windows defects found by running the whole suite there.

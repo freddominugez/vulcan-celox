@@ -41,6 +41,8 @@ class SessionHub:
             self._trackers[pty.id] = InputTracker()
         pty.subscribe(lambda chunk, p=pty: self._on_output(p, chunk))
         self.write_memory(pty.id)
+        if pty.ended:  # the process ended before the subscription, and that notice went to nobody
+            self.finalize(pty)
 
     def on_input(self, session_id: str, data: bytes) -> None:
         with self._lock:
