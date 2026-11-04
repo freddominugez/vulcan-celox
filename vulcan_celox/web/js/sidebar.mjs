@@ -11,6 +11,9 @@ window.addEventListener("vulcan-attention", () => {
   if (!badge || Number(badge.dataset.attentionCount) !== attentionCount()) renderSidebar();
 });
 
+// while the environment comes up it is not "stopped": no alarm color for a start that is still going
+const envStarting = (state) => Boolean(state.autostart && ["starting", "checking"].includes(state.autostart.phase));
+
 export function renderSidebar() {
   const state = app.state;
   const counts = {
@@ -26,8 +29,9 @@ export function renderSidebar() {
     if (n.id === "ambiente" && state) {
       label = state.backend.available ? state.backend.label : "Lerd";
       const run = state.status.running;
-      const word = run ? t("rodando") : state.backend.available ? t("parado") : t("ausente");
-      dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
+      const up = envStarting(state);
+      const word = run ? t("rodando") : up ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente");
+      dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available && !up ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
     }
     return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" ${active ? 'aria-current="page"' : ""}>
       ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${t("{n} aguardando você", { n: count })}"` : ""}>${count}</span>` : ""}${dot}</a>`;
@@ -94,9 +98,9 @@ export function renderSidebar() {
 
   $("#side-env").innerHTML = `
     <button class="side-env-btn" data-action="dashboard" ${state.backend.dashboard ? "" : "disabled"} title="${esc(state.status.summary)}">
-      <span class="dot ${running ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}"></span>
+      <span class="dot ${running ? "dot-ok" : state.backend.available && !envStarting(state) ? "dot-err" : "dot-idle"}"></span>
       <span class="side-env-label">${esc(state.backend.label)}</span>
-      <span class="dim">${running ? t("rodando") : state.backend.available ? t("parado") : t("ausente")}</span>
+      <span class="dim">${running ? t("rodando") : envStarting(state) ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente")}</span>
       ${state.backend.dashboard ? icon("external", "i-sm") : ""}
     </button>`;
 }
