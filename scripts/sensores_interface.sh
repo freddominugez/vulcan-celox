@@ -145,19 +145,22 @@ step "temas claro e escuro: telas principais sem estouro e com os tokens aplicad
 "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code4"
 for tema in claro escuro; do
   [ "$tema" = claro ] && fundo="rgb(250, 246, 238)" || fundo="rgb(7, 13, 24)"
-  THEME_JS="document.documentElement.dataset.theme = '$tema'; setTimeout(function () {
+  # chosen the way a user does: forcing the attribute races with the saved preference arriving from the server
+  THEME_JS="var pendente = 'tema $tema: não verificado'; window.__vtErrors.push(pendente);
+  import('./js/theme.mjs').then(function (m) { return m.setThemePref('$tema'); }).then(function () { setTimeout(function () {
+    window.__vtErrors.splice(window.__vtErrors.indexOf(pendente), 1);
     if (getComputedStyle(document.body).backgroundColor !== '$fundo') window.__vtErrors.push('tema $tema: fundo ' + getComputedStyle(document.body).backgroundColor);
-    if (document.documentElement.scrollWidth > window.innerWidth) window.__vtErrors.push('tema $tema: estourou a largura'); }, 1500);"
+    if (document.documentElement.scrollWidth > window.innerWidth) window.__vtErrors.push('tema $tema: estourou a largura'); }, 1500); });"
   for route in "#/overview" "#/agentes" "#/agentes/$CODE_SID/codigo" "#/agentes/$CODE_SID" "#/tasks" "#/notes" "#/ajuda"; do
     shot="$TMP_ROOT/tema-$tema-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
-    isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 3 --eval "$THEME_JS $CLIP_JS"
+    isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 5 --eval "$THEME_JS $CLIP_JS"
   done
 done
 
 step "fonte Inter e logo: carregados de verdade, em cada tema o arquivo certo"
 for tema in claro escuro; do
   [ "$tema" = claro ] && logo="primary" || logo="reverse"
-  BRAND_JS="document.documentElement.dataset.theme = '$tema'; setTimeout(function () {
+  BRAND_JS="import('./js/theme.mjs').then(function (m) { return m.setThemePref('$tema'); }); setTimeout(function () {
     var box = document.querySelector('.brand-logo'); if (!box) { window.__vtErrors.push('logo ausente'); return; }
     var img = Array.prototype.find.call(box.querySelectorAll('img'), function (i) { return getComputedStyle(i).display !== 'none'; });
     if (!img || img.src.indexOf('celox-logo-$logo') < 0) window.__vtErrors.push('logo errado no tema $tema: ' + (img ? img.src : 'nenhum'));
