@@ -1,4 +1,4 @@
-"""Quem já usa o app não perde nada com o nome novo: pasta de dados e chave no Keychain."""
+"""Whoever already uses the app loses nothing with the new name: data folder and Keychain key."""
 
 import tempfile
 import unittest
@@ -45,7 +45,7 @@ class PastaTest(unittest.TestCase):
         self.assertEqual(new.name, "VulcanCelox")
         self.assertEqual((new / "agentes.db").read_text(encoding="utf-8"), "dados")
         self.assertTrue(old.is_symlink())
-        self.assertEqual((old / "agentes.db").read_text(encoding="utf-8"), "dados")  # o hook antigo continua achando
+        self.assertEqual((old / "agentes.db").read_text(encoding="utf-8"), "dados")  # the old hook still finds it
 
     def test_segunda_abertura_nao_mexe(self):
         (self.support / OLD).mkdir()

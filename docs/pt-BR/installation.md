@@ -46,6 +46,10 @@ bash scripts/install_app.sh  # compila com swiftc, instala em ~/Applications e c
 bash scripts/package.sh      # pacotes de macOS e Linux em executaveis/
 ```
 
+## O Lerd é opcional
+
+O [Lerd](https://lerd.sh) só é preciso para rodar sites PHP e Laravel. Terminais, agentes e projetos Node funcionam sem ele. Na tela **Início**, **Instalar** mostra o comando oficial e o roda num terminal à vista, e **Não uso** dispensa o passo. Ele não inicia com o app, a menos que você ligue o botão de raio.
+
 ## Windows (versão de teste)
 
 Windows 10 versão 1809 ou mais novo, ou Windows 11. O Python vem junto, então não há mais nada para instalar.

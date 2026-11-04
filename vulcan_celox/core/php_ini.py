@@ -1,8 +1,8 @@
-"""Os seis ajustes comuns do php.ini de usuário do Lerd.
+"""The six common settings of the user php.ini in Lerd.
 
-A gravação passa pelo próprio `lerd php:ini [versão|shared]` com EDITOR apontando para este módulo: o Lerd entrega o
-caminho do arquivo ao "editor" e reaplica o PHP-FPM quando ele termina, como faz ao salvar no nano ou no vim.
-Este módulo, rodado como editor, faz uma cópia `.bak-<data>` ao lado e altera só as linhas das chaves pedidas.
+Writing goes through `lerd php:ini [version|shared]` itself with EDITOR pointing at this module: Lerd hands the
+file path to the "editor" and reapplies PHP-FPM when it finishes, as it does when saving in nano or vim.
+This module, run as an editor, makes a `.bak-<date>` copy alongside and changes only the lines of the requested keys.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def check(key: str, value: Optional[str]) -> None:
 
 
 def parse_directives(text: str) -> Dict[str, str]:
-    """Valores das seis chaves que estão valendo (linhas sem ponto e vírgula)."""
+    """Values of the six keys currently in effect (lines without a semicolon)."""
     out: Dict[str, str] = {}
     for line in (text or "").splitlines():
         stripped = line.strip()
@@ -46,7 +46,7 @@ def parse_directives(text: str) -> Dict[str, str]:
 
 
 def set_directive(text: str, key: str, value: Optional[str]) -> str:
-    """Troca a linha da chave; sem ela, acrescenta no fim; com None, tira a linha. O resto fica igual."""
+    """Replaces the key's line; without it, appends at the end; with None, removes the line. The rest stays the same."""
     check(key, value)
     lines = (text or "").splitlines()
     pattern = _line(key)
@@ -62,7 +62,7 @@ def set_directive(text: str, key: str, value: Optional[str]) -> str:
 
 
 def edit_file(path: str, changes: Dict[str, Optional[str]]) -> str:
-    """Aplica as mudanças com cópia ao lado; devolve o caminho da cópia."""
+    """Applies the changes with a copy alongside; returns the copy's path."""
     for key, value in changes.items():
         check(key, value)
     with open(path, encoding="utf-8") as fh:
@@ -77,7 +77,7 @@ def edit_file(path: str, changes: Dict[str, Optional[str]]) -> str:
 
 
 def main(argv=None) -> int:
-    """Usado como EDITOR pelo `lerd php:ini`: recebe o caminho e lê as mudanças de VULCAN_PHP_INI_SET."""
+    """Used as EDITOR by `lerd php:ini`: receives the path and reads the changes from VULCAN_PHP_INI_SET."""
     args = sys.argv[1:] if argv is None else argv
     if not args:
         return 2

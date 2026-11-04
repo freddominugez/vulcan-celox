@@ -1,4 +1,4 @@
-// Tarefas como mini gerenciador: responsável, prazo, resumo, filtros e visões Lista ou Quadro (arrastar muda o status).
+// Tasks as a mini manager: assignee, due date, summary, filters and Lista or Quadro views (dragging changes the status).
 import { del, get, patch, post } from "../api.mjs";
 import { $, flashFocus, esc, formatDue, icon, progressBar, reportError, toast, todayISO } from "../dom.mjs";
 import { t } from "../i18n.mjs";
@@ -35,7 +35,7 @@ function avatar(name) {
   return `<span class="avatar" style="--avatar:${avatarColor(name)}" aria-hidden="true">${esc(initials(name))}</span>`;
 }
 
-/** Prazo em linguagem de gestão: Hoje, Amanhã, Atrasada 3 d, dia da semana na próxima semana. */
+/** Due date in management language: Hoje, Amanhã, Atrasada 3 d, weekday next week. */
 function dueInfo(due, status) {
   if (!due) return null;
   const today = new Date(`${todayISO()}T00:00:00`);
@@ -64,7 +64,7 @@ export class TasksView {
   constructor(root, options) {
     this.root = root;
     this.options = options;
-    // "nova": veio do menu da sessão, cursor no campo de tarefa nova; outro id: item aberto pela árvore (pode estar concluído)
+    // "nova": came from the session menu, cursor in the new-task field; another id: item opened from the tree (may be done)
     this.filter = options.focus && options.focus !== "nova" ? "all" : "open";
     this.scope = options.terminal ? "session" : "site";
     this.tag = "";
@@ -81,7 +81,7 @@ export class TasksView {
     this.root.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && e.target.classList && e.target.classList.contains("task-title")) {
         e.preventDefault();
-        this.onDblClick(e);  // editar pelo teclado
+        this.onDblClick(e);  // edit by keyboard
       }
     });
     this.root.addEventListener("submit", (e) => this.onSubmit(e));
@@ -112,7 +112,7 @@ export class TasksView {
   }
 
   async load() {
-    // o quadro mostra as três colunas: o filtro de status só vale na lista
+    // the board shows all three columns: the status filter only applies to the list
     const status = this.view === "board" ? "" : FILTERS.find((f) => f.id === this.filter).status;
     const params = new URLSearchParams({ site: this.siteParam, sort: this.sort });
     if (this.sessionScoped) params.set("terminal", this.options.terminal);
@@ -122,7 +122,7 @@ export class TasksView {
     if (this.due) params.set("due", this.due);
     try {
       const [data, tags, people] = await Promise.all([get(`/api/tasks?${params}`), get("/api/tags"), get("/api/tasks/assignees")]);
-      if (!this.root.isConnected) return; // a tela foi trocada enquanto carregava
+      if (!this.root.isConnected) return; // the screen was switched while loading
       this.data = data;
       this.tags = tags.tags;
       this.assignees = people.assignees;
@@ -316,7 +316,7 @@ export class TasksView {
       form.due.value = "";
       form.due.classList.remove("has-value");
       form.tags.value = "";
-      form.title.focus(); // responsável fica preenchido para lançar várias tarefas da mesma pessoa
+      form.title.focus(); // assignee stays filled in to log several tasks for the same person
       await this.load();
       this.options.onChange();
     } catch (err) {
@@ -345,7 +345,7 @@ export class TasksView {
     const view = event.target.closest("[data-view]");
     if (view) {
       this.view = view.dataset.view;
-      try { localStorage.setItem(VIEW_KEY, this.view); } catch { /* só nesta janela */ }
+      try { localStorage.setItem(VIEW_KEY, this.view); } catch { /* this window only */ }
       this.root.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("is-on", b === view));
       this.load();
       return;
@@ -396,7 +396,7 @@ export class TasksView {
     return null;
   }
 
-  /** Troca o botão por um campo no lugar; Enter ou sair salva, Esc cancela. */
+  /** Swaps the button for an in-place field; Enter or blur saves, Esc cancels. */
   inlineEditor(button, input, save) {
     button.replaceWith(input);
     input.focus();

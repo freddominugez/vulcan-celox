@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only, SEM_LERD
 from tests.lerd_api_stub import LerdApiStub, closed_port_url
 from vulcan_celox.core.doctor import collect
 
@@ -24,7 +24,7 @@ class DoctorTest(TempDirTestCase):
                 "VULCAN_VALET_BIN": str(self.tmp / "sem-valet"), "VULCAN_VALET_HOME": str(self.tmp / "valet")}
 
     def test_precos_invalidos_avisam(self):
-        # Precos.json inválido mantém o padrão e aparece no --doctor
+        # invalid precos.json keeps the default and shows up in --doctor
         home = self.tmp / "home"
         home.mkdir()
         (home / "precos.json").write_text("{", encoding="utf-8")
@@ -32,6 +32,7 @@ class DoctorTest(TempDirTestCase):
         self.assertIn("JSON inválido", data["precos"]["aviso"])
         self.assertEqual((data["precos"]["moeda"], data["precos"]["conferido_em"]), ("USD", "2026-11-01"))
 
+    @unix_only(SEM_LERD)
     def test_lerd_rodando(self):
         with LerdApiStub() as stub:
             data = collect(self._env(stub.url, self._fake_lerd()))
@@ -43,6 +44,7 @@ class DoctorTest(TempDirTestCase):
         data = collect(self._env(closed_port_url()))
         self.assertEqual((data["backend"], data["running"], data["sites"]), ("local", False, []))
 
+    @unix_only(SEM_LERD)
     def test_cli_imprime_json_e_sai_zero(self):
         env = dict(os.environ, **self._env(closed_port_url(), self._fake_lerd()), PYTHONPATH=str(ROOT))
         proc = subprocess.run([sys.executable, "-m", "vulcan_celox", "--doctor"], env=env,

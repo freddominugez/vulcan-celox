@@ -1,0 +1,18 @@
+name: macOS
+
+# macOS minutes cost ten times more on private repositories, so this runs on pull requests only.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: All sensors
+        run: bash scripts/validate.sh

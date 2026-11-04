@@ -1,4 +1,4 @@
-"""Mascara segredos antes de qualquer texto sair da máquina (documentação com IA)."""
+"""Masks secrets before any text leaves the machine (AI documentation)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ MASK = "[segredo]"
 
 _SECRET_WORDS = r"(?:PASSWORD|PASSWD|PASS|PWD|SECRET|TOKEN|API_?KEY|ACCESS_?KEY|PRIVATE_?KEY|APP_KEY|AUTH|CREDENTIALS?|DSN)"
 
-# (padrão, substituição): a substituição preserva nomes de variáveis e prefixos úteis para entender o comando
+# (pattern, replacement): the replacement preserves variable names and prefixes useful for understanding the command
 _RULES: List[Tuple[Pattern[str], Union[str, Callable]]] = [
     (re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----", re.S),
      "[chave privada removida]"),
@@ -23,9 +23,9 @@ _RULES: List[Tuple[Pattern[str], Union[str, Callable]]] = [
     (re.compile(r"\bsb_(?:secret|publishable)_[A-Za-z0-9_\-]{10,}"), MASK),
     (re.compile(r"\beyJ[A-Za-z0-9_\-]{8,}\.eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}"), MASK),
     (re.compile(r"(?i)(\bBearer\s+)[A-Za-z0-9._~+/\-]{12,}=*"), lambda m: m.group(1) + MASK),
-    # usuário:senha@ em URLs (mysql://, postgres://, redis://, https://)
+    # user:password@ in URLs (mysql://, postgres://, redis://, https://)
     (re.compile(r"(?i)\b([a-z][a-z0-9+.\-]*://[^\s:/@]+:)([^\s@/]+)@"), lambda m: f"{m.group(1)}{MASK}@"),
-    # CHAVE=valor e chave: valor com palavra sensível no nome
+    # KEY=value and key: value with a sensitive word in the name
     (re.compile(r"(?i)\b([A-Z0-9_.\-]*" + _SECRET_WORDS + r"[A-Z0-9_.\-]*)(\s*[=:]\s*)([\"']?)"
                 r"(?!\[segredo\])(?!(?:Bearer|Basic)\b)(?!(?:\d+|true|false|null|none|\$\{?[A-Z_]+\}?)\3(?:\s|$))([^\s\"']{3,})\3"),
      lambda m: f"{m.group(1)}{m.group(2)}{m.group(3)}{MASK}{m.group(3)}"),

@@ -27,7 +27,7 @@ if ! python_ok; then
   sh "$DEPS" || true
   python_ok || { echo "Install Python 3.9+ and open it again (vulcan-celox --install-deps)." >&2; exit 1; }
 fi
-# com -m, a pasta atual entra no começo do sys.path: roda de dentro da biblioteca para um json.py ou secrets.py
-# do repositório onde o usuário está não ser importado no lugar do módulo de verdade
+# with -m, the current folder goes to the start of sys.path: runs from inside the library so a json.py or secrets.py
+# in the repository where the user is does not get imported in place of the real module
 cd "$LIB"
 PYTHONPATH="$LIB${PYTHONPATH:+:$PYTHONPATH}" exec "$PYTHON" -m vulcan_celox.desktop_linux "$@"

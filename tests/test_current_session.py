@@ -1,4 +1,4 @@
-"""Sessão atual pela API, lembrada entre aberturas do app."""
+"""Current session through the API, remembered between app launches."""
 
 from tests import test_agents_api
 from vulcan_celox.server.app import VulcanApp
@@ -11,7 +11,7 @@ class CurrentSessionTest(test_agents_api.AgentsServerCase):
     def test_automatica_por_padrao(self):
         data = self.get("/api/agents/current")
         self.assertTrue(data["automatic"])
-        self.assertEqual(data["session"]["id"], CLAUDE_SID)  # a mais recente das fixtures
+        self.assertEqual(data["session"]["id"], CLAUDE_SID)  # the most recent of the fixtures
         self.assertEqual(data["context"]["sessionId"], CLAUDE_SID)
         self.assertEqual(data["context"]["projectName"], "projeto")
 
@@ -19,7 +19,7 @@ class CurrentSessionTest(test_agents_api.AgentsServerCase):
         status, data, _ = self.request("PUT", "/api/agents/current", body={"session_id": CODEX_SID})
         self.assertEqual((status, data["session"]["id"], data["automatic"]), (200, CODEX_SID, False))
         self.assertEqual(data["context"]["agent"], "Codex")
-        other = VulcanApp(env=self.env(), runner=self.fake, token=self.token)  # outra abertura do app, mesma pasta de dados
+        other = VulcanApp(env=self.env(), runner=self.fake, token=self.token)  # another app launch, same data folder
         try:
             other.agents.refresh()
             self.assertEqual(other.agents.current()["session"]["id"], CODEX_SID)

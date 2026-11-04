@@ -1,4 +1,4 @@
-"""Contraste medido nos pares de tokens que a interface usa de verdade, nos dois temas. Alvo: texto 4,5:1; foco e controles 3:1."""
+"""Contrast measured on the token pairs the interface really uses, in both themes. Target: 4.5:1 text; 3:1 focus and controls."""
 
 import re
 import unittest
@@ -98,7 +98,7 @@ class ContrasteTest(unittest.TestCase):
 
 
 class AreaDoTerminalTest(unittest.TestCase):
-    """Dentro de .ws-body o fundo é sempre escuro, mesmo no tema claro."""
+    """Inside .ws-body the background is always dark, even in the light theme."""
 
     def test_texto_legivel(self):
         match = re.search(r"\.ws-body \{(.*?)\n\}", TOKENS, re.S)

@@ -1,4 +1,4 @@
-"""Cálculo de progresso das tarefas."""
+"""Task progress calculation."""
 
 from __future__ import annotations
 

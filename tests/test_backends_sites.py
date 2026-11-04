@@ -1,10 +1,9 @@
-"""Ações de site no Lerd e no Valet, por argv em lista e pasta de trabalho."""
+"""Site actions on Lerd and Valet, by list argv and working folder."""
 
 import json
-from pathlib import Path
 from unittest import mock
 
-from tests.helpers import FIXTURES, TempDirTestCase
+from tests.helpers import FIXTURES, TempDirTestCase, unix_only, SEM_LERD
 from vulcan_celox.core.backends import LerdBackend, NullBackend, ValetBackend
 from vulcan_celox.core.runner import FakeRunner, Result
 
@@ -12,7 +11,7 @@ LERD = "/opt/homebrew/bin/lerd"
 VALET = "/Users/dev/.composer/vendor/bin/valet"
 LOJA = "/Users/dev/Code/loja"
 
-# (método, argumentos, argv depois do binário, cwd)
+# (method, arguments, argv after the binary, cwd)
 LERD_TABLE = [
     ("link", (LOJA, "loja"), ["link", "loja"], LOJA),
     ("link", (LOJA, ""), ["link"], LOJA),
@@ -35,6 +34,7 @@ VALET_TABLE = [
 ]
 
 
+@unix_only(SEM_LERD)
 class SiteActionsTest(TempDirTestCase):
     def check(self, backend, table, binary):
         for method, args, argv, cwd in table:
@@ -84,6 +84,7 @@ class SiteActionsTest(TempDirTestCase):
         self.assertEqual(backend.php_versions(), [])
 
 
+@unix_only(SEM_LERD)
 class ShareTest(TempDirTestCase):
     def test_share_argv(self):
         lerd = LerdBackend(LERD)

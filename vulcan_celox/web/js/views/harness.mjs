@@ -1,5 +1,5 @@
-// Aba Harness do site: onde os agentes estão no contrato. Só leitura: o app não muda status de item nem
-// roda sensor; quem valida é o sensor do projeto.
+// Site Harness tab: where the agents stand in the contract. Read-only: the app does not change item status nor
+// run the sensor; the project's sensor is what validates.
 
 import { every, get, post } from "../api.mjs";
 import { confirmDialog } from "../ai.mjs";
@@ -25,7 +25,7 @@ export function resumePrompt(info) {
 
 const ACTION = { criar: t("criar arquivo novo"), bloco: t("acrescentar só o bloco marcado (o resto do arquivo não muda)") };
 
-/** Mostra a lista exata de arquivos e o conteúdo de cada um; só grava com a confirmação. */
+/** Shows the exact list of files and the content of each; only writes with confirmation. */
 export async function installDialog(site) {
   const base = `/api/sites/${encodeURIComponent(site.name)}/harness/install`;
   const plan = await get(base);
@@ -57,7 +57,7 @@ function taskForm() {
     <p class="dim hint">${t("APROVAÇÃO fica pendente: só você aprova, editando o arquivo depois de revisar.")}</p></div>`;
 }
 
-/** Formulário do contrato no formato mínimo; grava.vulcan/tasks/<id>.md e nunca sobrescreve. */
+/** Contract form in the minimal format; writes .vulcan/tasks/<id>.md and never overwrites. */
 export async function newTaskDialog(site) {
   let data = null;
   const ok = await confirmDialog({
@@ -98,7 +98,7 @@ export class HarnessView {
     try {
       const info = await get(`/api/sites/${encodeURIComponent(this.site.name)}/harness`);
       const key = `${info.tipo}|${info.estado}|${info.assinatura}`;
-      if (key === this.key) return;  // só redesenha quando os arquivos mudam
+      if (key === this.key) return;  // only redraws when the files change
       this.key = key;
       this.info = info;
       this.render();

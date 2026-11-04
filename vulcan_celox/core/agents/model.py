@@ -1,4 +1,4 @@
-"""Modelo normalizado das sessões de agente, igual para Claude Code e Codex (docs/en/agent-file-formats.md, seção 3)."""
+"""Normalized model of agent sessions, the same for Claude Code and Codex (docs/en/agent-file-formats.md, section 3)."""
 
 from __future__ import annotations
 
@@ -16,9 +16,9 @@ MAX_COMMANDS = 200
 _FRACTION = re.compile(r"\.(\d+)")
 
 
-# ── conversões seguras: os JSONL são de terceiros e o formato muda sem aviso ──
+# ── safe conversions: the JSONL are third-party and the format changes without notice ──
 def parse_iso(value: Any) -> Optional[datetime]:
-    """ISO 8601 para datetime com fuso. Aceita Z e frações de qualquer tamanho (o Python 3.9 só aceita 3 ou 6)."""
+    """ISO 8601 to timezone-aware datetime. Accepts Z and fractions of any length (Python 3.9 only accepts 3 or 6)."""
     if not isinstance(value, str) or not value:
         return None
     text = _FRACTION.sub(lambda m: "." + (m.group(1) + "000000")[:6], value.strip().replace("Z", "+00:00"), count=1)
@@ -35,7 +35,7 @@ def epoch(value: Any) -> Optional[float]:
 
 
 def local_day(value: Any) -> Optional[str]:
-    """Dia (AAAA-MM-DD) no fuso desta máquina."""
+    """Day (YYYY-MM-DD) in this machine's timezone."""
     dt = parse_iso(value)
     return dt.astimezone().date().isoformat() if dt else None
 
@@ -105,14 +105,14 @@ class AgentSession:
     tokens: Optional[Dict[str, int]] = None
     first_user_message: Optional[str] = None
     subagents: int = 0
-    origin: str = ""  # Subagent ou desktop quando a sessão não nasce de uma aba; vazio nos outros casos
+    origin: str = ""  # subagent or desktop when the session does not originate from a tab; empty otherwise
     pairing_id: Optional[str] = None
     theme: Optional[str] = None
     loop_alert: Optional[Dict] = None
     attention: Optional[Dict] = None
-    attention_hook: Optional[Dict] = None  # só na leitura, vem de <dados>/attention
+    attention_hook: Optional[Dict] = None  # read-time only, comes from <data>/attention
     parse_errors: int = 0
-    # contagens guardadas no resumo leve (a lista usa estas; files e commands só vêm no detalhe)
+    # counts stored in the light summary (the list uses these; files and commands only come in the detail)
     files_count: int = 0
     edited_count: int = 0
 
@@ -126,7 +126,7 @@ class AgentSession:
         return len(self.files) if self.files else self.files_count
 
     def light_dict(self) -> Dict:
-        """Resumo sem as listas de arquivos e comandos, que ficam nas tabelas próprias do índice."""
+        """Summary without the file and command lists, which live in the index's own tables."""
         data = asdict(self)
         data["files_count"], data["edited_count"] = len(self.files), len(self.edited_files())
         data["files"], data["commands"] = [], []

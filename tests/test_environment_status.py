@@ -1,8 +1,8 @@
-"""Estado do ambiente do Lerd (DNS, nginx, PHP-FPM, watcher, serviços) e ações nos serviços.
+"""Lerd environment state (DNS, nginx, PHP-FPM, watcher, services) and actions on the services.
 
-`lerd-api-status.json` é resposta real do Lerd. `lerd-api-services-montada.json` foi montada com os campos que o
-painel do próprio Lerd 1.37.1 lê de /api/services (name, status "active", version, pinned, connection_url...),
-porque nenhum serviço está instalado nesta máquina e instalar um baixaria imagens grandes.
+`lerd-api-status.json` is a real Lerd response. `lerd-api-services-montada.json` was assembled with the fields that the
+Lerd 1.37.1 dashboard itself reads from /api/services (name, status "active", version, pinned, connection_url...),
+because no service is installed on this machine and installing one would download large images.
 """
 
 import json
@@ -72,7 +72,7 @@ class ApiTest(ServerTestCase):
 
 
 class CacheTest(ApiTest):
-    """A tela Ambiente atualiza a cada 15 s; php:list e xdebug status ficam 60 s guardados."""
+    """The Environment screen refreshes every 15 s; php:list and xdebug status are cached for 60 s."""
 
     def tearDown(self):
         self.app.terminals.close_all()

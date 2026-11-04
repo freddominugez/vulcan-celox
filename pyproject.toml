@@ -1,0 +1,12 @@
+# Tool configuration only. The app has no dependencies to install and is not built from this file.
+[tool.ruff]
+target-version = "py39"
+line-length = 160
+extend-exclude = ["vulcan_celox/web/vendor", "tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.coverage.run]
+source = ["vulcan_celox"]
+omit = ["vulcan_celox/ui/*"]

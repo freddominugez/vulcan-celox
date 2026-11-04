@@ -11,7 +11,7 @@ class ServerSecurityTest(ServerTestCase):
         self.assertEqual(self.request("GET", "/api/state", token="outro")[0], 401)
 
     def test_token_na_query(self):
-        # Na API o token vem só pelo cabeçalho; a query vale só no WebSocket (test_api_endurecida)
+        # in the API the token comes only through the header; the query is valid only on the WebSocket (test_api_endurecida)
         self.assertEqual(self.request("GET", f"/api/state?token={self.token}", token=False)[0], 401)
 
     def test_host_estranho(self):
@@ -75,11 +75,16 @@ class ServerRoutesTest(ServerTestCase):
         self.assertEqual(self.request("POST", "/api/services/explodir", body={})[0], 404)
 
     def test_servico_com_backend(self):
+        from vulcan_celox.core.backends.base import EnvStatus
         from vulcan_celox.core.backends.lerd import LerdBackend
         self.app.backend = LerdBackend(self.tmp / "lerd", runner=self.fake, api_base="http://127.0.0.1:1")
+        # the command finished, but nothing answers: that is reported, without blaming a progress line
         status, data, _ = self.request("POST", "/api/services/restart", body={})
-        self.assertEqual((status, data["ok"]), (200, True))
-        self.assertEqual([c.argv[-1] for c in self.fake.calls], ["stop", "start"])
+        self.assertEqual((status, data["ok"]), (200, False))
+        self.assertIn("não respondeu", data["output"])
+        self.assertEqual([c.argv[-1] for c in self.fake.calls if c.argv[-1] != "--version"], ["stop", "start"])  # asking the version is a read
+        self.app.backend.status = lambda: EnvStatus(True, "")
+        self.assertEqual(self.request("POST", "/api/services/start", body={})[1]["ok"], True)
 
     def test_open(self):
         self.assertEqual(self.request("POST", "/api/open", body={"kind": "url", "target": "file:///etc"})[0], 400)

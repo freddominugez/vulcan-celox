@@ -1,4 +1,4 @@
-// Tela Ajuda: manual por assunto e perguntas frequentes, com busca enquanto digita.
+// Ajuda screen: manual by topic and frequently asked questions, with search as you type.
 
 import { put } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";

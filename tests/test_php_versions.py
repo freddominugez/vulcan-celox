@@ -1,9 +1,9 @@
-"""Versões de PHP do Lerd (lista, padrão, instalar, atualizar)."""
+"""PHP versions of Lerd (list, default, install, update)."""
 
 import os
 from unittest import mock
 
-from tests.helpers import FIXTURES
+from tests.helpers import FIXTURES, unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.environment import SUPPORTED_PHP, parse_php_list
 from vulcan_celox.core.runner import Result
@@ -11,7 +11,7 @@ from vulcan_celox.core.runner import Result
 
 class ParserTest(ServerTestCase):
     def test_saida_real(self):
-        # tests/fixtures/lerd-php-list.txt: saída de `lerd php:list` do Lerd 1.37.1 nesta máquina
+        # tests/fixtures/lerd-php-list.txt: output of `lerd php:list` from Lerd 1.37.1 on this machine
         self.assertEqual(parse_php_list((FIXTURES / "lerd-php-list.txt").read_text(encoding="utf-8")),
                          [{"version": "8.5", "default": True}])
 
@@ -49,6 +49,7 @@ class ApiTest(ServerTestCase):
         self.assertEqual([v["version"] for v in data["installed"]], ["8.4", "8.5"])
         self.assertEqual(data["installable"], [v for v in SUPPORTED_PHP if v not in ("8.4", "8.5")])
 
+    @unix_only(SEM_LERD)
     def test_padrao_e_abas(self):
         status, data, _ = self.request("POST", "/api/environment/php/8.4/use")
         self.assertEqual(status, 200, data)

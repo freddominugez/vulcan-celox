@@ -1,7 +1,7 @@
-"""Branches e worktrees com trabalho sem conciliar: sessões dos agentes cruzadas com o git real.
+"""Branches and worktrees with unreconciled work: agent sessions crossed with the real git.
 
-Só leitura: `git --no-optional-locks` impede o `status` de reescrever o .git/index, e todo comando passa
-por core/runner.py com timeout. O app nunca faz commit, push nem remove worktree; só mostra e copia prompts.
+Read-only: `git --no-optional-locks` stops `status` from rewriting .git/index, and every command goes
+through core/runner.py with a timeout. The app never commits, pushes or removes a worktree; it only shows and copies prompts.
 """
 
 from __future__ import annotations
@@ -19,8 +19,8 @@ IDLE_DAYS = 3
 STATE_ORDER = ("sem commit", "sem push", "sem upstream", "PR aberto", "publicado", "nada editado", "sem git")
 
 
-# o repositório analisado é de terceiros: core.fsmonitor faria o git status executar um programa definido
-# no .git/config dele, e untrackedCache escreveria no .git; --no-optional-locks impede reescrever o índice
+# the analyzed repository is third-party: core.fsmonitor would make git status run a program defined
+# in its .git/config, and untrackedCache would write to .git; --no-optional-locks stops the index from being rewritten
 SAFE_GIT = ("git", "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false", "--no-optional-locks")
 
 
@@ -58,7 +58,7 @@ def git_state(runner, path: str, worktrees: bool = False) -> GitState:
 
 
 class GitCache:
-    """Estado git por pasta guardado por `ttl` segundos: a tela Branches não roda git a cada atualização."""
+    """Git state per folder cached for `ttl` seconds: the Branches screen does not run git on every refresh."""
 
     def __init__(self, runner, ttl: float = 30.0, clock: Callable[[], float] = time.monotonic):
         self.runner = runner
@@ -115,7 +115,7 @@ def _row_state(git: Optional[GitState], branch: Optional[str], sessions: Sequenc
         if git.ahead:
             return "sem push"
     elif sessions and any(s.published in ("none", "committed") for s in sessions if s.edited_total()):
-        # branch que não está aberto em nenhuma pasta: vale o que as sessões registraram
+        # branch not open in any folder: what the sessions recorded counts
         return "sem commit" if all(s.published == "none" for s in sessions if s.edited_total()) else "sem push"
     if any(s.pr_opened for s in sessions):
         return "PR aberto"
@@ -123,8 +123,8 @@ def _row_state(git: Optional[GitState], branch: Optional[str], sessions: Sequenc
 
 
 def build(sessions: Sequence[AgentSession], runner, now: Optional[datetime] = None) -> List[Dict]:
-    """Um bloco por projeto, uma linha por branch ou worktree, a pior situação primeiro.
-    `runner` pode ser um GitCache (usado pela API) ou um runner simples (sem cache)."""
+    """One block per project, one row per branch or worktree, worst situation first.
+    `runner` can be a GitCache (used by the API) or a plain runner (no cache)."""
     now = now or datetime.now(timezone.utc)
     cache = runner if isinstance(runner, GitCache) else GitCache(runner, ttl=0)
     by_root: Dict[str, List[AgentSession]] = {}
@@ -141,7 +141,7 @@ def build(sessions: Sequence[AgentSession], runner, now: Optional[datetime] = No
             path = (rules.worktree_path(s.cwd) or s.cwd) if s.worktree else root
             if path not in states:
                 states[path] = cache.state(path)
-            branch = s.git_branch or states[path].branch  # o Codex 0.166.0 não grava o branch
+            branch = s.git_branch or states[path].branch  # Codex 0.166.0 does not record the branch
             row = rows.setdefault((path, branch), {"path": path, "branch": branch, "worktree": s.worktree, "sessions": []})
             row["sessions"].append(s)
         for wt in main.worktrees:

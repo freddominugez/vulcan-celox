@@ -1,4 +1,4 @@
-"""Sites no backend: adicionar, HTTPS, PHP, Node, ações, favoritos, compartilhar e remover."""
+"""Sites in the backend: add, HTTPS, PHP, Node, actions, favorites, share and remove."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ DOMAIN = re.compile(r"^[a-z0-9-]+$")
 KINDS = ("link", "park")
 RUNTIME_TTL = 30.0
 NODE = re.compile(r"^(\d+(\.\d+){0,2}|lts)$")
-# domínios dos túneis que o lerd share e o valet share usam; a URL de um --domain próprio vem numa linha de túnel
+# domains of the tunnels that lerd share and valet share use; the URL of a custom --domain comes in a tunnel line
 TUNNEL_SUFFIXES = (".ngrok-free.app", ".ngrok.app", ".ngrok.io", ".ngrok-free.dev", ".trycloudflare.com",
                    ".sharedwithexpose.com", ".expose.dev", ".lhr.life", ".lhr.rocks", ".serveo.net", ".serveousercontent.com",
                    ".pinggy.link", ".pinggy.online", ".a.pinggy.io")
@@ -33,7 +33,7 @@ NOT_TUNNEL = (".test", "localhost", "127.0.0.1", "ngrok.com", "cloudflare.com", 
 
 
 def extract_public_url(text: str):
-    """Primeira URL https do túnel na saída do share, sem códigos de terminal."""
+    """First https tunnel URL in the share output, without terminal codes."""
     clean = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", text or "")
     fallback = None
     for line in clean.splitlines():
@@ -52,7 +52,7 @@ SITE_NAME = r"(?P<name>[A-Za-z0-9][A-Za-z0-9._-]{0,99})"
 
 
 def suggest_domain(path_or_name: str) -> str:
-    """Domínio a partir do nome da pasta: minúsculas, sem www. nem .test, o resto vira hífen."""
+    """Domain from the folder name: lowercase, without www. or .test, everything else becomes a hyphen."""
     name = Path(path_or_name).name.lower()
     if name.startswith("www."):
         name = name[4:]
@@ -63,7 +63,7 @@ def suggest_domain(path_or_name: str) -> str:
 
 
 def validate_domain(domain: str) -> Tuple[bool, str]:
-    """(válido, sugestão). O domínio é só o nome, sem o .test, que o backend acrescenta."""
+    """(valid, suggestion). The domain is just the name, without the .test that the backend adds."""
     ok = bool(domain) and bool(DOMAIN.match(domain)) and not domain.startswith("-")
     return ok, domain if ok else suggest_domain(domain)
 
@@ -120,7 +120,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/versions")
     def versions(req: Request):
-        """Opções do cabeçalho do site e o que o backend escreve no projeto em cada ação."""
+        """Options of the site header and what the backend writes to the project on each action."""
         site = site_or_404(req.params["name"])
         return {"php": app.backend.php_versions(), "current": {"php": site.php, "node": site.node,
                                                                "secured": site.secured},
@@ -154,13 +154,13 @@ def register_sites_api(app) -> None:
             raise HttpError(400, str(err)) from None
         except NotImplementedError as err:
             raise HttpError(409, str(err)) from None
-        # pode construir a imagem da versão: roda numa aba do site, com a saída à vista
+        # may build the version image: runs in a site tab, with the output in view
         session = app.spawn_terminal(cwd or site.path, title, None, site=site.name, command=shlex.join(argv))
         return 201, session.info()
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/actions/(?P<action>[a-z]+)")
     def action(req: Request):
-        """Ações rápidas do site: banco e diagnóstico numa aba do site; painel do Lerd no site."""
+        """Quick site actions: database and diagnostics in a site tab; Lerd panel in the site."""
         site = site_or_404(req.params["name"])
         name = req.params["action"]
         if name not in SITE_ACTIONS:
@@ -184,7 +184,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("PUT", rf"/api/sites/{SITE_NAME}/favorite")
     def favorite(req: Request):
-        """Estrela do site: só o nome vai para favorites.json."""
+        """Site star: only the name goes to favorites.json."""
         site = site_or_404(req.params["name"])
         value = req.json().get("favorite")
         if not isinstance(value, bool):
@@ -195,7 +195,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/share")
     def share(req: Request):
-        """Túnel público numa aba do site; fechar a aba encerra o túnel."""
+        """Public tunnel in a site tab; closing the tab ends the tunnel."""
         site = site_or_404(req.params["name"])
         tool = req.json().get("tool") or None
         b = backend()
@@ -216,8 +216,8 @@ def register_sites_api(app) -> None:
             raise HttpError(404, "terminal não encontrado")
         return {"url": extract_public_url(session.history().decode("utf-8", "replace"))}
 
-    # ── remover ─────────────────────────────────────────────
-    released: Dict[str, str] = {}  # sites tirados da lista ou do backend nesta execução: só eles vão para a Lixeira
+    # ── remove ─────────────────────────────────────────────
+    released: Dict[str, str] = {}  # sites removed from the list or the backend in this run: only they go to the Trash
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/remove")
     def remove(req: Request):
@@ -234,7 +234,7 @@ def register_sites_api(app) -> None:
             if site.kind == "manual":
                 raise HttpError(409, "site manual não está no backend: use remover da lista")
             b = backend()
-            if site.kind == "parked":  # Valet: o equivalente é esquecer a pasta mãe inteira
+            if site.kind == "parked":  # Valet: the equivalent is to forget the whole parent folder
                 if not req.json().get("parent"):
                     raise HttpError(409, "site parkeado: desregistrar esquece a pasta mãe inteira, com todos os sites dela",
                                     {"needs_parent": str(Path(site.path).parent)})
@@ -248,7 +248,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("POST", "/api/sites/trash")
     def trash(req: Request):
-        """Pasta do site para a Lixeira: só de site já desregistrado pelo app, com o nome digitado; nunca apaga."""
+        """Site folder to the Trash: only for a site already unregistered by the app, with the typed name; never deletes."""
         body = req.json()
         name = str(body.get("name") or "")
         path = released.get(name)
@@ -265,7 +265,7 @@ def register_sites_api(app) -> None:
         released.pop(name, None)
         return {"ok": True, "moved_to": str(moved)}
 
-    # ── PHP e Node da aba ────────────────────────────────────
+    # ── tab PHP and Node ────────────────────────────────────
     runtime_cache: Dict[str, Tuple[float, Dict[str, Any]]] = {}
 
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/runtime")
@@ -286,7 +286,7 @@ def register_sites_api(app) -> None:
         runtime_cache[site.name] = (time.monotonic(), info)
         return info
 
-    # ── comandos do projeto ──────────────────────────────────
+    # ── project commands ──────────────────────────────────
     def custom_commands(name: str) -> list:
         data = app.store.load("quick", {})
         items = data.get(name) if isinstance(data, dict) else None
@@ -327,7 +327,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/recent")
     def recent(req: Request):
-        """Últimos comandos do site, das sessões de terminal registradas."""
+        """Latest commands of the site, from the registered terminal sessions."""
         site = site_or_404(req.params["name"])
         return {"commands": recent_commands(app.hub.sessions.list(site.name), site.name, 20)}
 
@@ -336,7 +336,7 @@ def register_sites_api(app) -> None:
     # ── logs ─────────────────────────────────────────────────
     @srv.route("GET", rf"/api/sites/{SITE_NAME}/log")
     def site_log(req: Request):
-        """storage/logs/laravel.log em pedaços: sem offset, o fim do arquivo; com offset, o que chegou depois."""
+        """storage/logs/laravel.log in chunks: without an offset, the end of the file; with an offset, what arrived afterwards."""
         site = site_or_404(req.params["name"])
         raw = req.arg("offset")
         offset = int(raw) if raw and raw.isdigit() else None
@@ -345,7 +345,7 @@ def register_sites_api(app) -> None:
 
     @srv.route("POST", rf"/api/sites/{SITE_NAME}/lerd-logs/(?P<target>[a-z0-9][a-z0-9._-]{{0,40}})")
     def lerd_logs(req: Request):
-        """Logs do Lerd numa aba do site: php (PHP-FPM do projeto), nginx ou um serviço instalado."""
+        """Lerd logs in a site tab: php (the project's PHP-FPM), nginx or an installed service."""
         site = site_or_404(req.params["name"])
         b = backend()
         if b.name != "lerd":

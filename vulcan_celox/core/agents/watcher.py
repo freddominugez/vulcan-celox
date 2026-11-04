@@ -1,7 +1,7 @@
-"""Observa as pastas do Claude Code e do Codex por polling de os.stat e mantém o índice em dia.
+"""Watches the Claude Code and Codex folders by os.stat polling and keeps the index up to date.
 
-Varre a cada `interval` segundos; cada arquivo que mudou espera `debounce` segundos sem novas mudanças
-(core/debounce.py) antes de ser lido a partir do offset salvo. Nunca escreve nas pastas observadas.
+Scans every `interval` seconds; each file that changed waits `debounce` seconds with no further changes
+(core/debounce.py) before being read from the saved offset. Never writes to the watched folders.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ class AgentWatcher:
         self._reading = 0
         self._changed: List[str] = []
         self._stop = threading.Event()
-        self._lock = threading.Lock()  # a thread e um refresh pedido pela API não podem varrer juntos
+        self._lock = threading.Lock()  # the thread and a refresh requested by the API must not scan together
         self._thread: Optional[threading.Thread] = None
 
     # ── varredura ──────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ class AgentWatcher:
                 debouncer.touch()
                 scheduled += 1
         for key in [k for k in self._seen if k not in current and k not in self._pending]:
-            del self._seen[key]  # arquivo removido ou arquivado: não fica na memória para sempre
+            del self._seen[key]  # removed or archived file: does not stay in memory forever
         self.last_scan = time.time()
         return scheduled
 
@@ -89,7 +89,7 @@ class AgentWatcher:
             self._pending.pop(key, None)
             try:
                 changed = self.index.update_file(agent, key)
-            except Exception as exc:  # noqa: BLE001  esquece a assinatura: a próxima varredura tenta de novo
+            except Exception as exc:  # noqa: BLE001  forget the signature: the next scan tries again
                 self._seen.pop(key, None)
                 self._error(f"{Path(key).name}: {type(exc).__name__}: {exc}")
                 return
@@ -100,14 +100,14 @@ class AgentWatcher:
         return read
 
     def settled(self) -> bool:
-        """Já varreu ao menos uma vez e não há arquivo esperando leitura nem sendo lido."""
+        """Has scanned at least once and no file is waiting to be read or being read."""
         return self.last_scan is not None and not self._pending and not self._reading
 
     def poll(self, flush: bool = False) -> List[str]:
-        """Lê os arquivos cujo prazo venceu (todos, com flush). Devolve os ids que mudaram."""
+        """Reads the files whose deadline expired (all, with flush). Returns the ids that changed."""
         for debouncer in list(self._pending.values()):
             if self._stop.is_set():
-                break  # desligando: não começa outro arquivo
+                break  # shutting down: do not start another file
             debouncer.flush() if flush else debouncer.poll()
         changed, self._changed = self._changed, []
         if changed and self.on_change:
@@ -120,11 +120,11 @@ class AgentWatcher:
             return self.poll(flush=True)
 
     def _error(self, message: str) -> None:
-        """Guarda o erro na memória (API) e no índice (--doctor, que roda em outro processo)."""
+        """Keeps the error in memory (API) and in the index (--doctor, which runs in another process)."""
         self.last_error = message
         try:
             self.index.note_error(message)
-        except Exception:  # noqa: BLE001  o índice pode estar fechando
+        except Exception:  # noqa: BLE001  the index may be closing
             pass
 
     # ── thread ─────────────────────────────────────────────────────────────
@@ -149,6 +149,6 @@ class AgentWatcher:
                         self.scan()
                         next_scan = self.clock() + self.interval
                     self.poll()
-            except Exception as exc:  # noqa: BLE001  um arquivo ruim não pode derrubar a observação
+            except Exception as exc:  # noqa: BLE001  one bad file must not bring down the watching
                 self._error(f"{type(exc).__name__}: {exc}")
             self._stop.wait(0.1)

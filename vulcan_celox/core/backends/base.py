@@ -1,4 +1,4 @@
-"""Interface comum dos backends de ambiente (ver docs/en/technical-manual.md seção 9)."""
+"""Common interface of the environment backends (see docs/pt-BR/technical-manual.md section 4)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from vulcan_celox.core.runner import Result, Runner
 from vulcan_celox.core.sites import Site, discover_sites
 
 SITE_TIMEOUT = 120.0
-BUILD_TIMEOUT = 600.0  # isolate pode construir a imagem da versão de PHP
+BUILD_TIMEOUT = 600.0  # isolate may build the image for the PHP version
 NO_BACKEND = "Sem Lerd ou Valet: instale um dos dois para gerenciar sites."
 
 
@@ -33,7 +33,7 @@ class Backend:
         self.runner = runner if runner is not None else Runner()
         self.valet_home = valet_home
 
-    # ── serviços ─────────────────────────────────────────────────────────
+    # ── services ─────────────────────────────────────────────────────────
     def start(self) -> Result:
         raise NotImplementedError
 
@@ -57,12 +57,12 @@ class Backend:
     def list_sites(self, manual: Optional[Mapping[str, str]] = None) -> List[Site]:
         return discover_sites(self.valet_home if self.available else None, manual)
 
-    # Ações de site. Cada backend diz o argv e a pasta de trabalho em `site_command`; a execução, a
-    # validação e o "sem backend" ficam aqui. Valor que começaria com hífen viraria opção da CLI: é recusado.
+    # Site actions. Each backend gives the argv and the working folder in `site_command`; the execution,
+    # the validation and the "sem backend" case live here. A value that would start with a hyphen would become a CLI option: it is refused.
     def site_command(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
         raise NotImplementedError(f"{self.label} não tem a ação {action}")
 
-    # o que o backend escreve na pasta do projeto em cada ação, para a interface avisar antes
+    # what the backend writes in the project folder on each action, so the interface can warn beforehand
     project_writes: Dict[str, str] = {}
 
     @staticmethod
@@ -72,7 +72,7 @@ class Backend:
                 raise ValueError(f"valor inválido para {action}: {value!r}")
 
     def site_argv(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
-        """argv e pasta de uma ação já validados, para rodar numa aba de terminal em vez de esperar aqui."""
+        """argv and folder of an already validated action, to run in a terminal tab instead of waiting here."""
         self._check(action, args)
         return self.site_command(action, *args)
 
@@ -111,5 +111,5 @@ class Backend:
         raise NotImplementedError(f"{self.label} não compartilha sites")
 
     def php_versions(self) -> List[Dict[str, Any]]:
-        """Versões de PHP disponíveis para o seletor do site: [{version, running, default}]."""
+        """PHP versions available for the site selector: [{version, running, default}]."""
         return []

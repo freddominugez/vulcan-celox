@@ -1,4 +1,4 @@
-"""Pastas para abrir terminais: validação do caminho digitado e pastas recentes (sessões e sites)."""
+"""Folders to open terminals in: validation of the typed path and recent folders (sessions and sites)."""
 
 from __future__ import annotations
 
@@ -18,14 +18,14 @@ def home_dir(env) -> str:
 def expand(raw: str, env) -> Path:
     raw = raw.strip()
     home = home_dir(env)
-    if raw == "~" or raw.startswith("~/"):
+    if raw == "~" or raw.startswith(("~/", "~" + os.sep)):
         raw = home + raw[1:]
     return Path(os.path.abspath(raw))
 
 
 def short(path: str, env) -> str:
-    home = home_dir(env).rstrip("/")
-    if home and (path == home or path.startswith(home + "/")):
+    home = home_dir(env).rstrip("/" + os.sep)
+    if home and (path == home or path.startswith(home + os.sep)):
         return "~" + path[len(home):]
     return path
 
@@ -51,7 +51,7 @@ def register_fs_api(app) -> None:
         seen = set()
         items: List[Dict[str, Any]] = []
         sites = {s.path: s.name for s in app.sites() if s.path}
-        # sessões mais recentes primeiro, depois os sites que ainda não apareceram
+        # most recent sessions first, then the sites that have not appeared yet
         candidates = [(r.cwd, r.site) for r in app.hub.sessions.list() if r.cwd]
         candidates += [(path, name) for path, name in sites.items()]
         for raw, site in candidates:

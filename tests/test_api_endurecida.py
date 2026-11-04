@@ -1,10 +1,11 @@
-"""API endurecida."""
+"""Hardened API."""
 
 import http.client
 import json
 import os
 import socket
 
+from tests.helpers import WINDOWS
 from tests import test_agents_api
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for
@@ -29,11 +30,11 @@ class TokenEOrigemTest(ServerTestCase):
     def test_requisicao_simples_da_auditoria_nao_abre_terminal(self):
         marker = self.tmp / "invadido"
         body = json.dumps({"command": f"touch {marker}"}).encode()
-        # token na query e text/plain: o navegador mandaria sem preflight
+        # token in the query and text/plain: the browser would send it without a preflight
         status, _ = self.raw("POST", f"/api/terminals?token={self.token}",
                              {"Content-Type": "text/plain", "Content-Length": str(len(body))}, body)
         self.assertEqual(status, 401)
-        # mesmo com o token no cabeçalho, corpo que não é JSON é recusado
+        # even with the token in the header, a body that is not JSON is refused
         status, _ = self.raw("POST", "/api/terminals", {"X-Vulcan-Token": self.token, "Content-Type": "text/plain",
                                                         "Content-Length": str(len(body))}, body)
         self.assertEqual(status, 415)
@@ -41,7 +42,7 @@ class TokenEOrigemTest(ServerTestCase):
         self.assertFalse(marker.exists())
 
     def test_tamanho_do_terminal_fora_do_limite(self):
-        """Rows/cols fora de 1 a 1000 dão 400 antes de abrir processo."""
+        """rows/cols outside 1 to 1000 give 400 before opening a process."""
         for bad in ({"rows": 70000, "cols": 80}, {"rows": 24, "cols": -3}, {"rows": "x", "cols": 80}):
             with self.subTest(bad=bad):
                 status, _, _ = self.request("POST", "/api/terminals", {"cwd": str(self.tmp), **bad})
@@ -65,7 +66,7 @@ class TokenEOrigemTest(ServerTestCase):
         status, _ = self.raw("POST", "/api/tasks/undo", {"X-Vulcan-Token": self.token, "Content-Length": "0",
                                                          "Content-Type": "application/json; charset=utf-8"})
         self.assertNotEqual(status, 415)
-        self.assertEqual(self.request("DELETE", "/api/tags/abc999")[0], 404)  # DELETE sem corpo segue valendo
+        self.assertEqual(self.request("DELETE", "/api/tags/abc999")[0], 404)  # DELETE without a body still holds
 
     def test_origem(self):
         port = self.app.server.port
@@ -118,8 +119,8 @@ class ResizeTest(ServerTestCase):
                         {"type": "resize", "rows": 0, "cols": -3}):
                 client.send(json.dumps(bad).encode(), OP_TEXT)
             client.send(json.dumps({"type": "resize", "rows": 30, "cols": 100}).encode(), OP_TEXT)
-            client.send(b"echo vivo-$((40+2))\n")
-            self.assertIn(b"vivo-42", client.read_until(b"vivo-42"))
+            client.send(b"echo ('vivo-' + (40+2))\r" if WINDOWS else b"echo vivo-$((40+2))\n")
+            self.assertIn(b"vivo-42", client.read_until(b"vivo-42", timeout=20))
             pty = self.app.terminals.get(info["id"])
             self.assertTrue(wait_for(lambda: (pty.rows, pty.cols) == (30, 100)), (pty.rows, pty.cols))
         finally:

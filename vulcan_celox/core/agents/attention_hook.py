@@ -1,17 +1,16 @@
-"""Hook opcional de atenção do Claude Code: registra só o tipo do aviso e a hora, nunca o texto da mensagem.
+"""Optional Claude Code attention hook: records only the notice type and the time, never the message text.
 
-`Notification` e `Stop` dizem na hora o que o JSONL só mostra depois. Sem este hook, o estado vem da leitura do
-arquivo (`attention.py`). Instalado junto com o de pareamento, só por `--instalar-hook`.
+`Notification` and `Stop` report right away what the JSONL only shows later. Without this hook, the state comes from reading
+the file (`attention.py`). Installed together with the pairing hook, only via `--instalar-hook`.
 """
 
 from __future__ import annotations
 
 import json
-import os
 import re
 import shlex
 from pathlib import Path
-from typing import Dict, Mapping, Optional
+from typing import Dict
 
 SCRIPT_NAME = "vulcan-atencao.py"
 EVENTS = ("Notification", "Stop")
@@ -60,7 +59,7 @@ def attention_dir(data_dir) -> Path:
 
 
 def read_records(folder) -> Dict[str, Dict]:
-    """sessão -> registro válido. Arquivo estranho é ignorado: a pasta é do app, mas o conteúdo vem de um script."""
+    """session -> valid record. A strange file is ignored: the folder belongs to the app, but the content comes from a script."""
     out: Dict[str, Dict] = {}
     try:
         paths = sorted(Path(folder).glob("*.json"))[:_MAX_FILES]
@@ -79,7 +78,7 @@ def read_records(folder) -> Dict[str, Dict]:
 
 
 def install(settings: Dict, data_dir) -> bool:
-    """Grava o script e acrescenta os dois eventos a `settings`, sem duplicar. Devolve se já estava completo."""
+    """Writes the script and adds the two events to `settings`, without duplicating. Returns whether it was already complete."""
     script = Path(data_dir) / "hooks" / SCRIPT_NAME
     script.parent.mkdir(parents=True, exist_ok=True)
     script.write_text(HOOK_SCRIPT.format(folder=str(attention_dir(data_dir))), encoding="utf-8")

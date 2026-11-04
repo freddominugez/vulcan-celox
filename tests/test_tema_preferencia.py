@@ -1,4 +1,4 @@
-"""Preferência de tema: Sistema por padrão, lembrada, e aplicada antes dos estilos para o app não piscar."""
+"""Theme preference: System by default, remembered, and applied before the styles so the app does not flash."""
 
 from pathlib import Path
 
@@ -26,7 +26,7 @@ class TemaPreferenciaTest(ServerTestCase):
         self.assertNotIn(" defer", index[:index.index('href="styles/tokens.css"')])
 
     def test_js_nao_confunde_tema_da_pagina_com_tema_da_aba(self):
-        # <html data-theme> é o tema da interface: qualquer closest("[data-theme]") acha a página inteira
+        # <html data-theme> is the interface theme: any closest("[data-theme]") finds the whole page
         for path in (WEB / "js").rglob("*.mjs"):
             self.assertNotIn('"[data-theme]"', path.read_text(encoding="utf-8"), path.name)
 

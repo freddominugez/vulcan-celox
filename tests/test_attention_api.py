@@ -1,4 +1,4 @@
-"""Rota dos sinais de atenção: quem aparece, com o hook valendo sobre o arquivo."""
+"""Attention signals route: who shows up, with the hook taking precedence over the file."""
 
 import json
 import time
@@ -32,7 +32,7 @@ class AttentionApiTest(AgentsServerCase):
         self.assertEqual(items[SID]["state"], "your_turn")
         self.assertEqual(items[SID]["source"], "jsonl")
         self.assertEqual(items[SID]["project"], "loja")
-        self.assertNotIn("11111111-2222-4333-8444-555555555555", items)  # fixture de outubro: passou do prazo
+        self.assertNotIn("11111111-2222-4333-8444-555555555555", items)  # October fixture: past the deadline
 
     def test_trabalhando_nao_entra(self):
         self.write_session({"type": "user", "timestamp": iso(time.time() - 5), "cwd": "/Users/dev/loja", "message": {"role": "user", "content": "faça"}})

@@ -1,4 +1,4 @@
-"""Leitor incremental dos rollouts do Codex CLI (docs/en/agent-file-formats.md, seção 2)."""
+"""Incremental reader for Codex CLI rollouts (docs/en/agent-file-formats.md, section 2)."""
 
 from __future__ import annotations
 
@@ -14,12 +14,12 @@ from vulcan_celox.core.agents.model import AgentSession, as_int, as_str, epoch
 
 UUID_TAIL = re.compile(r"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$")
 SHELL_TOOLS = ("shell", "container.exec", "exec_command", "local_shell")
-# contexto que o Codex injeta como mensagem de usuário
+# context that Codex injects as a user message
 INJECTED = ("<", "#")
 
 
 def new_session(path: Path) -> AgentSession:
-    stem = Path(path).name.split(".jsonl")[0]  # também rollout-...jsonl.zst
+    stem = Path(path).name.split(".jsonl")[0]  # also rollout-...jsonl.zst
     match = UUID_TAIL.search(stem)
     return AgentSession(id=match.group(1) if match else stem, agent="codex", file_path=str(path))
 
@@ -53,7 +53,7 @@ def _command_text(args) -> str:
 
 
 def session_origin(meta: dict) -> str:
-    """Subagente e app desktop não nascem de uma aba do terminal. Terminal e versão antiga: vazio."""
+    """Subagent and desktop app do not originate from a terminal tab. Terminal and old version: empty."""
     source = meta.get("source")
     if (isinstance(source, dict) and "subagent" in source) or meta.get("thread_source") == "subagent":
         return "subagent"
@@ -69,13 +69,13 @@ class CodexReader:
         self.session = session
         self.att = AttentionTracker(session, state.get("attention"))
         self.meta = bool(state.get("meta"))
-        self.items = bool(state.get("items"))  # comandos e arquivos vêm por item_completed: ignorar function_call
+        self.items = bool(state.get("items"))  # commands and files come via item_completed: ignore function_call
         self.ev_turns = int(state.get("ev_turns", 0))
         self.fb_turns = int(state.get("fb_turns", 0))
         self.fb_first: Optional[str] = state.get("fb_first")
         self.last_user: list = list(state.get("last_user") or ["", None])  # [texto, epoch]
         self.last_cmd: List[str] = list(state.get("last_cmd") or ["", ""])
-        self.last_total: Dict = dict(state.get("last_total") or {})  # último total acumulado
+        self.last_total: Dict = dict(state.get("last_total") or {})  # last accumulated total
         self.usage_seq = int(state.get("usage_seq", 0))
         self.usage_rows: list = []
 
@@ -93,7 +93,7 @@ class CodexReader:
         kind = obj.get("type")
         payload = obj.get("payload") if isinstance(obj.get("payload"), dict) else {}
         at = as_str(obj.get("timestamp"))
-        self.b.seen_at(at)  # qualquer linha datada é atividade, inclusive tipos que não lemos
+        self.b.seen_at(at)  # any dated line is activity, including types we do not read
         if kind == "session_meta":
             self._meta(payload)
         elif kind == "turn_context":
@@ -107,7 +107,7 @@ class CodexReader:
 
     def _meta(self, p: dict) -> None:
         if self.meta:
-            return  # sessão retomada: vale a primeira session_meta
+            return  # resumed session: the first session_meta wins
         self.meta = True
         if isinstance(p.get("id"), str) and p["id"]:
             self.session.id = p["id"]
@@ -139,8 +139,8 @@ class CodexReader:
             self._item(p["item"], at)
 
     def _usage(self, total: dict, at: str) -> None:
-        """O Codex grava o total acumulado; o consumo de cada evento é a diferença para o anterior.
-        Um total menor que o anterior (sessão retomada do zero) recomeça a conta a partir dele."""
+        """Codex records the accumulated total; the consumption of each event is the difference from the previous one.
+        A total smaller than the previous one (session resumed from zero) restarts the count from it."""
         cached = as_int(total.get("cached_input_tokens"))
         cur = {"input": max(0, as_int(total.get("input_tokens")) - cached), "output": as_int(total.get("output_tokens")),
                "cache_read": cached, "cache_write_5m": as_int(total.get("cache_write_input_tokens")),
@@ -150,7 +150,7 @@ class CodexReader:
         delta = dict(cur) if restart or not last else {k: cur[k] - as_int(last.get(k)) for k in cur}
         self.last_total = cur
         if not any(delta.values()):
-            return  # o Codex repete o mesmo total em eventos seguidos
+            return  # Codex repeats the same total in consecutive events
         self.usage_seq += 1
         self.usage_rows.append({"key": f"t{self.usage_seq}", "at": at, "model": self.session.model or "",
                                 "cache_write_1h": 0, **delta})
@@ -203,7 +203,7 @@ class CodexReader:
         when = epoch(at)
         last_text, last_when = self.last_user
         if not text or (text == last_text and (when is None or last_when is None or abs(when - last_when) <= 2)):
-            return  # o mesmo pedido chega como user_message e como UserMessage; o mesmo texto noutro turno conta
+            return  # the same request arrives as user_message and as UserMessage; the same text in another turn counts
         self.last_user = [text, when]
         self.ev_turns += 1
         self.b.user_turn(text, at)

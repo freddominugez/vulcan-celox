@@ -1,4 +1,4 @@
-// Documentação com IA na interface: confirmação com prévia do que será enviado e acompanhamento das tarefas.
+// AI documentation in the interface: confirmation with a preview of what will be sent, and task tracking.
 
 import { get, post } from "./api.mjs";
 import { esc, icon, reportError, toast } from "./dom.mjs";
@@ -8,7 +8,7 @@ const listeners = new Set();
 let polling = null;
 let lastStatus = new Map();
 
-/** Avisa quando uma tarefa de IA muda de estado (a árvore e as telas recarregam). */
+/** Notifies when an AI task changes state (the tree and the screens reload). */
 export function onJobsChange(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);
@@ -41,7 +41,7 @@ export function watchJobs(seed) {
   if (!polling) polling = setTimeout(poll, 1200);
 }
 
-/** Diálogo modal simples. Resolve true ao confirmar. */
+/** Simple modal dialog. Resolves true on confirm. */
 export function confirmDialog({ title, body, confirmLabel = t("Confirmar"), confirmDisabled = false, danger = false, onDecide = null }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement("div");
@@ -56,7 +56,7 @@ export function confirmDialog({ title, body, confirmLabel = t("Confirmar"), conf
         </div>
       </div>`;
     const finish = (answer) => {
-      if (onDecide) onDecide(answer, backdrop); // lê campos do diálogo (ex.: caixa de seleção) antes de fechar
+      if (onDecide) onDecide(answer, backdrop); // reads dialog fields (e.g. checkbox) before closing
       backdrop.remove();
       document.removeEventListener("keydown", onKey, true);
       resolve(answer);
@@ -91,7 +91,7 @@ function previewBody(preview, what) {
     <p class="dim">${t("O resultado é gravado ao lado da memória e entra no índice geral. Nada é enviado sem este clique.")}</p>`;
 }
 
-/** Fluxo completo para uma sessão: prévia, confirmação, geração e acompanhamento. */
+/** Full flow for one session: preview, confirmation, generation and tracking. */
 export async function documentSession(sessionId, title) {
   try {
     const preview = await get(`/api/ai/preview/session/${sessionId}`);
@@ -112,7 +112,7 @@ export async function documentSession(sessionId, title) {
   }
 }
 
-/** Mesmo fluxo para a documentação geral de todas as sessões. */
+/** Same flow for the general documentation of all sessions. */
 export async function documentGeneral() {
   try {
     const preview = await get("/api/ai/preview/general");

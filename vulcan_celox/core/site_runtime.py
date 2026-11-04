@@ -1,4 +1,4 @@
-"""PHP e Node que o backend usa para um site, e se a aba do terminal chega neles pelos shims do Lerd."""
+"""PHP and Node that the backend uses for a site, and whether the terminal tab reaches them through Lerd's shims."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ PHP_VERSION = re.compile(r"^PHP (\d+\.\d+\.\d+)", re.MULTILINE)
 
 
 def parse_which(text: str) -> Dict[str, str]:
-    """Saída de `lerd which` (rótulo e valor alinhados por espaços); vazio se o site não está registrado."""
+    """Output of `lerd which` (label and value aligned by spaces); empty if the site is not registered."""
     out: Dict[str, str] = {}
     for line in (text or "").splitlines():
         for label, key in WHICH_FIELDS.items():
@@ -35,7 +35,7 @@ def lerd_shims(home: str) -> Path:
 
 
 def shim_status(path_value: str, home: str) -> Dict[str, object]:
-    """Qual `php` a aba encontra no PATH e se é o shim do Lerd (que segue a versão do site)."""
+    """Which `php` the tab finds on PATH and whether it is Lerd's shim (which follows the site's version)."""
     found = shutil.which("php", path=path_value)
     shims = lerd_shims(home)
     if found and os.path.dirname(found) == str(shims):

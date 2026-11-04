@@ -1,8 +1,8 @@
-"""Índice sqlite das sessões de agente em <dados>/agentes.db. Descartável: a fonte da verdade é o JSONL.
+"""SQLite index of agent sessions in <data>/agentes.db. Disposable: the source of truth is the JSONL.
 
-Guarda o resumo, o estado do leitor e o offset de cada arquivo para continuar a leitura de onde parou.
-Uma sessão cujo JSONL sumiu (o Claude apaga as antigas) continua no índice. Banco corrompido vira
-`agentes.db.corrupt-<ts>` e é recriado (D6). Cada mudança incrementa a revisão consultada pela interface.
+Keeps the summary, the reader state and the offset of each file to resume reading where it stopped.
+A session whose JSONL vanished (Claude deletes old ones) stays in the index. A corrupted database becomes
+`agentes.db.corrupt-<ts>` and is recreated. Each change increments the revision queried by the interface.
 """
 
 from __future__ import annotations
@@ -21,13 +21,13 @@ from vulcan_celox.core.agents import edits as edit_log, history
 from vulcan_celox.core.agents.model import AgentSession, CommandRun, FileTouch, SessionEvent, epoch, local_day
 from vulcan_celox.core.agents.reading import read_session
 
-# 2: tabela de busca do histórico (FTS5); 3: resumo leve, sem as listas de arquivos e comandos;
-# 4: uso por turno (agent_usage), que exige reler todos os arquivos
-# 6: estado do turno no resumo, que também só sai relendo; 7: registro das edições (session_edits)
+# 2: history search table (FTS5); 3: light summary, without the file and command lists;
+# 4: usage per turn (agent_usage), which requires rereading every file
+# 6: turn state in the summary, which also only comes from rereading; 7: edit record (session_edits)
 SCHEMA_VERSION = 7
 ACTIVE_SECONDS = 90
-# o último evento gravado também precisa ser recente: copiar ou restaurar a pasta (backup, Mac novo, clone)
-# deixa a data do arquivo nova, mas não muda a data dos eventos; 10 min cobre uma ferramenta longa
+# the last recorded event must also be recent: copying or restoring the folder (backup, new Mac, clone)
+# makes the file date new, but does not change the event dates; 10 min covers a long tool
 ACTIVE_EVENT_SECONDS = 600
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
@@ -68,7 +68,7 @@ HEAD_BYTES = 4096
 
 
 def _split_state(saved: Optional[Dict]) -> Tuple[Optional[Dict], Optional[Dict]]:
-    """Estado salvo = estado do leitor + identidade do arquivo (inode e começo) guardada junto."""
+    """Saved state = reader state + file identity (inode and beginning) stored together."""
     if not isinstance(saved, dict):
         return saved, None
     state = dict(saved)
@@ -81,8 +81,8 @@ def _join_state(state: Dict, identity: Dict) -> Dict:
 
 
 def _file_identity(path: str, st, old: Optional[Dict]) -> Dict:
-    """Inode e hash do começo do arquivo. Compara o mesmo trecho que foi medido antes: um arquivo que só cresceu
-    tem o mesmo começo; um trocado por outro maior não."""
+    """Inode and hash of the beginning of the file. It compares the same stretch that was measured before: a file that only grew
+    has the same beginning; one replaced by a larger one does not."""
     length = min(int(old.get("len", HEAD_BYTES)) if old else HEAD_BYTES, HEAD_BYTES)
     try:
         with open(path, "rb") as fh:
@@ -103,7 +103,7 @@ def _error_text(value: str) -> Optional[str]:
 
 
 def parse_day(day: str) -> Optional[float]:
-    """Início do dia local AAAA-MM-DD em segundos."""
+    """Start of the local day YYYY-MM-DD in seconds."""
     try:
         return datetime.strptime(day, "%Y-%m-%d").astimezone().timestamp()
     except (TypeError, ValueError):
@@ -111,7 +111,7 @@ def parse_day(day: str) -> Optional[float]:
 
 
 def is_active(mtime: Optional[float], last_activity_at: Optional[str], now: float) -> bool:
-    """Ativa: o arquivo mudou há menos de 90 s e o último evento dentro dele tem menos de 10 min."""
+    """Active: the file changed less than 90 s ago and the last event inside it is less than 10 min old."""
     if not mtime or now - mtime >= ACTIVE_SECONDS:
         return False
     last = epoch(last_activity_at)
@@ -130,8 +130,8 @@ class AgentIndex:
         self.fts = history.ensure(self.db)
         version = int(self.db.execute("SELECT value FROM meta WHERE key = 'schema_version'").fetchone()[0])
         if version < SCHEMA_VERSION:
-            # o uso por turno (4) e a origem da sessão (5) só saem relendo os arquivos; a varredura
-            # seguinte refaz tudo. Também cobre o índice anterior ao resumo leve (esquema 2)
+            # usage per turn (4) and session origin (5) only come from rereading the files; the next
+            # scan redoes everything. It also covers the index prior to the light summary (schema 2)
             self.rebuild()
         self.db.execute("UPDATE meta SET value = ? WHERE key = 'schema_version'", (str(SCHEMA_VERSION),))
         self.db.commit()
@@ -160,15 +160,15 @@ class AgentIndex:
     def _connect(self) -> sqlite3.Connection:
         db = sqlite3.connect(str(self.path), check_same_thread=False, timeout=10)
         db.row_factory = sqlite3.Row
-        # WAL: --doctor, --reindexar-agentes e --podar-agentes leem com o app aberto sem "database is locked"
+        # WAL: --doctor, --reindexar-agentes and --podar-agentes read with the app open without "database is locked"
         try:
             db.execute("PRAGMA journal_mode=WAL")
         except sqlite3.DatabaseError:
-            db.close()  # no Windows, arquivo aberto não pode ser movido para o lado
+            db.close()  # on Windows, an open file cannot be moved aside
             raise
         for suffix in ("", "-wal", "-shm"):
             try:
-                os.chmod(str(self.path) + suffix, 0o600)  # eventos dos agentes: só do usuário
+                os.chmod(str(self.path) + suffix, 0o600)  # agent events: user only
             except OSError:
                 pass
         return db
@@ -186,16 +186,16 @@ class AgentIndex:
         self.db.execute("UPDATE meta SET value = CAST(value AS INTEGER) + 1 WHERE key='revision'")
 
     def known(self) -> Dict[str, Tuple[float, int]]:
-        """file_path -> (mtime, tamanho) do que já foi indexado."""
+        """file_path -> (mtime, size) of what has already been indexed."""
         with self.lock:
             return {r["file_path"]: (r["mtime"], r["file_size"])
                     for r in self.db.execute("SELECT file_path, mtime, file_size FROM sessions")}
 
     def update_file(self, agent: str, path, mtime: Optional[float] = None, size: Optional[int] = None) -> Optional[str]:
-        """Lê o que for novo no arquivo. Devolve o id da sessão se algo mudou, senão None.
+        """Reads what is new in the file. Returns the session id if something changed, otherwise None.
 
-        A leitura e a interpretação do JSONL ficam fora do lock: revision() e as listas da API não
-        esperam um arquivo grande. O lock volta só para gravar, e só se ninguém gravou este arquivo no meio."""
+        Reading and interpreting the JSONL happen outside the lock: revision() and the API lists do not
+        wait for a large file. The lock is taken again only to write, and only if nobody wrote this file in the meantime."""
         path = str(path)
         try:
             st = os.stat(path)
@@ -213,7 +213,7 @@ class AgentIndex:
         state, old_identity = _split_state(saved)
         identity = _file_identity(path, st, old_identity)
         offset = row["byte_offset"] if row else 0
-        replaced = old_identity is not None and identity != old_identity  # outro arquivo com o mesmo nome
+        replaced = old_identity is not None and identity != old_identity  # another file with the same name
         if replaced:
             session, state, offset = None, None, 0
         res = read_session(agent, path, session, state, offset)
@@ -223,26 +223,26 @@ class AgentIndex:
             now = self.db.execute("SELECT mtime, file_size, byte_offset FROM sessions WHERE file_path = ?",
                                   (path,)).fetchone()
             if (tuple(now) if now else None) != base:
-                return None  # outra leitura gravou este arquivo no meio: a próxima varredura continua dela
-            # a mesma sessão em outro caminho: rollout arquivado, pasta renomeada ou duas raízes no CODEX_HOME
+                return None  # another read wrote this file in the meantime: the next scan continues from it
+            # the same session at another path: archived rollout, renamed folder or two roots in CODEX_HOME
             other = self.db.execute("SELECT file_path, mtime FROM sessions WHERE id = ? AND file_path != ?",
                                     (s.id, path)).fetchone()
             if other and os.path.exists(other["file_path"]) and (other["mtime"] or 0) >= mtime:
-                return None  # as duas cópias existem: fica a mais recente, e empate mantém a já indexada
+                return None  # both copies exist: the most recent stays, and a tie keeps the one already indexed
             with self.db:
                 if row and (reset or row["id"] != s.id):
                     self._forget(row["id"])
                 if reset:
                     self.db.execute("DELETE FROM parse_errors WHERE file_path = ?", (path,))
                 if other:
-                    self._forget(s.id)  # este arquivo foi lido do zero: os eventos do caminho antigo saem
+                    self._forget(s.id)  # this file was read from scratch: the events from the old path go away
                 self._write(s, path, mtime, size, res.offset, _join_state(res.state, identity), res.events,
                             res.errors, res.usage)
                 edit_log.store(self.db, s.id, res.edits)
             return s.id
 
     def note_error(self, message: str) -> None:
-        """Último erro do observador, gravado no índice para o --doctor (outro processo) ver."""
+        """Last error of the watcher, stored in the index so --doctor (another process) can see it."""
         value = json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "message": message[:500]}, ensure_ascii=False)
         with self.lock, self.db:
             self.db.execute("INSERT OR REPLACE INTO meta VALUES ('last_error', ?)", (value,))
@@ -254,7 +254,7 @@ class AgentIndex:
 
     def _write(self, s: AgentSession, path: str, mtime: float, size: int, offset: int, state: Dict,
                events: List[SessionEvent], errors: List[Tuple[int, str]], usage: Optional[List[Dict]] = None) -> None:
-        """Grava a sessão (chamar dentro de `with self.db`). O resumo vai leve; arquivos e comandos nas tabelas."""
+        """Saves the session (call inside `with self.db`). The summary goes light; files and commands go in the tables."""
         self.db.execute(
             "INSERT OR REPLACE INTO sessions VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (s.id, s.agent, path, s.cwd, s.project_name, s.git_branch, s.started_at, s.last_activity_at,
@@ -282,7 +282,7 @@ class AgentIndex:
             self.db.execute(f"DELETE FROM {table} WHERE {column} = ?", (session_id,))
 
     def rebuild(self) -> None:
-        """Esvazia o índice; a próxima varredura relê todos os arquivos do zero."""
+        """Empties the index; the next scan rereads all files from scratch."""
         with self.lock, self.db:
             for table in TABLES:
                 self.db.execute(f"DELETE FROM {table}")
@@ -298,14 +298,14 @@ class AgentIndex:
     # ── leitura ────────────────────────────────────────────────────────────
     def _hydrate(self, row) -> AgentSession:
         s = AgentSession.from_dict(json.loads(row["summary"]))
-        if s.files and not s.files_count:  # resumo de formato antigo, com as listas dentro
+        if s.files and not s.files_count:  # summary saved before the light-summary change, with the lists inside
             s.files_count, s.edited_count = len(s.files), len(s.edited_files())
         s.is_active = is_active(row["mtime"], s.last_activity_at, self.clock())
         s.subagents = self.subagents.get(s.id, s.subagents)
         return s
 
     def _full(self, row) -> AgentSession:
-        """Resumo com as listas de arquivos e comandos remontadas das tabelas (detalhe e leitura incremental)."""
+        """Summary with the file and command lists reassembled from the tables (detail and incremental reading)."""
         s = self._hydrate(row)
         sid = s.id
         files = self.db.execute("SELECT path, kind, first_at, last_at FROM session_files WHERE session_id = ? "
@@ -319,7 +319,7 @@ class AgentIndex:
         return s
 
     def sessions(self) -> List[AgentSession]:
-        """Lista leve: sem arquivos nem comandos (use session() para o detalhe)."""
+        """Light list: no files or commands (use session() for the detail)."""
         with self.lock:
             rows = self.db.execute("SELECT summary, mtime FROM sessions ORDER BY last_activity_at DESC").fetchall()
             return [self._hydrate(r) for r in rows]
@@ -330,9 +330,9 @@ class AgentIndex:
             return self._full(row) if row else None
 
     def edited_on_day(self, day: str, session_ids: Optional[List[str]] = None) -> int:
-        """Arquivos editados (não só lidos) cuja última mudança caiu no dia local `day`."""
+        """Edited (not just read) files whose last change fell on the local day `day`."""
         start = (parse_day(day) - 86400) if parse_day(day) is not None else 0
-        floor = datetime.fromtimestamp(start, timezone.utc).strftime("%Y-%m-%d")  # filtro largo no SQL, exato no Python
+        floor = datetime.fromtimestamp(start, timezone.utc).strftime("%Y-%m-%d")  # wide filter in SQL, exact in Python
         with self.lock:
             rows = self.db.execute("SELECT session_id, last_at FROM session_files WHERE kind != 'read' AND last_at >= ?",
                                    (floor,)).fetchall()
@@ -340,8 +340,8 @@ class AgentIndex:
         return sum(1 for r in rows if (wanted is None or r["session_id"] in wanted) and local_day(r["last_at"]) == day)
 
     def prune_events(self, days: int, now: Optional[float] = None) -> int:
-        """Apaga os eventos (e a busca) de sessões sem atividade há mais de `days` dias. Resumo, arquivos e
-        comandos ficam. Nunca roda sozinho: só por --podar-agentes."""
+        """Deletes the events (and the search) of sessions with no activity for more than `days` days. Summary, files and
+        commands stay. Never runs on its own: only via --podar-agentes."""
         cutoff = datetime.fromtimestamp((now if now is not None else self.clock()) - days * 86400, timezone.utc)
         cutoff_iso = cutoff.strftime("%Y-%m-%dT%H:%M:%S")
         with self.lock:
@@ -353,11 +353,11 @@ class AgentIndex:
                 if removed:
                     self._bump()
             if removed:
-                self.db.execute("VACUUM")  # devolve o espaço ao disco
+                self.db.execute("VACUUM")  # gives the space back to the disk
             return removed
 
     def events(self, session_id: str, start: int = 0, limit: int = 200) -> Tuple[List[SessionEvent], Optional[int]]:
-        """Eventos a partir da posição `start`; devolve também a próxima posição, ou None no fim."""
+        """Events from position `start`; also returns the next position, or None at the end."""
         with self.lock:
             rows = self.db.execute("SELECT at, kind, text, tool FROM events WHERE session_id = ? ORDER BY id "
                                    "LIMIT ? OFFSET ?", (session_id, limit + 1, start)).fetchall()
@@ -372,7 +372,7 @@ class AgentIndex:
 
     def usage_rows(self, since: Optional[str] = None, until: Optional[str] = None,
                    session_id: Optional[str] = None) -> List[Dict]:
-        """Linhas de uso por turno com o projeto da sessão. `since`/`until` em ISO UTC (filtro em `at`)."""
+        """Usage rows per turn with the session's project. `since`/`until` in ISO UTC (filter on `at`)."""
         sql = ("SELECT u.*, s.project AS project, s.cwd AS cwd FROM agent_usage u "
                "LEFT JOIN sessions s ON s.id = u.session_id WHERE 1=1")
         args: list = []

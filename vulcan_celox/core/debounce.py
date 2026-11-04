@@ -1,4 +1,4 @@
-"""Debounce com relógio injetável: a UI chama touch() a cada mudança e poll() periodicamente."""
+"""Debounce with an injectable clock: the UI calls touch() on every change and poll() periodically."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ class Debouncer:
         self._due = self.clock() + self.delay
 
     def poll(self) -> bool:
-        """Executa a ação se o prazo venceu. Retorna True se executou."""
+        """Runs the action if the deadline expired. Returns True if it ran."""
         if self._due is not None and self.clock() >= self._due:
             self._due = None
             self.action()

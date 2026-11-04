@@ -1,4 +1,4 @@
-"""Aplicação do servidor: liga núcleo (backend, caderno, terminais) às rotas HTTP."""
+"""Server application: wires the core (backend, notebook, terminals) to the HTTP routes."""
 
 from __future__ import annotations
 
@@ -13,18 +13,19 @@ from vulcan_celox import APP_NAME, __version__
 from vulcan_celox.core import paths, themes
 from vulcan_celox.core.backends import detect_backend
 from vulcan_celox.core.i18n import tr
-from vulcan_celox.core.oscompat import open_argv
+from vulcan_celox.core.oscompat import is_windows, open_argv
 from vulcan_celox.core.notebook import Notebook
 from vulcan_celox.core.progress import progress, progress_by_site
 from vulcan_celox.core.pty_session import TerminalManager
 from vulcan_celox.core.store import Store, migrate_legacy, secure_data_dir
 from vulcan_celox.core import i18n
+from vulcan_celox.server.autostart import failure_reason, wait_running
 from vulcan_celox.server.local_http import HttpError, LocalServer, Request
 
 SERVICE_ACTIONS = ("start", "stop", "restart")
 NEW_TERMINAL_AGENTS = ("shell", "claude", "codex")
 MIN_TOKEN = 32  # VULCAN_TOKEN vindo do ambiente (a casca gera 64 caracteres)
-PACKAGE_SUFFIXES = (".app", ".pkg", ".mpkg")  # "abrir" um pacote no Finder executa o programa
+PACKAGE_SUFFIXES = (".app", ".pkg", ".mpkg")  # "opening" a package in Finder runs the program
 
 
 def site_payload(site) -> Dict[str, Any]:
@@ -45,7 +46,7 @@ class VulcanApp:
         self.env = dict(os.environ if env is None else env)
         paths.migrate_data_folder(self.env)
         self.data_dir = paths.data_dir(self.env)
-        secure_data_dir(self.data_dir)  # 0700/0600: memórias e eventos dos agentes só do usuário
+        secure_data_dir(self.data_dir)  # 0700/0600: agent memories and events readable by the user only
         self.store = Store(self.data_dir)
         i18n.set_language(i18n.resolve(self.store.load("preferences", {}), self.env))
         migrate_legacy(self.store, paths.legacy_dir(self.env))
@@ -55,7 +56,7 @@ class VulcanApp:
         self.runner = self.backend.runner
         self._service_lock = threading.Lock()
         from vulcan_celox.core.keychain import MemoryKeyStore, default_keystore
-        # VULCAN_KEYSTORE=memory: execuções isoladas (capturas, validação) nunca tocam o Keychain real
+        # VULCAN_KEYSTORE=memory: isolated runs (captures, validation) never touch the real Keychain
         self.keystore = keystore or (MemoryKeyStore() if self.env.get("VULCAN_KEYSTORE") == "memory"
                                      else default_keystore(runner=self.runner))
         self.ai_transport = ai_transport  # None: urllib de verdade
@@ -118,7 +119,13 @@ class VulcanApp:
             return None
         return next((s for s in self.sites() if s.name == name), None)
 
+    def refresh_backend(self) -> None:
+        """Lerd installed while the app is open is noticed without restarting."""
+        if not self.backend.available:
+            self.backend = detect_backend(self.env, runner=self.runner)
+
     def state(self) -> Dict[str, Any]:
+        self.refresh_backend()
         status = self.backend.status()
         by_site = progress_by_site(self.notebook.tasks)
         overall = progress(self.notebook.tasks)
@@ -126,6 +133,7 @@ class VulcanApp:
             "app": {"name": APP_NAME, "version": __version__, "data_dir": str(self.data_dir)},
             "backend": {
                 "name": self.backend.name, "label": self.backend.label, "available": self.backend.available,
+                "installable": not is_windows(),
                 "dashboard": self.backend.dashboard_url() if hasattr(self.backend, "dashboard_url") else None,
             },
             "status": {"running": status.running, "summary": status.summary, "details": status.details},
@@ -139,17 +147,17 @@ class VulcanApp:
             },
         }
 
-    # ── novo terminal ─────────────────────────────────────────
+    # ── new terminal ─────────────────────────────────────────
     def spawn_terminal(self, cwd: str, title: str, theme: Optional[str], site: Optional[str] = None,
                        rows: int = 30, cols: int = 110, command: Optional[str] = None, typed: Optional[str] = None):
-        """Cria a aba, registra a sessão e, se `typed` vier, digita o comando (agente) assim que o shell nascer.
-        O shell guarda o que chega antes de ficar pronto; o comando entra no registro da aba para o pareamento por
-        pasta e horário. `typed` é sempre montado pelo servidor a partir de valores validados."""
+        """Creates the tab, registers the session and, if `typed` is given, types the command (agent) as soon as the shell starts.
+        The shell buffers what arrives before it is ready; the command goes into the tab record for pairing by
+        folder and time. `typed` is always built by the server from validated values."""
         session = self.terminals.create(cwd, command=command, title=title[:60], site=site, rows=rows, cols=cols,
                                         theme=theme)
         self.hub.on_created(session)
         if typed:
-            session.write(f"{typed}\n".encode())
+            session.write(f"{typed}\r".encode())  # same as the keyboard Enter: in PowerShell, \n only opens another line
             self.hub.sessions.add_commands(session.id, [typed])
         return session
 
@@ -193,10 +201,15 @@ class VulcanApp:
                 raise HttpError(409, "outra operação de serviço está em andamento")
             try:
                 result = getattr(self.backend, action)()
+                status = wait_running(self.backend, self.autostart.start_wait) if result.ok and action != "stop" else None
             finally:
                 self._service_lock.release()
             lines = (result.output or "").strip().splitlines()
-            return {"ok": result.ok, "code": result.code, "output": "\n".join(lines[-40:])}
+            if status is not None and not status.running:
+                reason = tr("o comando terminou, mas o ambiente não respondeu: {summary}", summary=status.summary)
+                return {"ok": False, "code": result.code, "output": "\n".join(lines[-40:] + [reason])}
+            detail = lines[-40:] if result.ok else lines[-40:] + [failure_reason(result)]
+            return {"ok": result.ok, "code": result.code, "output": "\n".join(detail)}
 
         @srv.route("GET", "/api/app/build")
         def _build(_req: Request):
@@ -271,7 +284,7 @@ class VulcanApp:
                     raise HttpError(400, "só arquivos de prompt (.md da pasta de prompts) podem ser abertos assim")
                 argv = open_argv("editor", str(Path(target).resolve()), self.env)
             elif kind == "source":
-                # Arquivo de origem de um evento de depuração, só se estiver dentro de um site registrado
+                # source file of a debug event, only if it is inside a registered site
                 path = Path(os.path.abspath(target))
                 roots = [Path(os.path.abspath(s.path)) for s in self.sites() if s.path]
                 if not path.is_file() or not any(r in path.parents for r in roots):
@@ -290,13 +303,13 @@ class VulcanApp:
                     raise HttpError(400, "só arquivos .md da pasta de dados podem ser abertos assim")
                 argv = open_argv("file", str(path), self.env)
             elif kind == "session_file":
-                # visor de código: mesma checagem da leitura, inclusive raiz da sessão e nome sensível
+                # code viewer: same check as reading, including the session root and sensitive names
                 path = self.code.checked(self.code.session(str(body.get("session") or "")), target)
                 if not path.is_file():
                     raise HttpError(404, "arquivo não encontrado")
                 argv = open_argv("editor", str(path), self.env)
             elif kind == "terminal_file":
-                # caminho clicado no terminal: de novo a checagem do servidor, nunca o que a página afirma
+                # path clicked in the terminal: the server checks again, never what the page claims
                 found = self.code.resolve(str(body.get("terminal") or ""), [target]).get(target)
                 if not found or found["kind"] != "file" or found["sensitive"]:
                     raise HttpError(403, "este arquivo não pode ser aberto")
@@ -308,7 +321,7 @@ class VulcanApp:
                 raise HttpError(500, (result.output or tr("falha ao abrir")).strip())
             return {"ok": True}
 
-    # ── execução ─────────────────────────────────────────────────────────
+    # ── execution ──────────────────────────────────────────────────────
     def start(self) -> "VulcanApp":
         self.server.start()
         self.agents.start()
@@ -316,17 +329,17 @@ class VulcanApp:
 
     def shutdown(self) -> None:
         self.notebook_api.flush_index()
-        self.hub.finalize_all()  # grava a memória de todas as sessões abertas antes de matar os PTYs
+        self.hub.finalize_all()  # saves the memory of every open session before killing the PTYs
         self.terminals.close_all()
         self.hub.stop()
-        self.server.shutdown()  # para de aceitar requisições antes de fechar o banco dos agentes
+        self.server.shutdown()  # stops accepting requests before closing the agents database
         self.agents.stop()
 
 
 def _watch_parent(parent_pid: int, shutdown=None, getppid=os.getppid, exit=os._exit, interval: float = 1.0,
                   grace: float = 3.0) -> None:
-    """App nativo encerrou (até de forma anormal): grava memórias e fecha as abas com prazo, depois sai sem deixar
-    servidor nem PTYs órfãos."""
+    """Native app exited (even abnormally): saves memories and closes the tabs within a deadline, then exits leaving
+    no orphaned server or PTYs."""
     while True:
         time.sleep(interval)
         if getppid() != parent_pid:
@@ -345,12 +358,12 @@ def _raise_interrupt(_signum, _frame):
 def serve(port: int = 0) -> int:
     import signal
     app = VulcanApp(port=port)
-    # o app nativo encerra com SIGTERM: tratar como interrupção para gravar memórias e índice
+    # the native app exits with SIGTERM: treat it as an interrupt so memories and index get saved
     signal.signal(signal.SIGTERM, _raise_interrupt)
     sys.stdout.write(f"VULCAN_PORT={app.server.port}\n")
     sys.stdout.flush()
-    app.autostart.begin()  # o ambiente sobe junto com o app, sem atrasar a janela
-    app.agents.start()  # serve_forever não passa por start(): o observador de agentes sobe aqui
+    app.autostart.begin()  # the environment starts with the app, without delaying the window
+    app.agents.start()  # serve_forever does not go through start(): the agent watcher starts here
     if os.environ.get("VULCAN_WATCH_PARENT") == "1":
         threading.Thread(target=_watch_parent, args=(os.getppid(), app.shutdown), daemon=True).start()
     try:

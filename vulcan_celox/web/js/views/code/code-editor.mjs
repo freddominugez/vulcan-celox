@@ -1,5 +1,5 @@
-// Visor de código: CodeMirror 6 só leitura, carregado na primeira vez que a aba Código abre. O conteúdo é sempre dado:
-// entra como documento do editor, nunca como HTML.
+// Code viewer: read-only CodeMirror 6, loaded the first time the Código tab opens. The content is always data:
+// goes in as the editor document, never as HTML.
 
 let loading = null;
 
@@ -69,7 +69,7 @@ function extensions(CM, language, phrases = PHRASES) {
   ];
 }
 
-/** Arquivo inteiro. `setText` troca o conteúdo sem remontar, e `reveal` rola até o trecho e o marca. */
+/** Whole file. `setText` swaps the content without remounting, and `reveal` scrolls to the range and marks it. */
 export function mountFile(CM, parent, text, language, phrases) {
   const view = new CM.EditorView({ parent, state: CM.EditorState.create({ doc: text, extensions: extensions(CM, language, phrases) }) });
   return {
@@ -84,7 +84,7 @@ export function mountFile(CM, parent, text, language, phrases) {
                       effects: CM.EditorView.scrollIntoView(at, { y: "center" }) });
       return true;
     },
-    /** Vai para uma linha, com o cursor nela. */
+    /** Goes to a line, with the cursor on it. */
     line(number) {
       if (!number) return;
       const line = view.state.doc.line(Math.min(Math.max(1, number), view.state.doc.lines));
@@ -99,7 +99,7 @@ function lastPiece(snippet) {
   return pieces[pieces.length - 1];
 }
 
-/** Posição do trecho editado. O último pedaço é o mais recente; sem ele, a primeira linha não vazia. */
+/** Position of the edited range. The last piece is the most recent; without it, the first non-empty line. */
 export function findSnippet(text, snippet) {
   const piece = lastPiece(snippet);
   if (!piece) return -1;
@@ -109,7 +109,7 @@ export function findSnippet(text, snippet) {
   return line ? text.indexOf(line) : -1;
 }
 
-/** Diff: lado a lado ou unificado, com as partes iguais recolhidas. */
+/** Diff: side by side or unified, with the equal parts collapsed. */
 export function mountDiff(CM, parent, { old, current, language, layout, phrases }) {
   const base = extensions(CM, language, phrases);
   const collapse = { margin: 3, minSize: 6 };

@@ -1,4 +1,4 @@
-"""Leitor do Claude Code com fixture real anonimizada e casos sintéticos."""
+"""Claude Code reader with an anonymized real fixture and synthetic cases."""
 
 import json
 import tempfile
@@ -26,7 +26,7 @@ def tool(mid, name, data, at, usage=None):
 
 
 class ClaudeFixtureRealTest(unittest.TestCase):
-    """Valores conferidos por um script de contagem independente do leitor."""
+    """Values checked by a counting script independent of the reader."""
 
     def setUp(self):
         self.r = read_session("claude", REAL)
@@ -46,11 +46,11 @@ class ClaudeFixtureRealTest(unittest.TestCase):
     def test_arquivos_e_comandos(self):
         kinds = {f.path.replace("/Users/dev/projeto/", ""): f.kind for f in self.s.files}
         self.assertEqual(len(kinds), 13)
-        self.assertEqual(kinds["CLAUDE.md"], "edit")             # lido e depois reescrito
-        self.assertEqual(kinds["docs/PLANO-CONSTRUTIVO-AGENTES.md"], "new")  # criado e depois editado
+        self.assertEqual(kinds["CLAUDE.md"], "edit")             # read and then rewritten
+        self.assertEqual(kinds["docs/PLANO-CONSTRUTIVO-AGENTES.md"], "new")  # created and then edited
         self.assertEqual(kinds["PROMPT-EXECUCAO.md"], "edit")
         self.assertEqual(kinds["fora/byyui9qc3.txt"], "read")
-        self.assertNotIn("nao-contar.py", " ".join(kinds))      # api-request-blob é ignorado
+        self.assertNotIn("nao-contar.py", " ".join(kinds))      # api-request-blob is ignored
         self.assertEqual(self.s.commands_total, 41)
         self.assertEqual({c.kind for c in self.s.commands}, {"shell"})
         self.assertEqual(self.s.published, "none")
@@ -63,7 +63,7 @@ class ClaudeFixtureRealTest(unittest.TestCase):
 
     def test_leitura_em_partes_igual_a_inteira(self):
         data = REAL.read_bytes()
-        for cut in (len(data) // 3, len(data) // 2 + 7):  # o segundo corte cai no meio de uma linha
+        for cut in (len(data) // 3, len(data) // 2 + 7):  # the second cut falls in the middle of a line
             with self.subTest(cut=cut):
                 with tempfile.TemporaryDirectory() as tmp:
                     path = Path(tmp) / f"{SID}.jsonl"

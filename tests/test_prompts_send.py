@@ -1,4 +1,4 @@
-"""O prompt vai como colagem, sem Enter, só para a aba pareada à sessão."""
+"""The prompt goes as a paste, without Enter, only to the tab paired with the session."""
 import unittest
 
 from tests import test_agents_api
@@ -15,10 +15,10 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.real_terminals = self.app.terminals
         self.app.terminals = FakeTerminals()
         self.paired = FakePty(TAB, "loja")
-        self.paired.foreground = lambda: [("claude", "claude --resume x")]  # o agente em primeiro plano na aba
+        self.paired.foreground = lambda: [("claude", "claude --resume x")]  # the foreground agent in the tab
         self.other = FakePty("0000ffff", "outra")
         self.app.terminals.items = {TAB: self.paired, "0000ffff": self.other}
-        self.get("/api/prompts")  # cria os exemplos
+        self.get("/api/prompts")  # creates the examples
         self.real_decorate = self.app.agents.decorate
         self.pair_with = TAB
 
@@ -49,14 +49,14 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         inner = sent[len(prompts.PASTE_START):-len(prompts.PASTE_END)]
         self.assertIn(f"sessão {CLAUDE_SID}".encode(), inner)
         self.assertNotIn(b"\r", sent)
-        self.assertNotIn(b"\n", sent)  # o exemplo é uma linha: nada de Enter nem fora nem dentro da colagem
+        self.assertNotIn(b"\n", sent)  # the example is one line: no Enter, neither outside nor inside the paste
 
     def test_valores_dos_campos_e_controle_removido(self):
         status, _ = self.send({"prompt": "seguranca", "session": CLAUDE_SID,
                                "values": {"branch": "feat/x\x1b[201~\r rm -rf"}})
         self.assertEqual(status, 200)
         sent = self.paired.written[0]
-        self.assertEqual(sent.count(b"\x1b"), 2)  # só o início e o fim da colagem
+        self.assertEqual(sent.count(b"\x1b"), 2)  # only the start and the end of the paste
         self.assertIn(b"branch feat/x[201~ rm -rf", sent)
         self.assertNotIn(b"\r", sent)
 
@@ -71,7 +71,7 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.assertEqual(self.paired.written, [])
 
     def test_agente_fechou_e_a_aba_voltou_ao_shell_409(self):
-        """Depois que o agente sai, a aba pareada vira shell comum; o prompt não pode cair no shell."""
+        """After the agent exits, the paired tab becomes a plain shell; the prompt must not land in the shell."""
         self.paired.foreground = lambda: [("-zsh", "-zsh")]
         status, data = self.send({"prompt": "seguranca", "session": CLAUDE_SID})
         self.assertEqual(status, 409, data)
@@ -79,13 +79,13 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.assertEqual(self.paired.written, [])
         self.paired.foreground = lambda: [("-zsh", "-zsh"), ("node", "node /opt/homebrew/bin/codex")]
         status, _ = self.send({"prompt": "seguranca", "session": CLAUDE_SID})
-        self.assertEqual(status, 409)  # outro agente na aba também não serve
+        self.assertEqual(status, 409)  # another agent in the tab does not work either
         self.paired.foreground = lambda: [("-zsh", "-zsh"), ("2.1.316", "/Users/dev/.local/share/claude/versions/2.1.316")]
         status, _ = self.send({"prompt": "seguranca", "session": CLAUDE_SID})
-        self.assertEqual(status, 200)  # o binário nativo do Claude Code também conta
+        self.assertEqual(status, 200)  # the native Claude Code binary also counts
 
     def test_outra_sessao_mais_nova_na_mesma_aba_409(self):
-        """A sessão escolhida acabou e outra do mesmo agente começou na aba: o prompt iria para a nova."""
+        """The chosen session ended and another one of the same agent started in the tab: the prompt would go to the new one."""
         real = self.app.agents.paired_with
         self.app.agents.paired_with = lambda tab: type("S", (), {"id": "outra-sessao"})() if tab == TAB else None
         self.addCleanup(setattr, self.app.agents, "paired_with", real)
@@ -94,7 +94,7 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
         self.assertEqual(self.paired.written, [])
 
     def test_aba_parada_503(self):
-        """A aba não leu a colagem no prazo: 503 em vez de prender a thread HTTP."""
+        """The tab did not read the paste in time: 503 instead of tying up the HTTP thread."""
         self.paired.write = lambda data: False
         status, data = self.send({"prompt": "seguranca", "session": CLAUDE_SID})
         self.assertEqual(status, 503, data)
@@ -103,7 +103,7 @@ class PromptsSendTest(test_agents_api.AgentsServerCase):
     def test_variavel_vazia_e_validacao(self):
         status, data = self.send({"prompt": "seguranca", "session": CLAUDE_SID, "values": {}})
         self.assertEqual(status, 200)
-        path = self.app.prompts.global_dir / "ticket.md"  # na raiz: categoria Outros (sem depender de maiúsculas na pasta)
+        path = self.app.prompts.global_dir / "ticket.md"  # at the root: category Outros (without depending on capitalization in the folder)
         path.write_text("---\nid: ticket\ntitle: Ticket\n---\nResolva o ticket {{ticket}}.\n", encoding="utf-8")
         status, data = self.send({"prompt": "ticket", "session": CLAUDE_SID})
         self.assertEqual(status, 400)

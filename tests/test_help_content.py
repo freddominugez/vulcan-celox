@@ -1,4 +1,4 @@
-"""Conteúdo da Ajuda num lugar só, sem travessão, com FAQ suficiente e imagens que existem."""
+"""Help content in a single place, no em dash, with enough FAQ and images that exist."""
 
 import json
 import unittest

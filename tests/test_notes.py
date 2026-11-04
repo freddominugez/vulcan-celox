@@ -37,12 +37,12 @@ class NotesTest(TempDirTestCase):
         self.assertEqual([n.text for n in reloaded.notes_for("loja")], list("abcd"))
 
     def test_reorder_relativo_na_lista_filtrada(self):
-        # sessão mostra só b e d; arrastar d para cima de b deve pôr d antes de b no site inteiro
+        # the session shows only b and d; dragging d above b must put d before b across the whole site
         notes = {x: self.nb.add_note("loja", x, terminal="s1" if x in "bd" else None) for x in "abcd"}
         self.nb.reorder_note(notes["d"].id, target_id=notes["b"].id)
         self.assertEqual([n.text for n in self.nb.notes_for("loja")], list("adbc"))
         self.assertEqual([n.text for n in self.nb.notes_for("loja", terminal="s1")], list("db"))
-        self.nb.reorder_note(notes["a"].id, target_id=notes["c"].id)  # para baixo: fica depois do alvo
+        self.nb.reorder_note(notes["a"].id, target_id=notes["c"].id)  # downwards: ends up after the target
         self.assertEqual([n.text for n in self.nb.notes_for("loja")], list("dbca"))
         other = self.nb.add_note(None, "global")
         with self.assertRaises(KeyError):

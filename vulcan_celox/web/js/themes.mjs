@@ -1,5 +1,5 @@
-// Temas de sessão: carregados uma vez do servidor (core/themes.py é a fonte), injetados como estilo
-// e aplicados a cada terminal pelo tema da aba. Sem tema, o terminal usa a paleta padrão do app.
+// Session themes: loaded once from the server (core/themes.py is the source), injected as a style
+// and applied to each terminal by the tab's theme. With no theme, the terminal uses the app's default palette.
 
 import { get } from "./api.mjs";
 
@@ -24,19 +24,19 @@ export function loadThemes(force = false) {
     window.dispatchEvent(new CustomEvent("vulcan-themes-loaded"));
     return themes;
   }).catch(() => {
-    loaded = null;  // tenta de novo na próxima chamada
+    loaded = null;  // try again on the next call
     return themes;
   });
   return loaded;
 }
 
-/** Paleta do xterm para o tema, ou null (o terminal fica com a paleta padrão). */
+/** xterm palette for the theme, or null (the terminal keeps the default palette). */
 export function xtermTheme(id) {
   const t = id && themes.byId[id];
   return t ? t.xterm : null;
 }
 
-// Paleta do terminal quando a aba não tem tema.
+// Terminal palette when the tab has no theme.
 export const TERMINAL_THEME = {
   background: "#0A1120",
   foreground: "#E6E9F0",

@@ -1,8 +1,7 @@
-"""Estado do PR pelo gh: preferência desligada não executa nada, e toda falha cai na estimativa com rótulo."""
+"""PR state via gh: a disabled preference runs nothing, and every failure falls back to the labeled estimate."""
 
 import json
 import unittest
-from pathlib import Path
 
 from tests.test_agents_api import AgentsServerCase
 from vulcan_celox.core.pr_status import FIELDS, PrStatus, checks_summary, gh_bin

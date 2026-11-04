@@ -1,4 +1,4 @@
-// Monta a tela da rota atual.
+// Mounts the screen of the current route; split out of app.mjs.
 
 import { app } from "./app-state.mjs";
 import { navigate, refreshState, runCommand } from "./app.mjs";
@@ -25,7 +25,7 @@ import { TasksView } from "./views/tasks.mjs";
 export function mountView() {
   if (app.view && app.view.destroy) app.view.destroy();
   app.view = null;
-  // elemento novo a cada tela: os ouvintes de clique da tela anterior não podem continuar ativos
+  // new element per screen: click listeners from the previous screen must not stay active
   const old = $("#view");
   const root = old.cloneNode(false);
   old.replaceWith(root);

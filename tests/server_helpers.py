@@ -1,4 +1,4 @@
-"""Servidor do app em diretórios temporários para testes de API."""
+"""App server in temporary directories for API tests."""
 
 import http.client
 import json
@@ -20,7 +20,9 @@ class ServerTestCase(TempDirTestCase):
     def setUp(self):
         super().setUp()
         self.fake = FakeRunner()
-        self.app = VulcanApp(env=self.env(), runner=self.fake, token=self.token).start()
+        self.app = VulcanApp(env=self.env(), runner=self.fake, token=self.token)
+        self.app.autostart.start_wait = 0  # a fake start must not wait for an environment that never answers
+        self.app.start()
 
     def tearDown(self):
         self.app.shutdown()
@@ -32,7 +34,7 @@ class ServerTestCase(TempDirTestCase):
         if token:
             hdrs["X-Vulcan-Token"] = self.token if token is True else token
         if body is not None or method in ("POST", "PUT", "PATCH"):
-            hdrs["Content-Type"] = "application/json"  # como a interface (api.mjs) e a casca fazem
+            hdrs["Content-Type"] = "application/json"  # as the interface (api.mjs) and the shell do
         hdrs.update(headers or {})
         conn.request(method, path, body=json.dumps(body) if body is not None else None, headers=hdrs)
         resp = conn.getresponse()

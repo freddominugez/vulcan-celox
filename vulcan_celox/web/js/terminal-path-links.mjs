@@ -1,12 +1,12 @@
-// ⌘-clique em caminho no terminal. Reconhece e monta os links; quem existe é o servidor que diz. Sem DOM e sem dependência
-// de outro módulo do app, para rodar também no teste.
+// ⌘-click on a path in the terminal. Recognizes and builds the links; the server says which ones exist. Free of DOM and of dependencies
+// on another app module, so it also runs in the test.
 
 const PATH = /(?:\.{1,2}\/|\/)?(?:[\w@+~.-]+\/)*[\w@+~.-]*[\w@+~-](?::(\d+)(?::(\d+))?|\((\d+)\))?/g;
 const URL_RE = /\b[a-z][a-z0-9+.-]*:\/\/\S+/gi;
 const EXTENSION = /\.[A-Za-z][A-Za-z0-9]*$/;
 export const MAX_CANDIDATES = 50;
 
-/** Candidatos de uma linha lógica: { path, line, column, start, end }. Número solto e versão não entram. */
+/** Candidates from a logical line: { path, line, column, start, end }. Bare numbers and versions are excluded. */
 export function findPaths(text) {
   const urls = [...text.matchAll(URL_RE)].map((m) => [m.index, m.index + m[0].length]);
   const found = [];
@@ -25,8 +25,8 @@ export function findPaths(text) {
 }
 
 /**
- * Texto de uma linha lógica do xterm, juntando as quebras por largura (isWrapped), e o mapa de cada posição para a
- * célula na tela. Caractere largo ocupa duas células, por isso não dá para contar pelo índice da string.
+  * Text of an xterm logical line, joining the width-based wraps (isWrapped), and the map from each position to the
+  * on-screen cell. A wide character takes two cells, so you cannot count by string index.
  */
 export function logicalLine(buffer, y) {
   let first = y;
@@ -49,7 +49,7 @@ export function logicalLine(buffer, y) {
   return { text: text.replace(/\s+$/, ""), cells };
 }
 
-/** Link no formato do xterm (coordenadas a partir de 1, fim inclusivo). Só o que o servidor confirmou vira link. */
+/** Link in xterm format (coordinates from 1, inclusive end). Only what the server confirmed becomes a link. */
 export function buildLinks(line, candidates, results, y, activate) {
   const links = [];
   for (const candidate of candidates) {
@@ -69,8 +69,8 @@ export function buildLinks(line, candidates, results, y, activate) {
 }
 
 /**
- * Provedor do xterm. `modifier()` diz se a tecla está pressionada agora: sem ela não sublinha nem consulta o servidor.
- * `resolve(paths)` devolve { caminho: resultado } só para os que existem.
+  * xterm provider. `modifier()` says whether the key is pressed right now: without it, nothing is underlined and the server is not queried.
+  * `resolve(paths)` returns { path: result } only for those that exist.
  */
 export function pathLinkProvider(term, { modifier, resolve, activate }) {
   return {

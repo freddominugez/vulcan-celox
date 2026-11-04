@@ -1,4 +1,4 @@
-"""Serviços do Windows por ctypes, sem dependência: Lixeira, Gerenciador de Credenciais e lista de processos."""
+"""Windows services via ctypes, no dependency: Recycle Bin, Credential Manager and process list."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ class _SHFILEOPSTRUCTW(ctypes.Structure):
 
 
 def to_recycle_bin(path: str) -> bool:
-    """Manda para a Lixeira do Windows, sem perguntar e sem janela."""
+    """Sends to the Windows Recycle Bin, without asking and without a window."""
     shell32 = ctypes.WinDLL("shell32", use_last_error=True)
     op = _SHFILEOPSTRUCTW(None, FO_DELETE, path + "\0", None, FOF_ALLOWUNDO | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI)
     shell32.SHFileOperationW.argtypes = [ctypes.POINTER(_SHFILEOPSTRUCTW)]
@@ -82,7 +82,7 @@ class _PROCESSENTRY32W(ctypes.Structure):
 
 
 def process_table() -> List[Tuple[int, int, str]]:
-    """(pid, pai, executável) de todos os processos."""
+    """(pid, parent, executable) of all processes."""
     kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel32.CreateToolhelp32Snapshot.restype = wintypes.HANDLE
     kernel32.CreateToolhelp32Snapshot.argtypes = [wintypes.DWORD, wintypes.DWORD]

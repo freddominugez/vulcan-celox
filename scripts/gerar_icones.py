@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Gera o sprite de ícones em web/index.html a partir do Phosphor Icons (MIT), peso regular.
+"""Generates the icon sprite in web/index.html from Phosphor Icons (MIT), regular weight.
 
-Uso: gerar_icones.py <pasta do pacote @phosphor-icons/core>. Roda à mão, só para trocar ícone ou versão. O app não tem build:
-o sprite gerado fica no index.html. A tabela abaixo liga o nome usado no código ao nome no Phosphor.
+Usage: gerar_icones.py <folder of the @phosphor-icons/core package>. Run by hand, only to change an icon or version. The app has no build:
+the generated sprite lives in index.html. The table below maps the name used in the code to the Phosphor name.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pathlib import Path
 VERSAO = "2.1.1"
 ROOT = Path(__file__).resolve().parent.parent
 INDEX = ROOT / "vulcan_celox" / "web" / "index.html"
-# nome no app -> arquivo em assets/regular; o sufixo -fill vem de assets/fill
+# name in the app -> file in assets/regular; the -fill suffix comes from assets/fill
 ICONES = {
     "grid": "squares-four", "terminal": "terminal-window", "check-square": "check-square", "note": "note", "tag": "tag",
     "search": "magnifying-glass", "database": "database", "hex": "hexagon", "home": "house", "help": "question", "star": "star",

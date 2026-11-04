@@ -1,11 +1,11 @@
-// Árvore dos arquivos tocados pela sessão. Nome de arquivo é dado: sempre passa por esc.
+// Tree of the files touched by the session. A file name is data: it always goes through esc.
 
 import { esc, icon } from "../../dom.mjs";
 import { t } from "../../i18n.mjs";
 
 const MARKS = { new: t("novo"), edit: t("editado"), read: t("lido"), delete: t("apagado") };
 
-/** Monta a árvore a partir dos caminhos relativos. Pasta com uma só pasta dentro vira um nó só, como `a/b/c`. */
+/** Builds the tree from relative paths. A folder with a single folder inside becomes one node, like `a/b/c`. */
 export function buildTree(files) {
   const root = { name: "", dirs: new Map(), files: [] };
   for (const file of files) {

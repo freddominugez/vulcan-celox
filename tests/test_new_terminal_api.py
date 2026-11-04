@@ -1,4 +1,4 @@
-"""Novo terminal com tema da rotação, agente digitado ao abrir e preferência de não perguntar a pasta."""
+"""New terminal with a theme from the rotation, agent typed on open and the preference not to ask for the folder."""
 
 from tests.server_helpers import ServerTestCase
 from tests.test_pty import wait_for

@@ -16,7 +16,7 @@ SNIPPET_RADIUS = 40
 @dataclass
 class Hit:
     kind: str
-    key: str  # nome do site ou id do item
+    key: str  # site name or item id
     site: Optional[str]
     title: str
     snippet: str

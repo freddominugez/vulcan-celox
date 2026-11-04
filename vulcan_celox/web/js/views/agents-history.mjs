@@ -1,4 +1,4 @@
-// Histórico de agentes: Claude Code e Codex juntos, busca por conteúdo, resultados agrupados por dia.
+// Agent history: Claude Code and Codex together, content search, results grouped by day.
 
 import { get } from "../api.mjs";
 import { debounce, esc, icon, reportError } from "../dom.mjs";
@@ -23,7 +23,7 @@ function dayLabel(iso) {
   return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}${d.getFullYear() === today.getFullYear() ? "" : `/${d.getFullYear()}`}`;
 }
 
-/** O servidor marca o trecho achado com \x02 e \x03: escapa o texto e só então vira <mark>. */
+/** The server marks the match with \x02 and \x03: escape the text and only then turn it into <mark>. */
 function marked(text) {
   return esc(text).replace(/\x02/g, "<mark>").replace(/\x03/g, "</mark>");
 }
@@ -67,7 +67,7 @@ export class AgentsHistoryView {
     const seq = (this.seq = (this.seq || 0) + 1);
     try {
       const data = await get(`/api/agents/history?${params}`);
-      if (seq !== this.seq || this.destroyed) return;  // resposta de uma busca mais antiga
+      if (seq !== this.seq || this.destroyed) return;  // response of an older search
       this.watch.seen(data.revision);
       this.render(data);
     } catch (err) {

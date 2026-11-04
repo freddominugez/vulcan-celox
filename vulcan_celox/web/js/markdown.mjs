@@ -1,4 +1,4 @@
-// Renderizador de Markdown enxuto para as memórias de sessão (títulos, tabelas, listas, citações e código).
+// Lean Markdown renderer for session memories (headings, tables, lists, quotes and code).
 
 import { esc, icon } from "./dom.mjs";
 
@@ -21,7 +21,7 @@ export function renderMarkdown(source) {
   let i = 0;
   while (i < lines.length) {
     const line = lines[i];
-    // cercas também aparecem recuadas dentro de listas (documentação gerada por IA)
+    // fences also appear indented inside lists (AI-generated documentation)
     const fence = /^(\s*)(`{3,}|~{3,})([\w+-]*)\s*$/.exec(line);
     if (fence) {
       const indent = fence[1].length;

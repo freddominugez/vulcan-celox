@@ -1,5 +1,5 @@
-// Gera web/vendor/codemirror.js em IIFE e reescreve no LICENSES.md a parte que lista os pacotes embutidos.
-// Argumentos: <pasta com node_modules> <pasta web/vendor>
+// Generates web/vendor/codemirror.js as an IIFE and rewrites, in LICENSES.md, the part that lists the bundled packages.
+// Arguments: <folder with node_modules> <web/vendor folder>
 import { build } from "esbuild";
 import { readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";

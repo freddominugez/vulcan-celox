@@ -1,8 +1,8 @@
-"""Prompts por botão: arquivos Markdown com cabeçalho, globais e por projeto, com variáveis da sessão.
+"""Per-button prompts: Markdown files with a header, global and per project, with session variables.
 
-Globais em <dados>/prompts/, do projeto em <projeto>/.vulcan/prompts/ (lidos sempre; a pasta só é criada com
-confirmação do usuário). O do projeto sobrescreve o global pelo `id`. Categoria pelo campo `category` ou pela
-subpasta. Variáveis `{{nome}}` sem lógica; a ausente fica como está e é listada em `missing`.
+Global ones in <data>/prompts/, the project's in <project>/.vulcan/prompts/ (always read; the folder is only created with
+user confirmation). The project's overrides the global one by `id`. Category from the `category` field or the
+subfolder. `{{nome}}` variables without logic; a missing one stays as is and is listed in `missing`.
 """
 
 from __future__ import annotations
@@ -22,10 +22,10 @@ from vulcan_celox.core.store import make_private
 
 DEFAULT_CATEGORIES = ["Comportamento", "Parâmetros", "Segurança", "Publicação", "Testes"]
 FALLBACK_CATEGORY = "Outros"
-NAME_FILE = ".nome"  # nome de exibição de uma categoria criada pelo usuário (a pasta é só o slug)
+NAME_FILE = ".nome"  # display name of a user-created category (the folder is just the slug)
 VAR = re.compile(r"\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}")
 VARIABLES = ("projectName", "branch", "base", "sessionId", "agent", "cwd")
-# rótulo legível de cada variável: aparece nos cartões e nos campos do compositor, nunca o {{nome}}
+# readable label of each variable: shown on cards and composer fields, never {{nome}}
 LABELS = {"projectName": "Projeto", "branch": "Branch", "base": "Base", "sessionId": "Sessão", "agent": "Agente",
           "cwd": "Pasta"}
 ICON_NAME = re.compile(r"^[a-z][a-z-]{0,23}$")
@@ -42,8 +42,8 @@ class Prompt:
     path: Path
     pin: bool = False
     overrides: bool = False
-    description: str = ""  # campo `descricao` do cabeçalho; vazio = primeira frase do texto (ver summary)
-    icon: str = ""          # campo `icone`: nome de um ícone da interface; vazio ou desconhecido = ícone padrão
+    description: str = ""  # `descricao` header field; empty = first sentence of the text (see summary)
+    icon: str = ""          # `icone` field: name of an interface icon; empty or unknown = default icon
 
     def to_dict(self) -> Dict:
         return {"id": self.id, "title": self.title, "category": self.category, "scope": self.scope,
@@ -56,7 +56,7 @@ NEW_PROMPT_TEXT = ("Escreva aqui o texto que vai para o terminal. Variáveis pre
 
 
 def default_categories() -> List[str]:
-    """Categorias padrão na língua atual (as pastas dos exemplos nascem com esses nomes)."""
+    """Default categories in the current language (the example folders are born with these names)."""
     return [tr(c) for c in DEFAULT_CATEGORIES]
 
 
@@ -89,7 +89,7 @@ def _category_name(folder: Path) -> str:
 
 
 def categories(root: Path) -> List[str]:
-    """Categorias que existem como pasta (inclusive vazias), pelo nome de exibição."""
+    """Categories that exist as a folder (including empty ones), by display name."""
     root = Path(root)
     if not root.is_dir():
         return []
@@ -97,7 +97,7 @@ def categories(root: Path) -> List[str]:
 
 
 def parse_file(path: Path, scope: str, default_category: str) -> Tuple[Optional[Prompt], Optional[str]]:
-    """(prompt, aviso). Cabeçalho inválido ou sem fim: o arquivo é ignorado e devolve o aviso."""
+    """(prompt, warning). An invalid or unterminated header: the file is ignored and the warning is returned."""
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
@@ -144,7 +144,7 @@ def load_dir(root, scope: str) -> Tuple[List[Prompt], List[str]]:
 
 
 def load_all(global_dir, project_prompts: Optional[Path] = None) -> Tuple[List[Prompt], List[str]]:
-    """Globais e do projeto juntos; o do projeto sobrescreve o global de mesmo id."""
+    """Global and project prompts together; the project's overrides the global one with the same id."""
     merged, warnings = load_dir(global_dir, "global")
     if project_prompts is not None:
         local, local_warnings = load_dir(project_prompts, "project")
@@ -175,7 +175,7 @@ def render(body: str, context: Dict[str, str]) -> Tuple[str, List[str]]:
 
 
 def variables_in(body: str) -> List[str]:
-    """Variáveis usadas no texto, na ordem em que aparecem, sem repetir."""
+    """Variables used in the text, in order of appearance, without repeats."""
     seen: List[str] = []
     for match in VAR.finditer(body or ""):
         if match.group(1) not in seen:
@@ -184,8 +184,8 @@ def variables_in(body: str) -> List[str]:
 
 
 def summary(prompt: Prompt, context: Dict[str, str]) -> str:
-    """O que o cartão diz que o prompt faz: a `descricao` do cabeçalho ou a primeira frase do texto, com as
-    variáveis trocadas pelo valor da sessão ou por reticências quando falta (nunca `{{nome}}`)."""
+    """What the card says the prompt does: the header's `descricao` or the first sentence of the text, with
+        variables replaced by the session value or by an ellipsis when missing (never `{{nome}}`)."""
     text = prompt.description or ""
     if not text:
         flat = " ".join((prompt.body or "").split())
@@ -195,34 +195,34 @@ def summary(prompt: Prompt, context: Dict[str, str]) -> str:
     return text if len(text) <= DESCRIPTION_MAX else text[:DESCRIPTION_MAX - 1].rstrip() + "…"
 
 
-# ── envio ao terminal ───────────────────────────────────────────
+# ── sending to the terminal ───────────────────────────────────────────
 PASTE_START, PASTE_END = b"\x1b[200~", b"\x1b[201~"
 VALUE_MAX = 2000
 _CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")  # tudo de controle, menos \t e \n
 
 
 def clean(text: str) -> str:
-    """Sem ESC nem outro caractere de controle: nada no texto fecha a colagem ou vira tecla no terminal."""
+    """No ESC or other control character: nothing in the text closes the paste or becomes a key in the terminal."""
     return _CONTROL.sub("", (text or "").replace("\r\n", "\n").replace("\r", "\n"))
 
 
 def paste_bytes(body: str, context: Dict[str, str], values: Dict[str, str]) -> Tuple[bytes, List[str]]:
-    """Texto do prompt como colagem (bracketed paste), sem Enter: o agente recebe o texto no campo de entrada e o
-    usuário revisa e envia. Valores dos campos têm prioridade sobre a sessão. Devolve (bytes, variáveis faltando)."""
-    flat = lambda v: " ".join(clean(str(v)).split())  # noqa: E731  uma linha, sem controle
-    merged = {k: flat(v) for k, v in context.items() if v is not None}  # pasta e branch vêm do JSONL e do git
+    """Prompt text as a paste (bracketed paste), without Enter: the agent receives the text in its input field and the
+        user reviews and sends it. Field values take priority over the session. Returns (bytes, missing variables)."""
+    flat = lambda v: " ".join(clean(str(v)).split())  # noqa: E731  one line, no control characters
+    merged = {k: flat(v) for k, v in context.items() if v is not None}  # folder and branch come from the JSONL and from git
     merged.update({k: flat(v) for k, v in values.items() if v and v.strip()})
     text, missing = render(clean(body).strip(), merged)
     return PASTE_START + text.encode("utf-8") + PASTE_END, missing
 
 
-# ── sessão atual e contexto ────────────────────────────────────────────────
+# ── current session and context ────────────────────────────────────────────
 AGENT_LABELS = {"claude": "Claude Code", "codex": "Codex"}
 GIT_TIMEOUT = 5.0
 
 
 def choose_current(sessions: Sequence[AgentSession], chosen_id: Optional[str]) -> Optional[AgentSession]:
-    """A escolhida pelo usuário; senão a ativa mais recente; senão a mais recente (lista já ordenada)."""
+    """The one chosen by the user; otherwise the most recent active one; otherwise the most recent (list already sorted)."""
     if chosen_id:
         for s in sessions:
             if s.id == chosen_id:
@@ -240,7 +240,7 @@ def _git(runner, path: str, *args: str) -> Optional[str]:
 
 
 def context_for(session: Optional[AgentSession], runner) -> Dict[str, str]:
-    """Variáveis dos prompts. Só git de leitura: branch (quando o JSONL não traz) e o branch padrão do remoto."""
+    """Prompt variables. Read-only git only: branch (when the JSONL does not bring it) and the remote's default branch."""
     if session is None:
         return {}
     path = rules.worktree_path(session.cwd) or session.cwd or session.project_root
@@ -255,7 +255,7 @@ def context_for(session: Optional[AgentSession], runner) -> Dict[str, str]:
     return {k: v for k, v in ctx.items() if v}
 
 
-# ── escrita (só na pasta de prompts) ────────────────────────────────────────
+# ── writing (only in the prompts folder) ────────────────────────────────────
 def _free_path(folder: Path, stem: str) -> Path:
     path = folder / f"{stem}.md"
     n = 2
@@ -279,14 +279,14 @@ def create_category(root, name: str) -> Path:
 
 
 def _quoted(value: str) -> str:
-    """Valor do cabeçalho entre aspas simples: ` #` não vira comentário e `: ` não quebra a leitura."""
+    """Header value in single quotes: ` #` does not become a comment and `: ` does not break the parsing."""
     return "'" + value.replace("'", "''") + "'"
 
 
 def create_prompt(root, title: str, category: str, body: Optional[str] = None) -> Path:
-    """Novo arquivo a partir de um modelo, na subpasta da categoria. Nunca sobrescreve: acrescenta -2, -3."""
+    """New file from a template, in the category subfolder. Never overwrites: appends -2, -3."""
     title = " ".join((title or "").split()) or tr("Novo prompt")
-    category = " ".join((category or "").split()) or FALLBACK_CATEGORY  # uma linha: não injeta chave no cabeçalho
+    category = " ".join((category or "").split()) or FALLBACK_CATEGORY  # one line: does not inject a key into the header
     folder = create_category(root, category)
     path = _free_path(folder, slugify(title))
     text = body if body is not None else (
@@ -326,7 +326,7 @@ EXAMPLES = [
 
 
 def seed_global(root) -> List[Path]:
-    """Cria os exemplos na primeira execução. Se a pasta já existe, não toca em nada."""
+    """Creates the examples on first run. If the folder already exists, it touches nothing."""
     root = Path(root)
     if root.exists():
         return []

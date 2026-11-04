@@ -1,4 +1,4 @@
-"""WebSocket mínimo (RFC 6455) sobre o socket de um BaseHTTPRequestHandler."""
+"""Minimal WebSocket (RFC 6455) over the socket of a BaseHTTPRequestHandler."""
 
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ class WebSocket:
         self.send(text.encode("utf-8"), OP_TEXT)
 
     def recv(self) -> Optional[Tuple[int, bytes]]:
-        """Próxima mensagem completa (opcode, dados), respondendo ping; None quando fecha."""
+        """Next complete message (opcode, data), answering pings; None when it closes."""
         message = bytearray()
         message_op: Optional[int] = None
         while True:

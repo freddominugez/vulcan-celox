@@ -8,9 +8,9 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 NOTE_COLORS = ("amarelo", "rosa", "verde", "azul", "laranja", "roxo")
-# sem o acento da interface nem as cores de estado (verde, âmbar, vermelho)
+# without the interface accent or the state colors (green, amber, red)
 TAG_COLORS = ("#6ea8fe", "#a78bfa", "#f472b6", "#2dd4bf", "#c4a484", "#93c5fd", "#e879f9", "#a1a1aa")
-# paleta da v0.1: cada cor antiga vira a cor nova na mesma posição ao carregar
+# v0.1 palette: each old color becomes the new color at the same position on load
 LEGACY_TAG_COLORS = ("#f53003", "#e8b339", "#4cc38a", "#3fa7f5", "#a86cf0", "#f06cb4", "#36c5c5", "#9a9ba3")
 STATUSES = ("todo", "doing", "done")
 STATUS_LABELS = {"todo": "A fazer", "doing": "Em andamento", "done": "Concluída"}
@@ -26,7 +26,7 @@ def new_id() -> str:
 
 
 def _from_dict(cls, data: Optional[Dict[str, Any]]):
-    """Constrói a dataclass ignorando chaves desconhecidas e usando defaults nas ausentes."""
+    """Builds the dataclass ignoring unknown keys and using defaults for missing ones."""
     data = data if isinstance(data, dict) else {}
     names = {f.name for f in fields(cls)}
     obj = cls(**{k: v for k, v in data.items() if k in names})
@@ -62,7 +62,7 @@ class Note:
     order: int = 0
     created_at: str = field(default_factory=now_iso)
     updated_at: str = field(default_factory=now_iso)
-    terminal: Optional[str] = None  # id da sessão de terminal
+    terminal: Optional[str] = None  # terminal session id
 
     @property
     def title(self) -> str:
@@ -97,8 +97,8 @@ class Task:
     order: int = 0
     created_at: str = field(default_factory=now_iso)
     done_at: Optional[str] = None
-    terminal: Optional[str] = None  # id da sessão de terminal
-    assignee: Optional[str] = None  # responsável, texto livre
+    terminal: Optional[str] = None  # terminal session id
+    assignee: Optional[str] = None  # owner, free text
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

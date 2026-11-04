@@ -1,4 +1,4 @@
-"""Liga PTYs, registro de sessões, comandos digitados, memória em Markdown e índice geral."""
+"""Wires PTYs, the session registry, typed commands, Markdown memory and the general index."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class SessionHub:
     def __init__(self, app):
         self.app = app
         self.sessions = SessionStore(app.store)
-        self.sessions.close_orphans([])  # nenhum PTY sobrevive a um reinício do servidor
+        self.sessions.close_orphans([])  # no PTY survives a server restart
         self._trackers: Dict[str, InputTracker] = {}
         self._dirty: Set[str] = set()
         self._lock = threading.Lock()
@@ -63,7 +63,7 @@ class SessionHub:
             self._dirty.add(session_id)
 
     def finalize(self, pty) -> None:
-        """Processo terminou, terminal foi fechado ou o app está saindo: encerra e grava a memória."""
+        """Process ended, terminal was closed or the app is exiting: finishes and saves the memory."""
         before = self.sessions.get(pty.id)
         was_open = bool(before and before.is_open)
         record = self.sessions.close(pty.id, pty.exit_code)
@@ -95,7 +95,7 @@ class SessionHub:
             self.sessions.rename(session_id, title)
             self.mark_dirty(session_id)
 
-    # ── memória ──────────────────────────────────────────────────────────
+    # ── memory ─────────────────────────────────────────────────────────
     def _render(self, record, pty=None) -> str:
         nb = self.app.notebook
         tasks = [t for t in nb.tasks if t.terminal == record.id]
@@ -110,12 +110,12 @@ class SessionHub:
         return render_session_md(record, tasks, notes, dict(nb.tags), transcript, truncated,
                                  agents=self.agents_for(record.id))
 
-    # ── sessões de agente pareadas ───────────────────────────
+    # ── paired agent sessions ──────────────────────────────────────────
     def _agent_service(self):
-        return getattr(self.app, "agents", None)  # o hub nasce antes do serviço de agentes
+        return getattr(self.app, "agents", None)  # the hub is created before the agents service
 
     def agents_for(self, terminal_id: str) -> list:
-        """Sessões de agente pareadas com a aba, completas (arquivos e comandos), da mais antiga para a mais nova."""
+        """Agent sessions paired with the tab, complete (files and commands), from oldest to newest."""
         service = self._agent_service()
         if service is None:
             return []
@@ -124,7 +124,7 @@ class SessionHub:
         return sorted(found, key=lambda s: s.started_at)
 
     def agent_tags(self) -> Dict[str, list]:
-        """{aba: [{id, agent}]} para a árvore de sessões e o índice geral, a partir da lista leve."""
+        """{tab: [{id, agent}]} for the session tree and the general index, built from the light list."""
         service = self._agent_service()
         if service is None:
             return {}
@@ -156,7 +156,7 @@ class SessionHub:
             self.write_index()
         return path
 
-    # ── índice geral ─────────────────────────────────────────────────────
+    # ── general index ──────────────────────────────────────────────────
     def index_path(self) -> Path:
         return Path(self.app.data_dir) / GENERAL_INDEX_FILENAME
 
@@ -180,39 +180,39 @@ class SessionHub:
             self._flush_once()
 
     def _flush_once(self) -> None:
-        """Uma volta da thread de gravação: nenhuma exceção a derruba."""
+        """One iteration of the writer thread: no exception brings it down."""
         try:
             self.flush()
-        except Exception as exc:  # noqa: BLE001  a próxima volta tenta de novo
+        except Exception as exc:  # noqa: BLE001  the next iteration tries again
             self._error(exc)
 
     def flush(self) -> None:
-        """Grava as memórias pendentes e o índice geral uma vez só no fim."""
+        """Saves the pending memories and the general index once at the end."""
         with self._lock:
             dirty, self._dirty = self._dirty, set()
         wrote = False
         for session_id in dirty:
             try:
                 wrote = self.write_memory(session_id, index=False) is not None or wrote
-            except Exception as exc:  # noqa: BLE001  uma sessão com problema não impede as outras
+            except Exception as exc:  # noqa: BLE001  one problematic session does not stop the others
                 self.mark_dirty(session_id)
                 self._error(exc)
         if wrote:
             self.write_index()
 
     def _error(self, exc: Exception) -> None:
-        """Guarda o último erro na memória e na pasta de dados, para o --doctor (outro processo) ver."""
+        """Stores the last error in memory and in the data folder, so --doctor (another process) can see it."""
         self.last_error = f"{type(exc).__name__}: {exc}"
         try:
             self.app.store.save("memoria_status", {"last_error": self.last_error,
                                                    "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
-        except Exception:  # noqa: BLE001  disco cheio ou pasta sumiu: fica só na memória
+        except Exception:  # noqa: BLE001  disk full or folder gone: it stays in memory only
             pass
 
     def _on_notebook_change(self, kind: str) -> None:
         if kind not in ("tasks", "notes", "tags", "all"):
             return
-        with self._nb_lock:  # várias threads HTTP mudam o caderno ao mesmo tempo
+        with self._nb_lock:  # several HTTP threads change the notebook at the same time
             if self._nb_timer is not None:
                 self._nb_timer.cancel()
             self._nb_timer = threading.Timer(NOTEBOOK_DEBOUNCE_SECONDS, self.refresh_linked_memories)
@@ -220,7 +220,7 @@ class SessionHub:
             self._nb_timer.start()
 
     def refresh_linked_memories(self) -> None:
-        """Tarefas, post-its ou tags mudaram: regrava as memórias das sessões afetadas."""
+        """Tasks, post-its or tags changed: rewrites the memories of the affected sessions."""
         nb = self.app.notebook
         linked = {t.terminal for t in nb.tasks if t.terminal} | {n.terminal for n in nb.notes if n.terminal}
         for record in self.sessions.list():

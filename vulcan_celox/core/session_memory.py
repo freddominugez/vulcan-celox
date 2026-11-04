@@ -1,4 +1,4 @@
-"""Memória de uma sessão de terminal em Markdown: o que foi executado e o que foi anotado."""
+"""Memory of a terminal session in Markdown: what was run and what was noted."""
 
 from __future__ import annotations
 
@@ -23,10 +23,10 @@ _ESC2 = re.compile(r"\x1b[@-Z\\-_]")
 
 # ── registro do terminal ─────────────────────────────────────────────────────
 def strip_terminal(data) -> Tuple[str, bool]:
-    """Converte a saída crua do PTY em texto legível. Retorna (texto, truncado).
+    """Converts the raw PTY output into readable text. Returns (text, truncated).
 
-    Remove cores e sequências de controle, aplica retorno de carro, backspace e
-    apagamento de linha do jeito que o terminal mostraria.
+        Removes colors and control sequences, applies carriage return, backspace and
+        line erase the way the terminal would show them.
     """
     text = data.decode("utf-8", errors="replace") if isinstance(data, (bytes, bytearray)) else str(data)
     text = _OSC.sub("", text)
@@ -40,7 +40,7 @@ def strip_terminal(data) -> Tuple[str, bool]:
             m = _CSI.match(text, i)
             if m:
                 params, final = m.group(1), m.group(2)
-                if final == "K":  # apaga até o fim da linha (modo 0)
+                if final == "K":  # erase to the end of the line (mode 0)
                     if params in ("", "0"):
                         del line[col:]
                     elif params == "2":
@@ -102,7 +102,7 @@ def _put(line: List[str], col: int, ch: str) -> None:
 
 
 def extract_transcript(markdown: str) -> Tuple[str, bool]:
-    """Recupera o registro de uma memória já gravada (para regenerar sessões encerradas)."""
+    """Recovers the record of an already saved memory (to regenerate ended sessions)."""
     start = markdown.find(TRANSCRIPT_START)
     end = markdown.find(TRANSCRIPT_END, start + 1)
     if start == -1 or end == -1:
@@ -113,7 +113,7 @@ def extract_transcript(markdown: str) -> Tuple[str, bool]:
     return (fence.group(2) if fence else ""), truncated
 
 
-# ── Markdown da sessão ───────────────────────────────────────────────────────
+# ── session Markdown ───────────────────────────────────────────────────────
 def parse_iso(value: Optional[str]) -> Optional[datetime]:
     if not value:
         return None
@@ -154,7 +154,7 @@ def memory_path(data_dir: Path, record) -> Path:
 
 
 def doc_path(memory_file) -> Optional[Path]:
-    """Documentação gerada por IA fica ao lado da memória: <memória>.doc.md."""
+    """AI-generated documentation sits next to the memory: <memory>.doc.md."""
     if not memory_file:
         return None
     path = Path(memory_file)
@@ -177,12 +177,12 @@ def _tag_list(ids: Iterable[str], tags: Dict[str, Tag]) -> str:
 
 AGENT_LABELS = {"claude": "Claude Code", "codex": "Codex"}
 PUBLISH_LABELS = {"none": "sem commit", "committed": "commit feito, falta o push", "pushed": "push feito",
-                  "pr_open": "PR aberto"}  # a tr() entra na saída
+                  "pr_open": "PR aberto"}  # tr() goes into the output
 MAX_AGENT_FILES = 15
 
 
 def agent_lines(agents) -> List[str]:
-    """Resumo de cada sessão de agente pareada com a aba, igual na memória e no texto para a IA."""
+    """Summary of each agent session paired with the tab, the same in the memory and in the text for the AI."""
     lines: List[str] = []
     for s in agents:
         root = (s.project_root or s.cwd or "").rstrip("/") + "/"
@@ -297,7 +297,7 @@ def render_session_md(record, tasks: List[Task], notes: List[Note], tags: Dict[s
     return "\n".join(lines)
 
 
-# ── índice geral ─────────────────────────────────────────────────────────────
+# ── general index ─────────────────────────────────────────────────────────────
 GENERAL_INDEX_FILENAME = "INDICE.md"
 GENERAL_DOC_FILENAME = "DOCUMENTACAO.md"
 

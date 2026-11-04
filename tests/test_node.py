@@ -1,12 +1,13 @@
-"""Node pelo Lerd (padrão, gerenciador, instaladas; instalar, tornar padrão e remover).
+"""Node through Lerd (default, manager, installed; install, make default and remove).
 
-As instaladas vêm de GET /api/node-versions, a rota que o painel do Lerd 1.37.1 usa; nesta máquina ela respondeu
-["24","26"], o mesmo que `mise ls node`.
+The installed ones come from GET /api/node-versions, the route the Lerd 1.37.1 dashboard uses; on this machine it answered
+["24","26"], the same as `mise ls node`.
 """
 
 import os
 from unittest import mock
 
+from tests.helpers import unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 
 
@@ -36,6 +37,7 @@ class NodeApiTest(ServerTestCase):
         data = self.request("GET", "/api/environment/node")[1]
         self.assertEqual(data, {"default": "22", "manager": "mise", "installed": ["24", "26"]})
 
+    @unix_only(SEM_LERD)
     def test_acoes(self):
         status, info, _ = self.request("POST", "/api/environment/node/20/install")
         self.assertEqual(status, 201, info)

@@ -1,7 +1,6 @@
-"""Uso por turno no índice (tabela agent_usage)."""
+"""Per-turn usage in the index (agent_usage table)."""
 
 import shutil
-import sqlite3
 
 from tests.helpers import FIXTURES, TempDirTestCase
 from vulcan_celox.core.agents.index import SCHEMA_VERSION, USAGE_FIELDS, AgentIndex
@@ -17,7 +16,7 @@ SESSAO_GRANDE = FIXTURES / "agents" / "claude" / "projects" / "-Users-dev-projet
 
 def rows_by_key(rows):
     out = {}
-    for r in rows:  # a mesma chave regravada: vale a última, como no upsert do índice
+    for r in rows:  # the same key rewritten: the last one wins, as in the index upsert
         out[r["key"]] = r
     return out
 
@@ -31,7 +30,7 @@ class ClaudeUsageTest(TempDirTestCase):
                           a["reasoning"]), (2, 250, 1000, 1000, 4000, 30))
         self.assertEqual(a["at"], "2026-10-30T12:00:05.000Z")
         self.assertEqual(a["model"], "claude-opus-5-5")
-        # sem a divisão 5m/1h, a escrita de cache conta como 5m
+        # without the 5m/1h split, the cache write counts as 5m
         self.assertEqual((rows["msg_B"]["cache_write_5m"], rows["msg_B"]["cache_write_1h"]), (700, 0))
         self.assertEqual(rows["msg_C"]["model"], "claude-sonnet-5-5")
 
@@ -47,7 +46,7 @@ class ClaudeUsageTest(TempDirTestCase):
 
     def test_leitura_em_partes_regrava_o_turno_aberto(self):
         data = CLAUDE.read_bytes()
-        cut = data.index(b"\n", data.index(b"msg_A")) + 1  # só a primeira linha de msg_A
+        cut = data.index(b"\n", data.index(b"msg_A")) + 1  # only the first line of msg_A
         part = self.tmp / "s.jsonl"
         part.write_bytes(data[:cut])
         first = read_session("claude", part)
@@ -64,9 +63,9 @@ class CodexUsageTest(TempDirTestCase):
         rows = read_session("codex", CODEX).usage
         got = [(r["input"], r["cache_read"], r["output"], r["reasoning"], r["cache_write_5m"]) for r in rows]
         self.assertEqual(got, [
-            (20513 - 12032, 12032, 144, 0, 0),                          # primeiro total
-            ((41246 - 32512) - (20513 - 12032), 32512 - 12032, 100, 11, 0),  # o total repetido não gera linha
-            (5000 - 1000, 1000, 80, 5, 0),                              # total menor: retomada, recomeça a conta
+            (20513 - 12032, 12032, 144, 0, 0),                          # first total
+            ((41246 - 32512) - (20513 - 12032), 32512 - 12032, 100, 11, 0),  # the repeated total generates no row
+            (5000 - 1000, 1000, 80, 5, 0),                              # smaller total: resumption, the count starts over
             ((9000 - 4000) - (5000 - 1000), 3000, 40, 4, 200),
         ])
         self.assertEqual({r["model"] for r in rows}, {"gpt-5.5-codex"})

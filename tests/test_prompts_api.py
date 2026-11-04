@@ -1,4 +1,4 @@
-"""Rotas dos prompts, criação com confirmação para a pasta do projeto e abertura só de arquivos de prompt."""
+"""Prompt routes, creation with confirmation for the project folder and opening only prompt files."""
 
 from pathlib import Path
 
@@ -27,7 +27,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
         self.assertEqual(by_id["seguranca"]["missing"], [])
         self.assertEqual([c["name"] for c in data["categories"]][:5], prompts.DEFAULT_CATEGORIES)
         self.assertFalse(data["project"]["exists"])
-        self.assertEqual(data["project"]["dir"], "/Users/dev/projeto/.vulcan/prompts")
+        self.assertEqual(data["project"]["dir"], str(Path("/Users/dev/projeto/.vulcan/prompts")))
 
     def test_sessao_escolhida_e_desconhecida(self):
         codex = "019a0000-1111-7222-8333-444444444444"
@@ -40,7 +40,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
         data = self.get("/api/prompts?pinned=1&cwd=/Users/dev/loja")
         self.assertTrue(data["prompts"])
         self.assertTrue(all(p["pin"] for p in data["prompts"]))
-        self.assertEqual(data["session"]["project"], "loja")  # a sessão mais recente daquela pasta
+        self.assertEqual(data["session"]["project"], "loja")  # the most recent session of that folder
 
     def test_criar_prompt_global_e_categoria(self):
         self.get("/api/prompts")
@@ -56,7 +56,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
     def test_prompt_do_projeto_pede_confirmacao_para_criar_a_pasta(self):
         project = self.tmp / "loja-real"
         project.mkdir()
-        self.app.store.save("node_projects", {"loja-real": str(project)})  # pasta conhecida
+        self.app.store.save("node_projects", {"loja-real": str(project)})  # known folder
         body = {"title": "Só neste projeto", "category": "Testes", "scope": "project", "project_root": str(project)}
         status, data = self.post("/api/prompts", body)
         self.assertEqual((status, data.get("needs_confirmation")), (409, True))
@@ -66,7 +66,7 @@ class PromptsApiTest(test_agents_api.AgentsServerCase):
         self.assertTrue(Path(data["path"]).is_relative_to(project / ".vulcan" / "prompts"))
 
     def test_pasta_desconhecida_ou_dos_agentes_recusada(self):
-        """Project_root precisa ser site, projeto Node ou sessão; nunca a pasta de dados de um agente."""
+        """project_root must be a site, Node project or session; never an agent's data folder."""
         stranger = self.tmp / "qualquer"
         stranger.mkdir()
         claude = self.tmp / "claude-home"

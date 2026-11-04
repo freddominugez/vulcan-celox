@@ -3,14 +3,14 @@ import json
 import logging
 import unittest
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.ai import AiError, AnthropicClient
 from vulcan_celox.core.keychain import KeychainStore, MemoryKeyStore, mask, valid_key
 from vulcan_celox.core.runner import FakeRunner, Result
 from vulcan_celox.server.app import VulcanApp
 
-KEY = "sk-ant-api03-" + "x1Y2z3" * 8  # sintética
+KEY = "sk-ant-api03-" + "x1Y2z3" * 8  # synthetic
 MODELS = {"data": [{"id": "claude-sonnet-5-5", "display_name": "Claude Sonnet 5"},
                    {"id": "claude-opus-5", "display_name": "Claude Opus 5"}]}
 
@@ -70,7 +70,7 @@ class ClientTest(TempDirTestCase):
 
 
 class RecusaTest(unittest.TestCase):
-    """Recusa vira erro claro; texto parcial não passa por documento pronto."""
+    """A refusal becomes a clear error; partial text does not pass as a finished document."""
 
     def test_recusa_com_e_sem_categoria(self):
         for extra, esperado in (({"stop_details": {"type": "refusal", "category": "cyber"}}, "categoria: cyber"), ({}, "recusou"),
@@ -127,11 +127,12 @@ class AiConfigApiTest(ServerTestCase):
 
 
 class DefaultKeystoreTest(TempDirTestCase):
+    @unix_only("o cofre do Windows usa ctypes, sem runner")
     def test_app_usa_runner_do_app(self):
         runner = FakeRunner()
         app = VulcanApp(env={"VULCAN_CELOX_HOME": str(self.tmp / "h"), "VULCAN_LERD_BIN": str(self.tmp / "x"),
                              "VULCAN_VALET_BIN": str(self.tmp / "y"), "HOME": str(self.tmp)}, runner=runner).start()
         try:
-            self.assertIs(app.keystore.runner, runner)  # testes nunca tocam o Keychain real
+            self.assertIs(app.keystore.runner, runner)  # tests never touch the real Keychain
         finally:
             app.shutdown()

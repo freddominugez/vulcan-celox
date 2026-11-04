@@ -1,4 +1,4 @@
-// Tema da interface: Sistema (padrão), Claro ou Escuro. A área do terminal mantém o tema de cada aba nos dois.
+// Interface theme: System (default), Light or Dark. The terminal area keeps each tab's own theme in both.
 
 import { patch } from "./api.mjs";
 import { t } from "./i18n.mjs";
@@ -20,7 +20,7 @@ function apply() {
 
 function remember(value) {
   pref = THEME_OPTIONS.some(([id]) => id === value) ? value : "sistema";
-  try { localStorage.setItem(KEY, pref); } catch (_) { /* vale só nesta janela */ }
+  try { localStorage.setItem(KEY, pref); } catch (_) { /* applies only to this window */ }
   apply();
 }
 
@@ -29,7 +29,7 @@ export async function setThemePref(value) {
 }
 
 export function startTheme() {
-  try { pref = localStorage.getItem(KEY) || "sistema"; } catch (_) { /* sem armazenamento */ }
+  try { pref = localStorage.getItem(KEY) || "sistema"; } catch (_) { /* no storage */ }
   if (media) media.addEventListener("change", () => { if (pref === "sistema") apply(); });
   patch("/api/preferences", {}).then((prefs) => remember(prefs.theme)).catch(() => {});
 }

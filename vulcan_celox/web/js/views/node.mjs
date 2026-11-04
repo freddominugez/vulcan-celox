@@ -1,5 +1,5 @@
-// Projetos Node: lista com sugestões e a página de cada projeto. Scripts rodam numa aba de terminal à
-// vista; parar é Ctrl-C na aba do próprio projeto. O app não fala com a Vercel nem com o Supabase remoto.
+// Node projects: list with suggestions and a page per project. Scripts run in a terminal tab in
+// view; stopping is Ctrl-C in the project's own tab. The app does not talk to Vercel nor to remote Supabase.
 
 import { every, get, hasBridge, post } from "../api.mjs";
 import { esc, icon, reportError, shortPath, toast } from "../dom.mjs";
@@ -10,7 +10,7 @@ import { terminals } from "../terminals.mjs";
 
 const NAME = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const MAIN_SCRIPTS = ["dev", "start", "build", "preview", "test", "lint"];
-// estados de projeto quebrado, mostrados no lugar do framework
+// broken-project states, shown in place of the framework
 const ESTADOS = { sumiu: t("pasta ausente"), nenhum: t("sem package.json"), erro: t("package.json ilegível") };
 
 function slug(text) {
@@ -18,7 +18,7 @@ function slug(text) {
     .replace(/^[-._]+|[-._]+$/g, "").slice(0, 64) || "projeto";
 }
 
-/** Diálogo de adicionar: pasta (com seletor nativo) e nome; o servidor confere o package.json. */
+/** Add dialog: folder (with native picker) and name; the server checks package.json. */
 export async function addNodeDialog(path = "") {
   let data = null;
   const body = `<p>${t("Escolha a pasta raiz do projeto, onde fica o <code>package.json</code>. Nada é gravado nela.")}</p>

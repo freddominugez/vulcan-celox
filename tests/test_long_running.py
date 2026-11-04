@@ -1,4 +1,4 @@
-"""Abas de processo longo (servidor de desenvolvimento, fila, logs, túnel)."""
+"""Long-running process tabs (development server, queue, logs, tunnel)."""
 
 import os
 

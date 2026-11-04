@@ -1,4 +1,4 @@
-// Post-its de um site (ou Global): editar no lugar, cores, fixar, tags e arrastar para reordenar.
+// Sticky notes of a site (or Global): in-place editing, colors, pinning, tags and drag to reorder.
 
 import { del, get, patch, post } from "../api.mjs";
 import { $, debounce, flashFocus, esc, icon, reportError } from "../dom.mjs";
@@ -22,7 +22,7 @@ export class NotesView {
     this.root.addEventListener("click", (e) => this.onClick(e));
     this.root.addEventListener("input", (e) => this.onInput(e));
     this.root.addEventListener("keydown", (e) => this.onKey(e));
-    // o card só fica arrastável enquanto a alça está pressionada (no WebKit, draggable impede editar o texto)
+    // the card is only draggable while the handle is pressed (in WebKit, draggable prevents editing the text)
     this.root.addEventListener("pointerdown", (e) => {
       const grip = e.target.closest(".note-grip");
       if (grip) grip.closest(".note").setAttribute("draggable", "true");
@@ -54,7 +54,7 @@ export class NotesView {
     if (this.tag) params.set("tag", this.tag);
     try {
       const [data, tags] = await Promise.all([get(`/api/notes?${params}`), get("/api/tags")]);
-      if (!this.root.isConnected) return; // a tela foi trocada enquanto carregava
+      if (!this.root.isConnected) return; // the screen was switched while loading
       this.notes = data.notes;
       this.colors = data.colors;
       this.tags = tags.tags;
@@ -123,7 +123,7 @@ export class NotesView {
     grid.querySelectorAll(".note-text").forEach((ta) => this.autosize(ta));
     const card = flashFocus(grid, this.options, (id) => `.note[data-id="${id}"]`);
     const text = card && card.querySelector(".note-text");
-    if (text && !text.value) text.focus(); // post-it novo criado pelo menu da sessão: já pronto para escrever
+    if (text && !text.value) text.focus(); // new sticky note created from the session menu: ready to type
   }
 
   autosize(textarea) {
@@ -213,7 +213,7 @@ export class NotesView {
     const card = event.target.closest(".note");
     if (!card || !this.dragging || card.dataset.id === this.dragging) return;
     try {
-      // posição relativa a outro post-it: o índice da lista filtrada (sessão, busca, tag) não vale para o site inteiro
+      // position relative to another note: the index in the filtered list (session, search, tag) is not valid for the whole site
       await post(`/api/notes/${this.dragging}/move`, { target: card.dataset.id });
       this.dragging = null;
       await this.load();

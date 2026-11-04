@@ -1,4 +1,4 @@
-"""Tabela de preços e custo estimado por turno."""
+"""Price table and estimated cost per turn."""
 
 import json
 
@@ -18,7 +18,7 @@ class PrecosTest(TempDirTestCase):
 
     def test_custo_de_cada_tipo_de_token_bate_com_a_conta(self):
         t = self.table()
-        # Claude Opus 5.5: $4 entrada, $20 saída, $0.20 leitura, $5 escrita 5m, $8 escrita 1h (por milhão)
+        # Claude Opus 5.5: $4 input, $20 output, $0.20 read, $5 5m write, $8 1h write (per million)
         self.assertAlmostEqual(pricing.cost(row("claude-opus-5-5", input=1_000_000), t), 4.0)
         self.assertAlmostEqual(pricing.cost(row("claude-opus-5-5", output=500_000), t), 10.0)
         self.assertAlmostEqual(pricing.cost(row("claude-opus-5-5", cache_read=2_000_000), t), 0.40)
@@ -31,7 +31,7 @@ class PrecosTest(TempDirTestCase):
     def test_data_de_versao_e_contexto_longo(self):
         t = self.table()
         self.assertAlmostEqual(pricing.cost(row("claude-sonnet-4-5-20250929", input=1_000_000), t), 3.0)
-        # gpt-6.1-sol: prompt acima de 272 mil tokens usa o preço de contexto longo
+        # gpt-6.1-sol: a prompt above 272 thousand tokens uses the long-context price
         self.assertAlmostEqual(pricing.cost(row("gpt-6.1-sol", input=100_000, output=1000), t), 0.2 + 0.01)
         self.assertAlmostEqual(pricing.cost(row("gpt-6.1-sol", input=300_000, output=1000), t), 1.2 + 0.015)
 
@@ -39,8 +39,8 @@ class PrecosTest(TempDirTestCase):
         t = self.table()
         self.assertIsNone(pricing.cost(row("modelo-novo", input=10), t))
         self.assertIsNone(pricing.cost(row("", input=10), t))
-        self.assertIsNone(pricing.cost(row("gpt-5.5", input=10, cache_write_5m=5), t))  # página sem preço de escrita
-        self.assertEqual(pricing.cost(row("gpt-5.5"), t), 0.0)  # sem tokens: custo zero de verdade
+        self.assertIsNone(pricing.cost(row("gpt-5.5", input=10, cache_write_5m=5), t))  # page without a write price
+        self.assertEqual(pricing.cost(row("gpt-5.5"), t), 0.0)  # no tokens: truly zero cost
 
     def test_arquivo_do_usuario_vence_o_padrao(self):
         (self.tmp / "precos.json").write_text(json.dumps({"moeda": "USD", "modelos": {
@@ -51,7 +51,7 @@ class PrecosTest(TempDirTestCase):
         self.assertIsNone(warning)
         self.assertAlmostEqual(pricing.cost(row("claude-opus-5-5", input=1_000_000), t), 1.0)
         self.assertEqual(pricing.lookup(t, "meu-modelo")["fonte"], "usuário")
-        self.assertAlmostEqual(pricing.cost(row("claude-sonnet-5-5", input=1_000_000), t), 2.0)  # resto do padrão
+        self.assertAlmostEqual(pricing.cost(row("claude-sonnet-5-5", input=1_000_000), t), 2.0)  # rest of the default
 
     def test_json_invalido_mantem_o_padrao_e_avisa_no_doctor(self):
         (self.tmp / "precos.json").write_text("{ isto não é json")

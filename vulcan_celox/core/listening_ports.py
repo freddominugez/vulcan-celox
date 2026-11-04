@@ -1,4 +1,4 @@
-"""Portas em escuta que cada aba abriu: só os processos do PTY e seus descendentes, nunca os do resto da máquina."""
+"""Listening ports each tab opened: only the PTY's processes and their descendants, never the rest of the machine's."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ LISTEN = "0A"
 
 
 def parse_netstat(text: str, pids: Iterable[int]) -> List[Tuple[int, int, str]]:
-    """Saída de `netstat -ano -p tcp`: (pid, porta, comando), só de quem está em `pids` e em escuta."""
+    """Output of `netstat -ano -p tcp`: (pid, port, command), only for those in `pids` and listening."""
     wanted = set(pids)
     found: List[Tuple[int, int, str]] = []
     for line in text.splitlines():
@@ -40,9 +40,9 @@ def netstat_ports(runner, pids: Iterable[int]) -> Tuple[List[Tuple[int, int, str
     return rows, ""
 
 
-def process_tree(runner) -> Optional[Dict[int, List[int]]]:
-    """pai -> filhos. None se o `ps` não rodou."""
-    if sys.platform == "win32":
+def process_tree(runner, platform: str = sys.platform) -> Optional[Dict[int, List[int]]]:
+    """parent -> children. None if `ps` did not run."""
+    if platform == "win32":
         from vulcan_celox.core.win32 import children_map
         return children_map()
     result = runner.run(["ps", "-A", "-o", "pid=,ppid="], timeout=TIMEOUT)
@@ -69,7 +69,7 @@ def descendants(children: Dict[int, List[int]], root: int) -> Set[int]:
 
 
 def parse_lsof(text: str) -> List[Tuple[int, int, str]]:
-    """Saída de `lsof -F pcn`: (pid, porta, comando). `n` termina em :porta, com ou sem endereço."""
+    """Output of `lsof -F pcn`: (pid, port, command). `n` ends in :port, with or without an address."""
     found: List[Tuple[int, int, str]] = []
     pid, command = 0, ""
     for line in text.splitlines():
@@ -92,11 +92,11 @@ def lsof_ports(runner, pids: Iterable[int]) -> Tuple[List[Tuple[int, int, str]],
     result = runner.run(["lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-a", "-p", wanted, "-F", "pcn"], timeout=TIMEOUT)
     if result.code in (126, 127) or result.timed_out:
         return [], tr("lsof não rodou")
-    return parse_lsof(result.stdout), ""  # lsof sai com 1 quando nada escuta
+    return parse_lsof(result.stdout), ""  # lsof exits with 1 when nothing is listening
 
 
 def proc_listening(proc_root: Path) -> Dict[str, int]:
-    """Inode do socket -> porta, em /proc/net/tcp e tcp6, só os em escuta."""
+    """Socket inode -> port, in /proc/net/tcp and tcp6, listening ones only."""
     inodes: Dict[str, int] = {}
     for name in ("tcp", "tcp6"):
         try:
@@ -119,7 +119,7 @@ def proc_ports(proc_root: Path, pids: Iterable[int]) -> Tuple[List[Tuple[int, in
             links = [os.readlink(folder / "fd" / fd) for fd in os.listdir(folder / "fd")]
             command = (folder / "comm").read_text(encoding="utf-8", errors="replace").strip()
         except OSError:
-            continue  # o processo acabou ou é de outro usuário
+            continue  # the process ended or belongs to another user
         for link in links:
             if link.startswith("socket:[") and link[8:-1] in inodes:
                 found.append((pid, inodes[link[8:-1]], command))
@@ -135,7 +135,7 @@ class PortWatcher:
         self.cached: Optional[Tuple[float, Tuple, Dict]] = None
 
     def ports(self, tabs: List[Tuple[str, int]]) -> Dict:
-        """`tabs`: (id da aba, pid do PTY). Falha vira lista vazia com motivo, nunca erro."""
+        """`tabs`: (tab id, PTY pid). A failure becomes an empty list with a reason, never an error."""
         key = tuple(sorted(tabs))
         now = self.clock()
         with self.lock:
@@ -148,7 +148,7 @@ class PortWatcher:
     def _read(self, tabs: List[Tuple[str, int]]) -> Dict:
         if not tabs:
             return {"ports": {}, "reason": ""}
-        children = process_tree(self.runner)
+        children = process_tree(self.runner, self.platform)
         if children is None:
             return {"ports": {}, "reason": tr("ps não rodou")}
         owners: Dict[int, str] = {}
@@ -163,6 +163,6 @@ class PortWatcher:
             rows, reason = proc_ports(self.proc_root, owners)
         out: Dict[str, Dict[int, Dict]] = {}
         for pid, port, command in rows:
-            if pid in owners:  # o que não é da aba não aparece, mesmo se o comando devolver
+            if pid in owners:  # what does not belong to the tab does not appear, even if the command returns it
                 out.setdefault(owners[pid], {}).setdefault(port, {"port": port, "pid": pid, "command": command})
         return {"ports": {tab: sorted(ports.values(), key=lambda p: p["port"]) for tab, ports in out.items()}, "reason": reason}

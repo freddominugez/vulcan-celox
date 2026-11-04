@@ -1,6 +1,6 @@
 # Vulcan Celox: manual técnico
 
-Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.2.0. Para um passeio mais curto, leia [architecture.md](architecture.md).
+Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.2.1. Para um passeio mais curto, leia [architecture.md](architecture.md).
 
 Caminhos escritos como `core/...`, `server/...`, `web/...` e `ui/...` são relativos a `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Objetivos que moldam o código:
 - Nunca apagar nada de forma definitiva.
 - Tudo testável sem janela, sem Lerd real e sem agentes reais.
 
-Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.1.1. A versão 1.2.0 acrescenta versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
+Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.1.1. Desde a 1.2.0 há versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
 
 ## 2. Decisões de arquitetura
 
@@ -306,7 +306,7 @@ Encerramento: `terminate_pty` manda `SIGHUP` e `SIGTERM` ao grupo e `SIGKILL` de
 
 `/ws/terminals/<id>` leva entrada e saída em quadros binários. Quadros de texto levam JSON: `resize` (1 a 1000 linhas e colunas), `input` e `exit`. `ClientSender` dá a cada cliente uma fila limitada a 4 MB e uma thread de envio própria. A leitora do PTY só enfileira, então um cliente lento nunca para a leitora, os outros clientes nem o processo. Cliente acima do limite é desligado.
 
-Do lado da interface, `web/js/terminals.mjs` usa xterm.js 6 com os addons fit, web-links, search, WebGL, unicode 11 e serialize. Reconecta sozinho até 5 vezes, com espera crescente. Depois a aba avisa, e Enter tenta de novo.
+Do lado da interface, `web/js/terminal-session.mjs` usa xterm.js 6 com os addons fit, web-links, search, WebGL, unicode 11 e serialize. Reconecta sozinho até 5 vezes, com espera crescente. Depois a aba avisa, e Enter tenta de novo.
 
 ### Criar uma aba
 
@@ -493,7 +493,8 @@ Os dois são recusados com 409 se o projeto tiver `.harness/`.
 | `js/sidebar.mjs`, `js/session-tree.mjs` | Grupos da barra lateral, listas de sites e a seção Sessões |
 | `js/palette.mjs` | Paleta de comandos (⌘K) |
 | `js/global-events.mjs` | Ouvintes e atalhos globais |
-| `js/terminals.mjs`, `js/terminal-panel.mjs` | Área de terminais e o painel inferior nas telas sem terminal |
+| `js/terminals.mjs` (entrada), `js/terminal-workspace.mjs`, `-session`, `-pool`, `-tabs`, `-content`, `-commands`, `-search`, `js/terminal-panel.mjs` | Área de terminais e o painel inferior nas telas sem terminal |
+| `js/lerd-setup.mjs` | A instalação opcional do Lerd: o comando oficial, mostrado antes, num terminal à vista |
 | `js/api.mjs` | Cliente da API, `every`, `wsUrl`, `native`, `isNative`, `hasBridge`, `isMac` |
 | `js/dom.mjs`, `js/markdown.mjs`, `js/themes.mjs`, `js/ai.mjs`, `js/agents-ui.mjs`, `js/current-session.mjs`, `js/prompt-bar.mjs`, `js/folder-dialog.mjs`, `js/site-add.mjs`, `js/help-content.mjs` | Peças comuns |
 
@@ -669,7 +670,7 @@ Classes base: `tests/helpers.py` (`TempDirTestCase`) e `tests/server_helpers.py`
 
 | Item | Situação |
 |------|----------|
-| Sete arquivos acima de 400 linhas: `web/js/terminals.mjs` (1126), `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Aceito para o 1.0, porque dividir terminal e janela sem teste de navegador traz mais risco que ganho. `tests/test_tamanho_arquivos.py` impede que cresçam e barra arquivo novo acima de 400 |
+| Seis arquivos acima de 400 linhas: `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Aceito para o 1.0, porque dividir terminal e janela sem teste de navegador traz mais risco que ganho. `tests/test_tamanho_arquivos.py` impede que cresçam e barra arquivo novo acima de 400 |
 | O pacote macOS não embute Python e não é notarizado | Tem só assinatura ad hoc. `--verificar-dependencias` explica e oferece instalar. `packaging/LEIA-ME.md` explica como abrir um app sem certificado da Apple |
 | Linux | Versões de teste como pre-release; sem Release estável até o aceite num desktop real |
 | Windows | Versões de teste como pre-release, testadas só nas máquinas da CI. Indisponível: Lerd e Valet, o hook opcional, clique em caminhos `C:\...`, a checagem de primeiro plano antes de escrever na aba. Sem instalador nem assinatura |

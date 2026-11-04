@@ -1,14 +1,15 @@
-# Sensores de navegador da aba Código, do terminal e dos temas. Carregado por scripts/validate.sh, que define
-# isolated_env, step, CLIP_JS, TMP_ROOT e PY.
+# shellcheck shell=bash
+# Browser sensors for the Code tab, the terminal and the themes. Loaded by scripts/validate.sh, which defines
+# isolated_env, step, CLIP_JS, TMP_ROOT and PY.
 
-# cada seletor começa como erro pendente e sai da lista quando aparece; o snapshot falha (3) se algum faltar
+# each selector starts as a pending error and leaves the list when it appears; the snapshot fails (3) if any is missing
 expect() {
   printf '%s' "[$1].forEach(function (s) { var tag = 'ausente: ' + s; window.__vtErrors.push(tag);
     var t = setInterval(function () { if (document.querySelector(s)) { var i = window.__vtErrors.indexOf(tag);
       if (i >= 0) window.__vtErrors.splice(i, 1); clearInterval(t); } }, 150); });"
 }
 step "CodeMirror vendorizado carrega com a CSP do app"
-# aparece como erro pendente até o visor, o diff e cada linguagem montarem de verdade no WKWebView
+# shows as a pending error until the viewer, the diff and each language actually mount in the WKWebView
 CM_JS="(function () { var tag = 'CodeMirror não montou'; window.__vtErrors.push(tag);
   var s = document.createElement('script'); s.src = 'vendor/codemirror.js';
   s.onerror = function () { window.__vtErrors.push('vendor/codemirror.js recusado'); };
@@ -48,15 +49,15 @@ CODE_JS="(function () { var tag = 'aba Código incompleta'; window.__vtErrors.pu
     }
   }, 150); })();"
 isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-codigo.png" --route "#/agentes/$CODE_SID/codigo" --wait 7 --eval "$CODE_JS"
-# sessão cujos arquivos não existem nesta máquina: estados vazios, sem erro de console
+# session whose files do not exist on this machine: empty states, no console error
 isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-codigo-vazio.png" --route "#/agentes/11111111-2222-4333-8444-555555555555/codigo" --wait 4 --eval "$(expect "'.code-shell', '.code-tree', '.code-empty'")"
 
 step "aba Código segue o agente, pausa ao rolar e retoma"
 "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code2"
 ( for n in 1 2 3; do sleep 6; "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code2" crescer "$n"; done ) &
 GROW_PID=$!
-# com a tela do Mac inativa a janela fica oculta e o app para de consultar o servidor, de propósito; aqui ela conta como
-# visível (no modo --snapshot, a casca também não deixa o WebKit suspender a página)
+# with the Mac screen idle the window is hidden and the app stops polling the server, on purpose; here it counts as
+# visible (in --snapshot mode, the shell also keeps WebKit from suspending the page)
 UNHIDE_JS="Object.defineProperty(document, 'hidden', { configurable: true, get: function () { return false; } });"
 FOLLOW_JS="$UNHIDE_JS(function () {
   var tag = 'seguir o agente incompleto'; window.__vtErrors.push(tag); var fase = 0;
@@ -64,6 +65,8 @@ FOLLOW_JS="$UNHIDE_JS(function () {
   function text() { var c = document.querySelector('.code-body .cm-content'); return c ? c.textContent : ''; }
   function inTree(n) { return Array.prototype.some.call(document.querySelectorAll('.code-file'), function (b) { return b.textContent.indexOf(n) >= 0; }); }
   var t = setInterval(function () {
+    // CodeMirror draws the selection layer on a later frame, so it may not exist yet when the text first shows
+    if (fase === 1 && !window.__vtSel) window.__vtSel = document.querySelectorAll('.code-body .cm-selectionBackground').length;
     if (fase === 0 && shown().indexOf('passo-1.py') >= 0 && text().indexOf('valor = 1') >= 0) {
       var m = /gravado = (\d+)/.exec(text()); var atraso = m ? Date.now() - Number(m[1]) : -1;
       if (atraso < 0 || atraso > 5000) window.__vtErrors.push('edição levou ' + atraso + ' ms até a tela');
@@ -142,19 +145,22 @@ step "temas claro e escuro: telas principais sem estouro e com os tokens aplicad
 "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code4"
 for tema in claro escuro; do
   [ "$tema" = claro ] && fundo="rgb(250, 246, 238)" || fundo="rgb(7, 13, 24)"
-  THEME_JS="document.documentElement.dataset.theme = '$tema'; setTimeout(function () {
+  # chosen the way a user does: forcing the attribute races with the saved preference arriving from the server
+  THEME_JS="var pendente = 'tema $tema: não verificado'; window.__vtErrors.push(pendente);
+  import('./js/theme.mjs').then(function (m) { return m.setThemePref('$tema'); }).then(function () { setTimeout(function () {
+    window.__vtErrors.splice(window.__vtErrors.indexOf(pendente), 1);
     if (getComputedStyle(document.body).backgroundColor !== '$fundo') window.__vtErrors.push('tema $tema: fundo ' + getComputedStyle(document.body).backgroundColor);
-    if (document.documentElement.scrollWidth > window.innerWidth) window.__vtErrors.push('tema $tema: estourou a largura'); }, 1500);"
+    if (document.documentElement.scrollWidth > window.innerWidth) window.__vtErrors.push('tema $tema: estourou a largura'); }, 1500); });"
   for route in "#/overview" "#/agentes" "#/agentes/$CODE_SID/codigo" "#/agentes/$CODE_SID" "#/tasks" "#/notes" "#/ajuda"; do
     shot="$TMP_ROOT/tema-$tema-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
-    isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 3 --eval "$THEME_JS $CLIP_JS"
+    isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 5 --eval "$THEME_JS $CLIP_JS"
   done
 done
 
 step "fonte Inter e logo: carregados de verdade, em cada tema o arquivo certo"
 for tema in claro escuro; do
   [ "$tema" = claro ] && logo="primary" || logo="reverse"
-  BRAND_JS="document.documentElement.dataset.theme = '$tema'; setTimeout(function () {
+  BRAND_JS="import('./js/theme.mjs').then(function (m) { return m.setThemePref('$tema'); }); setTimeout(function () {
     var box = document.querySelector('.brand-logo'); if (!box) { window.__vtErrors.push('logo ausente'); return; }
     var img = Array.prototype.find.call(box.querySelectorAll('img'), function (i) { return getComputedStyle(i).display !== 'none'; });
     if (!img || img.src.indexOf('celox-logo-$logo') < 0) window.__vtErrors.push('logo errado no tema $tema: ' + (img ? img.src : 'nenhum'));
@@ -169,7 +175,7 @@ for tema in claro escuro; do
 done
 
 step "interface em inglês: nenhuma tela com texto em português"
-# os nomes vindos das fixtures são dados, não interface: o sensor olha o texto, tirando o que veio de sessão, site ou arquivo
+# names coming from the fixtures are data, not interface: the sensor looks at the text, discarding what came from a session, site or file
 EN_JS="$UNHIDE_JS setTimeout(function () {
   var pt = /[ãõç]|\b(para|sem|não|você|arquivo|arquivos|pasta|sessão|sessões|tarefas|nenhum|nenhuma|abrir|editar|ainda|pedido|pedidos|comandos)\b/i;
   var walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, found = [];
@@ -181,6 +187,18 @@ EN_JS="$UNHIDE_JS setTimeout(function () {
 for route in "#/inicio" "#/overview" "#/terminals" "#/agentes" "#/agentes/$CODE_SID" "#/agentes/$CODE_SID/codigo" "#/agentes/historico" "#/agentes/branches" "#/agentes/uso" "#/prompts" "#/tasks" "#/notes" "#/tags" "#/index" "#/ajuda" "#/lerd" "#/depuracao" "#/node"; do
   SENSOR_LANGUAGE=en isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/en-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png" --route "$route" --wait 4 --eval "$EN_JS" || { echo "português em $route"; exit 1; }
 done
+
+step "Lerd opcional: sem Lerd nada atrapalha e o Início oferece instalar"
+NOLERD_JS="$UNHIDE_JS setTimeout(function () {
+  if (document.querySelector('#env').children.length) window.__vtErrors.push('controles do ambiente sem Lerd');
+  if (document.querySelector('#toasts .toast, .toast.is-error')) window.__vtErrors.push('mensagem flutuante sem Lerd');
+  if (!document.querySelector('.in-step[data-spot=lerd] [data-home=lerd-install]')) window.__vtErrors.push('sem o botão Instalar');
+  if (!document.querySelector('.in-step[data-spot=lerd] [data-home=lerd-skip]')) window.__vtErrors.push('sem o botão Não uso');
+  document.querySelector('[data-home=lerd-install]').click();
+  setTimeout(function () { var d = document.querySelector('.dialog');
+    if (!d || d.textContent.indexOf('lerd.sh/install.sh') < 0) window.__vtErrors.push('o diálogo não mostra o comando');
+    if (d) d.querySelector('[data-answer=no]').click(); }, 700); }, 2200);"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-sem-lerd.png" --route "#/inicio" --wait 5 --eval "$NOLERD_JS"
 
 step "novo terminal pelo diálogo: clique fora do cartão de tema não troca o tema"
 DIALOG_JS="$UNHIDE_JS(function () { var tag = 'diálogo de novo terminal não abriu a aba'; window.__vtErrors.push(tag); var enviado = null;

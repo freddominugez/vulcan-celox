@@ -1,4 +1,4 @@
-// Prompts: quadro de botões por categoria; um clique copia o texto já preenchido com a sessão atual.
+// Prompts: board of buttons by category; one click copies the text already filled with the current session.
 
 import { get, post } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
@@ -7,12 +7,12 @@ import { AGENT_NAMES, copy, keepScroll } from "../agents-ui.mjs";
 
 const VAR = /\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 
-/** Texto final: cada variável trocada pelo valor do campo (vazio fica como estava, para o aviso pegar). */
+/** Final text: each variable replaced by the field value (empty stays as it was, so the warning catches it). */
 export function compose(body, values) {
   return body.replace(VAR, (m, name) => (values[name] ? values[name] : m));
 }
 
-/** Prévia em texto corrido com os valores destacados; o que falta aparece pelo rótulo, em âmbar. */
+/** Preview as running text with the values highlighted; what is missing appears by its label, in amber. */
 function previewHtml(body, values, label) {
   return esc(body).replace(VAR, (m, name) => (values[name]
     ? `<mark>${esc(values[name])}</mark>`
@@ -29,8 +29,8 @@ export class PromptsView {
     this.options = options;
     this.data = null;
     this.picked = null;
-    this.values = {};  // valores dos campos por prompt, guardados enquanto a tela está aberta
-    this.typed = {};  // só o que o usuário digitou: sobrevive à troca de sessão e à recarga
+    this.values = {};  // field values per prompt, kept while the screen is open
+    this.typed = {};  // only what the user typed: survives session change and reload
     this.root.addEventListener("click", (e) => this.onClick(e));
     this.root.addEventListener("input", (e) => {
       if (!e.target.closest(".pc-field")) return;
@@ -45,8 +45,8 @@ export class PromptsView {
         if (main && !main.disabled) main.click();
       }
     });
-    // só recarrega (e zera os campos) se a sessão mudou de fato: o primeiro aviso, de nenhuma para a mesma
-    // sessão que a tela já mostra, chegava depois do usuário digitar e apagava o texto
+    // only reloads (and zeroes the fields) if the session actually changed: the first notice, from none to the same
+    // session the screen already shows, arrived after the user typed and wiped the text
     this.onCurrent = (e) => {
       const next = e.detail && e.detail.session ? e.detail.session.id : null;
       const shown = this.data && this.data.session ? this.data.session.id : null;
@@ -58,7 +58,7 @@ export class PromptsView {
     this.load();
   }
 
-  /** Agente · projeto · branch da sessão, já escapado. */
+  /** Agent · project · branch of the session, already escaped. */
   who(s) {
     return `${esc(AGENT_NAMES[s.agent] || s.agent)} · ${esc(s.project || t("sem projeto"))}${s.branch ? ` · ${esc(s.branch)}` : ""}`;
   }
@@ -66,7 +66,7 @@ export class PromptsView {
   async load() {
     try {
       this.data = await get("/api/prompts");
-      this.values = {};  // sessão nova: os campos não editados voltam aos valores dela; o digitado fica
+      this.values = {};  // new session: unedited fields go back to its values; what was typed stays
       keepScroll(this.root, () => this.render());
     } catch (err) {
       reportError(err);
@@ -104,7 +104,7 @@ export class PromptsView {
     if (this.picked) this.refreshPreview();
   }
 
-  /** Painel ao lado: um campo por variável (Tab entre eles), prévia com os valores e o alvo. */
+  /** Side panel: one field per variable (Tab between them), preview with the values and the target. */
   composer(p) {
     const s = this.data.session;
     const values = this.values[p.id] || (this.values[p.id] = Object.fromEntries(p.variables.map((v) => [v,
@@ -128,7 +128,7 @@ export class PromptsView {
       <p class="dim hint">${p.scope === "project" ? t("Prompt do projeto") : t("Prompt global")} · ${esc(p.category)}</p>`;
   }
 
-  /** Valores atuais, a prévia e o aviso do que falta. */
+  /** Current values, the preview and the warning about what is missing. */
   refreshPreview() {
     const p = this.prompt(this.picked);
     const box = this.root.querySelector(".pc");
@@ -155,7 +155,7 @@ export class PromptsView {
     return (this.data.labels && this.data.labels[name]) || name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, (c) => c.toUpperCase());
   }
 
-  /** Etiqueta "Branch: main"; sem valor, "Branch: a preencher". Nunca o marcador {{nome}}. */
+  /** Label "Branch: main"; with no value, "Branch: a preencher". Never the {{nome}} placeholder. */
   tag(name) {
     const value = this.data.context[name];
     const shown = value ? (name === "sessionId" ? short(value) : value) : t("a preencher");
@@ -178,7 +178,7 @@ export class PromptsView {
     return this.data.prompts.find((p) => p.id === id);
   }
 
-  /** Cola o texto na aba pareada à sessão, sem Enter. Sem aba, oferece retomar a sessão num terminal. */
+  /** Pastes the text into the tab paired with the session, without Enter. With no tab, offers to resume the session in a terminal. */
   async send() {
     const out = this.refreshPreview();
     if (!out || out.missing.length) return;

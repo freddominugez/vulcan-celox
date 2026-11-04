@@ -75,4 +75,4 @@ One real PTY per tab (`os.forkpty`, or ConPTY on Windows), with the user's shell
 
 ## Known debt
 
-Seven files above 400 lines are frozen by a test and cannot grow: `web/js/terminals.mjs`, `packaging/macos/main.swift`, `ui/app.py`, `web/js/views/tasks.mjs`, `core/notebook.py`, `core/harness.py`, `web/js/views/site.mjs`. Risks are listed in section 17 of the [technical manual](technical-manual.md).
+Six files above 400 lines are frozen by a test and cannot grow: `packaging/macos/main.swift`, `ui/app.py`, `web/js/views/tasks.mjs`, `core/notebook.py`, `core/harness.py`, `web/js/views/site.mjs`. Risks are listed in section 17 of the [technical manual](technical-manual.md).

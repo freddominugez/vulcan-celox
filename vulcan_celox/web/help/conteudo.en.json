@@ -4,7 +4,7 @@
     {
       "id": "primeiros-passos",
       "titulo": "Getting started",
-      "resumo": "What Vulcan Celox does and how to start in four steps.",
+      "resumo": "What Vulcan Celox does and how to start in a few steps.",
       "blocos": [
         {"p": "The app has a light and a dark theme. Press ⌘K, search for \"Theme\" and pick System, Light or Dark. The terminal area stays dark in both, with each tab's own color."},
         {"p": "Vulcan Celox is a panel for solo developers who code with coding agents. It puts in one place the PHP sites that **Lerd** runs on your Mac, your Node projects (Next.js, Vite and the like), the terminals of each project and the **Claude Code** and **Codex** sessions."},
@@ -15,7 +15,7 @@
           "**Let the app read the agent sessions.** It reads the Claude Code and Codex files from disk, line by line, with no API key and without writing anything in those folders.",
           "**Open a terminal in a project** with ⌘T. Tasks, sticky notes and tags created there become the session memory in Markdown when the terminal closes."
         ]},
-        {"p": "The **Home** screen checks these steps by itself and stops opening at launch once all four are done. Check **Don't show the guide again** to make the app open straight on the Overview. The guide stays available in the Home item of the sidebar."}
+        {"p": "The **Home** screen checks these steps by itself and stops opening at launch once the essential steps are done. The Lerd step is optional: **Install** shows the official command and runs it in a visible terminal, and **I don't use it** dismisses the step. Check **Don't show the guide again** to make the app open straight on the Overview. The guide stays available in the Home item of the sidebar."}
       ]
     },
     {
@@ -45,7 +45,7 @@
           "**Services:** database, Redis and others, with start and stop.",
           "**PHP:** installed versions, extensions, Xdebug and six common php.ini settings, written by `lerd php:ini` itself.",
           "**Lerd Node:** versions that Lerd manages for PHP sites with a JavaScript front end.",
-          "**Start with the app:** the lightning button at the top starts Lerd together with Vulcan Celox."
+          "**Start with the app:** the lightning button at the top starts Lerd together with Vulcan Celox. It comes off: Lerd is optional and only needed for PHP and Laravel sites."
         ]},
         {"p": "Laravel Valet also works as an alternative. Herd is commercial and is not used."}
       ]
@@ -210,7 +210,7 @@
     }
   ],
   "faq": [
-    {"q": "What is Lerd for?", "a": "It is the environment that runs your PHP and Laravel sites on the Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. Vulcan Celox is the panel on top of it.", "secao": "lerd"},
+    {"q": "What is Lerd for?", "a": "It is the environment that runs your PHP and Laravel sites on the Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. It is optional: terminals, agents and Node projects work without it. Install it from Home if you want it.", "secao": "lerd"},
     {"q": "Do I need Lerd to use the app?", "a": "No. Without Lerd or Valet the app opens in local mode: Node projects, terminals, agents, prompts, tasks and notes work. Only the PHP sites part is limited.", "secao": "lerd"},
     {"q": "My project is Next.js with Supabase and Vercel. Does the app help?", "a": "Yes. Add the folder under Node projects: the app starts and stops the development server in a terminal you can see, shows the port, runs `supabase start` and `stop` and tells you whether the folder is linked to Vercel.", "secao": "node"},
     {"q": "Lerd is stopped. How do I start it?", "a": "Click Start on the Lerd screen, or the play button at the top. The first time can take up to a minute, because Lerd brings up the containers. To always start it with the app, use the lightning button.", "secao": "lerd"},

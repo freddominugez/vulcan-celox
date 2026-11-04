@@ -1,4 +1,4 @@
-"""Rotas das sessões de agente."""
+"""Agent session routes."""
 
 import json
 import shutil
@@ -25,7 +25,7 @@ def loop_session(path):
 
 
 class AgentsServerCase(ServerTestCase):
-    """Servidor com as fixtures de agentes e uma sessão em loop; sem testes próprios."""
+    """Server with the agent fixtures and a looping session; no tests of its own."""
 
     def env(self):
         claude, codex = self.tmp / "claude", self.tmp / "codex"
@@ -59,7 +59,7 @@ class AgentsApiTest(AgentsServerCase):
             self.assertIn(key, first)
 
     def test_sessao_sem_projeto_nao_entra_no_filtro(self):
-        """Nome vazio no filtro ficava selecionado no lugar de Todos os projetos e aparecia como (1)."""
+        """An empty name in the filter was left selected in place of All projects and showed up as (1)."""
         sem_pasta = self.tmp / "claude" / "projects" / "-vazio"
         sem_pasta.mkdir(parents=True)
         (sem_pasta / "bbbbbbbb-1111-4222-8333-444444444444.jsonl").write_text(
@@ -75,7 +75,7 @@ class AgentsApiTest(AgentsServerCase):
         self.assertEqual([s["id"] for s in self.get("/api/agents/sessions?project=loja")["sessions"]], [LOOP_SID])
         self.assertEqual([s["id"] for s in self.get("/api/agents/sessions?cwd=/Users/dev/clerk")["sessions"]], [CODEX_SID])
         self.assertEqual(self.get("/api/agents/sessions?active=1")["sessions"], [])
-        # cópia recém-feita (datas de arquivo novas) não é sessão ativa; um evento novo gravado agora é
+        # a fresh copy (new file dates) is not an active session; a new event written now is
         rollout = self.tmp / "codex" / "sessions" / "2026" / "10" / "30" / f"rollout-2026-10-30T21-15-44-{CODEX_SID}.jsonl"
         now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
         with rollout.open("a", encoding="utf-8") as f:

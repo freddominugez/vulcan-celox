@@ -1,4 +1,4 @@
-"""Pareamento entre a aba do terminal e a sessão de agente, por hook e por reserva."""
+"""Pairing between the terminal tab and the agent session, by hook and by reservation."""
 
 import json
 import os
@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 from tests import test_agents_api
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only
 from vulcan_celox.core.agents import pairing
 from vulcan_celox.core.agents.model import AgentSession
 from vulcan_celox.core.sessions import SessionRecord
@@ -38,7 +38,7 @@ class ResolveTest(TempDirTestCase):
         t = tab("t1", "/r/loja", "2026-10-31T10:00:00Z")
         self.assertEqual(pairing.resolve([agent("s1", "/r/loja", "2026-10-31T10:02:00Z")], [t], {}), {})
         self.assertEqual(pairing.resolve([agent("s1", "/r/outra", "2026-10-31T10:00:10Z")], [t], {}), {})
-        self.assertEqual(pairing.resolve([agent("s1", "/r/loja", "2026-10-31T09:59:50Z")], [t], {}), {})  # antes da aba
+        self.assertEqual(pairing.resolve([agent("s1", "/r/loja", "2026-10-31T09:59:50Z")], [t], {}), {})  # before the tab
 
     def test_comando_do_outro_agente_nao_pareia(self):
         t = tab("t1", "/r/loja", "2026-10-31T08:00:00Z", [("2026-10-31T10:00:00Z", "codex")])
@@ -56,7 +56,7 @@ class ResolveTest(TempDirTestCase):
         pairs = pairing.resolve([agent("s1", "/r/loja", "2026-10-31T10:00:20Z")], tabs, files)
         self.assertEqual(pairs["s1"], {"terminal_id": "t9", "theme": "homebrew", "how": "hook"})
 
-    # ── só quem nasce de uma aba, e um lançamento por sessão ────────────────────
+    # ── only what is born from a tab, and one launch per session ────────────────────
     def test_subagente_e_desktop_nao_pareiam_por_pasta_e_horario(self):
         t = tab("t1", "/r/loja", "2026-10-31T08:00:00Z", [("2026-10-31T10:00:00Z", "codex")])
         principal = agent("principal", "/r/loja", "2026-10-31T10:00:05Z", "codex")
@@ -67,7 +67,7 @@ class ResolveTest(TempDirTestCase):
         self.assertEqual(set(pairing.resolve([sub, desk, principal], [t], {})), {"principal"})
 
     def test_duas_abas_e_duas_sessoes_que_demoram_para_nascer(self):
-        # as duas sessões nascem depois dos dois lançamentos: a mais antiga fica com o primeiro
+        # both sessions are born after both launches: the oldest gets the first
         a = tab("a", "/r/loja", "2026-10-31T08:00:00Z", [("2026-10-31T10:00:00Z", "codex")])
         b = tab("b", "/r/loja", "2026-10-31T08:00:00Z", [("2026-10-31T10:00:05Z", "codex")])
         s1 = agent("s1", "/r/loja", "2026-10-31T10:00:06Z", "codex")
@@ -93,7 +93,7 @@ class ResolveTest(TempDirTestCase):
         t = tab("t1", "/r/loja", "2026-10-31T08:00:00Z", [("2026-10-31T10:00:00Z", "codex")])
         s1 = agent("s1", "/r/loja", "2026-10-31T10:00:02Z", "codex")
         s2 = agent("s2", "/r/loja", "2026-10-31T10:00:04Z", "codex")
-        self.assertEqual(set(pairing.resolve([s1, s2], [t], {})), {"s1"})  # a primeira é a que nasce do lançamento
+        self.assertEqual(set(pairing.resolve([s1, s2], [t], {})), {"s1"})  # the first is the one born from the launch
 
     def test_le_arquivos_de_pareamento(self):
         folder = self.tmp / "pairings"
@@ -120,14 +120,14 @@ class HookTest(TempDirTestCase):
         self.assertEqual(json.loads(backup.read_text()), original)
         settings = json.loads((self.claude / "settings.json").read_text())
         self.assertEqual(settings["model"], "opus")
-        # o hook do usuário fica intacto e em primeiro; a única entrada a mais é a do hook de atenção
+        # the user's hook stays intact and first; the only extra entry is the attention hook
         self.assertEqual(settings["hooks"]["Stop"][:-1], original["hooks"]["Stop"])
         self.assertEqual(settings["hooks"]["Stop"][-1]["hooks"][0]["command"].count("vulcan-atencao.py"), 1)
         commands = [h["command"] for e in settings["hooks"]["SessionStart"] for h in e["hooks"]]
         self.assertEqual(commands, ["echo meu", info["script"]])
         pairing.install_hook(self.claude, self.data, now=1_800_000_100)
         again = json.loads((self.claude / "settings.json").read_text())
-        self.assertEqual(again, settings)  # segunda vez não duplica
+        self.assertEqual(again, settings)  # the second time does not duplicate
 
     def test_sem_settings_cria_sem_backup(self):
         info = pairing.install_hook(self.claude, self.data, now=1)
@@ -139,6 +139,7 @@ class HookTest(TempDirTestCase):
         env = {"PATH": os.environ.get("PATH", ""), **env_extra}
         return subprocess.run([sys.executable, info["script"]], input=stdin, env=env, capture_output=True, text=True, timeout=20)
 
+    @unix_only("o hook é recusado no Windows")
     def test_script_grava_o_par_so_dentro_de_uma_aba_do_vulcan(self):
         payload = json.dumps({"session_id": "s1", "cwd": "/r/loja", "hook_event_name": "SessionStart"})
         proc = self.run_hook({"VULCAN_SESSION_ID": "t1", "VULCAN_THEME": "oceano"}, payload)
@@ -149,7 +150,7 @@ class HookTest(TempDirTestCase):
                 (self.data / "pairings" / "s1.json").unlink()
                 (self.data / "pairings" / "s1.json").write_text(json.dumps({"session_id": "s1", "terminal_id": "t1"}))
                 proc = self.run_hook(env, stdin)
-                self.assertEqual(proc.returncode, 0)  # nunca atrapalha o Claude Code
+                self.assertEqual(proc.returncode, 0)  # never gets in the way of Claude Code
                 self.assertEqual(sorted(p.name for p in (self.data / "pairings").iterdir()), ["s1.json"])
 
 
@@ -157,7 +158,7 @@ class PairingApiTest(test_agents_api.AgentsServerCase):
     def test_sessao_pareada_com_a_aba_pela_pasta_e_horario(self):
         record = self.app.hub.sessions.create("aba000000001", "projeto", None, "/Users/dev/projeto", theme="ardosia")
         session = self.app.agents.index.session(CLAUDE_SID)
-        record.created_at = session.started_at[:19] + "Z"  # aba aberta no segundo em que a sessão começou
+        record.created_at = session.started_at[:19] + "Z"  # tab opened in the second the session started
         card = next(s for s in self.get("/api/agents/sessions")["sessions"] if s["id"] == CLAUDE_SID)
         self.assertEqual((card["pairing_id"], card["theme"]), ("aba000000001", "ardosia"))
         paired = self.get("/api/agents/paired?terminal=aba000000001")
@@ -168,6 +169,7 @@ class PairingApiTest(test_agents_api.AgentsServerCase):
 
 
 class InstallCommandTest(TempDirTestCase):
+    @unix_only("o hook é recusado no Windows")
     def test_opcao_instalar_hook(self):
         import io
         from contextlib import redirect_stdout
@@ -184,8 +186,9 @@ class InstallCommandTest(TempDirTestCase):
         self.assertEqual(settings["hooks"]["SessionStart"][0]["hooks"][0]["command"], info["script"])
 
 
+@unix_only("o hook é recusado no Windows")
 class HookComEspacoTest(TempDirTestCase):
-    """No macOS a pasta de dados tem espaço (Application Support)."""
+    """On macOS the data folder has a space (Application Support)."""
 
     def setUp(self):
         super().setUp()
@@ -219,4 +222,4 @@ class HookComEspacoTest(TempDirTestCase):
         settings = json.loads((self.claude / "settings.json").read_text())
         self.assertEqual(settings["model"], "opus")
         pairing.install_hook(self.claude, self.data, now=3)
-        self.command()  # continua uma entrada só
+        self.command()  # still a single entry

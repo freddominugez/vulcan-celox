@@ -1,4 +1,4 @@
-"""Quais pastas o app pode tratar como projeto: nunca as de dados dos agentes, nem uma pasta que as contenha."""
+"""Which folders the app may treat as a project: never the agents' data folders, nor a folder that contains them."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from vulcan_celox.core.agents import discovery
 
 
 def touches_agent_data(root: str, env: Optional[Mapping[str, str]] = None) -> bool:
-    """Verdadeiro se a pasta está dentro de uma pasta de dados de agente ou contém uma (a pasta pessoal, por exemplo)."""
+    """True if the folder is inside an agent data folder or contains one (the home folder, for example)."""
     try:
         real = Path(root).resolve()
     except (OSError, ValueError):
@@ -26,7 +26,7 @@ def touches_agent_data(root: str, env: Optional[Mapping[str, str]] = None) -> bo
 
 
 def known_folders(app) -> List[str]:
-    """Pastas de site, de projeto Node salvo e de sessão indexada, sem as que tocam os dados dos agentes."""
+    """Site folders, saved Node project folders and indexed session folders, excluding those that touch the agents' data."""
     known = [s.path for s in app.sites() if s.path]
     node = getattr(app, "node", None)
     if node is not None:
@@ -37,7 +37,7 @@ def known_folders(app) -> List[str]:
 
 
 def known_root(app, root: str) -> bool:
-    """Só pasta de site, de projeto Node salvo ou de sessão indexada."""
+    """Only a site folder, saved Node project folder or indexed session folder."""
     if touches_agent_data(root, app.env):
         return False
     real = Path(root).resolve()

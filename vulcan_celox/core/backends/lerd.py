@@ -1,4 +1,4 @@
-"""Backend Lerd (github.com/lerd-env/lerd, MIT): CLI `lerd` e API local do painel."""
+"""Lerd backend (github.com/lerd-env/lerd, MIT): the `lerd` CLI and the local panel API."""
 
 from __future__ import annotations
 
@@ -15,12 +15,12 @@ from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.runner import Result
 from vulcan_celox.core.sites import KIND_ORDER, Site, discover_sites
 
-SERVICE_TIMEOUT = 300.0  # um start pode baixar imagens e subir a VM do Podman
+SERVICE_TIMEOUT = 300.0  # a start may download images and bring up the Podman VM
 DEFAULT_API = "http://127.0.0.1:7073"
 API_TIMEOUT = 1.5
 SITE_TERMINAL_ACTIONS = {"db": "db:shell", "doctor": "site:doctor"}
 SHARE_TOOLS = ("cloudflare", "expose", "ngrok", "localhost-run", "serveo", "pinggy")  # lerd share --help
-_NO_PROXY = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # API é loopback: ignora proxy do ambiente
+_NO_PROXY = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the API is loopback: ignore the environment proxy
 
 
 class LerdBackend(Backend):
@@ -39,7 +39,7 @@ class LerdBackend(Backend):
     def argv(self, *args: str) -> List[str]:
         return [str(self.bin_path), *args]
 
-    # ── serviços ─────────────────────────────────────────────────────────
+    # ── services ─────────────────────────────────────────────────────────
     def start(self) -> Result:
         return self.runner.run(self.argv("start"), timeout=SERVICE_TIMEOUT)
 
@@ -60,7 +60,7 @@ class LerdBackend(Backend):
         return match.group(1) if (r.ok and match) else ""
 
     def dashboard_url(self, domain: str = "") -> str:
-        """Painel do Lerd; com domínio, abre direto no site (rota #sites/<domínio> do próprio painel)."""
+        """Lerd panel; with a domain, opens straight to the site (the panel's own #sites/<domain> route)."""
         return self.api_base + "/" + (f"#sites/{domain}" if domain else "")
 
     def status(self) -> EnvStatus:
@@ -76,15 +76,15 @@ class LerdBackend(Backend):
 
     # ── API local do painel ──────────────────────────────────────────────
     def api_get(self, path: str, timeout: float = API_TIMEOUT) -> Any:
-        """GET JSON na API do Lerd; None se o painel não responder."""
+        """GET JSON from Lerd's API; None if the panel does not respond."""
         try:
-            with _NO_PROXY.open(self.api_base + path, timeout=timeout) as resp:  # noqa: S310 (só loopback)
+            with _NO_PROXY.open(self.api_base + path, timeout=timeout) as resp:  # noqa: S310 (loopback only)
                 return json.loads(resp.read().decode("utf-8"))
         except (OSError, ValueError):
             return None
 
-    # ── ações de site ─────────────────────────────────────────
-    # link, isolate e isolate:node agem na pasta atual (lerd --help); os demais recebem o nome ou a pasta
+    # ── site actions ─────────────────────────────────────────────────
+    # link, isolate and isolate:node act on the current folder (lerd --help); the others receive the name or the folder
     def site_command(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
         if action == "link":
             path, domain = args
@@ -97,7 +97,7 @@ class LerdBackend(Backend):
             return self.argv("isolate:node", node), path
         if action in ("unlink", "park", "unpark", "secure", "unsecure"):
             return self.argv(action, args[0]), None
-        if action in SITE_TERMINAL_ACTIONS:  # Interativos ou longos, rodam numa aba do site
+        if action in SITE_TERMINAL_ACTIONS:  # interactive or long-running, they run in a site tab
             return self.argv(SITE_TERMINAL_ACTIONS[action]), args[0]
         return super().site_command(action, *args)
 
@@ -122,12 +122,12 @@ class LerdBackend(Backend):
         return [out[v] for v in sorted(out, key=_version_key)]
 
     def api_post(self, path: str, body: Optional[dict] = None, timeout: float = 10.0) -> int:
-        """POST na API do Lerd com o cabeçalho que o painel dele manda (X-Lerd-CSRF); devolve o código HTTP."""
+        """POST to Lerd's API with the header its panel sends (X-Lerd-CSRF); returns the HTTP code."""
         data = json.dumps(body or {}).encode("utf-8")
         request = urllib.request.Request(self.api_base + path, data=data, method="POST",
                                          headers={"Content-Type": "application/json", "X-Lerd-CSRF": "1"})
         try:
-            with _NO_PROXY.open(request, timeout=timeout) as resp:  # noqa: S310 (só loopback)
+            with _NO_PROXY.open(request, timeout=timeout) as resp:  # noqa: S310 (loopback only)
                 return resp.status
         except urllib.error.HTTPError as err:
             return err.code
@@ -136,7 +136,7 @@ class LerdBackend(Backend):
 
     # ── sites ────────────────────────────────────────────────────────────
     def registry_rows(self) -> List[dict]:
-        """Sites registrados: API do painel, ou sites.yaml quando o painel está fora."""
+        """Registered sites: the panel API, or sites.yaml when the panel is down."""
         rows = self.api_get("/api/sites")
         if isinstance(rows, list):
             return [r for r in rows if isinstance(r, dict)]
@@ -186,7 +186,7 @@ def summarize_status(data: Mapping[str, Any], label: str = "Lerd") -> EnvStatus:
 
 
 def site_from_row(row: Mapping[str, Any]) -> Optional[Site]:
-    """Converte um registro da API (/api/sites) ou do sites.yaml em Site."""
+    """Converts a record from the API (/api/sites) or from sites.yaml into a Site."""
     domains = row.get("domains") or ([row["domain"]] if row.get("domain") else [])
     domains = [d for d in domains if isinstance(d, str) and d]
     name = str(row.get("name") or "")

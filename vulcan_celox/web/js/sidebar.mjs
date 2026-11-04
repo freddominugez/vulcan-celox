@@ -1,4 +1,4 @@
-// Barra lateral.
+// Sidebar; split out of app.mjs.
 
 import { attentionCount } from "./attention-state.mjs";
 import { AGENT_NAV, HELP_NAV, NAV, NAV_GROUPS, app } from "./app-state.mjs";
@@ -10,6 +10,9 @@ window.addEventListener("vulcan-attention", () => {
   const badge = document.querySelector("[data-attention-count]");
   if (!badge || Number(badge.dataset.attentionCount) !== attentionCount()) renderSidebar();
 });
+
+// while the environment comes up it is not "stopped": no alarm color for a start that is still going
+const envStarting = (state) => Boolean(state.autostart && ["starting", "checking"].includes(state.autostart.phase));
 
 export function renderSidebar() {
   const state = app.state;
@@ -26,22 +29,24 @@ export function renderSidebar() {
     if (n.id === "ambiente" && state) {
       label = state.backend.available ? state.backend.label : "Lerd";
       const run = state.status.running;
-      const word = run ? t("rodando") : state.backend.available ? t("parado") : t("ausente");
-      dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
+      const up = envStarting(state);
+      const word = run ? t("rodando") : up ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente");
+      dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available && !up ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
     }
     return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" ${active ? 'aria-current="page"' : ""}>
       ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${t("{n} aguardando você", { n: count })}"` : ""}>${count}</span>` : ""}${dot}</a>`;
   };
   const byId = Object.fromEntries([...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => [n.id, n]));
-  // O redesenho troca os elementos do #nav; guarda o que tinha o foco (grupo ou link) para devolver
+  // the redraw replaces the #nav elements; remember what had focus (group or link) to restore it
   const nav = $("#nav");
   const had = nav.contains(document.activeElement) ? document.activeElement : null;
   const refocus = had && (had.dataset.navGroup ? `[data-nav-group="${CSS.escape(had.dataset.navGroup)}"]`
     : had.getAttribute("href") ? `.nav-item[href="${CSS.escape(had.getAttribute("href"))}"]` : null);
   nav.innerHTML = NAV_GROUPS.map((g) => {
-    const items = g.items.map((id) => byId[id]);
+    const noLerd = app.state && app.state.backend && app.state.backend.installable === false && !app.state.backend.available;
+    const items = g.items.map((id) => byId[id]).filter((n) => !(noLerd && n.id === "ambiente"));
     const closed = Boolean(g.label && app.tree && app.tree.isOpen(`nav:${g.id}-closed`));
-    // recolhido, o grupo ainda mostra o item da tela atual
+    // collapsed, the group still shows the current screen's item
     const shown = closed ? items.filter((n) => (n.routes || [n.id]).includes(app.route.name)) : items;
     return `<div class="nav-group ${closed ? "is-collapsed" : ""}" data-group="${g.id}">
       ${g.label ? `<button type="button" class="nav-group-head" data-nav-group="${g.id}" aria-expanded="${!closed}">
@@ -56,7 +61,7 @@ export function renderSidebar() {
   if (app.tree) app.tree.render();
   if (!state) return;
   const running = state.status.running;
-  // Favoritos no topo e o resto em ordem alfabética (mesma regra de core/site_list.py)
+  // favorites on top and the rest in alphabetical order (same rule as core/site_list.py)
   const filter = app.siteFilter.trim().toLowerCase();
   const favorites = new Set(state.favorites || []);
   const sites = state.sites.filter((s) => !filter || s.name.toLowerCase().includes(filter) || s.domain.toLowerCase().includes(filter))
@@ -93,9 +98,9 @@ export function renderSidebar() {
 
   $("#side-env").innerHTML = `
     <button class="side-env-btn" data-action="dashboard" ${state.backend.dashboard ? "" : "disabled"} title="${esc(state.status.summary)}">
-      <span class="dot ${running ? "dot-ok" : state.backend.available ? "dot-err" : "dot-idle"}"></span>
+      <span class="dot ${running ? "dot-ok" : state.backend.available && !envStarting(state) ? "dot-err" : "dot-idle"}"></span>
       <span class="side-env-label">${esc(state.backend.label)}</span>
-      <span class="dim">${running ? t("rodando") : state.backend.available ? t("parado") : t("ausente")}</span>
+      <span class="dim">${running ? t("rodando") : envStarting(state) ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente")}</span>
       ${state.backend.dashboard ? icon("external", "i-sm") : ""}
     </button>`;
 }

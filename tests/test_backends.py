@@ -3,7 +3,7 @@ import os
 import re
 from pathlib import Path
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only, MODOS
 from vulcan_celox.core.backends import NullBackend, ValetBackend, detect_backend
 from vulcan_celox.core.runner import FakeRunner, Result
 
@@ -27,6 +27,7 @@ class DetectTest(TempDirTestCase):
         self.assertIsInstance(backend, ValetBackend)
         self.assertTrue(backend.available)
 
+    @unix_only(MODOS)
     def test_nao_executavel_vira_null(self):
         self.assertIsInstance(detect_backend(self._env(self._bin(executable=False))), NullBackend)
 
@@ -59,11 +60,11 @@ class DetectTest(TempDirTestCase):
                                            encoding="utf-8")
         self.assertEqual([s.domain for s in detect_backend(self._env(self._bin())).list_sites()],
                          ["loja.test"])
-        # sem Valet: config ignorado, só manuais
+        # without Valet: config ignored, only manual ones
         self.assertEqual(detect_backend(self._env(self.tmp / "nada")).list_sites(), [])
 
     def test_acoes_de_site_implementadas(self):
-        # O que era "disponível depois" agora chama a CLI (tabela em test_backends_sites)
+        # what used to be "available from now on" now calls the CLI (table in test_backends_sites)
         fake = FakeRunner()
         backend = detect_backend(self._env(self._bin()), runner=fake)
         self.assertTrue(backend.secure("loja").ok)

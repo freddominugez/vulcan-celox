@@ -1,4 +1,4 @@
-// Visão geral: sites em tabela densa, tarefas abertas, terminais ativos, sessões recentes e o índice geral.
+// Visão geral: sites in a dense table, open tasks, active terminals, recent sessions and the general index.
 
 import { brandLogo } from "../brand.mjs";
 import { get, isMac, post } from "../api.mjs";
@@ -29,7 +29,7 @@ export class OverviewView {
       this.nodeProjects = (await get("/api/node-projects")).projects;
       if (this.nodeProjects.length) this.render();
     } catch {
-      /* painel secundário */
+      /* secondary panel */
     }
   }
 

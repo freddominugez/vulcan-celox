@@ -1,6 +1,6 @@
 # Vulcan Celox: technical manual
 
-Reference for a developer who has never seen this project. It describes version 1.2.0. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
+Reference for a developer who has never seen this project. It describes version 1.2.1. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
 
 Paths written as `core/...`, `server/...`, `web/...` and `ui/...` are relative to `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Goals that shape the code:
 - Never delete anything for good.
 - Everything testable without a window, a real Lerd or real agents.
 
-Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.1.1. Version 1.2.0 adds test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
+Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.1.1. Since 1.2.0 there are test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
 
 ## 2. Design decisions
 
@@ -306,7 +306,7 @@ Ending: `terminate_pty` sends `SIGHUP` and `SIGTERM` to the group and `SIGKILL` 
 
 `/ws/terminals/<id>` carries input and output as binary frames. Text frames carry JSON: `resize` (1 to 1000 rows and columns), `input` and `exit`. `ClientSender` gives each client a queue limited to 4 MB and its own sending thread. The PTY reader only queues, so a slow client never stops the reader, the other clients or the process. A client over the limit is dropped.
 
-On the interface side, `web/js/terminals.mjs` uses xterm.js 6 with the addons fit, web-links, search, WebGL, unicode 11 and serialize. It reconnects automatically up to 5 times, with a growing delay. After that the tab warns, and Enter tries again.
+On the interface side, `web/js/terminal-session.mjs` uses xterm.js 6 with the addons fit, web-links, search, WebGL, unicode 11 and serialize. It reconnects automatically up to 5 times, with a growing delay. After that the tab warns, and Enter tries again.
 
 ### Creating a tab
 
@@ -493,7 +493,8 @@ Both are refused with 409 if the project has `.harness/`.
 | `js/sidebar.mjs`, `js/session-tree.mjs` | Sidebar groups, site lists and the Sessions section |
 | `js/palette.mjs` | Command palette (⌘K) |
 | `js/global-events.mjs` | Global listeners and shortcuts |
-| `js/terminals.mjs`, `js/terminal-panel.mjs` | Terminal workspace and the bottom panel on screens with no terminal |
+| `js/terminals.mjs` (entry), `js/terminal-workspace.mjs`, `-session`, `-pool`, `-tabs`, `-content`, `-commands`, `-search`, `js/terminal-panel.mjs` | Terminal workspace, split by concern, and the bottom panel on screens with no terminal |
+| `js/lerd-setup.mjs` | The optional Lerd install: the official command, shown first, in a visible terminal |
 | `js/api.mjs` | API client, `every`, `wsUrl`, `native`, `isNative`, `hasBridge`, `isMac` |
 | `js/dom.mjs`, `js/markdown.mjs`, `js/themes.mjs`, `js/ai.mjs`, `js/agents-ui.mjs`, `js/current-session.mjs`, `js/prompt-bar.mjs`, `js/folder-dialog.mjs`, `js/site-add.mjs`, `js/help-content.mjs` | Shared pieces |
 
@@ -669,7 +670,7 @@ Base classes: `tests/helpers.py` (`TempDirTestCase`) and `tests/server_helpers.p
 
 | Item | Situation |
 |------|-----------|
-| Seven files above 400 lines: `web/js/terminals.mjs` (1126), `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Accepted for 1.0, because splitting terminal and window code with no browser test carries more risk than gain. `tests/test_tamanho_arquivos.py` stops them from growing and blocks new files above 400 |
+| Six files above 400 lines: `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Accepted for 1.0, because splitting terminal and window code with no browser test carries more risk than gain. `tests/test_tamanho_arquivos.py` stops them from growing and blocks new files above 400 |
 | macOS package has no embedded Python and is not notarized | It has only an ad hoc signature. `--verificar-dependencias` explains and offers to install. `packaging/LEIA-ME.md` explains how to open an app that is not signed with an Apple certificate |
 | Linux | Test builds as pre-releases; no stable release until acceptance on a real desktop |
 | Windows | Test builds as pre-releases, tested only on CI machines. Not available: Lerd and Valet, the optional hook, clicking `C:\...` paths, the foreground check before writing to a tab. No installer or code signature |

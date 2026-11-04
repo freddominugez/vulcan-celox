@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
-from tests.test_ai_config import KEY, MODELS, FakeTransport
+from tests.test_ai_config import KEY, FakeTransport
 from vulcan_celox.core.keychain import MemoryKeyStore
 
 
@@ -116,9 +116,9 @@ class AiGeneralDocsTest(AiDocsBase):
     def test_documentacao_geral(self):
         self.assertEqual(self.request("GET", "/api/index/documentation")[0], 404)
         self.app.keystore.set(KEY)
-        self.assertEqual(self.request("POST", "/api/ai/docs/general")[0], 409)  # sem sessões
+        self.assertEqual(self.request("POST", "/api/ai/docs/general")[0], 409)  # no sessions
         sid = self.closed_session()
-        wait = self.request("POST", f"/api/ai/docs/session/{sid}")
+        self.request("POST", f"/api/ai/docs/session/{sid}")
         self.assertEqual(wait_job(self, sid)["status"], "done")
 
         self.app.ai_transport = SlowTransport((200, GENERAL))
@@ -131,7 +131,7 @@ class AiGeneralDocsTest(AiDocsBase):
         self.assertTrue(done["file"].endswith("DOCUMENTACAO.md"))
 
         prompt = json.loads(self.app.ai_transport.calls[-1]["body"])["messages"][0]["content"]
-        self.assertIn("Documentação da sessão:", prompt)  # usa a documentação já gerada da sessão
+        self.assertIn("Documentação da sessão:", prompt)  # uses the session documentation already generated
         self.assertIn(".doc.md", prompt)
         self.assertNotIn("vulcan:documentacao", prompt)
         self.assertNotIn("segredo123", prompt)

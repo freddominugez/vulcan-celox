@@ -1,8 +1,8 @@
-"""Temas de sessão: a aba do terminal e a sessão de agente pareada usam a mesma identidade de cor.
+"""Session themes: the terminal tab and the paired agent session use the same color identity.
 
-Temas são dados: acrescentar um é um item em THEMES e um id em ROTATION. Cada tema tem a paleta do xterm e os três
-tokens da interface (--t cor viva, --t-bg fundo, --t-ink texto sobre o app). A rotação segue a ordem do Escopo 3.6
-: Homebrew, Clássico (o tradicional), Oceano e Ardósia, e é lembrada entre aberturas do app.
+Themes are data: adding one is an item in THEMES and an id in ROTATION. Each theme has the xterm palette and the three
+interface tokens (--t vivid color, --t-bg background, --t-ink text on the app). The rotation follows the agreed order:
+Homebrew, Clássico (the traditional one), Oceano and Ardósia, and is remembered between app launches.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ from typing import Dict, List, Optional
 
 from vulcan_celox.core.i18n import tr
 
-# cores ANSI comuns; cada tema troca fundo, texto, cursor e seleção
+# common ANSI colors; each theme swaps background, text, cursor and selection
 _ANSI = {
     "black": "#1f1f23", "red": "#ff6b5e", "green": "#4fd08a", "yellow": "#f2c14e", "blue": "#6aa8ff",
     "magenta": "#d38cff", "cyan": "#4fcfd6", "white": "#d4d4da", "brightBlack": "#6b6b75", "brightRed": "#ff8a7f",
@@ -44,7 +44,7 @@ def is_theme(value) -> bool:
 
 
 def css() -> str:
-    """Classes .t-<id> com os tokens da interface; a página injeta este texto (CSP permite estilo inline)."""
+    """.t-<id> classes with the interface tokens; the page injects this text (CSP allows inline style)."""
     return "\n".join(f".t-{tid} {{ --t: {t['accent']}; --t-bg: {t['bg']}; --t-ink: {t['ink']}; }}"
                      for tid, t in THEMES.items())
 
@@ -54,7 +54,7 @@ def public() -> List[Dict]:
 
 
 class Rotation:
-    """Próximo tema da rotação, guardado no Store para continuar entre aberturas do app."""
+    """Next theme in the rotation, kept in the Store to continue between app launches."""
 
     KEY = "themes"
 

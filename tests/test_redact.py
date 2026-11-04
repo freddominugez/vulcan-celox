@@ -2,7 +2,7 @@ import unittest
 
 from vulcan_celox.core.redact import MASK, redact
 
-# valores sintéticos, montados por partes para nenhum scanner confundir com segredos reais
+# synthetic values, assembled in parts so no scanner mistakes them for real secrets
 ANT = "sk-ant-" + "api03-" + "Ab1" * 12
 GH = "ghp_" + "Z9y8" * 8
 AWS = "AKIA" + "ABCDEFGHIJKLMNOP"

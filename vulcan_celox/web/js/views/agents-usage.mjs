@@ -1,4 +1,4 @@
-// Uso dos agentes: tokens e custo estimado no preço da API por dia, projeto, modelo e sessão.
+// Agent usage: tokens and estimated cost at API price by day, project, model and session.
 
 import { get, token } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
@@ -6,7 +6,7 @@ import { currentLanguage, t } from "../i18n.mjs";
 import { AGENT_NAMES, agentMark, copy, RevisionWatch } from "../agents-ui.mjs";
 
 const PERIODS = [7, 30, 90];
-// cores por agente validadas contra a superfície escura (#202024): faixa de luminosidade, croma, daltonismo e contraste
+// per-agent colors validated against the dark surface (#202024): luminosity range, chroma, color blindness and contrast
 const AGENT_ORDER = ["claude", "codex"];
 
 const decimal = (v) => (currentLanguage() === "pt" ? v.replace(".", ",") : v);
@@ -46,7 +46,7 @@ export class AgentsUsageView {
     this.root = root;
     this.options = options;
     this.days = 30;
-    this.until = options.until || null;  // fim do período (AAAA-MM-DD); sem ele, hoje
+    this.until = options.until || null;  // end of the period (AAAA-MM-DD); without it, today
     this.root.addEventListener("click", (e) => this.onClick(e));
     this.root.innerHTML = `<div class="loading"><span class="skeleton w-40"></span><span class="skeleton w-70"></span></div>`;
     this.watch = new RevisionWatch(() => this.load());
@@ -67,7 +67,7 @@ export class AgentsUsageView {
   }
 
   async load() {
-    if (this.loading) { this.pending = true; return; }  // período trocado no meio da carga: recarrega no fim
+    if (this.loading) { this.pending = true; return; }  // period changed mid-load: reload at the end
     this.loading = true;
     const [from, to] = this.range();
     const q = `from=${from}&to=${to}`;
@@ -75,10 +75,10 @@ export class AgentsUsageView {
       const [day, project, model, session] = await Promise.all(["day", "project", "model", "session"]
         .map((g) => get(`/api/agents/usage?${q}&group=${g}`)));
       this.data = { day, project, model, session, from, to };
-      // a menor revisão das quatro leituras: se o índice mudou no meio, a próxima volta do relógio recarrega
+      // the lowest revision of the four reads: if the index changed midway, the next clock tick reloads
       this.watch.seen(Math.min(day.revision, project.revision, model.revision, session.revision));
       this.render();
-      // antes da primeira varredura o índice ainda está vazio; o polling pausa com a janela oculta, então relê aqui
+      // before the first scan the index is still empty; polling pauses with the window hidden, so it rereads here
       if (!day.scanned && !this.retry && (this.retries = (this.retries || 0) + 1) <= 40) {
         this.retry = setTimeout(() => { this.retry = null; this.load(); }, 500);
       }
@@ -168,7 +168,7 @@ export class AgentsUsageView {
   }
 
   async download(path) {
-    // a janela nativa não baixa arquivo: o CSV vai para a área de transferência (a rota também serve ao navegador)
+    // the native window does not download files: the CSV goes to the clipboard (the route also serves the browser)
     try {
       const res = await fetch(path, { headers: { "X-Vulcan-Token": token } });
       if (!res.ok) throw new Error(`CSV: HTTP ${res.status}`);

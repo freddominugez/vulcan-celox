@@ -1,4 +1,4 @@
-// Paleta de comandos.
+// Command palette; split out of app.mjs.
 
 import { api, get, isMac, patch, post } from "./api.mjs";
 import { noticesEnabled, setNoticesEnabled } from "./attention-notify.mjs";

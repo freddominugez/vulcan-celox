@@ -1,4 +1,4 @@
-// Sessão de agente: faixa com a identidade, alerta de loop e abas Resumo, Arquivos, Comandos e Linha do tempo.
+// Agent session: identity strip, loop alert and Resumo, Arquivos, Comandos and Linha do tempo tabs.
 
 import { dismissSession } from "../attention-state.mjs";
 import { every, get, post } from "../api.mjs";
@@ -21,7 +21,7 @@ const FILE_KINDS = { edit: "edit", new: t("novo"), read: t("leu"), delete: t("ap
 const CMD_KINDS = { shell: "shell", test: t("teste"), publish: t("publica") };
 const PAGE = 200;
 
-/** Custo estimado da sessão no preço da API; assinatura cobra de outro jeito. */
+/** Estimated session cost at API price; a subscription bills differently. */
 function costText(cost) {
   if (!cost || !cost.turns) return "";
   if (cost.value === null) return ` · ${t("custo sem preço conferido")}`;
@@ -48,7 +48,7 @@ export class AgentSessionView {
     dismissSession(this.id);
     try {
       const data = await get(`/api/agents/sessions/${encodeURIComponent(this.id)}?limit=${PAGE}`);
-      if (this.destroyed) return;  // saiu da tela durante a leitura: não liga o relógio
+      if (this.destroyed) return;  // left the screen during the read: do not start the clock
       this.session = data.session;
       this.events = data.events;
       this.next = data.next;
@@ -60,7 +60,7 @@ export class AgentSessionView {
     } catch (err) {
       if (this.destroyed) return;
       if (err.status === 404 && (this.retries = (this.retries || 0) + 1) <= 4) {
-        this.retryTimer = setTimeout(() => this.load(), 1200);  // o índice pode ainda estar na primeira leitura
+        this.retryTimer = setTimeout(() => this.load(), 1200);  // the index may still be on its first read
         return;
       }
       if (err.status === 404) {
@@ -72,17 +72,17 @@ export class AgentSessionView {
     }
   }
 
-  /** Atualização automática: troca o resumo e acrescenta só os eventos novos, sem perder a paginação. */
+  /** Automatic update: swaps the summary and appends only the new events, without losing pagination. */
   async refresh() {
     if (!this.session) return this.load();
     const complete = this.next === null;
-    // com todas as páginas carregadas, pede o que veio depois; senão só o resumo (posição além do fim)
+    // with all pages loaded, asks for what came after; otherwise only the summary (position past the end)
     const from = complete ? this.events.length : 1000000000;
     try {
       const data = await get(`/api/agents/sessions/${encodeURIComponent(this.id)}?from=${from}&limit=${PAGE}`);
       this.session = data.session;
       if (this.tab === "codigo") {
-        // remontar a faixa tiraria o foco e a seleção do visor; os eventos novos entram ao trocar de aba
+        // remounting the strip would drop the viewer's focus and selection; new events come in when switching tabs
         this.watch.seen(data.revision);
         if (complete) {
           this.events = this.events.concat(data.events);
@@ -145,7 +145,7 @@ export class AgentSessionView {
     this.placeCode();
   }
 
-  /** O visor sobrevive à troca de abas: o mesmo elemento volta para a tela, com seleção e rolagem. */
+  /** The viewer survives tab changes: the same element returns to the screen, with selection and scroll. */
   placeCode() {
     const slot = this.root.querySelector(".code-slot");
     if (!slot) return;
@@ -173,7 +173,7 @@ export class AgentSessionView {
     </div>`;
   }
 
-  /** Fonte do estado de publicação; com a preferência desligada não consulta nada. */
+  /** Source of the publish state; with the preference off it queries nothing. */
   prLine() {
     if (!this.pr || this.prFor !== this.session.last_activity_at) this.loadPrStatus();
     return this.pr ? prHtml(this.pr) : "";
@@ -187,7 +187,7 @@ export class AgentSessionView {
     if (this.tab === "resumo" && this.session) keepScroll(this.root, () => this.render());
   }
 
-  /** Erros do site do Lerd durante a sessão (só aparece quando a pasta da sessão é um site do Lerd). */
+  /** Lerd site errors during the session (only appears when the session folder is a Lerd site). */
   async loadDebug() {
     try {
       const data = await get(`/api/debug/agent/${encodeURIComponent(this.id)}`);
@@ -195,7 +195,7 @@ export class AgentSessionView {
       this.debug = data;
       if (changed && !this.destroyed && this.tab === "resumo") keepScroll(this.root, () => this.render());
     } catch (err) {
-      this.debug = null;  // a depuração é extra: falha aqui não atrapalha a sessão
+      this.debug = null;  // debugging is extra: failing here does not disturb the session
     }
   }
 
@@ -249,7 +249,7 @@ export class AgentSessionView {
     }
   }
 
-  /** ⌘⇧↑/↓ na Linha do tempo. */
+  /** ⌘⇧↑/↓ in the Linha do tempo. */
   stepTurn(direction) {
     return this.tab === "linha" && stepTurn(this.root, direction);
   }
@@ -277,7 +277,7 @@ export class AgentSessionView {
     if (action.dataset.action === "resume") this.resume(action);
   }
 
-  /** Retoma a sessão numa aba nova: o servidor abre o terminal e digita o comando do agente. */
+  /** Resumes the session in a new tab: the server opens the terminal and types the agent command. */
   async resume(button) {
     button.disabled = true;
     try {
@@ -291,7 +291,7 @@ export class AgentSessionView {
     }
   }
 
-  /** Tarefa a partir da sessão de agente: fica na aba pareada, e com ela no site e no caderno. */
+  /** Task from the agent session: stays in the paired tab, and with it on the site and in the notebook. */
   createTask() {
     const s = this.session;
     const backdrop = document.createElement("div");

@@ -39,7 +39,7 @@ class TagsTest(TempDirTestCase):
         self.nb.create_tag("ux")
         with self.assertRaises(DuplicateTag):
             self.nb.rename_tag(tag.id, "UX")
-        self.nb.rename_tag(tag.id, "BUG")  # mesma tag, só muda a caixa
+        self.nb.rename_tag(tag.id, "BUG")  # same tag, only the case changes
 
     def test_chip_specs(self):
         a = self.nb.create_tag("a", "#111111")

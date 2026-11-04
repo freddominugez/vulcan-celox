@@ -1,4 +1,4 @@
-"""Título curto a partir do pedido colado."""
+"""Short title from the pasted request."""
 import unittest
 
 from vulcan_celox.core.textutil import HEADLINE_MAX, headline
@@ -13,8 +13,8 @@ class HeadlineTest(unittest.TestCase):
     def test_quebras_de_linha_e_bloco_sem_linguagem(self):
         self.assertEqual(headline("```\ncrie o cupom\n```"), "crie o cupom")
         self.assertEqual(headline("  corrija\n  o login  "), "corrija o login")
-        self.assertEqual(headline("``text\nExecute o bloco B0"), "Execute o bloco B0")  # colagem real, uma crase a menos
-        self.assertEqual(headline("`npm test` falha no login"), "`npm test` falha no login")  # crase de código fica
+        self.assertEqual(headline("``text\nExecute o bloco B0"), "Execute o bloco B0")  # real paste, one backtick short
+        self.assertEqual(headline("`npm test` falha no login"), "`npm test` falha no login")  # a code backtick stays
 
     def test_texto_longo_sem_frase_corta_numa_palavra(self):
         out = headline("palavra " * 60)

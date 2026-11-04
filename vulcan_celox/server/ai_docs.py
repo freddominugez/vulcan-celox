@@ -1,4 +1,4 @@
-"""Documentação com IA: prévia do que será enviado, geração em segundo plano e leitura dos arquivos gerados."""
+"""AI documentation: preview of what will be sent, background generation and reading of the generated files."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ class AiDocs:
         self.app = app
         self.jobs = AiJobs()
 
-    # ── sessão ───────────────────────────────────────────────────────────
+    # ── session ────────────────────────────────────────────────────────
     def record(self, session_id: str):
         record = self.app.hub.sessions.get(session_id)
         if record is None:
@@ -55,7 +55,7 @@ class AiDocs:
                 "stats": prompt.stats, "model": self.app.ai.model(), "configured": bool(self.app.ai.key())}
 
     def generate_session(self, record) -> Dict[str, Any]:
-        client = self.app.ai.client()  # 409 sem chave, antes de criar a tarefa
+        client = self.app.ai.client()  # 409 without a key, before creating the task
         model = self.app.ai.model()
         if not record.memory_file:
             self.app.hub.write_memory(record.id)

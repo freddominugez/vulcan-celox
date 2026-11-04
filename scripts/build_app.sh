@@ -1,5 +1,5 @@
 #!/bin/bash
-# Gera dist/Vulcan Celox.app a partir do fonte (sem dependências externas).
+# Builds dist/Vulcan Celox.app from source (no external dependencies).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -8,11 +8,11 @@ APP="dist/Vulcan Celox.app"
 VERSION="$(/usr/bin/python3 -c 'import vulcan_celox as v; print(v.__version__)')"
 
 if [ -d "$APP" ]; then
-  # dist/ é artefato de build nosso e ignorado pelo git; recriado a cada build
+  # dist/ is our own build artifact and ignored by git; recreated on every build
   find "$APP" -depth -delete
 fi
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-touch dist/.metadata_never_index  # a cópia de build não aparece no Spotlight nem no Launchpad
+touch dist/.metadata_never_index  # the build copy does not show up in Spotlight or Launchpad
 
 rsync -a --exclude '__pycache__' --exclude '*.pyc' --exclude '.DS_Store' vulcan_celox "$APP/Contents/Resources/"
 
@@ -54,10 +54,10 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-# executável nativo (AppKit + WKWebView) que sobe o servidor Python embutido
+# native executable (AppKit + WKWebView) that starts the embedded Python server
 ARCH="$(uname -m)"
 if [ "${VULCAN_UNIVERSAL:-0}" = "1" ]; then
-  # binário universal (Apple Silicon + Intel) para distribuição
+  # universal binary (Apple Silicon + Intel) for distribution
   UNI_TMP="$(mktemp -d)"
   for arch in arm64 x86_64; do
     swiftc -O -target "${arch}-apple-macos13.0" -o "$UNI_TMP/vulcan-celox-$arch" packaging/macos/main.swift packaging/macos/notify.swift \
@@ -71,7 +71,7 @@ else
     -framework AppKit -framework WebKit -framework Security
 fi
 
-# ícone aprovado da marca, sem os tamanhos de 16 e 32 px: o macOS reduz a partir dos maiores
+# approved brand icon, without the 16 and 32 px sizes: macOS downsamples from the larger ones
 cp packaging/macos/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
 echo "build: $ROOT/$APP ($VERSION)"

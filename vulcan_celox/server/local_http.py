@@ -1,4 +1,4 @@
-"""Servidor HTTP em loopback com token, verificação de Host, rotas JSON e arquivos estáticos."""
+"""Loopback HTTP server with token, Host verification, JSON routes and static files."""
 
 from __future__ import annotations
 
@@ -39,11 +39,11 @@ class HttpError(Exception):
         super().__init__(message)
         self.status = status
         self.message = message
-        self.extra = extra or {}  # campos a mais no corpo do erro (ex.: needs_confirmation)
+        self.extra = extra or {}  # extra fields in the error body (e.g. needs_confirmation)
 
 
 class RawResponse:
-    """Resposta que não é JSON (CSV de uso). Mesmos cabeçalhos de segurança da API."""
+    """Non-JSON response (e.g. the usage CSV). Same security headers as the API."""
 
     def __init__(self, body: bytes, content_type: str, filename: Optional[str] = None):
         self.body, self.content_type, self.filename = body, content_type, filename
@@ -93,7 +93,7 @@ class QuietThreadingServer(ThreadingHTTPServer):
         import sys
         exc = sys.exc_info()[1]
         if isinstance(exc, (ConnectionError, TimeoutError)):
-            return  # cliente fechou a conexão (aba, janela ou WebSocket encerrados)
+            return  # client closed the connection (tab, window or WebSocket closed)
         super().handle_error(request, client_address)
 
 
@@ -104,11 +104,11 @@ class LocalServer:
                  web_root: Path = WEB_ROOT):
         self.token = token or secrets.token_urlsafe(32)
         self.web_root = Path(web_root).resolve()
-        # a interface é lida uma vez: reinstalar o app com ele aberto não mistura interface nova com servidor antigo
+        # the interface is read once: reinstalling the app while it is open does not mix a new interface with an old server
         self.assets = self._snapshot_assets(self.web_root)
         self.build_id = self.assets_build_id(self.assets)
         self.routes: List[Route] = []
-        self.last_api_request = 0.0  # a casca Linux em modo navegador encerra quando a interface para de consultar
+        self.last_api_request = 0.0  # the Linux shell in browser mode exits when the interface stops polling
         self.ws_routes: List[Tuple[Pattern, Callable]] = []
         server = self
 
@@ -121,7 +121,7 @@ class LocalServer:
 
     @staticmethod
     def assets_build_id(assets: Dict[str, bytes]) -> str:
-        """Impressão digital da interface: muda quando uma versão nova é instalada por cima."""
+        """Fingerprint of the interface: changes when a new version is installed over the old one."""
         import hashlib
         digest = hashlib.sha256()
         for rel in sorted(assets):
@@ -211,7 +211,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_DELETE(self):  # noqa: N802
         self._dispatch("DELETE")
 
-    # ── núcleo ───────────────────────────────────────────────────────────
+    # ── core ───────────────────────────────────────────────────────────
     def _dispatch(self, method: str) -> None:
         self.body_consumed = False
         try:
@@ -221,8 +221,8 @@ class Handler(BaseHTTPRequestHandler):
             query = parse_qs(parts.query)
             path = parts.path
             if path.startswith("/api/") or path.startswith("/ws/"):
-                # Na API o token vem só pelo cabeçalho (força preflight entre origens, que aqui falha);
-                # a query vale só no WebSocket, que o navegador não deixa abrir com cabeçalho próprio
+                # in the API the token comes only through the header (forces a cross-origin preflight, which fails here);
+                # the query is accepted only on the WebSocket, which the browser does not let open with a custom header
                 token = self.headers.get("X-Vulcan-Token")
                 if path.startswith("/ws/"):
                     token = token or (query.get("token") or [None])[0]
@@ -283,7 +283,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _static(self, path: str) -> None:
         rel = "index.html" if path in ("", "/") else posixpath.normpath(path.lstrip("/"))
-        body = self.app.assets.get(rel)  # só arquivos copiados da pasta web na abertura: sem travessia de caminho
+        body = self.app.assets.get(rel)  # only files copied from the web folder at startup: no path traversal
         if body is None:
             raise HttpError(404, "não encontrado")
         target = Path(rel)
@@ -299,7 +299,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _discard_unread_body(self) -> None:
-        """Corpo que a rota não leu fica no socket e corromperia a próxima requisição da mesma conexão."""
+        """A body the route did not read stays on the socket and would corrupt the next request on the same connection."""
         if getattr(self, "body_consumed", True):
             return
         self.body_consumed = True

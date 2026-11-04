@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Monta um .deb só com a biblioteca padrão (sem dpkg-deb): ar com debian-binary, control.tar.gz e data.tar.gz.
+"""Builds a .deb with the standard library only (no dpkg-deb): ar with debian-binary, control.tar.gz and data.tar.gz.
 
-uso: make_deb.py <pasta-raiz-dos-dados> <arquivo-control> <postinst> <saida.deb>
+usage: make_deb.py <data-root-folder> <control-file> <postinst> <output.deb>
 """
 
 import hashlib
@@ -34,13 +34,13 @@ def data_members(root):
     dirs_seen = set()
     for current, dirs, files in os.walk(root):
         dirs.sort()
-        rel_dir = os.path.relpath(current, root)
+        rel_dir = os.path.relpath(current, root).replace(os.sep, "/")  # name in the package: always with /, even when built on Windows
         if rel_dir != "." and rel_dir not in dirs_seen:
             dirs_seen.add(rel_dir)
             members.append((_info(f"./{rel_dir}/", 0o755, tarfile.DIRTYPE), None))
         for name in sorted(files) + sorted(d for d in dirs if os.path.islink(os.path.join(current, d))):
             path = os.path.join(current, name)
-            rel = os.path.normpath(os.path.join(rel_dir, name))
+            rel = os.path.normpath(os.path.join(rel_dir, name)).replace(os.sep, "/")
             if os.path.islink(path):
                 members.append((_info(f"./{rel}", 0o777, tarfile.SYMTYPE, link=os.readlink(path)), None))
                 continue

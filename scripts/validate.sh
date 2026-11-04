@@ -1,10 +1,10 @@
 #!/bin/bash
-# Sensor único do Vulcan Celox. Exit 0 = tudo verde; exit 1 no primeiro erro.
+# Single sensor for Vulcan Celox. Exit 0 = all green; exit 1 on the first error.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-# Mesmo critério do launcher: primeiro Python com Tk >= 8.6 (o Tk 8.5 do sistema não desenha no macOS atual)
+# Same criterion as the launcher: first Python with Tk >= 8.6 (the system Tk 8.5 does not draw on current macOS)
 pick_python() {
   for c in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
     if [ -x "$c" ] && "$c" -c 'import sys, tkinter; sys.exit(0 if tkinter.TkVersion >= 8.6 else 1)' >/dev/null 2>&1; then
@@ -19,7 +19,7 @@ export PYTHONDONTWRITEBYTECODE=1
 export TK_SILENCE_DEPRECATION=1
 
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/vulcan-validate.XXXXXX")"
-# cópias de teste não ficam registradas no macOS: viravam ícones repetidos no Launchpad
+# test copies are not registered with macOS: they became repeated icons in Launchpad
 LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
 unregister() { [ -x "$LSREGISTER" ] && "$LSREGISTER" -u "$1" >/dev/null 2>&1 || true; }
 cleanup() { unregister "$ROOT/dist/Vulcan Celox.app"; unregister "$TMP_ROOT/Applications/Vulcan Celox.app"; find "$TMP_ROOT" -depth -delete 2>/dev/null || true; }
@@ -27,7 +27,7 @@ trap cleanup EXIT
 
 RUN_ID=0
 isolated_env() {
-  # cada execução ganha um diretório de dados próprio
+  # each run gets its own data directory
   RUN_ID=$((RUN_ID + 1))
   env VULCAN_CELOX_HOME="$TMP_ROOT/home-$RUN_ID" \
       VULCAN_LEGACY_HOME="$TMP_ROOT/legacy" \
@@ -83,8 +83,8 @@ if [ -f scripts/build_app.sh ]; then
   [ -f "$shot_png" ] && [ "$(stat -f %z "$shot_png")" -gt 20000 ] || { echo "captura do guia ausente no pacote: $shot_png"; exit 1; }
   [ "$(sips -g pixelWidth "$icns" 2>/dev/null | awk '/pixelWidth/ {print $2}')" = "1024" ] || { echo "AppIcon.icns ausente ou sem 1024 px"; exit 1; }
 
-  # Painel ou faixa visível com um filho em fluxo normal passando da borda de baixo vira erro
-  # (overflow hidden + contêiner que espreme); decoração em posição absoluta não conta
+  # a visible panel or strip with a normal-flow child extending past the bottom edge becomes an error
+  # (overflow hidden + a container that squeezes); absolutely positioned decoration does not count
   CLIP_JS="setTimeout(function () { document.querySelectorAll('.panel, .ag-banner').forEach(function (el) {
     if (el.offsetParent === null) return;
     var box = el.getBoundingClientRect();
@@ -94,7 +94,7 @@ if [ -f scripts/build_app.sh ]; then
       window.__vtErrors.push('painel cortado: ' + (h ? h.textContent.trim() : el.className)); } }); }, 1800);"
 
   step "snapshot do app nativo (servidor embutido + interface web)"
-  # as fixtures de agentes (CLAUDE_CONFIG_DIR, CODEX_HOME) entram pelo isolated_env; o snapshot falha com erro de JS
+  # the agent fixtures (CLAUDE_CONFIG_DIR, CODEX_HOME) enter through isolated_env; the snapshot fails on a JS error
   for route in "#/overview" "#/terminals" "#/tasks" "#/agentes" "#/agentes/11111111-2222-4333-8444-555555555555" "#/agentes/historico" "#/agentes/branches" "#/prompts" "#/ambiente" "#/depuracao"; do
     shot="$TMP_ROOT/snapshot-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 3 \
@@ -105,9 +105,9 @@ if [ -f scripts/build_app.sh ]; then
   . scripts/sensores_interface.sh
 
   step "telas com Lerd simulado"
-  # API falsa com as fixtures reais e um lerd falso; o Lerd de verdade nunca é tocado. A sessão de agente das
-  # fixtures roda em /Users/dev/projeto entre 01:04 e 01:46 UTC: o site loja aponta para lá e os eventos caem às 01:10.
-  # O site vulcan-demo aponta para a fixture com harness do formato do repositório
+  # fake API with the real fixtures and a fake lerd; the real Lerd is never touched. The agent session in the
+  # fixtures runs in /Users/dev/projeto between 01:04 and 01:46 UTC: the loja site points there and the events land at 01:10.
+  # the vulcan-demo site points to the fixture with a harness in the repository format
   "$PY" -I tests/tools/fake_lerd_api.py --site-path loja=/Users/dev/projeto \
     --site-path vulcan-demo="$ROOT/tests/fixtures/harness/repo" --dumps-at 2026-10-31T01:10 \
     > "$TMP_ROOT/lerd-api.port" 2>/dev/null &
@@ -116,7 +116,7 @@ if [ -f scripts/build_app.sh ]; then
   lerd_env() {
     isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")" "$@"
   }
-  # Texto selecionado num dump continua selecionado depois de duas voltas da atualização (2 s cada)
+  # text selected in a dump stays selected after two refresh cycles (2 s each)
   SEL_JS="(function () { var tag = 'seleção perdida na Depuração'; window.__vtErrors.push(tag);
     var t = setInterval(function () { var d = document.querySelector('.debug-dump'); if (!d) return; clearInterval(t);
       var r = document.createRange(); r.selectNodeContents(d); getSelection().removeAllRanges(); getSelection().addRange(r);
@@ -139,9 +139,9 @@ if [ -f scripts/build_app.sh ]; then
     shot="$TMP_ROOT/lerd-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     extra=""; wait_s=4
     if [ "$route" = "#/depuracao" ]; then extra="$SEL_JS"; wait_s=7; fi
-    # A captura do guia precisa carregar de verdade
-    # Busca por "custo" deixa à vista só seções e perguntas com a palavra
-    # O botão ? da tela Uso e custo leva à seção custo da Ajuda
+    # the guide screenshot must really load
+    # searching for "custo" leaves only sections and questions with that word in view
+    # the ? button on the Uso e custo screen leads to the custo section of Help
     if [ "$route" = "#/agentes/uso/2026-10-31" ]; then extra="(function () { var tag = 'botão ? não levou a #/ajuda/custo'; window.__vtErrors.push(tag);
       setTimeout(function () { document.getElementById('help-here').click(); setTimeout(function () {
         if (location.hash === '#/ajuda/custo' && document.querySelector('#hp-custo')) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 900); }, 3500); })();"; wait_s=6; fi
@@ -153,7 +153,7 @@ if [ -f scripts/build_app.sh ]; then
         var bad = vis.filter(function (e) { return fold(e.textContent).indexOf('custo') < 0; });
         if (vis.length >= 2 && !bad.length) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
         else window.__vtErrors.push('busca: ' + vis.length + ' visíveis, ' + bad.length + ' sem a palavra'); }, 200); })();"; fi
-    # Nenhum marcador {{nome}} à vista na grade de prompts; o compositor tem campos e a prévia muda ao editar
+    # no {{nome}} placeholder in view in the prompt grid; the composer has fields and the preview changes on edit
     if [ "$route" = "#/prompts" ]; then extra="setTimeout(function () { var g = document.querySelectorAll('.pr-grid');
       Array.prototype.forEach.call(g, function (e) { if (e.innerText.indexOf('{{') >= 0) window.__vtErrors.push('marcador {{ à vista na grade'); });
       var tag = 'compositor: prévia não acompanhou o campo'; window.__vtErrors.push(tag);
@@ -161,9 +161,9 @@ if [ -f scripts/build_app.sh ]; then
       var i = document.querySelector('.pc-field input[name=branch]'); if (!i || !document.querySelector('.pc-preview mark')) return;
       i.value = 'teste-do-sensor'; i.dispatchEvent(new Event('input', { bubbles: true }));
       if (document.querySelector('.pc-preview').textContent.indexOf('teste-do-sensor') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 2500);"; wait_s=5; fi
-    # Grupos fixos, nenhum item perdido (17: os 16 de antes e Sites PHP) e o grupo Agentes recolhe e volta
-    # O foco do teclado continua no cabeçalho do grupo depois de recolher
-    # A paleta (⌘K) abre e lista: era a única parte do antigo app.mjs sem roteiro
+    # fixed groups, no item lost (17: the previous 16 plus Sites PHP) and the Agentes group collapses and comes back
+    # keyboard focus stays on the group header after collapsing
+    # the palette (⌘K) opens and lists: it was the only part of the old app.mjs without a script
     if [ "$route" = "#/overview" ]; then extra="setTimeout(function () {
       var ids = Array.prototype.map.call(document.querySelectorAll('.nav-group'), function (g) { return g.dataset.group; }).join(',');
       if (ids !== 'geral,projetos,ambiente,agentes,organizar,ajuda') window.__vtErrors.push('grupos: ' + ids);
@@ -180,7 +180,7 @@ if [ -f scripts/build_app.sh ]; then
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
       var inp = document.getElementById('palette-input'); inp.value = 'ajuda'; inp.dispatchEvent(new Event('input', { bubbles: true }));
       setTimeout(function () { if (document.querySelectorAll('.pal-item').length) window.__vtErrors.splice(window.__vtErrors.indexOf(pal), 1); }, 800); }, 2500);"; wait_s=6; fi
-    # Enter no último passo do guia seleciona o passo e o foco fica nele
+    # Enter on the last step of the guide selects the step and focus stays on it
     if [ "$route" = "#/inicio" ]; then extra="setTimeout(function () { var i = document.querySelector('.in-shot img');
       if (!i || !i.naturalWidth) window.__vtErrors.push('captura do guia não carregou');
       var s = document.querySelectorAll('.in-step'); var alvo = s[s.length - 1]; if (!alvo) return;
@@ -190,7 +190,7 @@ if [ -f scripts/build_app.sh ]; then
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \
       --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
   done
-  # Projeto Node registrado pela própria API da página (fixture só leitura) e aberto na tela dele
+  # Node project registered through the page's own API (read-only fixture) and opened on its own screen
   if [ "$lerd_ok" -eq 0 ]; then
     NODE_JS="import('./js/api.mjs').then(function (m) { return m.post('/api/node-projects', { path: '$ROOT/tests/fixtures/node/painel', name: 'painel' }); })
       .then(function () { window.dispatchEvent(new CustomEvent('vulcan-node-changed')); location.hash = '#/node/painel'; }, function (e) { window.__vtErrors.push('node: ' + e.message); });"
@@ -203,7 +203,7 @@ if [ -f scripts/build_app.sh ]; then
   [ "$lerd_ok" -eq 0 ] || exit 1
 
   step "texto digitado sobrevive à mudança da lista de sites"
-  # API falsa com um site que aparece e some a cada 3 s; o campo do compositor de Prompts precisa manter o texto
+  # fake API with a site that appears and disappears every 3 s; the Prompts composer field must keep its text
   "$PY" -I tests/tools/fake_lerd_api.py --site-path loja=/Users/dev/projeto --sites-alternam 3 \
     > "$TMP_ROOT/lerd-alterna.port" 2>/dev/null &
   ALT_PID=$!
@@ -223,7 +223,7 @@ if [ -f scripts/build_app.sh ]; then
   [ "$alt_ok" -eq 0 ] || { echo "falhou: #/prompts com a lista de sites mudando"; exit 1; }
 
   step "janela presa à origem do app"
-  # outra origem que responde de verdade: sem a política de navegação a janela iria para lá e o snapshot sai com 4
+  # another origin that really responds: without the navigation policy the window would go there and the snapshot exits with 4
   mkdir -p "$TMP_ROOT/fora" && echo '<html><body>fora</body></html>' > "$TMP_ROOT/fora/index.html"
   "$PY" -c 'import http.server, functools, sys
 h = functools.partial(http.server.SimpleHTTPRequestHandler, directory=sys.argv[1])

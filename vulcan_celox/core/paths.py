@@ -1,4 +1,4 @@
-"""Diretórios usados pelo app. Todos sobrescrevíveis por variável de ambiente para testes."""
+"""Directories used by the app. All overridable by environment variable for tests."""
 
 from __future__ import annotations
 
@@ -32,14 +32,14 @@ def data_dir(env: Optional[Mapping[str, str]] = None) -> Path:
 
 
 def migrate_data_folder(env: Optional[Mapping[str, str]] = None) -> None:
-    """Pasta com o nome antigo vira a nova, salvo se os dados estão em outro lugar por variável de ambiente."""
+    """The folder with the old name becomes the new one, unless the data is elsewhere via an environment variable."""
     if not _env(env).get(ENV_HOME):
         from vulcan_celox.core.oscompat import migrate_old_folder
         migrate_old_folder(_env(env))
 
 
 def legacy_dir(env: Optional[Mapping[str, str]] = None) -> Path:
-    """Dados do protótipo Valet GUI."""
+    """Data of the Valet GUI prototype."""
     value = _env(env).get(ENV_LEGACY)
     if value:
         return Path(value).expanduser()
@@ -65,7 +65,7 @@ LERD_BIN_CANDIDATES = (
 
 
 def lerd_bin_candidates(env: Optional[Mapping[str, str]] = None):
-    """Se VULCAN_LERD_BIN estiver definido, só ele é considerado."""
+    """If VULCAN_LERD_BIN is set, only it is considered."""
     value = _env(env).get(ENV_LERD_BIN)
     if value:
         return [Path(value).expanduser()]
@@ -85,7 +85,7 @@ def lerd_api_base(env: Optional[Mapping[str, str]] = None) -> str:
 
 
 def valet_bin_candidates(env: Optional[Mapping[str, str]] = None):
-    """Se VULCAN_VALET_BIN estiver definido, só ele é considerado."""
+    """If VULCAN_VALET_BIN is set, only it is considered."""
     value = _env(env).get(ENV_VALET_BIN)
     if value:
         return [Path(value).expanduser()]

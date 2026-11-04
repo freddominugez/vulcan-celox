@@ -1,6 +1,6 @@
 #!/bin/bash
-# Instala o bundle em ~/Applications e cria o atalho na Mesa. Sem sudo.
-# VULCAN_INSTALL_DEST e VULCAN_DESKTOP permitem instalar em diretórios de teste.
+# Installs the bundle in ~/Applications and creates the Desktop shortcut. No sudo.
+# VULCAN_INSTALL_DEST and VULCAN_DESKTOP allow installing into test directories.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -14,7 +14,7 @@ LINK="$DESKTOP/Vulcan Celox"
 [ -d "$SRC" ] || bash scripts/build_app.sh
 mkdir -p "$DEST_DIR" "$DESKTOP"
 
-# versão anterior vai para a Lixeira (recuperável), nunca é apagada em definitivo
+# the previous version goes to the Trash (recoverable), never deleted permanently
 to_trash() {
   if [ -n "${VULCAN_NO_FINDER:-}" ] || ! /usr/bin/osascript -e "tell application \"Finder\" to delete POSIX file \"$1\"" >/dev/null 2>&1; then
     BACKUP="${1%.app} (anterior $(date +%Y%m%d-%H%M%S)).app"
@@ -25,7 +25,7 @@ to_trash() {
 
 if [ -e "$DEST" ]; then to_trash "$DEST"; fi
 
-# o app se chamava Vulcan Terminal: o bundle antigo sai de cena; dados, Keychain e preferências ficam onde estavam
+# the app used to be called Vulcan Terminal: the old bundle is removed; data, Keychain and preferences stay where they were
 OLD_APP="$DEST_DIR/Vulcan Terminal.app"
 OLD_LINK="$DESKTOP/Vulcan Terminal"
 if [ -e "$OLD_APP" ]; then

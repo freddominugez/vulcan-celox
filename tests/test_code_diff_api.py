@@ -1,4 +1,4 @@
-"""Árvore, edições e diff do visor. Fixtures sintéticas; repositório hostil não pode executar nada."""
+"""Tree, edits and diff of the viewer. Synthetic fixtures; a hostile repository cannot run anything."""
 
 import json
 import shutil
@@ -60,7 +60,7 @@ class TreeAndEditsTest(CodeDiffCase):
         self.assertEqual(data["root"], str(self.project))
         self.assertEqual((files["a.py"]["kind"], files["a.py"]["edits"], files["a.py"]["inside"], files["a.py"]["exists"]), ("edit", 1, True, True))
         self.assertTrue(files[".env"]["sensitive"])
-        self.assertFalse(files["/fora/z.py"]["inside"])
+        self.assertFalse(next(f for rel, f in files.items() if Path(rel).name == "z.py")["inside"])
         self.assertEqual(files["b.py"]["kind"], "read")
         self.assertEqual(data["total_edits"], 3)
 
@@ -144,7 +144,7 @@ class GitScopeTest(CodeDiffCase):
         self.repo()
         status, data = self.diff("a.py", "git")
         self.assertEqual((status, data["status"], data["old"], data["new"]), (200, "modified", "um\ndois\n", "um\nmudou\n"))
-        (self.project / "novo.py").write_text("n\n", encoding="utf-8")
+        (self.project / "novo.py").write_bytes(b"n\n")
         status, data = self.diff("novo.py", "git")
         self.assertEqual((data["status"], data["old"], data["new"]), ("new", "", "n\n"))
         (self.project / "a.py").unlink()

@@ -1,4 +1,4 @@
-"""Índice sqlite das sessões de agente e observação incremental das pastas."""
+"""sqlite index of agent sessions and incremental watching of the folders."""
 
 import json
 import os
@@ -59,7 +59,7 @@ class AgentIndexTest(TempDirTestCase):
         before = self.index.session(CLAUDE_SID)
         ev_before = self.events(CLAUDE_SID)
         rev = self.index.revision()
-        self.assertEqual(w.run_once(), [])  # nada mudou: nada relido
+        self.assertEqual(w.run_once(), [])  # nothing changed: nothing re-read
         self.assertEqual(self.index.revision(), rev)
         with self.claude_file.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"type": "user", "timestamp": "2026-10-31T09:00:00Z", "cwd": "/Users/dev/projeto",
@@ -128,7 +128,7 @@ class AgentIndexTest(TempDirTestCase):
         env = {**self.env, "CODEX_HOME": f"{self.tmp / 'codex'},{self.tmp / 'codex2'}"}
         AgentWatcher(self.index, env).run_once()
         first = self.total_events()
-        for _ in range(3):  # cada reinício cria um observador novo
+        for _ in range(3):  # each restart creates a new watcher
             AgentWatcher(self.index, env).run_once()
         self.assertEqual(self.total_events(), first)
         self.assertEqual(self.index.session(CODEX_SID).file_path, str(self.codex_file("codex2")))
@@ -155,7 +155,7 @@ class AgentIndexTest(TempDirTestCase):
     def test_sessao_ativa_pelo_mtime_e_pelo_ultimo_evento(self):
         clock = Clock(time.time())
         self.index.clock = clock
-        os.utime(self.claude_file)  # cópia recém-feita: arquivo novo, eventos antigos
+        os.utime(self.claude_file)  # fresh copy: new file, old events
         self.watcher().run_once()
         self.assertFalse(self.index.session(CLAUDE_SID).is_active)
         now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -170,9 +170,9 @@ class AgentIndexTest(TempDirTestCase):
         now = 1_800_000_000.0
         iso = lambda t: datetime.fromtimestamp(t, timezone.utc).isoformat().replace("+00:00", "Z")  # noqa: E731
         self.assertTrue(is_active(now - 5, iso(now - 30), now))
-        self.assertFalse(is_active(now - 5, iso(now - 86400), now))   # pasta copiada ou restaurada
-        self.assertFalse(is_active(now - 300, iso(now - 30), now))    # arquivo parado
-        self.assertTrue(is_active(now - 5, "", now))                  # sem data de evento: vale o arquivo
+        self.assertFalse(is_active(now - 5, iso(now - 86400), now))   # folder copied or restored
+        self.assertFalse(is_active(now - 300, iso(now - 30), now))    # idle file
+        self.assertTrue(is_active(now - 5, "", now))                  # no event date: the file counts
         self.assertFalse(is_active(None, iso(now), now))
 
     def test_eventos_paginados(self):
@@ -200,7 +200,7 @@ class AgentIndexTest(TempDirTestCase):
 
     def test_opcao_reindexar_agentes(self):
         import io
-        from contextlib import redirect_stdout
+        from contextlib import closing, redirect_stdout
         from unittest import mock
         env = {**self.env, "VULCAN_CELOX_HOME": str(self.tmp / "home")}
         out = io.StringIO()
@@ -208,5 +208,5 @@ class AgentIndexTest(TempDirTestCase):
             self.assertEqual(main(["--reindexar-agentes"]), 0)
         data = json.loads(out.getvalue())
         self.assertEqual((data["sessions"], data["counts"]["claude"], data["counts"]["codex"]), (2, 1, 1))
-        with sqlite3.connect(str(self.tmp / "home" / "agentes.db")) as db:
+        with closing(sqlite3.connect(str(self.tmp / "home" / "agentes.db"))) as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM sessions").fetchone()[0], 2)

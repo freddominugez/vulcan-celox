@@ -1,4 +1,4 @@
-// Diálogo "Abrir terminal em": pasta sugerida, digitação validada, recentes e seletor nativo do macOS.
+// "Abrir terminal em" dialog: suggested folder, validated typing, recents and the native macOS picker.
 
 import { get, hasBridge, native, patch } from "./api.mjs";
 import { debounce, esc, icon } from "./dom.mjs";
@@ -25,7 +25,7 @@ export function pickNative(start) {
   });
 }
 
-/** Pasta sugerida para abrir direto: a do site, senão a mais recente, senão a pasta de início. */
+/** Suggested folder to open directly: the site's, else the most recent, else the start folder. */
 export async function suggestedFolder(site = null) {
   if (site && site.path) return site.path;
   try {
@@ -48,14 +48,14 @@ function themeCards(themes, chosen) {
 }
 
 /**
- * Pergunta a pasta do terminal novo, o agente e o tema.
- * @param {{suggested?: string, site?: string}} options  suggested: caminho absoluto ou com ~
+  * Asks for the new terminal's folder, the agent and the theme.
+  * @param {{suggested?: string, site?: string}} options  suggested: absolute path or one with ~
  * @returns {Promise<{cwd: string, title: string, theme: string, agent: string}|null>}
  */
 export async function askFolder({ suggested = "", site = "" } = {}) {
   let data = { home: { path: "", short: "~" }, recent: [] };
   const [recent, themes] = await Promise.all([get("/api/fs/recent").catch(() => null), loadThemes(true)]);
-  if (recent) data = recent;  // sem recentes: o diálogo continua funcionando só com a digitação
+  if (recent) data = recent;  // no recents: the dialog keeps working with typing only
   let theme = themes.next || "homebrew";
   let agent = (themes.newTerminal && themes.newTerminal.agent) || "shell";
   const start = suggested || data.home.path || "~";
@@ -157,7 +157,7 @@ export async function askFolder({ suggested = "", site = "" } = {}) {
       if (!resolved) return;
       const skip = form.elements.skip && form.elements.skip.checked;
       patch("/api/preferences", { new_terminal: { agent, ...(skip ? { skip_folder: true } : {}) } }).catch(() => null);
-      // o tema sugerido gasta a rotação ("auto"); um tema escolhido à mão não
+      // the suggested theme uses up the rotation ("auto"); a hand-picked theme does not
       finish({ cwd: resolved, title: form.elements.title.value.trim(), theme: theme === themes.next ? "auto" : theme, agent });
     });
     backdrop.addEventListener("click", async (e) => {

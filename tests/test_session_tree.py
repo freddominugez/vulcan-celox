@@ -52,5 +52,5 @@ class SessionTreeTest(ServerTestCase):
         again = {s["id"]: s for s in self.request("GET", "/api/sessions/tree")[1]["closed"]}
         self.assertTrue(again[b["id"]]["has_doc"])
         self.assertEqual(self.request("GET", "/api/sessions/tree?closed=x")[0], 400)
-        more = self.request("GET", "/api/sessions/tree?closed=60")[1]  # "Carregar mais" aumenta o limite
+        more = self.request("GET", "/api/sessions/tree?closed=60")[1]  # "Carregar mais" raises the limit
         self.assertEqual((len(more["closed"]), more["closed_total"]), (2, 2))

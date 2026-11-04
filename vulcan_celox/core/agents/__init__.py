@@ -1,1 +1,1 @@
-"""Leitura das sessões do Claude Code e do Codex gravadas em disco. Somente leitura, stdlib pura."""
+"""Reads Claude Code and Codex sessions stored on disk. Read-only, pure stdlib."""

@@ -27,7 +27,7 @@ class ValetBackend(Backend):
     def restart(self) -> Result:
         return self.runner.run(self.argv("restart"), timeout=SERVICE_TIMEOUT)
 
-    # ── ações de site ─────────────────────────────────────────
+    # ── site actions ─────────────────────────────────────────────────
     def site_command(self, action: str, *args: str) -> Tuple[List[str], Optional[str]]:
         if action == "link":
             path, domain = args
@@ -35,7 +35,7 @@ class ValetBackend(Backend):
         if action == "park":
             return self.argv("park"), args[0]
         if action == "unpark":
-            return self.argv("forget"), args[0]  # forget é o equivalente do unpark no Valet
+            return self.argv("forget"), args[0]  # forget is the equivalent of unpark in Valet
         if action == "isolate":
             _path, php, name = args
             return self.argv("isolate", f"php@{php}", f"--site={name}"), None
@@ -46,7 +46,7 @@ class ValetBackend(Backend):
         return super().site_command(action, *args)
 
     def share_argv(self, name: str, tool: Optional[str] = None) -> List[str]:
-        return self.argv("share")  # roda na pasta do site
+        return self.argv("share")  # runs in the site folder
 
     def version(self) -> str:
         r = self.runner.run(self.argv("--version"), timeout=10)

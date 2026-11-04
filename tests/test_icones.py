@@ -1,4 +1,4 @@
-"""Ícones: todo nome usado existe no sprite, e o sprite vem do Phosphor com a licença registrada."""
+"""Icons: every name used exists in the sprite, and the sprite comes from Phosphor with the license recorded."""
 
 import re
 import unittest

@@ -1,4 +1,4 @@
-"""Leitura de um arquivo de projeto para o visor de código. Só leitura; o conteúdo é sempre dado."""
+"""Reads a project file for the code viewer. Read-only; the content is always data."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ LANGUAGES = {
 
 
 class CodeReadError(Exception):
-    """Recusa com um motivo que a interface sabe mostrar."""
+    """Refusal with a reason the interface knows how to show."""
 
     def __init__(self, status: int, reason: str, message: str):
         super().__init__(message)
@@ -42,7 +42,7 @@ def language_of(path: str) -> str:
 
 
 def resolve_inside(path: str, roots: Iterable[str]) -> Path:
-    """Caminho real (links resolvidos) dentro de uma das raízes. Relativo vale a partir da primeira raiz."""
+    """Real path (links resolved) inside one of the roots. A relative path counts from the first root."""
     roots = [r for r in roots if r]
     if not path or "\x00" in path or not roots:
         raise CodeReadError(400, "invalid", "caminho inválido")
@@ -59,15 +59,15 @@ def resolve_inside(path: str, roots: Iterable[str]) -> Path:
 def read_for_viewer(path: str, roots: Iterable[str]) -> Dict[str, Any]:
     roots = list(roots)
     real = resolve_inside(path, roots)
-    # o nome pedido e o nome real: um link chamado notas.txt que aponta para .env também é recusado
+    # the requested name and the real name: a link called notas.txt that points to .env is also refused
     if is_sensitive(path) or is_sensitive(str(real)):
         raise CodeReadError(403, "sensitive", "arquivo com nome sensível não é exibido")
     try:
-        # sem seguir link no último trecho, e sem travar se alguém trocar o arquivo por um FIFO
+        # without following a link in the last component, and without hanging if someone swaps the file for a FIFO
         fd = os.open(real, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0))
     except FileNotFoundError:
         raise CodeReadError(404, "missing", "o arquivo não existe mais") from None
-    except OSError:  # no Windows, abrir uma pasta dá erro de permissão: o resultado é o mesmo
+    except OSError:  # on Windows, opening a folder gives a permission error: the result is the same
         raise CodeReadError(403, "unreadable", "não foi possível abrir o arquivo") from None
     try:
         info = os.fstat(fd)

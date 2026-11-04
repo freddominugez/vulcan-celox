@@ -1,7 +1,6 @@
-"""Hook opcional de atenção: instalação sem duplicar, script que só grava tipo e hora, e prioridade sobre o JSONL."""
+"""Optional attention hook: installation without duplicating, a script that only records type and time, and priority over the JSONL."""
 
 import json
-import os
 import subprocess
 import sys
 import unittest

@@ -1,8 +1,8 @@
-"""Processos do grupo em primeiro plano da aba, com PTY real e /proc falso."""
+"""Processes of the tab's foreground group, with a real PTY and a fake /proc."""
 import os
 import shutil
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only
 from tests.test_pty import wait_for
 from vulcan_celox.core import procinfo
 from vulcan_celox.core.pty_session import PtySession, terminal_env
@@ -17,7 +17,7 @@ class AgentRunningTest(TempDirTestCase):
         self.assertFalse(procinfo.agent_running([("-zsh", "-zsh")], "claude"))
         self.assertFalse(procinfo.agent_running([("codex", "/Users/dev/.codex/packages/standalone/current/bin/codex")], "claude"))
         self.assertFalse(procinfo.agent_running([], "codex"))
-        self.assertFalse(procinfo.agent_running([("cat", "cat /Users/dev/notas/x claude")], "claude"))  # só os dois primeiros
+        self.assertFalse(procinfo.agent_running([("cat", "cat /Users/dev/notas/x claude")], "claude"))  # only the first two
 
     def test_ps_pelo_runner(self):
         runner = FakeRunner({("ps", "-A", "-o", "pgid=", "-o", "args="):
@@ -44,16 +44,17 @@ class ForegroundPtyTest(TempDirTestCase):
     def env(self):
         return terminal_env({"PATH": os.environ.get("PATH", ""), "HOME": str(self.tmp), "SHELL": "/bin/sh"})
 
+    @unix_only("o Windows não tem grupo em primeiro plano")
     def test_processo_em_primeiro_plano_da_aba(self):
-        # um "agente" falso: um executável chamado claude que só espera
+        # a fake "agent": an executable named claude that just waits
         bindir = self.tmp / "bin"
         bindir.mkdir()
         fake = bindir / "claude"
-        fake.write_text("#!/bin/sh\nsleep 30\n")  # sem exec: fica /bin/sh .../claude
+        fake.write_text("#!/bin/sh\nsleep 30\n")  # without exec: it stays /bin/sh .../claude
         fake.chmod(0o755)
         s = PtySession(["/bin/sh", "-c", f"exec '{shutil.which('sleep')}' 30"], str(self.tmp), self.env())
         self.addCleanup(s.close)
-        # o primeiro olhar pode pegar o sh antes do exec (Linux): espera o sleep aparecer
+        # the first look may catch the sh before the exec (Linux): waits for the sleep to appear
         has_sleep = lambda: any(os.path.basename(c) == "sleep" or "sleep" in a for c, a in (s.foreground() or []))
         self.assertTrue(wait_for(has_sleep), s.foreground())
         self.assertFalse(procinfo.agent_running(s.foreground(), "claude"))

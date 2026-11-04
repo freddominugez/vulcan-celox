@@ -1,5 +1,5 @@
-// Avisos que os programas mandam pelo próprio terminal (OSC 9, 99 e 777 e o sino). Funciona com qualquer programa.
-// O texto vem do programa que roda na aba, então é sempre dado: passa por cleanText e nunca vira marcação.
+// Notices that programs send through the terminal itself (OSC 9, 99 and 777 and the bell). Works with any program.
+// The text comes from the program running in the tab, so it is always data: it goes through cleanText and never becomes markup.
 
 const MAX_TEXT = 200;
 const MIN_INTERVAL_MS = 5000;
@@ -8,7 +8,7 @@ export function cleanText(raw) {
   return String(raw == null ? "" : raw).replace(/[\u0000-\u001f\u007f-\u009f]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_TEXT);
 }
 
-/** Texto do aviso, ou null quando a sequência não é um aviso (`9;4` é a barra de progresso, não uma mensagem). */
+/** Notice text, or null when the sequence is not a notice (`9;4` is the progress bar, not a message). */
 export function oscMessage(code, data) {
   const text = String(data == null ? "" : data);
   if (code === 9) return /^4(;|$)/.test(text) ? null : cleanText(text);
@@ -20,7 +20,7 @@ export function oscMessage(code, data) {
   return null;
 }
 
-/** No máximo um aviso por aba a cada `interval` ms: um programa em laço não pode inundar a interface. */
+/** At most one notice per tab every `interval` ms: a looping program must not flood the interface. */
 export function rateLimiter(interval = MIN_INTERVAL_MS, clock = Date.now) {
   const last = new Map();
   return (id) => {
@@ -31,7 +31,7 @@ export function rateLimiter(interval = MIN_INTERVAL_MS, clock = Date.now) {
   };
 }
 
-/** Liga os avisos de uma aba do xterm. `report(id, texto)` recebe só o que passou pelo filtro e pelo limite. */
+/** Wires up the notices of an xterm tab. `report(id, texto)` receives only what passed the filter and the limit. */
 export function watchTerminal(term, id, report, allow = rateLimiter()) {
   const send = (text) => { if (allow(id)) report(id, text); };
   for (const code of [9, 99, 777]) {

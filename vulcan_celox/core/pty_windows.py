@@ -1,4 +1,4 @@
-"""Terminal real no Windows: ConPTY por ctypes, sem dependência. Importado só no Windows."""
+"""Real terminal on Windows: ConPTY via ctypes, no dependency. Imported only on Windows."""
 
 from __future__ import annotations
 
@@ -72,14 +72,14 @@ def _size(rows: int, cols: int) -> COORD:
 
 
 def _env_block(env: Mapping[str, str]):
-    # o Windows exige o bloco em ordem alfabética, sem diferenciar maiúscula
+    # Windows requires the block in alphabetical order, case-insensitive
     items = sorted(env.items(), key=lambda kv: kv[0].upper())
     text = "\0".join(f"{k}={v}" for k, v in items) + "\0\0"
     return ctypes.create_unicode_buffer(text, len(text))
 
 
 class WinPty:
-    """Processo ligado a um console virtual. `read_fd` e `write_fd` são descritores comuns, em modo binário."""
+    """Process attached to a virtual console. `read_fd` and `write_fd` are plain descriptors, in binary mode."""
 
     def __init__(self, command_line: str, cwd: Optional[str], env: Mapping[str, str], rows: int = 24, cols: int = 80):
         in_read, in_write = wintypes.HANDLE(), wintypes.HANDLE()
@@ -88,7 +88,7 @@ class WinPty:
         _check(kernel32.CreatePipe(ctypes.byref(out_read), ctypes.byref(out_write), None, 0), "CreatePipe")
         self.hpc = HPCON()
         result = kernel32.CreatePseudoConsole(_size(rows, cols), in_read, out_write, 0, ctypes.byref(self.hpc))
-        # o console guardou as pontas dele: estas cópias fechadas é que deixam a leitura terminar quando ele fechar
+        # the console kept its ends: these closed copies are what let the read finish when it closes
         kernel32.CloseHandle(in_read)
         kernel32.CloseHandle(out_write)
         if result != 0:
@@ -106,7 +106,7 @@ class WinPty:
             raise
         self.read_fd = msvcrt.open_osfhandle(out_read.value, os.O_RDONLY | os.O_BINARY)
         self.write_fd = msvcrt.open_osfhandle(in_write.value, os.O_WRONLY | os.O_BINARY)
-        # o console não fecha a saída quando o processo acaba: sem isto, a leitura do terminal esperaria para sempre
+        # the console does not close the output when the process ends: without this, the terminal read would wait forever
         self._lock = threading.Lock()
         self._watcher = threading.Thread(target=self._watch, name="conpty-saida", daemon=True)
         self._watcher.start()
@@ -125,7 +125,7 @@ class WinPty:
                                                       ctypes.sizeof(HPCON), None, None), "UpdateProcThreadAttribute")
             info = STARTUPINFOEXW()
             info.StartupInfo.cb = ctypes.sizeof(STARTUPINFOEXW)
-            # canais vazios: sem isto, com a saída deste processo redirecionada, o filho herda essa saída e ignora o console
+            # empty channels: without this, with this process's output redirected, the child inherits that output and ignores the console
             info.StartupInfo.dwFlags = STARTF_USESTDHANDLES
             info.lpAttributeList = ctypes.cast(attrs, ctypes.c_void_p)
             process = PROCESS_INFORMATION()
@@ -146,7 +146,7 @@ class WinPty:
             kernel32.ResizePseudoConsole(self.hpc, _size(rows, cols))
 
     def wait(self) -> Optional[int]:
-        """Espera o processo acabar e devolve o código de saída."""
+        """Waits for the process to end and returns the exit code."""
         kernel32.WaitForSingleObject(self.process, WAIT_INFINITE)
         code = wintypes.DWORD()
         return code.value if kernel32.GetExitCodeProcess(self.process, ctypes.byref(code)) else None
@@ -163,7 +163,7 @@ class WinPty:
             if self.closed:
                 return
             self.closed = True
-        kernel32.ClosePseudoConsole(self.hpc)  # espera a saída ser lida: quem lê é a thread do terminal
+        kernel32.ClosePseudoConsole(self.hpc)  # wait for the output to be read: the reader is the terminal thread
 
     def release(self) -> None:
         self.close_console()

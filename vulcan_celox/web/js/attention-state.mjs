@@ -1,5 +1,5 @@
-// Quem espera por você agora: sessões de agente (pelo servidor) e abas que avisaram pelo próprio terminal.
-// O app marca abas, painéis e a barra lateral, e o aviso some ao focar a aba ou abrir a sessão.
+// Who is waiting for you now: agent sessions (from the server) and tabs that signaled through their own terminal.
+// The app marks tabs, panels and the sidebar, and the notice disappears when the tab is focused or the session opened.
 
 import { get } from "./api.mjs";
 import { t } from "./i18n.mjs";
@@ -7,13 +7,13 @@ import { t } from "./i18n.mjs";
 const POLL_MS = 3000;
 export const ATTENTION_LABELS = { your_turn: t("sua vez"), maybe_waiting: t("talvez esperando"), waiting_permission: t("pedindo permissão") };
 
-const dismissed = new Map();  // sessão -> `since` já visto
+const dismissed = new Map();  // session -> `since` already seen
 const fromTerminal = new Map();  // aba -> { text, at }
 let sessions = [];
 let first = true;
 let listeners = [];
 
-/** As sessões ainda não vistas. A que já estava em "sua vez" ao abrir o app não conta: seria um aviso antigo. */
+/** Sessions not yet seen. One already in "sua vez" when the app opened does not count: it would be a stale notice. */
 export function unreadSessions(items, seen, isFirst) {
   if (isFirst) items.forEach((s) => { if (s.state === "your_turn") seen.set(s.session, s.since); });
   return items.filter((s) => seen.get(s.session) !== s.since);
@@ -39,7 +39,7 @@ function labelFor(id) {
   return local ? (local.text || t("A aba pediu atenção")) : "";
 }
 
-/** Reaplica as marcas: chamado a cada leitura e depois que a barra de abas é redesenhada. */
+/** Reapplies the marks: called on every read and after the tab bar is redrawn. */
 export function syncTabs() {
   document.querySelectorAll(".tab[data-id]").forEach((tab) => {
     const label = labelFor(tab.dataset.id);
@@ -59,7 +59,7 @@ function changed() {
 }
 
 export function attentionTerminal(id, text) {
-  if (id === activeTabId() && document.hasFocus()) return;  // o usuário já está olhando para esta aba
+  if (id === activeTabId() && document.hasFocus()) return;  // the user is already looking at this tab
   fromTerminal.set(id, { text, at: Date.now() });
   listeners.forEach((f) => f({ kind: "terminal", id, text }));
   changed();
@@ -76,13 +76,13 @@ export function dismissSession(id) {
   changed();
 }
 
-/** Estado de uma sessão para mostrar no cartão, ou "" se já foi visto. */
+/** State of a session to show on the card, or "" if already seen. */
 export function sessionAttention(id) {
   const found = unread().find((s) => s.session === id);
   return found ? ATTENTION_LABELS[found.state] : "";
 }
 
-/** O aviso mais recente, para o atalho: { tab, session }. */
+/** The most recent notice, for the shortcut: { tab, session }. */
 export function latestAttention() {
   const best = [...unread()].sort((a, b) => String(b.since).localeCompare(String(a.since)))[0];
   if (best) return { tab: best.terminal_id || null, session: best.session };
@@ -106,7 +106,7 @@ async function poll() {
     unread().filter((s) => !known.has(`${s.session}|${s.since}`)).forEach((s) => listeners.forEach((f) => f({ kind: "session", item: s })));
     changed();
   } catch {
-    // servidor reiniciando: a próxima volta tenta de novo, sem aviso
+    // server restarting: the next round tries again, without notice
   }
 }
 

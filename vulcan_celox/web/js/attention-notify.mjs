@@ -1,5 +1,5 @@
-// Aviso do sistema quando um agente espera e a janela está sem foco. O texto é genérico: agente, projeto e estado,
-// nunca o conteúdo da conversa nem o que um programa escreveu no terminal.
+// System notification when an agent is waiting and the window is unfocused. The text is generic: agent, project and state,
+// never the conversation content nor what a program wrote to the terminal.
 
 import { isNative, native, patch, post } from "./api.mjs";
 import { ATTENTION_LABELS, attentionCount, onAttention } from "./attention-state.mjs";
@@ -25,6 +25,16 @@ export async function setNoticesEnabled(value) {
   enabled = prefs.attention_notify !== false;
 }
 
+const TOLD_KEY = "vulcan-notice-denied-told";
+
+function wasTold() {
+  try { return localStorage.getItem(TOLD_KEY) === "1"; } catch { return false; }
+}
+
+function rememberTold() {
+  try { localStorage.setItem(TOLD_KEY, "1"); } catch { /* no storage: it just shows once per run */ }
+}
+
 export function startNotices() {
   patch("/api/preferences", {}).then((prefs) => { enabled = prefs.attention_notify !== false; }).catch(() => {});
   onAttention((event) => {
@@ -37,8 +47,9 @@ export function startNotices() {
     if (isNative) native({ type: "badge", count: attentionCount() });
   });
   window.addEventListener("vulcan-notice-denied", () => {
-    if (deniedShown) return;
+    if (deniedShown || wasTold()) return;  // once per machine: it does not change on the next launch
     deniedShown = true;
+    rememberTold();
     toast(t("O macOS não autorizou avisos deste app, que não é assinado pela Apple. O número no ícone do Dock continua valendo."), { kind: "info" });
   });
 }

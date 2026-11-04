@@ -1,12 +1,12 @@
-"""Leitor do harness de um projeto. Só leitura.
+"""Reader for a project's harness. Read-only.
 
-Dois formatos:
-- "repo": o deste repositório (`.harness/state.json`, `specs/<feature>/contract.md`, `.harness/handoff.md`);
-- "minimo": o do Harness Vulcan 3.0.0-rc1 (`.vulcan/state/execution.json`, `.vulcan/tasks/<task_id>.md`,
+Two formats:
+- "repo": this repository's (`.harness/state.json`, `specs/<feature>/contract.md`, `.harness/handoff.md`);
+- "minimo": that of Harness Vulcan 3.0.0-rc1 (`.vulcan/state/execution.json`, `.vulcan/tasks/<task_id>.md`,
   `.vulcan/handoff.md`).
 
-Arquivo ilegível ou corrompido vira `estado: ilegivel` com o erro, nunca estado vazio. Cada arquivo tem limite
-de 1 MB. O app nunca muda status de item: quem valida é o sensor do projeto.
+An unreadable or corrupted file becomes `estado: ilegivel` with the error, never an empty state. Each file has a limit
+of 1 MB. The app never changes an item's status: the project's sensor is what validates.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ MIN_STATE = Path(".vulcan") / "state" / "execution.json"
 MIN_HANDOFF = Path(".vulcan") / "handoff.md"
 MIN_TASKS = Path(".vulcan") / "tasks"
 TASK_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
-# linha de item do contrato mínimo: "C1 [verde]  objetivo   sensor: build"
+# item line of the minimal contract: "C1 [verde]  objetivo   sensor: build"
 _ITEM_LINE = re.compile(r"^\s*(C\d+)\s*\[(verde|amarela|vermelha)\]\s*(.*?)(?:\s+sensor:\s*(.*))?\s*$", re.I)
 _TABLE_ROW = re.compile(r"^\|\s*(C\d+)\s*\|\s*(.+?)\s*\|")
 DONE = ("done", "feito", "validated")
@@ -102,7 +102,7 @@ def _items(raw: Any, titles: Dict[str, Dict]) -> List[Dict]:
 
 
 def parse_min_contract(text: str) -> Dict:
-    """TAREFA, itens (id, faixa, título, sensor), FORA, ESCRITA, ORÇAMENTO e APROVAÇÃO do formato mínimo."""
+    """TAREFA, items (id, band, title, sensor), FORA, ESCRITA, ORÇAMENTO and APROVAÇÃO of the minimal format."""
     out: Dict[str, Any] = {"itens": {}}
     for line in text.splitlines():
         m = _ITEM_LINE.match(line)
@@ -118,7 +118,7 @@ def parse_min_contract(text: str) -> Dict:
 
 
 def _repo_titles(text: str) -> Dict[str, Dict]:
-    """Títulos dos itens na tabela do contract.md do repo (| C1 | **Título.** descrição | sensor |)."""
+    """Item titles in the repo's contract.md table (| C1 | **Título.** descrição | sensor |)."""
     out = {}
     for line in text.splitlines():
         m = _TABLE_ROW.match(line)
@@ -129,7 +129,7 @@ def _repo_titles(text: str) -> Dict[str, Dict]:
 
 
 def _inside(root: Path, rel: str) -> Optional[Path]:
-    """Caminho relativo do estado dentro da pasta do projeto; fora dela, None."""
+    """Relative path of the state inside the project folder; outside it, None."""
     if not isinstance(rel, str) or not rel or Path(rel).is_absolute():
         return None
     target = (root / rel).resolve()
@@ -201,7 +201,7 @@ def _read_min(root: Path) -> Dict:
     contract = None
     parsed: Dict[str, Any] = {"itens": {}}
     if task_id and TASK_ID.match(task_id):
-        rel = str(MIN_TASKS / f"{task_id}.md")
+        rel = (MIN_TASKS / f"{task_id}.md").as_posix()
         path = root / rel
         contract = {"id": task_id, "caminho": rel, "existe": path.is_file()}
         if path.is_file():
@@ -213,7 +213,7 @@ def _read_min(root: Path) -> Dict:
     status = state.get("status") if state.get("status") in MIN_STATUSES else None
     items = _items(state.get("items"), parsed["itens"])
     known = {i["id"] for i in items}
-    for cid, info in parsed["itens"].items():  # item do contrato que o estado ainda não citou: pendente
+    for cid, info in parsed["itens"].items():  # contract item the state has not cited yet: pending
         if cid not in known:
             items.append({"id": cid, "titulo": info["titulo"], "status": "", "estado": "pendente",
                           "validated": False, "causa": None, "faixa": info["faixa"], "sensor": info["sensor"],
@@ -229,7 +229,7 @@ def _read_min(root: Path) -> Dict:
 
 
 def signature(root) -> str:
-    """mtime e tamanho dos arquivos lidos: a tela só redesenha quando isso muda."""
+    """mtime and size of the files read: the screen only redraws when this changes."""
     root = Path(root)
     parts = []
     for rel in (REPO_STATE, REPO_HANDOFF, MIN_STATE, MIN_HANDOFF):
@@ -248,7 +248,7 @@ def signature(root) -> str:
 
 
 def find_project(path: str, sites) -> Optional[Any]:
-    """Site registrado que contém a pasta (a mais específica), para ligar a sessão de agente à aba Harness."""
+    """Registered site that contains the folder (the most specific), to link the agent session to the Harness tab."""
     if not path:
         return None
     target = Path(path)
@@ -264,7 +264,7 @@ def find_project(path: str, sites) -> Optional[Any]:
 
 
 def summary(info: Dict) -> Optional[str]:
-    """Uma linha para a sessão de agente: contrato, itens feitos e próximo."""
+    """One line for the agent session: contract, items done and next."""
     if info.get("estado") != "ok" or not info.get("contrato"):
         return None
     items, done = info["itens"], sum(1 for i in info["itens"] if i["estado"] == "feito")
@@ -272,7 +272,7 @@ def summary(info: Dict) -> Optional[str]:
             + (tr(", próximo {next}", next=info["proximo"]) if info.get("proximo") else ""))
 
 
-# ── instalação do formato mínimo ────────────────────────────────
+# ── installing the minimal format ────────────────────────────────
 BLOCK_START = "<!-- vulcan:harness:inicio -->"
 BLOCK_END = "<!-- vulcan:harness:fim -->"
 FIRST_TASK = "primeira-tarefa"
@@ -287,7 +287,7 @@ class InstallRefused(Exception):
 
 def task_template(task_id: str, objetivo: str = "", itens: Optional[List[Dict]] = None, fora: str = "",
                   escrita: str = "", orcamento: str = "") -> str:
-    """Contrato no formato mínimo do Harness Vulcan (references/technical.md). APROVAÇÃO sempre pendente."""
+    """Contract in the Harness Vulcan minimal format (references/technical.md). APROVAÇÃO always pending."""
     itens = itens or [{"faixa": "verde", "objetivo": "<objetivo verificável>", "sensor": "build"}]
     lines = [f"TAREFA: {task_id} {objetivo or '<objetivo em uma frase>'}".rstrip()]
     for n, item in enumerate(itens, 1):
@@ -333,7 +333,7 @@ def block_text() -> str:
 
 
 def with_block(text: str) -> str:
-    """Troca só o bloco marcado; sem bloco, acrescenta no fim. Todo byte fora do bloco fica igual."""
+    """Replaces only the marked block; without a block, appends at the end. Every byte outside the block stays the same."""
     if _BLOCK.search(text):
         return _BLOCK.sub(lambda _m: block_text(), text, count=1)
     sep = "" if not text or text.endswith("\n\n") else ("\n" if text.endswith("\n") else "\n\n")
@@ -341,16 +341,16 @@ def with_block(text: str) -> str:
 
 
 def install_plan(root) -> List[Dict[str, str]]:
-    """Lista exata do que a instalação faria: arquivo novo (criar) ou bloco marcado num arquivo existente."""
+    """Exact list of what the installation would do: a new file (create) or a marked block in an existing file."""
     root = Path(root)
     if (root / ".harness").exists():
         raise InstallRefused(409, "o projeto tem harness próprio (.harness/); o app não instala o formato mínimo aqui")
     if not root.is_dir():
         raise InstallRefused(404, "pasta do site não existe")
     files = [
-        (str(MIN_TASKS / f"{FIRST_TASK}.md"), task_template(FIRST_TASK)),
-        (str(MIN_STATE), _initial_state(FIRST_TASK)),
-        (str(MIN_HANDOFF), HANDOFF_TEMPLATE),
+        ((MIN_TASKS / f"{FIRST_TASK}.md").as_posix(), task_template(FIRST_TASK)),
+        (MIN_STATE.as_posix(), _initial_state(FIRST_TASK)),
+        (MIN_HANDOFF.as_posix(), HANDOFF_TEMPLATE),
     ]
     plan = [{"caminho": rel, "acao": "criar", "conteudo": text} for rel, text in files if not (root / rel).exists()]
     docs = [name for name in ("AGENTS.md", "CLAUDE.md") if (root / name).exists()]
@@ -365,8 +365,8 @@ def install_plan(root) -> List[Dict[str, str]]:
 def _create(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
-    fd = os.open(str(path), flags, 0o644)  # O_EXCL: arquivo que já existe nunca é sobrescrito
-    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+    fd = os.open(str(path), flags, 0o644)  # O_EXCL: a file that already exists is never overwritten
+    with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:  # on Windows, without turning \n into \r\n
         fh.write(text)
 
 
@@ -376,7 +376,7 @@ def _replace_block(path: Path) -> None:
     try:
         if path.stat().st_size > MAX_FILE:
             raise InstallRefused(409, f"{path.name} maior que 1 MB")
-        original = path.read_bytes().decode("utf-8")  # bytes como estão: sem trocar \r\n por \n
+        original = path.read_bytes().decode("utf-8")  # bytes as they are: without turning \r\n into \n
     except (OSError, UnicodeDecodeError) as exc:
         raise InstallRefused(409, f"{path.name}: {exc}") from None
     updated = with_block(original)
@@ -387,7 +387,7 @@ def _replace_block(path: Path) -> None:
 
 
 def install(root) -> List[Dict[str, str]]:
-    """Aplica o plano (chamar só depois da confirmação do usuário). Devolve o que foi feito."""
+    """Applies the plan (call only after user confirmation). Returns what was done."""
     root = Path(root)
     plan = install_plan(root)
     done = []
@@ -401,21 +401,21 @@ def install(root) -> List[Dict[str, str]]:
             try:
                 _create(target, step["conteudo"])
             except FileExistsError:
-                continue  # apareceu entre o plano e a escrita: fica o do usuário
+                continue  # appeared between the plan and the write: the user's stays
         else:
             _replace_block(target)
         done.append({"caminho": step["caminho"], "acao": step["acao"]})
     return done
 
 
-# ── novo contrato pela interface ───────────────────────────────
+# ── new contract via the interface ───────────────────────────────
 FAIXAS = ("verde", "amarela", "vermelha")
 MAX_ITEMS = 20
 MAX_FIELD = 300
 
 
 def _one_line(value, field: str) -> str:
-    """Campo de uma linha: quebra de linha viraria outra chave do contrato (por exemplo uma APROVAÇÃO forjada)."""
+    """One-line field: a line break would become another contract key (for example a forged APROVAÇÃO)."""
     if value is None:
         return ""
     if not isinstance(value, str):
@@ -427,7 +427,7 @@ def _one_line(value, field: str) -> str:
 
 
 def create_task(root, data: Dict) -> Dict[str, str]:
-    """Grava .vulcan/tasks/<task_id>.md no formato mínimo. APROVAÇÃO sempre pendente; nunca sobrescreve."""
+    """Writes .vulcan/tasks/<task_id>.md in the minimal format. APROVAÇÃO always pending; never overwrites."""
     root = Path(root)
     if (root / ".harness").exists():
         raise InstallRefused(409, "o projeto tem harness próprio (.harness/); contratos ficam em specs/")
@@ -454,7 +454,7 @@ def create_task(root, data: Dict) -> Dict[str, str]:
     text = task_template(task_id, _one_line(data.get("objetivo"), "objetivo"), items,
                          _one_line(data.get("fora"), "fora"), _one_line(data.get("escrita"), "escrita"),
                          _one_line(data.get("orcamento"), "orçamento"))
-    rel = str(MIN_TASKS / f"{task_id}.md")
+    rel = (MIN_TASKS / f"{task_id}.md").as_posix()
     try:
         _create(root / rel, text)
     except FileExistsError:

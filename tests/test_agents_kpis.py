@@ -1,4 +1,4 @@
-"""KPIs do dia contam o que aconteceu hoje, no fuso local."""
+"""Day KPIs count what happened today, in the local time zone."""
 
 import unittest
 from datetime import datetime, timedelta, timezone

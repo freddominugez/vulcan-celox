@@ -1,4 +1,4 @@
-// Tela Índice: índice geral, documentação geral com IA, chave da Anthropic e documentação por sessão.
+// Índice screen: general index, general AI documentation, Anthropic key and per-session documentation.
 
 import { confirmDialog, documentGeneral, documentSession, onJobsChange } from "../ai.mjs";
 import { del, get, patch, post, put } from "../api.mjs";
@@ -42,7 +42,7 @@ export class IndexView {
       this.docs.index = index;
       this.running = new Set(jobs.jobs.filter((j) => j.status === "running").map((j) => j.target));
       this.docs.documentation = await get("/api/index/documentation").catch(() => null);
-      if (!this.root.isConnected) return; // a tela foi trocada enquanto carregava
+      if (!this.root.isConnected) return; // the screen was switched while loading
       this.render();
     } catch (err) {
       reportError(err);
@@ -194,7 +194,7 @@ export class IndexView {
     }
   }
 
-  /** Links relativos do índice apontam para memórias e documentações: abre a sessão correspondente no app. */
+  /** Relative links in the index point to memories and documentations: opens the matching session in the app. */
   followLink(href) {
     if (!href) return;
     if (/DOCUMENTACAO\.md$/.test(href)) { this.tab = "documentation"; this.render(); return; }

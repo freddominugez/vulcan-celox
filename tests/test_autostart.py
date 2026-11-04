@@ -1,11 +1,12 @@
 import threading
+from unittest import mock
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.backends.base import EnvStatus
 from vulcan_celox.core.runner import Result
 from vulcan_celox.core.store import Store
-from vulcan_celox.server.autostart import EnvAutostart
+from vulcan_celox.server.autostart import EnvAutostart, failure_reason
 
 
 class FakeBackend:
@@ -38,13 +39,45 @@ class FakeApp:
 
 class EnvAutostartTest(TempDirTestCase):
     def auto(self, backend, env=None):
-        return EnvAutostart(FakeApp(self.tmp, backend, env))
+        auto = EnvAutostart(FakeApp(self.tmp, backend, env))
+        auto.set_enabled(True)
+        auto.start_wait = 0
+        return auto
 
     def test_parado_inicia(self):
         backend = FakeBackend(running=False)
         auto = self.auto(backend)
         self.assertEqual(auto.run(), "ready")
         self.assertEqual((backend.starts, auto.state()["message"]), (1, "Lerd iniciado"))
+
+    def test_desligado_ate_o_usuario_escolher(self):
+        """Lerd is optional: with no choice recorded, opening the app starts nothing."""
+        backend = FakeBackend(running=False)
+        auto = EnvAutostart(FakeApp(self.tmp, backend))
+        self.assertFalse(auto.enabled())
+        self.assertEqual((auto.run(), backend.starts), ("skipped", 0))
+
+    def test_espera_o_ambiente_responder_depois_do_comando(self):
+        """`lerd start` returns while the VM and the panel still come up: that is not a failure."""
+        backend = FakeBackend(running=False, comes_up=False)
+        answers = iter([False, False, True])
+        backend.status = lambda: EnvStatus(next(answers, True), "")
+        from vulcan_celox.server import autostart as module
+        auto = self.auto(backend)
+        auto.start_wait = 30
+        with mock.patch.object(module, "POLL_SECONDS", 0):
+            self.assertEqual(auto.run(), "ready")
+
+    def test_linha_de_sucesso_nunca_vira_motivo(self):
+        ok_lines = " → nginx\n → starting lerd-tray… ✓\n"
+        self.assertEqual(failure_reason(Result(1, ok_lines, "")), "código 1")
+        self.assertEqual(failure_reason(Result(1, ok_lines, "Error: unable to connect\n")), "Error: unable to connect")
+        backend = FakeBackend(running=False, comes_up=False)
+        backend.start = lambda: Result(0, ok_lines, "")
+        auto = self.auto(backend)
+        self.assertEqual(auto.run(), "failed")
+        self.assertNotIn("lerd-tray", auto.state()["message"])
+        self.assertIn("não respondeu", auto.state()["message"])
 
     def test_ja_rodando_nao_inicia(self):
         backend = FakeBackend(running=True)
@@ -71,6 +104,7 @@ class EnvAutostartTest(TempDirTestCase):
         backend = FakeBackend()
         app = FakeApp(self.tmp, backend)
         auto = EnvAutostart(app)
+        auto.set_enabled(True)
         app._service_lock.acquire()
         thread = auto.begin()
         thread.join(0.3)
@@ -83,7 +117,7 @@ class EnvAutostartTest(TempDirTestCase):
 class AutostartApiTest(ServerTestCase):
     def test_estado_e_preferencia(self):
         auto = self.request("GET", "/api/state")[1]["autostart"]
-        self.assertEqual((auto["phase"], auto["enabled"]), ("idle", True))
+        self.assertEqual((auto["phase"], auto["enabled"]), ("idle", False))
         self.assertFalse(self.request("PATCH", "/api/preferences", body={"autostart_env": False})[1]["autostart"]["enabled"])
         self.assertFalse(self.request("GET", "/api/state")[1]["autostart"]["enabled"])
         self.assertEqual(self.request("PATCH", "/api/preferences", body={"autostart_env": "sim"})[0], 400)

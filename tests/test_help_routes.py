@@ -1,4 +1,4 @@
-"""Toda rota da barra lateral tem seção na Ajuda, e toda seção mapeada existe no conteúdo."""
+"""Every sidebar route has a Help section, and every mapped section exists in the content."""
 
 import json
 import re

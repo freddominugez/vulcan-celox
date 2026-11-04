@@ -14,7 +14,7 @@ class ChooseModeTest(unittest.TestCase):
         self.assertEqual(choose_mode(env, self.which_for("chromium"), gtk=lambda: "4.1"), ("gtk", "4.1"))
         self.assertEqual(choose_mode(env, self.which_for("google-chrome"), gtk=lambda: None), ("app", "/usr/bin/google-chrome"))
         self.assertEqual(choose_mode(env, self.which_for(), gtk=lambda: None), ("browser", None))
-        # sem tela não tenta GTK
+        # without a display it does not try GTK
         self.assertEqual(choose_mode({}, self.which_for("chromium"), gtk=lambda: "4.1"), ("app", "/usr/bin/chromium"))
 
     def test_modo_forcado(self):
@@ -24,14 +24,14 @@ class ChooseModeTest(unittest.TestCase):
         self.assertEqual(choose_mode(env, self.which_for("chromium"), gtk=lambda: "4.1"), ("app", "/usr/bin/chromium"))
 
     def test_ociosidade(self):
-        self.assertFalse(should_exit_idle(0.0, started=100.0, now=350.0, timeout=150))  # ainda abrindo (300 s de folga)
+        self.assertFalse(should_exit_idle(0.0, started=100.0, now=350.0, timeout=150))  # still opening (300 s of slack)
         self.assertTrue(should_exit_idle(0.0, started=100.0, now=401.0, timeout=150))
         self.assertFalse(should_exit_idle(500.0, started=100.0, now=600.0, timeout=150))
         self.assertTrue(should_exit_idle(500.0, started=100.0, now=651.0, timeout=150))
 
 
 class OrigemTest(unittest.TestCase):
-    """A janela GTK só navega e só fala com a ponte na origem do app."""
+    """The GTK window only navigates and only talks to the bridge on the app's origin."""
 
     def test_so_a_origem_do_app(self):
         self.assertTrue(is_app_uri("http://127.0.0.1:5000/#/overview", 5000))

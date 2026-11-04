@@ -1,4 +1,4 @@
-"""Lista de projetos Node, detalhe e sugestões vindas das sessões dos agentes."""
+"""List of Node projects, detail and suggestions coming from the agent sessions."""
 
 import json
 import shutil
@@ -31,10 +31,10 @@ class NodeApiTest(ServerTestCase):
         self.assertEqual((info["estado"], info["porta_provavel"]), ("ok", 3100))
         self.call("POST", "/api/node-projects/painel/remove", {})
         self.assertEqual(self.call("GET", "/api/node-projects")["projects"], [])
-        self.assertTrue((self.tmp / "painel" / "package.json").is_file())  # nada saiu do disco
+        self.assertTrue((self.tmp / "painel" / "package.json").is_file())  # nothing left the disk
 
     def test_dois_cadastros_ao_mesmo_tempo_nao_perdem_projeto(self):
-        """Ler, mudar e salvar a lista ficam sob a mesma trava."""
+        """Reading, changing and saving the list happen under the same lock."""
         import threading
         for name in ("um", "dois", "tres", "quatro"):
             shutil.copytree(N / "painel", self.tmp / name)

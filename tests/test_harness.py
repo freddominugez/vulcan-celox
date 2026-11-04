@@ -1,4 +1,4 @@
-"""Leitor de harness dos dois formatos, só leitura."""
+"""Harness reader for both formats, read-only."""
 
 import hashlib
 import shutil

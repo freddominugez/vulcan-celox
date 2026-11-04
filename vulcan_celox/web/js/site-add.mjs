@@ -1,4 +1,4 @@
-// Adicionar site: linkar uma pasta com um domínio ou parkear uma pasta de projetos, pelo backend.
+// Add site: link a folder to a domain or park a projects folder, through the backend.
 
 import { get, hasBridge, post } from "./api.mjs";
 import { esc, icon, toast } from "./dom.mjs";
@@ -16,7 +16,7 @@ function suggest(name) {
 
 export function addSiteDialog({ backend = null, onDone = () => {} } = {}) {
   const available = Boolean(backend && backend.available);
-  // só o Lerd escreve no projeto ao registrar (.php-version); o Valet só cria o link
+  // only Lerd writes to the project on register (.php-version); Valet only creates the link
   const note = !available ? `${icon("text")}<span>${t("Sem Lerd ou Valet: instale um dos dois para adicionar sites.")}</span>`
     : backend.name === "lerd" ? `${icon("text")}<span>${t("O Lerd grava <code>.php-version</code> na pasta do projeto ao registrar o site.")}</span>` : "";
   const backdrop = document.createElement("div");

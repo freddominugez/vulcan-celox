@@ -1,5 +1,5 @@
-"""Chave de API no Keychain do macOS (ou no chaveiro do Linux). O valor entra pelo stdin, nunca pela linha de
-comando, e nunca é gravado em arquivo, log ou resposta da API."""
+"""API key in the macOS Keychain (or the Linux keyring). The value comes in via stdin, never via the command
+line, and is never written to a file, log or API response."""
 
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ from typing import Optional
 from vulcan_celox.core.runner import Runner
 
 SERVICE = "com.byvulcan.celox.anthropic"
-OLD_SERVICE = "com.byvulcan." + "terminal.anthropic"  # nome até a 1.1: a chave é copiada na primeira leitura
+OLD_SERVICE = "com.byvulcan." + "terminal.anthropic"  # name used up to 1.1: the key is copied on first read
 ACCOUNT = "api-key"
 SECURITY = "/usr/bin/security"
-# formato das chaves da Anthropic; restringir os caracteres também impede injeção no comando do `security -i`
+# format of Anthropic keys; restricting the characters also prevents injection into the `security -i` command
 KEY_PATTERN = re.compile(r"^sk-ant-[A-Za-z0-9_\-]{20,300}$")
 
 
@@ -57,7 +57,7 @@ class KeychainStore:
         try:
             self.set(value)
         except SecretError:
-            pass  # não copiou: a antiga continua valendo, e a próxima leitura tenta de novo
+            pass  # did not copy: the old one stays valid, and the next read tries again
         finally:
             self.migrating = False
         return value
@@ -76,7 +76,7 @@ class KeychainStore:
 
 
 class SecretToolStore:
-    """Linux: chaveiro do sistema (Secret Service) pelo `secret-tool`, com o valor pelo stdin."""
+    """Linux: the system keyring (Secret Service) via `secret-tool`, with the value on stdin."""
 
     def __init__(self, runner=None, service: str = SERVICE, account: str = ACCOUNT, tool: Optional[str] = None):
         import shutil
@@ -127,7 +127,7 @@ class SecretToolStore:
 
 
 class WindowsCredentialStore:
-    """Gerenciador de Credenciais do Windows: a chave fica protegida pela conta do usuário."""
+    """Windows Credential Manager: the key is protected by the user's account."""
 
     def __init__(self, service: str = SERVICE, account: str = ACCOUNT):
         self.target, self.account = service, account
@@ -157,7 +157,7 @@ def default_keystore(runner=None, system: Optional[str] = None):
 
 
 class MemoryKeyStore:
-    """Para testes e para rodar fora do macOS: guarda só em memória."""
+    """For tests and for running outside macOS: keeps it in memory only."""
 
     def __init__(self) -> None:
         self.value: Optional[str] = None

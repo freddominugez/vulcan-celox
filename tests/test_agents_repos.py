@@ -1,4 +1,4 @@
-"""Branches e worktrees cruzando as sessões com o git real (só leitura)."""
+"""Branches and worktrees crossing the sessions with real git (read-only)."""
 
 import shutil
 import unittest
@@ -101,14 +101,14 @@ class ReposTest(unittest.TestCase):
         orphan = r[("feat/esquecida", "esquecida")]
         self.assertTrue(orphan["orphan_worktree"])
         self.assertEqual(orphan["sessions"], [])
-        self.assertEqual(list(r)[0], ("feat/relatorio", "relatorio"))  # a pior situação primeiro
+        self.assertEqual(list(r)[0], ("feat/relatorio", "relatorio"))  # the worst situation first
 
     def test_so_comandos_de_leitura(self):
         repo(self.runner, "/dev/loja", status=" M a\n", worktrees="")
         self.build([session("s1", "/dev/loja", "main")])
         self.assertTrue(self.runner.calls)
         for call in self.runner.calls:
-            # Sem fsmonitor nem untrackedCache, o git status não executa programa do repositório analisado
+            # without fsmonitor or untrackedCache, git status does not run a program from the analyzed repository
             self.assertEqual(list(call.argv[:len(SAFE)]), SAFE)
             verb = call.argv[len(SAFE) + 2]
             self.assertNotIn(verb, WRITE_VERBS, call.argv)
@@ -131,23 +131,23 @@ if __name__ == "__main__":
 
 @unittest.skipUnless(shutil.which("git"), "git ausente")
 class FsmonitorRealTest(TempDirTestCase):
-    """Prova com git de verdade: um core.fsmonitor do repositório analisado não é executado."""
+    """Proof with real git: a core.fsmonitor in the analyzed repository is not executed."""
 
     def test_hook_do_repositorio_nao_roda(self):
         repo_dir, marker = self.tmp / "repo", self.tmp / "executou"
         repo_dir.mkdir()
         hook = self.tmp / "hook.sh"
-        hook.write_text(f"#!/bin/sh\ntouch {marker}\n")
+        hook.write_bytes(f"#!/bin/sh\ntouch '{marker.as_posix()}'\n".encode())
         hook.chmod(0o755)
         runner = Runner()
         runner.run(["git", "init", "-q", str(repo_dir)])
-        runner.run(["git", "-C", str(repo_dir), "config", "core.fsmonitor", str(hook)])
+        runner.run(["git", "-C", str(repo_dir), "config", "core.fsmonitor", hook.as_posix()])
         (repo_dir / "a.txt").write_text("x")
         state = repos.git_state(runner, str(repo_dir))
         self.assertTrue(state.is_repo)
         self.assertEqual(state.dirty, 1)
         self.assertFalse(marker.exists(), "o git status executou o core.fsmonitor do repositório")
-        runner.run(["git", "-C", str(repo_dir), "status", "--porcelain"])  # controle: sem a defesa, o hook roda
+        runner.run(["git", "-C", str(repo_dir), "status", "--porcelain"])  # control: without the defense, the hook runs
         self.assertTrue(marker.exists())
 
 

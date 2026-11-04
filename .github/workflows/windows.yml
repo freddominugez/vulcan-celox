@@ -3,6 +3,7 @@ name: Windows
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -21,13 +22,14 @@ jobs:
           python-version: "3.12"
       - name: Windows tests
         run: python -m unittest tests.test_windows -v
-      - name: Whole suite, for information
-        continue-on-error: true
+      - name: Whole suite
         shell: bash
         run: |
-          python -m unittest discover -s tests -t . > suite.log 2>&1 || true
-          grep -E '^(FAIL|ERROR):' suite.log | sed 's/ (.*//' | sort | uniq -c | sort -rn | head -60
+          code=0
+          python -m unittest discover -s tests -t . > suite.log 2>&1 || code=$?
+          grep -E '^(FAIL|ERROR):' suite.log | sed 's/ (.*//' | sort | uniq -c | sort -rn | head -60 || true
           tail -3 suite.log
+          exit $code
       - name: Build package
         run: python scripts/package_windows.py out
       - name: Run from the extracted package

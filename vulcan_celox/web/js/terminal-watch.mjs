@@ -1,4 +1,4 @@
-// O que cada terminal observa além da saída: avisos dos programas e caminhos clicáveis com ⌘.
+// What each terminal watches besides the output: program notices and ⌘-clickable paths.
 
 import { get, isMac, post } from "./api.mjs";
 import { attentionTerminal, syncTabs as syncAttention } from "./attention-state.mjs";
@@ -9,7 +9,7 @@ import { pathLinkProvider } from "./terminal-path-links.mjs";
 import { syncPorts } from "./terminal-ports.mjs";
 import { TurnMarks } from "./terminal-turns.mjs";
 
-/** Marcas da barra de abas, depois de ela ser redesenhada. */
+/** Tab bar marks, after it is redrawn. */
 export function syncTabs() {
   syncAttention();
   syncPorts();
@@ -18,7 +18,7 @@ export function syncTabs() {
 const turns = new Map();
 let lastTyped = null;
 
-/** ⌘⇧↑/↓ na aba em foco, ou na última em que se digitou, se ainda estiver na tela. */
+/** ⌘⇧↑/↓ on the focused tab, or on the last one typed in, if still on screen. */
 export function stepTerminalTurn(direction) {
   const entries = [...turns.entries()].filter(([, e]) => e.term.element && e.term.element.isConnected && e.term.element.offsetParent);
   const focused = entries.find(([, e]) => e.term.element.contains(document.activeElement));
@@ -33,7 +33,7 @@ const isModifier = (event) => (isMac ? event.key === "Meta" : event.key === "Con
 const pressed = (event) => (isMac ? event.metaKey : event.ctrlKey);
 window.addEventListener("keydown", (e) => { if (isModifier(e)) held = true; }, true);
 window.addEventListener("keyup", (e) => { if (isModifier(e)) held = false; }, true);
-window.addEventListener("blur", () => { held = false; });  // ⌘Tab: o keyup vai para outro app
+window.addEventListener("blur", () => { held = false; });  // ⌘Tab: the keyup goes to another app
 
 export function openTarget(terminal, event, target) {
   if (!pressed(event)) return;

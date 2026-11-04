@@ -1,6 +1,8 @@
-// Tela Ambiente: o que o Lerd mantém rodando, com as ações do dia a dia; o resto fica no painel do Lerd.
+// Ambiente screen: what Lerd keeps running, with the day-to-day actions; the rest lives in the Lerd panel.
 
 import { every, get, post } from "../api.mjs";
+import { installLerd } from "../lerd-setup.mjs";
+import { app } from "../app-state.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
 import { terminals } from "../terminals.mjs";
 import { confirmDialog } from "../ai.mjs";
@@ -37,10 +39,14 @@ export class EnvironmentView {
     const d = this.data;
     if (!d.available || d.backend !== "lerd") {
       this.root.innerHTML = `<div class="page"><div class="empty-block"><h3>${d.available ? t("{label} não tem esta tela", { label: esc(d.label) }) : t("Sem Lerd ou Valet")}</h3>
-        <p>${t("Esta tela mostra o que o Lerd mantém rodando.")} ${d.available ? t("Com o Valet, use os comandos dele no terminal.") : t("Instale o Lerd para ver serviços, PHP e Node aqui.")}</p></div></div>`;
+        <p>${t("Esta tela mostra o que o Lerd mantém rodando.")} ${d.available ? t("Com o Valet, use os comandos dele no terminal.") : t("O Lerd é opcional: só é preciso para rodar sites PHP e Laravel.")}</p>
+        ${d.available ? "" : `<button class="btn btn-primary" data-lerd-install>${icon("plus")}<span>${t("Instalar o Lerd")}</span></button>`}</div></div>`;
       return;
     }
+    const auto = (app.state && app.state.autostart) || {};
+    const failed = auto.phase === "failed" && !(app.state && app.state.status.running);
     this.root.innerHTML = `<div class="page env-page">
+      ${failed ? `<p class="env-note is-warn" role="status">${icon("alert")}<span>${esc(auto.message)}</span></p>` : ""}
       <div class="env-head"><h1>Lerd</h1><span class="dim">${esc(d.label)} · ${t("PHP, nginx, banco e HTTPS dos sites locais")}</span><span class="spacer"></span>
         <button class="btn btn-sm" data-service="start">${icon("play")}<span>${t("Ligar")}</span></button>
         <button class="btn btn-sm" data-service="stop">${icon("stop")}<span>${t("Parar")}</span></button>
@@ -113,7 +119,7 @@ export class EnvironmentView {
     return (this.xdebug && this.xdebug.port) || 9003;
   }
 
-  /** Liga com modo e sob demanda, ou desliga; reconstrói a imagem do PHP-FPM numa aba do terminal. */
+  /** Turns on with mode and on demand, or off; rebuilds the PHP-FPM image in a terminal tab. */
   async xdebugAction(version, isOn) {
     let choice = null;
     const port = this.xdebugPort();
@@ -183,7 +189,7 @@ export class EnvironmentView {
     await this.load();
   }
 
-  /** Seis ajustes comuns, gravados pelo próprio lerd php:ini (o Lerd reaplica o PHP-FPM). */
+  /** Six common settings, written by lerd php:ini itself (Lerd reapplies PHP-FPM). */
   async editIni(version) {
     const info = await get(`/api/environment/php/${version}/ini`);
     const hints = { memory_limit: "512M", upload_max_filesize: "64M", post_max_size: "64M", max_execution_time: "60",
@@ -202,7 +208,7 @@ export class EnvironmentView {
         values = Object.fromEntries([...root.querySelectorAll("[data-key]")].map((i) => [i.dataset.key, i.value.trim()]));
       },
     });
-    // a janela fica no body: o botão é ligado aqui; abrir no editor fecha a janela sem gravar
+    // the window lives in body: the button is wired here; opening in the editor closes the window without saving
     const dialogs = document.querySelectorAll(".dialog-backdrop [data-open-ini]");
     const openBtn = dialogs[dialogs.length - 1];
     if (openBtn) {
@@ -225,7 +231,7 @@ export class EnvironmentView {
     else toast(t("php.ini: {msg}", { msg: (result.output || "").split("\n").pop() }), { kind: "error", timeout: 8000 });
   }
 
-  /** Extensões carregadas (php -m no contêiner da versão), só leitura; gerenciar fica no painel do Lerd. */
+  /** Loaded extensions (php -m in the version's container), read-only; managing stays in the Lerd panel. */
   async showExtensions(version) {
     const info = await get(`/api/environment/php/${version}/extensions`);
     const chips = (list) => list.map((m) => `<span class="chip ext-chip" data-name="${esc(m.toLowerCase())}">${esc(m)}</span>`).join("");
@@ -268,6 +274,7 @@ export class EnvironmentView {
   }
 
   async onClick(event) {
+    if (event.target.closest("[data-lerd-install]")) return installLerd();
     const node = event.target.closest("[data-node]");
     if (node) {
       this.nodeAction(node.dataset.node, node.dataset.op).catch(reportError);

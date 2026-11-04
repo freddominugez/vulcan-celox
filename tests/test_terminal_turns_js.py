@@ -1,4 +1,4 @@
-"""Marcas de pedido no terminal, rodando o módulo de verdade no node."""
+"""Request marks in the terminal, running the real module in node."""
 
 import json
 import shutil

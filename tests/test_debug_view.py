@@ -1,4 +1,4 @@
-"""Tela Depuração (agrupar por requisição, filtrar, abrir a origem no editor)."""
+"""Debug screen (group by request, filter, open the source in the editor)."""
 
 import json
 import os
@@ -14,7 +14,7 @@ EVENTS = parse_events(json.loads((FIXTURES / "lerd-api-dumps.json").read_text(en
 class AgruparTest(TempDirTestCase):
     def test_por_requisicao_mais_nova_primeiro(self):
         groups = group_by_request(EVENTS)
-        self.assertEqual(len(groups), 4)  # duas requisições em cada site de teste
+        self.assertEqual(len(groups), 4)  # two requests on each test site
         self.assertGreaterEqual(groups[0]["ts"], groups[-1]["ts"])
         erro = next(g for g in groups if g["site"] == "loja" and "erro=1" in g["request"])
         self.assertEqual(erro["counts"]["log"], 2)
@@ -55,7 +55,7 @@ class AbrirOrigemTest(ServerTestCase):
     def test_so_arquivo_dentro_de_um_site(self):
         status, data, _ = self.request("POST", "/api/open", body={"kind": "source", "target": str(self.pasta / "routes" / "web.php")})
         self.assertEqual(status, 200, data)
-        self.assertTrue(self.fake.calls[-1].argv[-1].endswith("routes/web.php"))
+        self.assertTrue(self.fake.calls[-1].argv[-1].endswith(os.path.join("routes", "web.php")))
         fora = self.tmp / "fora.php"
         fora.write_text("<?php")
         for target in (str(fora), str(self.pasta / "routes" / "nao-existe.php"), str(self.pasta / "routes" / ".." / ".." / "fora.php")):

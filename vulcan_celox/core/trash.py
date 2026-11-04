@@ -1,5 +1,5 @@
-"""Nada é apagado de forma definitiva: arquivos vão para a Lixeira do sistema ou, se não der, para `lixeira/`
-dentro da pasta de dados do Vulcan Celox."""
+"""Nothing is permanently deleted: files go to the system Trash or, failing that, to `lixeira/`
+inside the Vulcan Celox data folder."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def _applescript_string(value: str) -> str:
 
 
 def move_to_trash(path, data_dir, runner, system: Optional[str] = None) -> Path:
-    """Move `path` para a Lixeira e devolve onde ficou (o próprio caminho original se foi para a Lixeira do sistema)."""
+    """Moves `path` to the Trash and returns where it ended up (the original path itself if it went to the system Trash)."""
     path = Path(path)
     if not path.exists():
         return path
@@ -34,7 +34,7 @@ def move_to_trash(path, data_dir, runner, system: Optional[str] = None) -> Path:
             runner.run([gio, "trash", str(path)], timeout=20)
     if not path.exists():
         return path
-    # sem Lixeira disponível: guarda na pasta de dados, com data para não sobrescrever
+    # no Trash available: keep it in the data folder, with a date so as not to overwrite
     target_dir = Path(data_dir) / TRASH_DIR
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / f"{time.strftime('%Y%m%d-%H%M%S')}-{path.name}"

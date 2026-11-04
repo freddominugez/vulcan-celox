@@ -1,6 +1,6 @@
-// Painel inferior de terminal: abaixo das telas que não têm terminal, com as abas de todos os
-// terminais. ⌘J mostra e esconde, a borda de cima arrasta, a altura fica lembrada. Nas telas de site e Terminais o
-// terminal já ocupa a área principal: o painel se recolhe e devolve os terminais (um xterm só fica num lugar).
+// Bottom terminal panel: below the screens that have no terminal, with the tabs of all the
+// terminals. ⌘J shows and hides, the top edge drags, the height is remembered. On the site and Terminais screens the
+// terminal already takes the main area: the panel collapses and hands the terminals back (an xterm lives in one place only).
 
 import { isMac } from "./api.mjs";
 import { icon } from "./dom.mjs";
@@ -52,7 +52,7 @@ export class TerminalPanel {
     try {
       localStorage.setItem(KEY, JSON.stringify(this.state));
     } catch {
-      /* sem armazenamento: só não lembra */
+      /* no storage: it just does not remember */
     }
   }
 
@@ -74,7 +74,7 @@ export class TerminalPanel {
     this.el.querySelector("[data-tp-count]").textContent = n ? String(n) : "";
   }
 
-  /** Chamado a cada troca de tela: monta o workspace nas telas sem terminal e o desmonta nas outras. */
+  /** Called on every screen change: mounts the workspace on screens without a terminal and unmounts it on the others. */
   setRoute(name) {
     this.route = name;
     if (HIDDEN_ON.includes(name)) {
@@ -87,7 +87,7 @@ export class TerminalPanel {
 
   unmount() {
     if (this.ws) {
-      this.ws.destroy();  // devolve os xterm ao conjunto; os processos continuam vivos
+      this.ws.destroy();  // hands the xterms back to the pool; the processes stay alive
       this.ws = null;
       this.body.innerHTML = "";
     }
@@ -107,13 +107,13 @@ export class TerminalPanel {
     }
   }
 
-  /** ⌘F com o painel aberto: busca no terminal ativo do painel. */
+  /** ⌘F with the panel open: searches the panel's active terminal. */
   find() {
     if (!this.ws || !this.state.open) return false;
     return this.ws.openSearch();
   }
 
-  /** ⌘T nas telas sem terminal: abre no painel, sem sair da tela. */
+  /** ⌘T on screens without a terminal: opens in the panel, without leaving the screen. */
   async newTerminal(options = {}) {
     if (!this.ws) return null;
     this.toggle(true);

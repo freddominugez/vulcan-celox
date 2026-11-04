@@ -1,4 +1,4 @@
-"""Desligamento na ordem certa e observador que para entre arquivos."""
+"""Shutdown in the right order and a watcher that stops between files."""
 
 from unittest import mock
 
@@ -16,7 +16,7 @@ class ShutdownOrderTest(test_agents_api.AgentsServerCase):
                 mock.patch.object(self.app.agents, "stop", lambda: (order.append("agentes"), agents_stop())):
             self.app.shutdown()
         self.assertEqual(order, ["http", "agentes"])
-        self.app.shutdown = lambda: None  # o tearDown não desliga de novo
+        self.app.shutdown = lambda: None  # tearDown does not shut down again
 
 
 class WatcherStopTest(TempDirTestCase):
@@ -33,7 +33,7 @@ class WatcherStopTest(TempDirTestCase):
 
         def slow(agent, path):
             reads.append(path)
-            watcher._stop.set()  # o pedido de parada chega durante a primeira leitura
+            watcher._stop.set()  # the stop request arrives during the first read
             return original(agent, path)
 
         with mock.patch.object(index, "update_file", slow):

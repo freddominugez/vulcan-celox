@@ -1,4 +1,4 @@
-"""Adicionar site (linkar ou parkear pasta) pela API do app."""
+"""Adding a site (link or park a folder) through the app API."""
 
 import os
 

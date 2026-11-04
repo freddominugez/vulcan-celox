@@ -1,8 +1,8 @@
-// Pedidos feitos ao agente numa aba: uma marca do xterm a cada Enter, e ⌘⇧↑/↓ salta entre elas. Nada é desenhado na área
-// do terminal. Sem dependência de outro módulo do app, para rodar também no teste.
+// Requests made to the agent in a tab: an xterm marker on every Enter, and ⌘⇧↑/↓ jumps between them. Nothing is drawn in the terminal
+// area. No dependency on another app module, so it also runs in the test.
 
 export class TurnMarks {
-  /** `isAgent()` diz, depois do Enter, se a aba roda um agente vivo; `warn` avisa uma vez que não há o que navegar. */
+  /** `isAgent()` says, after Enter, whether the tab runs a live agent; `warn` notifies once that there is nothing to navigate. */
   constructor(term, { isAgent = () => Promise.resolve(true), warn = () => {} } = {}) {
     this.term = term;
     this.isAgent = isAgent;
@@ -15,7 +15,7 @@ export class TurnMarks {
     return this.term.buffer.active.type === "alternate";
   }
 
-  /** Tela alternativa não tem histórico: nem marca. A marca nasce já no Enter, senão a linha certa muda antes da resposta. */
+  /** The alternate screen keeps no history, so it gets no marker. The marker is created right at Enter, otherwise the right line shifts before the answer. */
   enter() {
     if (this.alternate()) return Promise.resolve(null);
     const marker = this.term.registerMarker(0);
@@ -25,19 +25,19 @@ export class TurnMarks {
     return Promise.resolve(this.isAgent()).then((yes) => {
       if (!yes) marker.dispose();
       return yes ? marker : null;
-    }, () => marker);  // sem como saber: fica a marca, que não desenha nada
+    }, () => marker);  // no way to know: the marker stays, and it draws nothing
   }
 
   forget(marker) {
     this.marks = this.marks.filter((m) => m !== marker);
   }
 
-  /** Marcas vivas, em ordem. A que saiu do histórico (linha -1 ou descartada) não conta. */
+  /** Live markers, in order. One that left the history (line -1 or disposed) does not count. */
   lines() {
     return this.marks.filter((m) => !m.isDisposed && m.line >= 0).map((m) => m.line).sort((a, b) => a - b);
   }
 
-  /** Rola até a marca anterior (-1) ou seguinte (1). Devolve a linha, ou null se não saiu do lugar. */
+  /** Scrolls to the previous (-1) or next (1) marker. Returns the line, or null if it did not move. */
   step(direction) {
     if (this.alternate()) {
       if (!this.warned) this.warn();

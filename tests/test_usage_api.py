@@ -1,4 +1,4 @@
-"""API de uso (JSON e CSV) sobre as fixtures."""
+"""Usage API (JSON and CSV) over the fixtures."""
 
 import csv
 import io
@@ -47,10 +47,10 @@ class UsageApiTest(UsageServerCase):
 
     def test_custo_bate_com_a_tabela(self):
         models = {g["key"]: g for g in self.get(f"/api/agents/usage?{PERIODO}&group=model")["groups"]}
-        sonnet = models["claude-sonnet-5-5"]  # msg_C da fixture de uso: 10 in, 50 out, 6700 leitura, 300 escrita 5m
+        sonnet = models["claude-sonnet-5-5"]  # msg_C of the usage fixture: 10 in, 50 out, 6700 read, 300 5m write
         expected = (10 * 2 + 50 * 10 + 6700 * 0.10 + 300 * 2.5) / 1_000_000
         self.assertAlmostEqual(sonnet["cost"], expected, places=9)
-        self.assertIsNone(models["gpt-5.5-codex"]["cost"])  # modelo sem preço conferido: null, nunca 0
+        self.assertIsNone(models["gpt-5.5-codex"]["cost"])  # model without a verified price: null, never 0
 
     def test_periodo_padrao_e_filtro(self):
         data = self.get("/api/agents/usage?from=2026-10-31&to=2026-10-31&group=day")
@@ -73,7 +73,7 @@ class SessionCostTest(UsageServerCase):
         self.assertFalse(cost["partial"])
         self.assertGreater(cost["value"], 0)
         codex = self.get(f"/api/agents/sessions/{CODEX_USO_SID}")["session"]["cost"]
-        self.assertIsNone(codex["value"])  # gpt-5.5-codex não tem preço conferido
+        self.assertIsNone(codex["value"])  # gpt-5.5-codex has no verified price
 
 
 class UsageCsvTest(UsageServerCase):

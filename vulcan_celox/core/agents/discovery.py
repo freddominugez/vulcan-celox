@@ -1,4 +1,4 @@
-"""Onde ficam as sessões: CLAUDE_CONFIG_DIR ou ~/.claude; CODEX_HOME (lista por vírgula) ou ~/.codex."""
+"""Where the sessions live: CLAUDE_CONFIG_DIR or ~/.claude; CODEX_HOME (comma-separated list) or ~/.codex."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def codex_roots(env: Optional[Mapping[str, str]] = None) -> List[Path]:
 
 
 def claude_session_files(root: Path) -> List[Path]:
-    """Uma sessão por arquivo em projects/<slug>/; agent-*.jsonl são sub-agentes, não sessões."""
+    """One session per file in projects/<slug>/; agent-*.jsonl are sub-agents, not sessions."""
     projects = root / "projects"
     if not projects.is_dir():
         return []
@@ -57,8 +57,8 @@ ZSTD_PLACES = ("/opt/homebrew/bin/zstd", "/usr/local/bin/zstd", "/usr/bin/zstd")
 
 
 def zstd_bin(env: Optional[Mapping[str, str]] = None, extra: Sequence[str] = ZSTD_PLACES) -> Optional[str]:
-    """O comando zstd, se houver. VULCAN_ZSTD_BIN manda (vazio: sem zstd); o app aberto pelo Finder tem
-    PATH curto, por isso também olha nos lugares de costume."""
+    """The zstd command, if any. VULCAN_ZSTD_BIN wins (empty: no zstd); an app opened from Finder has a
+    short PATH, so it also looks in the usual places."""
     env = os.environ if env is None else env
     if "VULCAN_ZSTD_BIN" in env:
         chosen = env["VULCAN_ZSTD_BIN"]
@@ -68,8 +68,8 @@ def zstd_bin(env: Optional[Mapping[str, str]] = None, extra: Sequence[str] = ZST
 
 
 def codex_session_files(roots: List[Path], zstd: Optional[str] = None) -> Tuple[List[Path], int]:
-    """(rollouts legíveis, quantidade de .jsonl.zst ignorados por falta do comando zstd). Com o mesmo rollout nas
-    duas formas, vale o .jsonl."""
+    """(readable rollouts, count of .jsonl.zst ignored for lack of the zstd command). With the same rollout in
+    both forms, the .jsonl wins."""
     files: List[Path] = []
     compressed: List[Path] = []
     for root in roots:

@@ -1,4 +1,4 @@
-// Utilitários de DOM: escape, ícones, toasts, debounce e formatação.
+// DOM utilities: escape, icons, toasts, debounce and formatting.
 
 import { t } from "./i18n.mjs";
 
@@ -56,7 +56,7 @@ export function reportError(err) {
   toast(err && err.message ? t(err.message) : String(err), { kind: "error", timeout: 6000 });
 }
 
-/** Rola até o item aberto pela árvore da barra lateral e o destaca por um instante (uma vez por abertura). */
+/** Scrolls to the item opened from the sidebar tree and highlights it briefly (once per opening). */
 export function flashFocus(root, options, selector) {
   if (!options.focus) return null;
   const el = root.querySelector(selector(CSS.escape(options.focus)));

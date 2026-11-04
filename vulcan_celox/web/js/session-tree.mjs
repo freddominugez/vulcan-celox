@@ -1,5 +1,5 @@
-// Árvore de sessões da barra lateral: abertas e encerradas, cada uma com tarefas, post-its e tags.
-// Clicar num nó abre a sessão (ou o item) na área da direita.
+// Sidebar session tree: open and closed, each with tasks, sticky notes and tags.
+// Clicking a node opens the session (or the item) in the right-hand area.
 
 import { confirmDialog } from "./ai.mjs";
 import { del, get, patch, post } from "./api.mjs";
@@ -39,7 +39,7 @@ function loadExpanded() {
   }
 }
 
-/** Rota da sessão na área da direita; `focus` destaca um item dentro da aba. */
+/** Session route in the right-hand area; `focus` highlights an item inside the tab. */
 export function sessionHash(session, tab = "terminal", focus = "") {
   const tail = `${tab}/${session.id}${focus ? `/${encodeURIComponent(focus)}` : ""}`;
   return session.site ? `#/sites/${encodeURIComponent(session.site)}/${tail}` : `#/terminals/${tail}`;
@@ -80,7 +80,7 @@ export class SessionTree {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify([...this.expanded]));
     } catch {
-      /* armazenamento indisponível: vale só nesta janela */
+      /* storage unavailable: only applies to this window */
     }
   }
 
@@ -90,7 +90,7 @@ export class SessionTree {
       this.render();
       syncPorts();
     } catch {
-      /* servidor fora do ar: a barra lateral mostra o estado offline pelo app */
+      /* server down: the sidebar shows the offline state through the app */
     }
   }
 
@@ -128,7 +128,7 @@ export class SessionTree {
       </div>`;
   }
 
-  /** Pasta Histórico: sessões encerradas em subpastas por dia (a mais recente aberta por padrão). */
+  /** Histórico folder: closed sessions in per-day subfolders (the most recent open by default). */
   historyHtml(closed, total, active) {
     const expanded = this.isOpen("group:closed");
     const days = new Map();
@@ -191,7 +191,7 @@ export class SessionTree {
       </div>`;
   }
 
-  // ── opções da sessão ─────────────────────────────────────────────────
+  // ── session options ──────────────────────────────────────────────────
   findSession(id) {
     return this.data ? [...this.data.open, ...this.data.closed].find((s) => s.id === id) : null;
   }
@@ -330,7 +330,7 @@ export class SessionTree {
     }
     const link = event.target.closest("a.tree-link");
     if (link) {
-      // abrir uma sessão também mostra os itens dela
+      // opening a session also shows its items
       const id = link.closest(".tree-node").querySelector("[data-toggle^='s:']").dataset.toggle;
       if (!this.isOpen(id)) this.toggle(id);
     }

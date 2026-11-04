@@ -1,8 +1,9 @@
-"""Retomar uma sessão de agente numa aba nova, na pasta e no tema dela."""
+"""Resuming an agent session in a new tab, in its folder and theme."""
 
 import json
 
 from tests import test_agents_api
+from tests.helpers import strip_ansi
 from tests.test_pty import wait_for
 
 CLAUDE_ID = "44444444-5555-4666-8777-888888888888"
@@ -39,14 +40,14 @@ class ResumeApiTest(test_agents_api.AgentsServerCase):
         self.assertIn(info["theme"], ("homebrew", "classico", "oceano", "ardosia"))
         pty = self.app.terminals.get(info["id"])
         expected = f"claude --resume {CLAUDE_ID}".encode()
-        self.assertTrue(wait_for(lambda: expected in pty.history()), pty.history())
+        self.assertTrue(wait_for(lambda: expected in strip_ansi(pty.history()).replace(b"\r\n", b""), timeout=15), pty.history())
         self.assertEqual([c["cmd"] for c in self.app.hub.sessions.get(info["id"]).commands], [f"claude --resume {CLAUDE_ID}"])
 
     def test_codex_usa_o_subcomando_resume(self):
         status, info = self.resume(CODEX_ID)
         self.assertEqual(status, 201, info)
         pty = self.app.terminals.get(info["id"])
-        self.assertTrue(wait_for(lambda: f"codex resume {CODEX_ID}".encode() in pty.history()), pty.history())
+        self.assertTrue(wait_for(lambda: f"codex resume {CODEX_ID}".encode() in strip_ansi(pty.history()).replace(b"\r\n", b""), timeout=15), pty.history())
 
     def test_tema_da_aba_pareada_e_reaproveitado(self):
         record = self.app.hub.sessions.create("aba000000777", "loja", None, str(self.project), theme="ardosia")
@@ -57,6 +58,6 @@ class ResumeApiTest(test_agents_api.AgentsServerCase):
     def test_erros(self):
         status, _ = self.resume("nao-existe")
         self.assertEqual(status, 404)
-        status, data = self.resume("11111111-2222-4333-8444-555555555555")  # fixture com pasta que não existe aqui
+        status, data = self.resume("11111111-2222-4333-8444-555555555555")  # fixture with a folder that does not exist here
         self.assertEqual(status, 409)
         self.assertIn("pasta", data["error"])

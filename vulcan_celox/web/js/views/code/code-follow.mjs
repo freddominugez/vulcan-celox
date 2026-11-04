@@ -1,5 +1,5 @@
-// Decide quando o visor acompanha o agente. Sem DOM: quem chama mexe na tela só se `next` mandar. Rolagem feita pelo
-// próprio visor não passa por aqui, então só a interação do usuário pausa.
+// Decides when the viewer follows the agent. No DOM: the caller touches the screen only if `next` says so. Scrolling done by the
+// viewer itself does not pass through here, so only user interaction pauses.
 
 export class Follow {
   constructor(active = false, lastSeq = 0) {
@@ -8,7 +8,7 @@ export class Follow {
     this.lastSeq = lastSeq;
   }
 
-  /** Sessão parada não tem o que seguir; ao voltar a rodar, respeita a pausa que o usuário escolheu. */
+  /** A stopped session has nothing to follow; when it runs again, the pause the user chose is respected. */
   setActive(active) {
     this.active = Boolean(active);
     if (!this.active) this.paused = false;
@@ -27,7 +27,7 @@ export class Follow {
     this.paused = false;
   }
 
-  /** Há edição nova e é para ir até ela? A edição vista durante a pausa fica contada, e `resume` leva até a última. */
+  /** Is there a new edit and should we go to it? An edit seen during the pause stays counted, and `resume` goes to the last one. */
   next(lastSeq) {
     const fresh = lastSeq > this.lastSeq;
     this.lastSeq = Math.max(this.lastSeq, lastSeq);

@@ -1,4 +1,4 @@
-"""Registro das edições. Fixtures sintéticas: nada aqui veio de sessão real."""
+"""Edit log. Synthetic fixtures: nothing here came from a real session."""
 
 import json
 import shutil

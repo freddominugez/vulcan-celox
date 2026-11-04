@@ -1,6 +1,6 @@
-"""Projetos Node: lista guardada pelo app, detalhe lido do disco e sugestões vindas das sessões dos agentes.
+"""Node projects: list stored by the app, detail read from disk and suggestions coming from the agents' sessions.
 
-A lista é só do app (`node_projects` no Store): tirar um projeto dela não toca na pasta.
+The list belongs to the app only (`node_projects` in the Store): removing a project from it does not touch the folder.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ def register_node_api(app) -> "NodeProjects":
         name = str(body.get("name") or slug(path.name))
         if not NAME.match(name):
             raise HttpError(400, "nome só com letras minúsculas, números, ponto, hífen e sublinhado")
-        with projects.list_lock:  # ler, mudar e salvar juntos: dois pedidos ao mesmo tempo não perdem projeto
+        with projects.list_lock:  # read, change and save together: two simultaneous requests do not lose a project
             saved = projects.saved()
             if name in saved:
                 raise HttpError(409, "já existe um projeto com esse nome")
@@ -105,7 +105,7 @@ def register_node_api(app) -> "NodeProjects":
         session = app.terminals.get(terminal)
         if session is None or not session.alive:
             raise HttpError(409, "a aba já foi fechada")
-        session.write(CTRL_C)  # Ctrl-C na aba do próprio projeto; a aba fica aberta com a saída
+        session.write(CTRL_C)  # Ctrl-C in the project's own tab; the tab stays open with the output
         return {"ok": True}
 
     @srv.route("POST", rf"/api/node-projects/{NAME_RE}/remove")
@@ -125,8 +125,8 @@ class NodeProjects:
     def __init__(self, app):
         self.app = app
         self._lock = threading.Lock()
-        self.list_lock = threading.Lock()  # A lista salva de projetos
-        self._runs: Dict[str, List[Dict[str, Any]]] = {}  # projeto -> abas abertas por ele (memória desta execução)
+        self.list_lock = threading.Lock()  # the saved project list
+        self._runs: Dict[str, List[Dict[str, Any]]] = {}  # project -> tabs opened by it (memory of this run)
 
     def start(self, name: str, path: str, label: str, typed: str) -> Dict[str, Any]:
         session = self.app.spawn_terminal(path, f"{name} · {label}", None, typed=typed)
@@ -140,7 +140,7 @@ class NodeProjects:
             return any(r["terminal"] == terminal for r in self._runs.get(name, []))
 
     def running(self, name: str) -> List[Dict[str, Any]]:
-        """Abas ainda abertas que rodam scripts do projeto, com a primeira URL local vista na saída."""
+        """Tabs still open that run project scripts, with the first local URL seen in the output."""
         out, alive = [], []
         with self._lock:
             runs = list(self._runs.get(name, []))
@@ -182,7 +182,7 @@ class NodeProjects:
         return info
 
     def suggestions(self) -> List[Dict[str, str]]:
-        """Pastas onde os agentes trabalharam que têm package.json e ainda não estão na lista (mais recentes antes)."""
+        """Folders where the agents worked that have a package.json and are not yet in the list (most recent first)."""
         agents = getattr(self.app, "agents", None)
         if agents is None:
             return []

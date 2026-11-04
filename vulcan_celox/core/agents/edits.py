@@ -1,5 +1,5 @@
-"""Registro das edições de arquivo de cada sessão. O índice guarda só onde cada edição está no JSONL; o conteúdo é
-lido sob demanda pelo offset, porque o JSONL segue sendo a fonte da verdade (e `originalFile` nunca é guardado)."""
+"""Record of each session's file edits. The index keeps only where each edit is in the JSONL; the content is
+read on demand by offset, because the JSONL remains the source of truth (and `originalFile` is never stored)."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ def _find_patch(data: Any) -> str:
 
 
 class EditTracker:
-    """Acompanha as linhas do JSONL ao lado do leitor da sessão; o estado salvo permite continuar do offset."""
+    """Follows the JSONL lines alongside the session reader; the saved state allows continuing from the offset."""
 
     def __init__(self, agent: str, state: Optional[Dict] = None):
         state = state or {}
@@ -140,7 +140,7 @@ class EditTracker:
             self._remember(path, row)
 
     def _file_change(self, item: dict, start: int, at: str, turn: int) -> None:
-        """O item traz o diff pronto. O patch que o originou fica sendo a mesma edição, e não uma segunda."""
+        """The item brings the ready-made diff. The patch that originated it stays the same edit, not a second one."""
         self.items = True
         state = "ok" if item.get("status") in ("completed", None) else "failed"
         for path, change in item["changes"].items():
@@ -155,11 +155,11 @@ class EditTracker:
 
     # ── linha acima do limite ──────────────────────────────────────────────
     def feed_oversized(self, start: int, raw: bytes, turn: int) -> None:
-        """A linha gigante é descartada pelo leitor, mas a edição aconteceu: registra sem diff."""
+        """The giant line is discarded by the reader, but the edit happened: record it without a diff."""
         if self.agent == "claude":
             head = raw[:65536]
             tool, path = BIG_TOOL.search(head), BIG_PATH.search(head)
-            # só a mensagem do agente: a chave "type" da linha fica depois do conteúdo, fora do que foi lido
+            # only the agent message: the "type" key of the line comes after the content, outside what was read
             if tool and path and BIG_ASSISTANT.search(head) and not BIG_SIDECHAIN.search(head):
                 try:
                     name = json.loads(b'"' + path.group(1) + b'"')
@@ -195,9 +195,9 @@ def row_at(index, session_id: str, seq: int) -> Optional[Dict]:
     return {c: row[c] for c in COLUMNS} if row else None
 
 
-# ── conteúdo sob demanda ─────────────────────────────────────────────────────
+# ── on-demand content ───────────────────────────────────────────────────────
 def line_at(file_path: str, offset: Optional[int], max_line: int = MAX_LINE) -> Optional[dict]:
-    """A linha que começa em `offset`, lendo só ela (no .zst, descomprimindo até chegar nela)."""
+    """The line that starts at `offset`, reading only it (in .zst, decompressing until reaching it)."""
     if offset is None:
         return None
     if file_path.endswith(".zst"):
@@ -292,7 +292,7 @@ def _codex_detail(row: Dict, line: dict) -> Optional[Dict]:
 
 
 def edit_detail(agent: str, file_path: str, row: Dict) -> Dict:
-    """Os dois lados de uma edição, ou `available: False` com o motivo. `complete` diz se é o arquivo todo ou um trecho."""
+    """Both sides of an edit, or `available: False` with the reason. `complete` says whether it is the whole file or a snippet."""
     if row.get("state") == "no_diff":
         return {"available": False, "reason": "no_diff"}
     line = line_at(file_path, row.get("byte_offset"))

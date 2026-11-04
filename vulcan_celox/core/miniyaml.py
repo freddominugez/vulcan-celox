@@ -1,9 +1,9 @@
-"""Parser YAML mínimo (estilo bloco) para os arquivos do Lerd. Sem dependências.
+"""Minimal YAML parser (block style) for Lerd's files. No dependencies.
 
-Suporta: mapas por indentação, listas `- item` (inclusive lista de mapas),
-escalares com e sem aspas, true/false/null, inteiros, `{}`/`[]` e listas
-inline simples, comentários. Não suporta âncoras, multilinha (`|`, `>`)
-nem mapas inline com conteúdo.
+Supports: maps by indentation, `- item` lists (including lists of maps),
+quoted and unquoted scalars, true/false/null, integers, `{}`/`[]` and simple
+inline lists, comments. Does not support anchors, multiline (`|`, `>`)
+or inline maps with content.
 """
 
 from __future__ import annotations
@@ -148,7 +148,7 @@ class _Parser:
                     result.append(None)
                 continue
             if _looks_like_map(content):
-                # "- chave: valor" abre um mapa cuja coluna é a do conteúdo
+                # "- key: value" opens a map whose column is that of the content
                 offset = len(text) - len(text[1:].lstrip())
                 self.lines[self.i] = [indent + offset, content, lineno]
                 result.append(self.mapping(indent + offset))

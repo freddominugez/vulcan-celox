@@ -1,4 +1,4 @@
-"""Possível loop: o mesmo comando de teste rodou 3 vezes ou mais sem nenhum commit entre as execuções."""
+"""Possible loop: the same test command ran 3 times or more with no commit between the runs."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ _MAX_KEYS = 20
 
 
 class LoopTracker:
-    """Conta execuções por teste desde o último commit. Estado serializável para a leitura incremental."""
+    """Counts runs per test since the last commit. Serializable state for incremental reading."""
 
     def __init__(self, state: Optional[Dict] = None):
         self.runs: Dict[str, Dict] = dict((state or {}).get("runs") or {})
@@ -20,12 +20,12 @@ class LoopTracker:
         return {"runs": self.runs}
 
     def reset(self) -> None:
-        """Chamado pelo montador quando um commit dá certo."""
+        """Called by the builder when a commit succeeds."""
         self.runs = {}
 
     def feed(self, text: str, at: str) -> None:
         if rules.publish_level(text):
-            return  # publicação não é teste; quem zera é o commit que deu certo (reset)
+            return  # a publish is not a test; what resets is the commit that succeeded (reset)
         key = rules.test_key(text)
         if not key:
             return

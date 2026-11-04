@@ -1,4 +1,4 @@
-"""Quais caminhos impressos numa aba existem dentro de raiz conhecida."""
+"""Which paths printed in a tab exist inside a known root."""
 
 import json
 import os

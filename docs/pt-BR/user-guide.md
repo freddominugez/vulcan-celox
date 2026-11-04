@@ -4,7 +4,7 @@
 
 ## Sumário
 
-- [Primeiros passos](#primeiros-passos): O que o Vulcan Celox faz e como começar em quatro passos.
+- [Primeiros passos](#primeiros-passos): O que o Vulcan Celox faz e como começar em poucos passos.
 - [Sites PHP](#projetos-php): Sites do Lerd: abrir, trocar PHP, HTTPS, logs e terminal.
 - [Lerd](#lerd): O ambiente que roda PHP, nginx, banco e HTTPS dos sites.
 - [Projetos Node](#node): Next.js, Vite, Supabase local e vínculo com a Vercel.
@@ -23,7 +23,7 @@
 
 ## Primeiros passos
 
-*O que o Vulcan Celox faz e como começar em quatro passos.*
+*O que o Vulcan Celox faz e como começar em poucos passos.*
 
 O app tem tema claro e escuro. Em ⌘K, busque "Tema" e escolha Sistema, Claro ou Escuro. A área do terminal fica escura nos dois, com a cor de cada aba.
 
@@ -36,7 +36,7 @@ O Vulcan Celox é um painel para quem programa sozinho com agentes de código. E
 3. **Deixe o app ler as sessões dos agentes.** Ele lê os arquivos do Claude Code e do Codex do disco, linha por linha, sem chave de API e sem escrever nada nessas pastas.
 4. **Abra um terminal num projeto** com ⌘T. Tarefas, post-its e tags criados nele viram a memória da sessão em Markdown quando o terminal fecha.
 
-A tela **Início** confere esses passos sozinha e sai da abertura do app quando os quatro estão feitos. Marque **Não mostrar mais o guia** para o app abrir direto na Visão geral. O guia continua no item Início da barra lateral.
+A tela **Início** confere esses passos sozinha e sai da abertura do app quando os passos essenciais estão feitos. O passo do Lerd é opcional: **Instalar** mostra o comando oficial e o roda num terminal à vista, e **Não uso** dispensa o passo. Marque **Não mostrar mais o guia** para o app abrir direto na Visão geral. O guia continua no item Início da barra lateral.
 
 <a id="projetos-php"></a>
 
@@ -67,7 +67,7 @@ O **Lerd** é um ambiente de desenvolvimento PHP de código aberto (licença MIT
 - **Serviços:** banco, Redis e outros, com ligar e parar.
 - **PHP:** versões instaladas, extensões, Xdebug e seis ajustes comuns do php.ini, gravados pelo próprio `lerd php:ini`.
 - **Node do Lerd:** versões que o Lerd gerencia para os sites PHP com front em JavaScript.
-- **Iniciar com o app:** o botão de raio, no alto, liga o Lerd junto com o Vulcan Celox.
+- **Iniciar com o app:** o botão de raio, no alto, liga o Lerd junto com o Vulcan Celox. Vem desligado: o Lerd é opcional e só é preciso para sites PHP e Laravel.
 
 O Laravel Valet também funciona como alternativa. O Herd é comercial e não é usado.
 
@@ -238,7 +238,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 
 **Para que serve o Lerd?**
 
-É o ambiente que roda seus sites PHP e Laravel no Mac: domínio `.test`, versão de PHP por projeto, banco e HTTPS local, sem configurar servidor na mão. O Vulcan Celox é o painel por cima dele.
+É o ambiente que roda seus sites PHP e Laravel no Mac: domínio `.test`, versão de PHP por projeto, banco e HTTPS local, sem configurar servidor na mão. É opcional: terminais, agentes e projetos Node funcionam sem ele. Instale pelo Início, se quiser.
 
 **Preciso do Lerd para usar o app?**
 

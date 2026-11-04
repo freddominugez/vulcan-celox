@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Sensor do pacote no Windows, rodado de dentro da pasta extraída: terminal real, API e a interface num Edge sem tela.
+"""Sensor for the Windows package, run from inside the extracted folder: real terminal, API and the interface in a headless Edge.
 
-Uso: python -X utf8 smoke_windows.py <saida para a captura>. Sai com erro no primeiro problema.
+Usage: python -X utf8 smoke_windows.py <output for the screenshot>. Exits with an error on the first problem.
 """
 
 from __future__ import annotations

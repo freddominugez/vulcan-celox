@@ -1,4 +1,4 @@
-"""Execução de processos: único módulo do pacote que usa subprocess (D5)."""
+"""Process execution: the only module in the package that uses subprocess."""
 
 from __future__ import annotations
 
@@ -22,8 +22,8 @@ else:
     import fcntl
     import termios
 
-SHELL = default_shell()  # zsh no macOS; no Linux, $SHELL ou o que existir; no Windows, PowerShell
-# sem janela de console piscando para cada comando no Windows; no resto, sessão própria para encerrar o grupo inteiro
+SHELL = default_shell()  # zsh on macOS; on Linux, $SHELL or whatever exists; on Windows, PowerShell
+# no console window flashing for every command on Windows; elsewhere, its own session so the whole group can be ended
 SPAWN_KWARGS = {"creationflags": subprocess.CREATE_NO_WINDOW} if WINDOWS else {"start_new_session": True}
 KILL_GRACE_SECONDS = 3.0
 
@@ -61,7 +61,7 @@ def _kill_group(proc: subprocess.Popen, sig: int) -> None:
 
 
 def _terminate(proc: subprocess.Popen) -> None:
-    """SIGTERM no grupo e SIGKILL se não sair em KILL_GRACE_SECONDS."""
+    """SIGTERM to the group and SIGKILL if it does not exit within KILL_GRACE_SECONDS."""
     if proc.poll() is not None:
         return
     _kill_group(proc, signal.SIGTERM)
@@ -100,7 +100,7 @@ class Handle:
 class Runner:
     def run(self, argv: Sequence[str], cwd: Optional[str] = None,
             env: Optional[Mapping[str, str]] = None, timeout: float = 60.0, input: Optional[str] = None) -> Result:
-        """`input` vai pelo stdin (nunca pela linha de comando, que outros processos enxergam)."""
+        """`input` goes through stdin (never the command line, which other processes can see)."""
         start = time.monotonic()
         try:
             proc = subprocess.Popen(list(argv), cwd=cwd, env=dict(env) if env is not None else None,
@@ -109,7 +109,7 @@ class Runner:
                                     text=True, **SPAWN_KWARGS)
         except FileNotFoundError as exc:
             return Result(127, "", str(exc), time.monotonic() - start)
-        except PermissionError as exc:
+        except OSError as exc:  # no permission, or a file that is not a program on this system
             return Result(126, "", str(exc), time.monotonic() - start)
         try:
             out, err = proc.communicate(input=input, timeout=timeout)
@@ -127,9 +127,9 @@ class Runner:
                env: Optional[Mapping[str, str]] = None,
                on_line: Callable[[str], None] = lambda _l: None,
                on_exit: Callable[[int], None] = lambda _c: None) -> Handle:
-        """Executa em segundo plano entregando stdout+stderr linha a linha.
+        """Runs in the background, delivering stdout+stderr line by line.
 
-        Os callbacks rodam na thread leitora: a UI deve repassá-los por fila.
+                The callbacks run on the reader thread: the UI must forward them through a queue.
         """
         try:
             proc = subprocess.Popen(list(argv), cwd=cwd, env=dict(env) if env is not None else None,
@@ -159,12 +159,12 @@ class Runner:
 
 
 def open_pipe(argv: Sequence[str]) -> subprocess.Popen:
-    """Saída de um comando em stream, sem guardar tudo na memória. Levanta OSError se não rodar."""
+    """Output of a command as a stream, without keeping it all in memory. Raises OSError if it does not run."""
     return subprocess.Popen(list(argv), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, **SPAWN_KWARGS)
 
 
 def close_pipe(proc: subprocess.Popen, grace: float = 5.0) -> Optional[int]:
-    """Fecha a saída e espera o processo; se não sair em `grace` segundos, encerra. Devolve o código de saída."""
+    """Closes the output and waits for the process; if it does not exit within `grace` seconds, ends it. Returns the exit code."""
     proc.stdout.close()
     try:
         proc.wait(timeout=grace)
@@ -180,9 +180,9 @@ def set_winsize(fd: int, rows: int, cols: int) -> None:
 
 def spawn_pty(argv: Sequence[str], cwd: Optional[str], env: Mapping[str, str],
               rows: int = 24, cols: int = 80) -> Tuple[int, object]:
-    """Processo com terminal controlador próprio (forkpty). Retorna (pid, fd do mestre); no Windows, (pid, WinPty).
+    """Process with its own controlling terminal (forkpty). Returns (pid, master fd); on Windows, (pid, WinPty).
 
-    O filho só faz chdir e exec, então o fork a partir de um processo com threads é seguro.
+        The child only does chdir and exec, so forking from a process with threads is safe.
     """
     argv = list(argv)
     env = dict(env)
@@ -201,7 +201,7 @@ def spawn_pty(argv: Sequence[str], cwd: Optional[str], env: Mapping[str, str],
             os._exit(127)
     try:
         set_winsize(fd, rows, cols)
-    except Exception:  # tamanho recusado: não deixa shell órfão nem fd aberto
+    except Exception:  # size refused: leaves no orphan shell or open fd
         try:
             os.kill(pid, signal.SIGKILL)
             os.waitpid(pid, 0)
@@ -213,7 +213,7 @@ def spawn_pty(argv: Sequence[str], cwd: Optional[str], env: Mapping[str, str],
 
 
 def terminate_pty(pid: int, grace: float = 2.0) -> Optional[int]:
-    """SIGHUP no grupo do terminal, SIGKILL se não sair em `grace` segundos. Retorna o status."""
+    """SIGHUP to the terminal's group, SIGKILL if it does not exit within `grace` seconds. Returns the status."""
     if WINDOWS:
         _kill_tree(pid)
         return None
@@ -242,8 +242,8 @@ def terminate_pty(pid: int, grace: float = 2.0) -> Optional[int]:
 
 
 def terminate_many(pids: Sequence[int], grace: float = 2.0) -> Dict[int, Optional[int]]:
-    """Como terminate_pty para várias abas de uma vez: sinal para todas, uma espera só.
-    Dez abas que ignoram SIGHUP levam `grace` segundos, não dez vezes isso."""
+    """Like terminate_pty for several tabs at once: a signal to all, a single wait.
+        Ten tabs that ignore SIGHUP take `grace` seconds, not ten times that."""
     if WINDOWS:
         for pid in pids:
             _kill_tree(pid)

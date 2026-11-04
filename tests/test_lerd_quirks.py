@@ -1,7 +1,7 @@
-"""Tabela dos contornos do Lerd e o bloco do --doctor (o comportamento não muda com a versão)."""
+"""Table of Lerd workarounds and the --doctor block (behavior does not change with the version)."""
 import unittest
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only, SEM_LERD
 from tests.lerd_api_stub import LerdApiStub, closed_port_url
 from tests import test_doctor
 from vulcan_celox.core import lerd_quirks
@@ -23,16 +23,17 @@ class QuirksTest(unittest.TestCase):
         self.assertEqual([r["necessario"] for r in antes["contornos"]], [True, True])
         self.assertEqual([r["necessario"] for r in depois["contornos"]], [False, True])
         self.assertEqual(depois["necessarios"], 1)
-        desconhecida = lerd_quirks.status("", quirks)  # sem versão: tudo segue necessário
+        desconhecida = lerd_quirks.status("", quirks)  # no version: everything stays needed
         self.assertEqual(desconhecida["necessarios"], 2)
         self.assertEqual(lerd_quirks.version_tuple("1.38.0-beta.3"), (1, 38, 0))
         self.assertIsNone(lerd_quirks.version_tuple("lerd"))
 
 
 class DoctorContornosTest(TempDirTestCase):
-    _fake_lerd = test_doctor.DoctorTest._fake_lerd  # sem importar a classe: os testes dela não rodam duas vezes
+    _fake_lerd = test_doctor.DoctorTest._fake_lerd  # without importing the class: its tests do not run twice
     _env = test_doctor.DoctorTest._env
 
+    @unix_only(SEM_LERD)
     def test_bloco_no_doctor(self):
         with LerdApiStub() as stub:
             data = collect(self._env(stub.url, self._fake_lerd()))

@@ -79,7 +79,7 @@ class SessionApiTest(ServerTestCase):
 
         b = self.open_terminal(command="exit 3")
         wait_for(lambda: any(s["id"] == b["id"] for s in self.request("GET", "/api/sessions?site=loja")[1]["closed"]),
-                 timeout=10.0)  # contêiner Linux sob carga demora mais a notar a saída
+                 timeout=10.0)  # a Linux container under load takes longer to notice the output
         closed = {s["id"]: s for s in self.request("GET", "/api/sessions?site=loja")[1]["closed"]}
         self.assertIn(b["id"], closed)
 

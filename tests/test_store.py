@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only, MODOS
 from vulcan_celox.core import paths
 from vulcan_celox.core.store import Store, migrate_legacy, read_json, write_json_atomic
 
@@ -17,9 +17,9 @@ class PathsTest(TempDirTestCase):
 
     def test_defaults(self):
         import sys
-        expected = "Library/Application Support/VulcanCelox" if sys.platform == "darwin" else "vulcan-celox"
+        expected = {"darwin": "Library/Application Support/VulcanCelox", "win32": "VulcanCelox"}.get(sys.platform, "vulcan-celox")
         self.assertTrue(str(paths.data_dir({})).endswith(expected))
-        self.assertTrue(str(paths.valet_home({})).endswith(".config/valet"))
+        self.assertTrue(paths.valet_home({}).as_posix().endswith(".config/valet"))
         self.assertEqual(len(paths.valet_bin_candidates({})), 4)
 
 
@@ -46,6 +46,7 @@ class StoreTest(TempDirTestCase):
         self.assertEqual(json.loads(target.read_text(encoding="utf-8")), {"ok": True})
         self.assertEqual([p.name for p in self.tmp.iterdir()], ["x.json"])
 
+    @unix_only(MODOS)
     def test_permissao_do_arquivo(self):
         novo = self.tmp / "novo.md"
         write_json_atomic(novo, {})

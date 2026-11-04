@@ -75,4 +75,4 @@ Um PTY real por aba (`os.forkpty`, ou ConPTY no Windows), com o shell do usuári
 
 ## Dívida conhecida
 
-Sete arquivos acima de 400 linhas estão travados por teste e não podem crescer: `web/js/terminals.mjs`, `packaging/macos/main.swift`, `ui/app.py`, `web/js/views/tasks.mjs`, `core/notebook.py`, `core/harness.py`, `web/js/views/site.mjs`. Os riscos estão na seção 17 do [manual técnico](technical-manual.md).
+Seis arquivos acima de 400 linhas estão travados por teste e não podem crescer: `packaging/macos/main.swift`, `ui/app.py`, `web/js/views/tasks.mjs`, `core/notebook.py`, `core/harness.py`, `web/js/views/site.mjs`. Os riscos estão na seção 17 do [manual técnico](technical-manual.md).

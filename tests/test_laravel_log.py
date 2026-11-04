@@ -1,9 +1,9 @@
-"""Aba Logs do site (storage/logs/laravel.log) e atalhos para os logs do Lerd."""
+"""Logs tab of the site (storage/logs/laravel.log) and shortcuts to the Lerd logs."""
 
 import os
 from unittest import mock
 
-from tests.helpers import TempDirTestCase
+from tests.helpers import TempDirTestCase, unix_only, SEM_LERD
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.laravel_log import filter_entries, parse_entries, parse_laravel_line, read_log
 
@@ -44,8 +44,8 @@ class ParserTest(TempDirTestCase):
         with open(path, "a", encoding="utf-8") as fh:
             fh.write("[2026-10-31 10:05:00] local.ERROR: novo\n[2026-10-31 10:06:00] local.INFO: linha incomple")
         more = read_log(path, first["offset"])
-        self.assertEqual([e["message"] for e in more["entries"]], ["novo"])  # a linha sem fim fica para depois
-        path.write_text("[2026-10-31 11:00:00] local.INFO: girou\n", encoding="utf-8")  # log rotacionado
+        self.assertEqual([e["message"] for e in more["entries"]], ["novo"])  # the line without an end is left for later
+        path.write_text("[2026-10-31 11:00:00] local.INFO: girou\n", encoding="utf-8")  # rotated log
         rotated = read_log(path, more["offset"])
         self.assertTrue(rotated["reset"])
         self.assertEqual(rotated["entries"][0]["message"], "girou")
@@ -53,7 +53,7 @@ class ParserTest(TempDirTestCase):
     def test_arquivo_grande_comeca_numa_linha_inteira(self):
         path = self.tmp / "laravel.log"
         line = "[2026-10-31 10:00:00] local.INFO: " + "x" * 80 + "\n"
-        path.write_text(line * 2000, encoding="utf-8")  # cerca de 230 KB
+        path.write_text(line * 2000, encoding="utf-8")  # about 230 KB
         result = read_log(path)
         self.assertTrue(result["entries"])
         self.assertTrue(all(e["message"] == "x" * 80 for e in result["entries"]))
@@ -97,6 +97,7 @@ class ApiTest(ServerTestCase):
         again = self.request("GET", f"/api/sites/loja/log?offset={data['offset']}")[1]
         self.assertEqual(again["entries"], [])
 
+    @unix_only(SEM_LERD)
     def test_atalhos_do_lerd(self):
         for target, args in (("php", ["logs", "-f"]), ("nginx", ["logs", "nginx", "-f"]), ("mysql", ["logs", "mysql", "-f"])):
             with self.subTest(target=target):

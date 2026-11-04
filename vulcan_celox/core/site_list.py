@@ -1,4 +1,4 @@
-"""Ordem dos sites na barra lateral: favoritos no topo, os demais em ordem alfabética."""
+"""Order of the sites in the sidebar: favorites on top, the rest in alphabetical order."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ def matches(site, query: str) -> bool:
 
 
 def arrange_sidebar(sites: Iterable, favorites: Sequence[str], query: str = "") -> List[Tuple[str, list]]:
-    """[(título, sites)]: "Favoritos" (se houver) e "Sites", sem repetir, filtrados por nome ou domínio."""
+    """[(title, sites)]: "Favoritos" (if any) and "Sites", without repeats, filtered by name or domain."""
     wanted = set(favorites)
     shown = sorted((s for s in sites if matches(s, query)), key=lambda s: s.name.lower())
     fav = [s for s in shown if s.name in wanted]

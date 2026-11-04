@@ -1,10 +1,10 @@
-"""Pareamento entre a aba do terminal e a sessão de agente, sem adivinhação quando possível.
+"""Pairing between the terminal tab and the agent session, without guessing when possible.
 
-1. Hook SessionStart do Claude Code: o script lê VULCAN_SESSION_ID (herdado da aba) e grava
-   <dados>/pairings/<sessão>.json. Só é instalado por `--instalar-hook`, com backup do settings.json.
-2. Reserva sem hook (e para o Codex): mesma pasta e início até 60 s depois de a aba abrir ou de `claude`/`codex`
-   ser digitado nela. Subagente e app desktop não nascem de uma aba e ficam de fora. Na disputa, os pares seguem a
-   ordem no tempo: o maior número possível e, no empate, os menores intervalos.
+1. Claude Code SessionStart hook: the script reads VULCAN_SESSION_ID (inherited from the tab) and writes
+   <data>/pairings/<session>.json. Only installed by `--instalar-hook`, with a backup of settings.json.
+2. Fallback without hook (and for Codex): same folder and start up to 60 s after the tab opened or after `claude`/`codex`
+   was typed in it. Subagent and desktop app do not originate from a tab and are left out. In a contest, pairs follow the
+   order in time: as many as possible and, on a tie, the smallest intervals.
 """
 
 from __future__ import annotations
@@ -67,7 +67,7 @@ def pairings_dir(data_dir) -> Path:
 
 
 def read_pairings(folder) -> Dict[str, Dict[str, Optional[str]]]:
-    """{sessão de agente: {terminal_id, theme}} a partir dos arquivos gravados pelo hook."""
+    """{agent session: {terminal_id, theme}} from the files written by the hook."""
     out: Dict[str, Dict[str, Optional[str]]] = {}
     folder = Path(folder)
     if not folder.is_dir():
@@ -89,7 +89,7 @@ def _same_folder(agent_cwd: str, root: str, tab_cwd: str) -> bool:
 
 
 def _launches(tab, agent: str) -> List[float]:
-    """Momentos em que o agente pode ter nascido nesta aba. Abrir a aba e digitar o comando logo depois é um só."""
+    """Moments when the agent may have been born in this tab. Opening the tab and typing the command right after is one."""
     pattern = _AGENT_COMMAND.get(agent)
     typed = [epoch(c.get("ts")) for c in tab.commands if pattern and pattern.match(c.get("cmd", ""))]
     typed = [t for t in typed if t is not None]
@@ -100,7 +100,7 @@ def _launches(tab, agent: str) -> List[float]:
 
 
 def _match(starts: Sequence[float], launches: Sequence[float]) -> List[Tuple[int, int]]:
-    """Pares (sessão, lançamento) em ordem no tempo, listas já ordenadas: mais pares e, no empate, menores intervalos."""
+    """Pairs (session, launch) in time order, lists already sorted: more pairs and, on a tie, smaller intervals."""
     n, m = len(starts), len(launches)
     # melhor[i][j]: (pares, -soma dos intervalos) usando starts[i:] e launches[j:]
     best = [[(0, 0.0)] * (m + 1) for _ in range(n + 1)]
@@ -127,7 +127,7 @@ def _match(starts: Sequence[float], launches: Sequence[float]) -> List[Tuple[int
 
 
 def resolve(agents: Sequence[AgentSession], tabs: Sequence, files: Mapping[str, Dict]) -> Dict[str, Dict]:
-    """{sessão de agente: {terminal_id, theme, how}}. O arquivo do hook vence; senão pasta e horário."""
+    """{agent session: {terminal_id, theme, how}}. The hook file wins; otherwise folder and time."""
     by_tab = {t.id: t for t in tabs}
     out: Dict[str, Dict] = {}
     waiting: List[Tuple[float, AgentSession]] = []
@@ -141,7 +141,7 @@ def resolve(agents: Sequence[AgentSession], tabs: Sequence, files: Mapping[str, 
         start = epoch(s.started_at)
         if start is not None and not s.origin:
             waiting.append((start, s))
-    # a disputa é por agente e pela pasta da aba: abas de pastas diferentes não competem entre si
+    # the contest is per agent and per tab folder: tabs in different folders do not compete with each other
     folders = sorted({(t.cwd or "").rstrip("/") for t in tabs})
     for kind in sorted({s.agent for _, s in waiting}):
         for folder in folders:
@@ -150,7 +150,7 @@ def resolve(agents: Sequence[AgentSession], tabs: Sequence, files: Mapping[str, 
             if not launches:
                 continue
             times = [at for at, _ in launches]
-            # só quem tem algum lançamento na janela entra na conta: o histórico inteiro não precisa
+            # only those with some launch in the window enter the count: the whole history is not needed
             rivals = sorted(((start, s.id, s) for start, s in waiting
                              if s.agent == kind and s.id not in out and _same_folder(s.cwd, s.project_root, folder)
                              and any(0 <= start - at <= WINDOW_SECONDS for at in times)), key=lambda x: (x[0], x[1]))
@@ -168,10 +168,10 @@ def apply(sessions: List[AgentSession], pairs: Mapping[str, Dict]) -> List[Agent
     return sessions
 
 
-# ── instalação do hook (só por --instalar-hook) ─────────────────────────────
+# ── hook installation (only via --instalar-hook) ─────────────────────────────
 def install_hook(claude_root, data_dir, now: Optional[float] = None) -> Dict[str, Optional[str]]:
-    """Grava o script na pasta de dados do app e acrescenta o hook ao settings.json do Claude, com backup.
-    Idempotente: rodar de novo não duplica a entrada. É a única escrita do app em ~/.claude."""
+    """Writes the script to the app's data folder and adds the hook to Claude's settings.json, with a backup.
+    Idempotent: running again does not duplicate the entry. It is the app's only write to ~/.claude."""
     claude_root, data_dir = Path(claude_root), Path(data_dir)
     script = data_dir / "hooks" / SCRIPT_NAME
     script.parent.mkdir(parents=True, exist_ok=True)
@@ -190,9 +190,9 @@ def install_hook(claude_root, data_dir, now: Optional[float] = None) -> Dict[str
     attention_ready = attention_hook.install(settings, data_dir)
     hooks = settings.setdefault("hooks", {})
     entries = hooks.setdefault("SessionStart", [])
-    # o Claude Code roda o comando pelo shell: sem aspas, "Application Support" quebra o caminho
+    # Claude Code runs the command through the shell: without quotes, "Application Support" breaks the path
     command = shlex.quote(str(script))
-    ours = (command, str(script))  # a entrada sem aspas gravada até a 0.3.0 é trocada, não duplicada
+    ours = (command, str(script))  # the unquoted entry written up to 0.3.0 is replaced, not duplicated
     present = False
     for entry in entries:
         if not isinstance(entry, dict):

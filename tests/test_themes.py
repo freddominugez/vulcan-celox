@@ -1,4 +1,4 @@
-"""Temas de sessão como dados e rotação lembrada."""
+"""Session themes as data and remembered rotation."""
 
 from tests.helpers import TempDirTestCase
 from tests.server_helpers import ServerTestCase
@@ -23,7 +23,7 @@ class ThemesTest(TempDirTestCase):
         rot = themes.Rotation(store)
         self.assertEqual(rot.peek(), "homebrew")
         self.assertEqual([rot.take() for _ in range(5)], ["homebrew", "classico", "oceano", "ardosia", "homebrew"])
-        self.assertEqual(themes.Rotation(Store(self.tmp)).peek(), "classico")  # outra abertura do app continua daí
+        self.assertEqual(themes.Rotation(Store(self.tmp)).peek(), "classico")  # another app launch continues from there
 
     def test_css_das_classes(self):
         css = themes.css()
@@ -53,11 +53,11 @@ class ThemesApiTest(ServerTestCase):
         status, second = self.create(theme="oceano")
         self.assertEqual(second["theme"], "oceano")
         status, third = self.create(theme="auto")
-        self.assertEqual(third["theme"], "classico")  # o explícito não gasta a rotação
+        self.assertEqual(third["theme"], "classico")  # the explicit one does not spend the rotation
         status, _ = self.create(theme="rosa")
         self.assertEqual(status, 400)
         status, plain = self.create()
-        self.assertIsNone(plain["theme"])  # comandos rápidos seguem sem tema
+        self.assertIsNone(plain["theme"])  # quick commands stay without a theme
         self.assertEqual(self.app.hub.sessions.get(first["id"]).theme, "homebrew")
 
     def test_rota_de_temas(self):

@@ -1,4 +1,4 @@
-"""Rotas JSON do caderno: tags, post-its, tarefas, progresso, busca e índice TAREFAS.md."""
+"""Notebook JSON routes: tags, post-its, tasks, progress, search and the TAREFAS.md index."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ class NotebookApi:
         self.register(app.server)
         self.write_indexes()
 
-    # ── índice ───────────────────────────────────────────────────────────
+    # ── index ──────────────────────────────────────────────────────────
     def _on_change(self, kind: str) -> None:
         if kind not in ("tasks", "tags", "all"):
             return
@@ -65,7 +65,7 @@ class NotebookApi:
         site_paths = {s.name: s.path for s in self.app.sites()}
         return sync_project_indexes(self.project_index, site_paths, tasks, tags)
 
-    # ── serialização ─────────────────────────────────────────────────────
+    # ── serialization ──────────────────────────────────────────────────
     def chips(self, item) -> List[Dict[str, str]]:
         return [{"id": i, "name": n, "color": c} for i, n, c in chip_specs(item, self.nb.tags)]
 
@@ -91,7 +91,7 @@ class NotebookApi:
         return data
 
     def resolve_terminal(self, body: Dict[str, Any], site: Optional[str]):
-        """(terminal, site): item criado numa sessão herda o site dela."""
+        """(terminal, site): an item created in a session inherits its site."""
         terminal = body.get("terminal") or None
         if not terminal:
             return None, site
@@ -101,7 +101,7 @@ class NotebookApi:
         return record.id, record.site
 
     def resolve_tags(self, values) -> List[str]:
-        """Aceita ids existentes ou nomes (cria a tag quando o nome é novo)."""
+        """Accepts existing ids or names (creates the tag when the name is new)."""
         if values is None:
             return []
         if not isinstance(values, list):
@@ -287,7 +287,7 @@ class NotebookApi:
                 raise HttpError(410, "nada para desfazer")
             return api.task_dict(task)
 
-        # progresso, busca, índice
+        # progress, search, index
         @route("GET", "/api/progress")
         def get_progress(_req):
             return {"overall": progress_dict(progress(api.nb.tasks)),
