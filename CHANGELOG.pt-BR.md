@@ -4,22 +4,18 @@ Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O form
 
 ## [Não lançado]
 
-### Corrigido
-- Documentação que não batia mais com o código: os nomes técnicos depois da renomeação, versões, situação de Linux e Windows, e as versões com suporte na política de segurança.
-
-### Alterado
-- A CI agora cobre macOS, lint e a suíte inteira no Windows. Um teste mantém a versão citada na documentação igual à do código.
-
-## [1.2.1] - 2026-11-03
+## [1.2.1] - 2026-11-04
 
 ### Alterado
 - **O Lerd é opcional.** Ele não inicia mais com o app até você ligar o botão de raio, e sem ele a barra do alto não mostra controles do ambiente. No Início, o passo do Lerd não segura o guia e oferece **Instalar**, com o comando oficial num terminal à vista, e **Não uso**. O Lerd instalado com o app aberto é percebido sem reiniciar. No Windows, o item do Lerd sai.
 - Comentários e docstrings do código em inglês.
+- A CI cobre lint e a suíte inteira no Windows. O workflow de macOS roda sob demanda antes de cada Release, e cada pull request roda os sensores num Mac. Um teste mantém a versão citada na documentação igual à do código.
 
 ### Corrigido
 - "Não foi possível iniciar o Lerd" com uma linha de progresso como motivo. O app agora espera o ambiente responder depois do `lerd start`, e linha de progresso nunca aparece como falha.
 - O início automático não mostra mais mensagem flutuante: o estado fica na barra do alto, e a falha, nas telas Lerd e Início.
 - Comando digitado pelo app numa aba do PowerShell não executava. Outros defeitos do Windows achados ao rodar a suíte inteira lá.
+- Documentação que não batia mais com o código: os nomes técnicos depois da renomeação, versões, situação de Linux e Windows, e as versões com suporte na política de segurança.
 
 ## [1.2.0] - 2026-11-03
 

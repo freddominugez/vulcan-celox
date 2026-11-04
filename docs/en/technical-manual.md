@@ -23,7 +23,7 @@ Goals that shape the code:
 - Never delete anything for good.
 - Everything testable without a window, a real Lerd or real agents.
 
-Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.1.1. Since 1.2.0 there are test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
+Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.2.1. Since 1.2.0 there are test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
 
 ## 2. Design decisions
 

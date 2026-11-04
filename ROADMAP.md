@@ -11,7 +11,7 @@ Agent panel for Claude Code and Codex, history search, prompts, usage and cost, 
 ## Next
 
 - **Linux release.** Test on a real Linux Mint desktop, fix what fails, publish `.deb` and `.tar.gz`. Help welcome.
-- **Windows acceptance.** Test build 1.2.0 ran only on CI machines. Test on real Windows 10 and 11, then decide on an installer and signature.
+- **Windows acceptance.** Test build 1.2.1 ran only on CI machines. Test on real Windows 10 and 11, then decide on an installer and signature.
 - **Finish the manual checks on macOS:** pairing with the real Claude Code, split, search and resize.
 
 ## Delivered in 1.1.0 (macOS)

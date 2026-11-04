@@ -4,22 +4,18 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 
 ## [Unreleased]
 
-### Fixed
-- Documentation that no longer matched the code: the technical names after the rename, versions, Linux and Windows status, and the supported versions in the security policy.
-
-### Changed
-- CI now covers macOS, lint and the whole suite on Windows. A test keeps the version cited in the documentation equal to the code.
-
-## [1.2.1] - 2026-11-03
+## [1.2.1] - 2026-11-04
 
 ### Changed
 - **Lerd is optional.** It no longer starts with the app until you turn on the bolt button, and without it the top bar shows no environment controls. On the Home screen, the Lerd step does not hold the guide back, offers **Install** with the official command in a visible terminal, and **I don't use it**. A Lerd installed while the app is open is noticed without restarting. On Windows the Lerd item is gone.
 - Code comments and docstrings are in English.
+- CI covers lint and the whole suite on Windows. The macOS workflow runs on request before each release, and each pull request runs the sensors on a Mac. A test keeps the version cited in the documentation equal to the code.
 
 ### Fixed
 - "Could not start Lerd" with a progress line as the reason. The app now waits for the environment to answer after `lerd start`, and a progress line is never shown as a failure.
 - The automatic start no longer shows a floating message: the state stays in the top bar, and a failure on the Lerd and Home screens.
 - A command typed by the app into a PowerShell tab did not run. Other Windows defects found by running the whole suite there.
+- Documentation that no longer matched the code: the technical names after the rename, versions, Linux and Windows status, and the supported versions in the security policy.
 
 ## [1.2.0] - 2026-11-03
 

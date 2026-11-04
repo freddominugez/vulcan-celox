@@ -8,7 +8,7 @@ A desktop panel for developers who work alone with code agents. Real terminals, 
 
 ![Overview screen with PHP sites, a Node project, tasks and the terminal panel](vulcan_celox/web/img/manual/visao-geral.png)
 
-**Status:** the latest stable release is 1.1.1, for macOS. Version 1.2.1 is on `main`. The latest test builds for Windows and Linux are on the [Releases](https://github.com/freddominugez/vulcan-celox/releases) page. Neither test build has been accepted on a real machine yet. The interface is in English by default, with Portuguese available from ⌘K.
+**Status:** the latest stable release is 1.2.1, for macOS. The latest test builds for Windows and Linux are on the [Releases](https://github.com/freddominugez/vulcan-celox/releases) page. Neither test build has been accepted on a real machine yet. The interface is in English by default, with Portuguese available from ⌘K.
 
 ## Why it exists
 
