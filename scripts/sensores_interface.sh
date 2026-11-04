@@ -65,6 +65,8 @@ FOLLOW_JS="$UNHIDE_JS(function () {
   function text() { var c = document.querySelector('.code-body .cm-content'); return c ? c.textContent : ''; }
   function inTree(n) { return Array.prototype.some.call(document.querySelectorAll('.code-file'), function (b) { return b.textContent.indexOf(n) >= 0; }); }
   var t = setInterval(function () {
+    // CodeMirror draws the selection layer on a later frame, so it may not exist yet when the text first shows
+    if (fase === 1 && !window.__vtSel) window.__vtSel = document.querySelectorAll('.code-body .cm-selectionBackground').length;
     if (fase === 0 && shown().indexOf('passo-1.py') >= 0 && text().indexOf('valor = 1') >= 0) {
       var m = /gravado = (\d+)/.exec(text()); var atraso = m ? Date.now() - Number(m[1]) : -1;
       if (atraso < 0 || atraso > 5000) window.__vtErrors.push('edição levou ' + atraso + ' ms até a tela');

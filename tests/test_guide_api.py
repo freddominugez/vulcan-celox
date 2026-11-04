@@ -9,6 +9,16 @@ from tests.test_agents_api import AgentsServerCase
 
 
 class GuideApiTest(AgentsServerCase):
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch("vulcan_celox.server.guide_api.is_windows", return_value=False)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_no_windows_nao_ha_passo_do_lerd(self):
+        with mock.patch("vulcan_celox.server.guide_api.is_windows", return_value=True):
+            self.assertEqual([s["id"] for s in self.get("/api/guide")["steps"]], ["projetos", "agentes", "terminal"])
+
     def steps(self, data):
         return {s["id"]: s["ok"] for s in data["steps"]}
 
