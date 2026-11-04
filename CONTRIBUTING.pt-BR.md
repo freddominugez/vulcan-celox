@@ -28,7 +28,7 @@ São conferidas por teste ou na revisão. Pull request que as quebra não entra.
 ## Pull requests
 
 1. Escreva primeiro um teste que falha, depois a correção.
-2. Rode `bash scripts/validate.sh`. No Linux, ou para testar o Linux a partir do Mac, rode `bash scripts/test_linux.sh`.
+2. Rode `bash scripts/validate.sh` num Mac antes de abrir o pull request. Enquanto o repositório for privado, essa rodada local é a conferência do macOS: os pull requests rodam Linux, Windows e lint automaticamente, e o workflow de macOS roda só sob demanda. No Linux, ou para testar o Linux a partir do Mac, rode `bash scripts/test_linux.sh`.
 3. Uma mudança lógica por commit. Mensagens no formato `tipo(escopo): resumo`, por exemplo `fix(terminal): ...`.
 4. Atualize a documentação atingida, nas duas línguas quando a página existir nas duas. Não edite `docs/pt-BR/user-guide.md` à mão: ele é gerado de `vulcan_celox/web/help/conteudo.json` por `scripts/manual_md.py`.
 5. Nunca enfraqueça um teste para passar. Se o comportamento mudou de propósito, explique no pull request.

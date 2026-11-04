@@ -54,7 +54,7 @@ The list is in [CONTRIBUTING.md](../../CONTRIBUTING.md). Python must stay compat
 ## Releasing
 
 1. Update `vulcan_celox/__init__.py`, the workflow in `.github/workflows/`, `README` files, `CHANGELOG` in both languages.
-2. `bash scripts/validate.sh` and `bash scripts/test_linux.sh`.
+2. `bash scripts/validate.sh` and `bash scripts/test_linux.sh`. Then run the macOS workflow on a clean machine with `gh workflow run macos.yml --ref main` and wait for it to pass.
 3. `bash scripts/package.sh`, `bash scripts/install_app.sh`.
 4. Tag, push, create the release with the packages and `SHA256SUMS`, then download and check the sums.
 

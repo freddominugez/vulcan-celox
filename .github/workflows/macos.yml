@@ -1,8 +1,8 @@
 name: macOS
 
-# macOS minutes cost ten times more on private repositories, so this runs on pull requests only.
+# macOS minutes cost ten times more on private repositories, so this runs only on request, before each release.
+# Pull requests are checked with validate.sh on a Mac. When the repository goes public, put pull_request back.
 on:
-  pull_request:
   workflow_dispatch:
 
 permissions:
