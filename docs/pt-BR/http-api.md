@@ -84,7 +84,8 @@ Arquivos estáticos: qualquer caminho fora de `/api/` e `/ws/` serve a interface
 | PATCH | `/api/preferences` | Mudar preferências | `autostart_env` (bool), `new_terminal` (`skip_folder`, `agent`) | 400 |
 | POST | `/api/open` | Abrir algo fora do app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source` ou `file`; `target` | 400, 404, 409, 500 |
 | GET | `/api/guide` | Passos do guia do Início | | |
-| PUT | `/api/guide` | Pular ou restaurar o guia | `skipped` (bool) | 400 |
+| PUT | `/api/guide` | Pular ou restaurar o guia, ou dispensar o passo do Lerd | `skipped`, `lerd_skipped` (bool) | 400 |
+| POST | `/api/guide/lerd/install` | Abre um terminal à vista com o instalador oficial do Lerd | | 409 no Windows |
 | GET | `/api/themes` | Temas das abas, rotação, temas em uso e preferências de terminal | | |
 
 `POST /api/open` limita cada `kind`: `url` exige `http://` ou `https://`; `finder` e `editor` exigem pasta existente, e `finder` recusa pacotes de aplicativo; `prompt` abre só arquivos `.md` de uma pasta de prompts; `source` abre só arquivos dentro de um site registrado; `file` abre só arquivos `.md` da pasta de dados do app.

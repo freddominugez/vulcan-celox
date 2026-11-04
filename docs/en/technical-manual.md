@@ -306,7 +306,7 @@ Ending: `terminate_pty` sends `SIGHUP` and `SIGTERM` to the group and `SIGKILL` 
 
 `/ws/terminals/<id>` carries input and output as binary frames. Text frames carry JSON: `resize` (1 to 1000 rows and columns), `input` and `exit`. `ClientSender` gives each client a queue limited to 4 MB and its own sending thread. The PTY reader only queues, so a slow client never stops the reader, the other clients or the process. A client over the limit is dropped.
 
-On the interface side, `web/js/terminals.mjs` uses xterm.js 6 with the addons fit, web-links, search, WebGL, unicode 11 and serialize. It reconnects automatically up to 5 times, with a growing delay. After that the tab warns, and Enter tries again.
+On the interface side, `web/js/terminal-session.mjs` uses xterm.js 6 with the addons fit, web-links, search, WebGL, unicode 11 and serialize. It reconnects automatically up to 5 times, with a growing delay. After that the tab warns, and Enter tries again.
 
 ### Creating a tab
 
@@ -493,7 +493,8 @@ Both are refused with 409 if the project has `.harness/`.
 | `js/sidebar.mjs`, `js/session-tree.mjs` | Sidebar groups, site lists and the Sessions section |
 | `js/palette.mjs` | Command palette (⌘K) |
 | `js/global-events.mjs` | Global listeners and shortcuts |
-| `js/terminals.mjs`, `js/terminal-panel.mjs` | Terminal workspace and the bottom panel on screens with no terminal |
+| `js/terminals.mjs` (entry), `js/terminal-workspace.mjs`, `-session`, `-pool`, `-tabs`, `-content`, `-commands`, `-search`, `js/terminal-panel.mjs` | Terminal workspace, split by concern, and the bottom panel on screens with no terminal |
+| `js/lerd-setup.mjs` | The optional Lerd install: the official command, shown first, in a visible terminal |
 | `js/api.mjs` | API client, `every`, `wsUrl`, `native`, `isNative`, `hasBridge`, `isMac` |
 | `js/dom.mjs`, `js/markdown.mjs`, `js/themes.mjs`, `js/ai.mjs`, `js/agents-ui.mjs`, `js/current-session.mjs`, `js/prompt-bar.mjs`, `js/folder-dialog.mjs`, `js/site-add.mjs`, `js/help-content.mjs` | Shared pieces |
 

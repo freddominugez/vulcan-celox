@@ -84,7 +84,8 @@ Static files: any path outside `/api/` and `/ws/` serves the interface, `GET` on
 | PATCH | `/api/preferences` | Change preferences | `autostart_env` (bool), `new_terminal` (`skip_folder`, `agent`) | 400 |
 | POST | `/api/open` | Open something outside the app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source` or `file`; `target` | 400, 404, 409, 500 |
 | GET | `/api/guide` | Steps of the start guide | | |
-| PUT | `/api/guide` | Skip or restore the guide | `skipped` (bool) | 400 |
+| PUT | `/api/guide` | Skip or restore the guide, or dismiss the Lerd step | `skipped`, `lerd_skipped` (bool) | 400 |
+| POST | `/api/guide/lerd/install` | Opens a visible terminal running the official Lerd installer | | 409 on Windows |
 | GET | `/api/themes` | Tab themes, rotation, themes in use and terminal preferences | | |
 
 `POST /api/open` limits each `kind`: `url` needs `http://` or `https://`; `finder` and `editor` need an existing folder, and `finder` refuses application packages; `prompt` opens only `.md` files from a prompts folder; `source` opens only files inside a registered site; `file` opens only `.md` files from the app's data folder.

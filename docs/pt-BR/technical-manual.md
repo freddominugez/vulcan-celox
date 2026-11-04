@@ -306,7 +306,7 @@ Encerramento: `terminate_pty` manda `SIGHUP` e `SIGTERM` ao grupo e `SIGKILL` de
 
 `/ws/terminals/<id>` leva entrada e saída em quadros binários. Quadros de texto levam JSON: `resize` (1 a 1000 linhas e colunas), `input` e `exit`. `ClientSender` dá a cada cliente uma fila limitada a 4 MB e uma thread de envio própria. A leitora do PTY só enfileira, então um cliente lento nunca para a leitora, os outros clientes nem o processo. Cliente acima do limite é desligado.
 
-Do lado da interface, `web/js/terminals.mjs` usa xterm.js 6 com os addons fit, web-links, search, WebGL, unicode 11 e serialize. Reconecta sozinho até 5 vezes, com espera crescente. Depois a aba avisa, e Enter tenta de novo.
+Do lado da interface, `web/js/terminal-session.mjs` usa xterm.js 6 com os addons fit, web-links, search, WebGL, unicode 11 e serialize. Reconecta sozinho até 5 vezes, com espera crescente. Depois a aba avisa, e Enter tenta de novo.
 
 ### Criar uma aba
 
@@ -493,7 +493,8 @@ Os dois são recusados com 409 se o projeto tiver `.harness/`.
 | `js/sidebar.mjs`, `js/session-tree.mjs` | Grupos da barra lateral, listas de sites e a seção Sessões |
 | `js/palette.mjs` | Paleta de comandos (⌘K) |
 | `js/global-events.mjs` | Ouvintes e atalhos globais |
-| `js/terminals.mjs`, `js/terminal-panel.mjs` | Área de terminais e o painel inferior nas telas sem terminal |
+| `js/terminals.mjs` (entrada), `js/terminal-workspace.mjs`, `-session`, `-pool`, `-tabs`, `-content`, `-commands`, `-search`, `js/terminal-panel.mjs` | Área de terminais e o painel inferior nas telas sem terminal |
+| `js/lerd-setup.mjs` | A instalação opcional do Lerd: o comando oficial, mostrado antes, num terminal à vista |
 | `js/api.mjs` | Cliente da API, `every`, `wsUrl`, `native`, `isNative`, `hasBridge`, `isMac` |
 | `js/dom.mjs`, `js/markdown.mjs`, `js/themes.mjs`, `js/ai.mjs`, `js/agents-ui.mjs`, `js/current-session.mjs`, `js/prompt-bar.mjs`, `js/folder-dialog.mjs`, `js/site-add.mjs`, `js/help-content.mjs` | Peças comuns |
 
