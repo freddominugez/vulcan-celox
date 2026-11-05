@@ -8,7 +8,9 @@ from typing import Any, Dict
 
 from vulcan_celox import __version__
 from vulcan_celox.core.backup import BackupError, create_backup, prepare_restore, restore_pending
+from vulcan_celox.core.backup_inspect import inspect_backup, list_restores, restore_folder
 from vulcan_celox.core.memory_mask import mask_saved_memories
+from vulcan_celox.core.trash import move_to_trash
 from vulcan_celox.server.fs_api import expand, home_dir
 from vulcan_celox.server.local_http import HttpError, Request
 
@@ -28,7 +30,8 @@ def register_data_api(app) -> None:
     def payload() -> Dict[str, Any]:
         data = saved()
         folder = data.get("folder") or str(Path(home_dir(app.env)).joinpath(*DEFAULT_FOLDER))
-        return {"folder": folder, "last": data.get("last"), "restore_pending": restore_pending(app.data_dir)}
+        return {"folder": folder, "last": data.get("last"), "restore_pending": restore_pending(app.data_dir),
+                "restore_error": app.restore_error}
 
     def path_arg(req: Request, field: str) -> Path:
         raw = req.json().get(field)
@@ -58,6 +61,26 @@ def register_data_api(app) -> None:
         except BackupError as exc:
             raise HttpError(400, str(exc)) from None
         return {**payload(), "restore": info}
+
+    @srv.route("POST", "/api/data/backup/inspect")
+    def _inspect(req: Request):
+        try:
+            return inspect_backup(path_arg(req, "path"), app.data_dir, __version__)
+        except BackupError as exc:
+            raise HttpError(400, str(exc)) from None
+
+    @srv.route("GET", "/api/data/restores")
+    def _restores(_req: Request):
+        return {"restores": list_restores(app.data_dir)}
+
+    @srv.route("POST", "/api/data/restores/trash")
+    def _restore_trash(req: Request):
+        try:
+            folder = restore_folder(app.data_dir, req.json().get("name"))
+        except BackupError as exc:
+            raise HttpError(400, str(exc)) from None
+        move_to_trash(folder, app.data_dir, app.runner)
+        return {"restores": list_restores(app.data_dir)}
 
     @srv.route("POST", "/api/data/mask-saved")
     def _mask(_req: Request):

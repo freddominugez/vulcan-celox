@@ -1,6 +1,6 @@
 # Vulcan Celox: technical manual
 
-Reference for a developer who has never seen this project. It describes version 1.2.1. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
+Reference for a developer who has never seen this project. It describes version 1.3.0. For a shorter tour, read [architecture.md](architecture.md). Many identifiers and source strings in the code are in Brazilian Portuguese; this manual keeps those names as they are so you can search for them.
 
 Paths written as `core/...`, `server/...`, `web/...` and `ui/...` are relative to `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Goals that shape the code:
 - Never delete anything for good.
 - Everything testable without a window, a real Lerd or real agents.
 
-Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.2.1. Since 1.2.0 there are test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
+Release state: stable releases ship for macOS 13 or newer, Apple Silicon and Intel; the latest is 1.3.0. Since 1.2.0 there are test builds for Windows 10 (1809 or newer) and 11 and for Linux, published as pre-releases until they pass acceptance on real machines.
 
 ## 2. Design decisions
 
@@ -141,6 +141,12 @@ In the last two modes the token never goes on a command line. A 0600 page, `<dat
 | `core/redact.py` | Masks secrets before text is saved to a memory file or leaves the machine. Returns the text and the count. |
 | `core/memory_mask.py` | Rewrites memories saved before masking existed, only when the user asks. |
 | `core/backup.py` | Backup `.zip` of the data folder, restore validation, and the swap on start. |
+| `core/backup_inspect.py` | Reads a backup without extracting it (date, version, size, counts, warnings; 20 thousand members and 2 GB at most), lists the copies in `.restauros/` and checks a name before it goes to the Trash. |
+| `core/data_lock.py` | Shared lock on the data folder: a restore waits until the previous instance has left. |
+| `core/server_log.py` | `logs/servidor.log` (1 MB, 3 files) and the error output in `logs/servidor-erro.log`, 0600, masked line by line, token replaced by `[token]`. |
+| `core/file_tree.py` | Code screen: one folder at a time, ignored entries from `ls-files -o -i`, relative paths checked, text search with `grep --no-textconv`. |
+| `core/file_watch.py` | Code screen: photo of the disk with `os.scandir` (size, date, type), compared at each sweep, within a budget of 20 thousand entries. |
+| `core/git_marks.py` | Git state per file (`M`, `D`, `U`) from `ls-files -s --debug` compared with `lstat` and `ls-files -o`, without running the repository's filters. Also the `dirty` count of Branches. |
 | `core/update_check.py` | Reads the latest stable Release version from GitHub, with the user's `gh` as a fallback. |
 | `core/doctor.py` | Builds the `--doctor` JSON. |
 | `core/miniyaml.py` | Minimal block YAML parser with no dependency, used for Lerd files and prompt headers. |
@@ -245,6 +251,10 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 | `server/node_api.py` | `/api/node-projects/*`. |
 | `server/guide_api.py` | `/api/guide`: the four steps of the Home screen and the choice to skip them. |
 | `server/data_api.py` | `/api/data/*`: backup, restore and masking what was already saved. Also registers the version notice. |
+| `server/files_api.py` | `/api/files/*`: the Code screen, read only, plus `/api/files/git` with marks cached per root. |
+| `server/code_roots.py` | Folders the Code screen may open: known ones and up to 50 chosen ones, with the refusals. |
+| `server/files_agents.py` | Who wrote a file on the Code screen: an agent session that recorded the same edit within 60 s. |
+| `server/sidebar_prefs.py` | What Settings can hide from the sidebar, and the sidebar collapsed to a rail (`sidebar_collapsed`). |
 | `server/update_api.py` | `/api/update*`: new version notice, at most one check a day. |
 | `server/fs_api.py` | Folder check and recent folders for the "open terminal in" dialog. |
 | `server/autostart.py` | `EnvAutostart`: starts Lerd or Valet with the app, in the background, if it is stopped. |

@@ -81,8 +81,8 @@ Static files: any path outside `/api/` and `/ws/` serves the interface, `GET` on
 |--------|------|---------|--------------------|----------------|
 | GET | `/api/state` | App, backend, environment status, autostart, sites, favorites and progress | | |
 | GET | `/api/app/build` | Version and fingerprint of the loaded and installed interface | | |
-| PATCH | `/api/preferences` | Change preferences | `autostart_env` (bool), `new_terminal` (`skip_folder`, `agent`), `sidebar_hidden` (list of sidebar items) | 400 |
-| POST | `/api/open` | Open something outside the app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source` or `file`; `target` | 400, 404, 409, 500 |
+| PATCH | `/api/preferences` | Change preferences | `autostart_env`, `attention_notify`, `pr_status` (bool), `theme` (`sistema`, `claro`, `escuro`), `language` (`en`, `pt`), `new_terminal` (`skip_folder`, `agent`), `sidebar_hidden` (list of sidebar items), `sidebar_collapsed` (bool; `null` in the answer while never chosen) | 400 |
+| POST | `/api/open` | Open something outside the app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source`, `file`, `session_file`, `code_file` or `terminal_file`; `target` (plus `session`, `root` or `terminal` for the last three) | 400, 403, 404, 409, 500 |
 | GET | `/api/guide` | Steps of the start guide | | |
 | PUT | `/api/guide` | Skip or restore the guide, or dismiss the Lerd step | `skipped`, `lerd_skipped` (bool) | 400 |
 | POST | `/api/guide/lerd/install` | Opens a visible terminal running the official Lerd installer | | 409 on Windows |
@@ -92,6 +92,9 @@ Static files: any path outside `/api/` and `/ws/` serves the interface, `GET` on
 | GET | `/api/data/backup` | Backup folder, last backup, and whether a restore is prepared | | |
 | POST | `/api/data/backup` | Write a `.zip` of the data folder | `folder` | 400 inside the data folder |
 | POST | `/api/data/restore` | Check a backup and prepare it for the next start | `path` | 400 if refused |
+| POST | `/api/data/backup/inspect` | Read a backup without extracting anything: date, version, size, counts per kind and warnings. Over 20 thousand members or 2 GB uncompressed it is refused | `path` | 400 if the file is missing |
+| GET | `/api/data/restores` | The copies a restore set aside in `.restauros/`, with name, date and size | | |
+| POST | `/api/data/restores/trash` | Send one copy to the Trash | `name` (must be in the list) | 400 |
 | POST | `/api/data/mask-saved` | Mask secrets in memories and commands already saved. Cannot be undone | | |
 | GET | `/api/themes` | Tab themes, rotation, themes in use and terminal preferences | | |
 
@@ -299,6 +302,23 @@ Unknown ids return 404. Invalid values return 400. In `site`, `*` means all site
 |--------|------|---------|--------------------|----------------|
 | GET | `/api/fs/folder` | Check a typed folder; accepts `~` | Query: `path` | 400 |
 | GET | `/api/fs/recent` | Home folder and up to 12 recent folders | | |
+
+### Code screen
+
+Read only: the one write adds or removes a folder from the app's own list. `root` must be a folder the app knows or that was chosen; `path` is relative to it.
+
+| Method | Path | Purpose | Parameters or body | Notable status |
+|--------|------|---------|--------------------|----------------|
+| GET | `/api/files/roots` | Folders of the Code screen: known ones and chosen ones | | |
+| POST | `/api/files/roots` | Choose a folder (at most 50) | `path` | 400, 403 |
+| DELETE | `/api/files/roots` | Take a chosen folder off the list. Nothing is deleted | Query: `path` | 400 |
+| GET | `/api/files/tree` | One folder of the tree, with ignored entries marked | Query: `root`, `path` | 400, 403, 404 |
+| GET | `/api/files/read` | Text of a file, with the same rules as the code viewer | Query: `root`, `path` | 400, 403, 404, 413 |
+| GET | `/api/files/diff` | The file against the last commit, read with `cat-file` | Query: `root`, `path` | 400, 403 |
+| GET | `/api/files/changes` | What changed on disk since the cursor, with the author when an agent session recorded it | Query: `root`, `since`, `open` (repeatable), `file` | 400, 403 |
+| GET | `/api/files/search` | Text search in the files Git tracks, without textconv | Query: `root`, `q` | 400 |
+| GET | `/api/files/photo` | Files in the current photo of the disk, for the quick open | Query: `root` | 400, 403 |
+| GET | `/api/files/git` | Git state per file (`M`, `U`, `D`), from the index compared with the disk, with the branch. Cached per root | Query: `root` | 400, 403 |
 
 ## WebSocket
 

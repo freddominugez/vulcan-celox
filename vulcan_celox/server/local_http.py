@@ -29,6 +29,7 @@ CONTENT_TYPES = {
     ".woff2": "font/woff2",
 }
 from vulcan_celox.core import i18n
+from vulcan_celox.core.server_log import logger
 
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
        "connect-src 'self' ws://127.0.0.1:* ws://localhost:*; frame-ancestors 'none'")
@@ -88,6 +89,7 @@ Route = Tuple[str, Pattern, Callable[[Request], Any]]
 
 class QuietThreadingServer(ThreadingHTTPServer):
     daemon_threads = True
+    request_queue_size = 64  # the interface opens many requests at once when a screen mounts
 
     def handle_error(self, request, client_address) -> None:
         import sys
@@ -250,6 +252,7 @@ class Handler(BaseHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError):
             pass
         except Exception as exc:  # noqa: BLE001
+            logger().exception("%s %s", method, urlsplit(self.path).path)
             self._send_json(500, {"error": i18n.tr("erro interno: {exc}", exc=exc)})
 
     def _api(self, method: str, path: str, query) -> None:

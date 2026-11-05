@@ -4,6 +4,7 @@ import { get, post } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
 import { t } from "../i18n.mjs";
 import { AGENT_NAMES, copy, keepScroll } from "../agents-ui.mjs";
+import { terminals } from "../terminals.mjs";
 
 const VAR = /\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 
@@ -206,6 +207,7 @@ export class PromptsView {
   async resume(sessionId, result) {
     try {
       const tab = await post(`/api/agents/sessions/${encodeURIComponent(sessionId)}/resume`, {});
+      await terminals.sync();
       window.dispatchEvent(new CustomEvent("vulcan-show-terminal", { detail: { id: tab.id } }));
       result.innerHTML = `${icon("check")}<span>${t("Terminal aberto com o agente. Quando ele estiver pronto, clique em Enviar ao terminal.")}</span>`;
     } catch (err) {

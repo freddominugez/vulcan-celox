@@ -9,19 +9,16 @@ from typing import Any, Dict, Optional, Tuple
 
 from vulcan_celox.core import code_files
 from vulcan_celox.core.agents.repos import SAFE_GIT
-from vulcan_celox.core.runner import close_pipe, open_pipe
+from vulcan_celox.core.runner import capture
 
 MAX_OUTPUT = 2 * 1024 * 1024
+GIT_SECONDS = 10.0
 
 
 def _capture(argv, limit: int) -> Tuple[Optional[int], bytes]:
     """(exit code or None if git did not run, up to limit + 1 bytes of output). Never keeps more than that."""
-    try:
-        proc = open_pipe(argv)
-    except OSError:
-        return None, b""
-    raw = proc.stdout.read(limit + 1)
-    return close_pipe(proc), raw
+    code, raw, timed_out = capture(argv, limit, GIT_SECONDS)
+    return (1 if timed_out and code is not None else code), raw
 
 
 def _toplevel(folder: str) -> Tuple[Optional[str], str]:

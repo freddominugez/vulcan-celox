@@ -6,6 +6,7 @@ import sqlite3
 import stat
 import subprocess
 import sys
+import unittest
 from pathlib import Path
 
 from tests.helpers import TempDirTestCase, unix_only, MODOS, WINDOWS
@@ -141,3 +142,14 @@ class PastaDeTrabalhoTest(TempDirTestCase):
         self.assertFalse(marker.exists(), "o lançador importou secrets.py da pasta atual")
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertIn("Vulcan Celox", proc.stdout)
+
+
+class PastaNovaTest(TempDirTestCase):
+    @unittest.skipIf(os.name == "nt", "sem modo de permissão no Windows")
+    def test_pasta_criada_depois_da_abertura_nasce_privada(self):
+        from vulcan_celox.core.store import secure_data_dir, write_text_atomic
+        root = self.tmp / "dados"
+        secure_data_dir(root)
+        write_text_atomic(root / "sessoes" / "global" / "a.md", "x")
+        for folder in (root / "sessoes", root / "sessoes" / "global"):
+            self.assertEqual(stat.S_IMODE(folder.stat().st_mode), 0o700, folder)

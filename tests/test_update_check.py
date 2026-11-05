@@ -1,5 +1,7 @@
 import json
 import time
+import unittest
+from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
 from tests.helpers import TempDirTestCase
@@ -114,3 +116,16 @@ class ApiTest(ServerTestCase):
         self.get()
         self.assertEqual(self.request("PUT", "/api/update", {"dismissed": "99.0.0"})[1]["dismissed"], "99.0.0")
         self.assertEqual(self.request("PUT", "/api/update", {"enabled": "sim"})[0], 400)
+
+
+class TextoDoVerificarTest(unittest.TestCase):
+    """The Check now button says it asks GitHub at that moment, even with the automatic notice off."""
+
+    def test_diz_que_consulta_agora(self):
+        import json
+        web = Path(__file__).resolve().parent.parent / "vulcan_celox" / "web"
+        source = (web / "js" / "views" / "settings-data.mjs").read_text(encoding="utf-8")
+        row = source[source.index("export function updateRow"):source.index("const COUNTS")]
+        text = "Verificar agora consulta o GitHub neste momento, mesmo com o aviso automático desligado."
+        self.assertIn(text, row)
+        self.assertIn("automatic notice turned off", json.loads((web / "i18n" / "en.json").read_text(encoding="utf-8"))[text])

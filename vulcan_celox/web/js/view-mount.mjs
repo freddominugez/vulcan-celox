@@ -9,6 +9,7 @@ import { AgentsBranchesView } from "./views/agents-branches.mjs";
 import { AgentsHistoryView } from "./views/agents-history.mjs";
 import { AgentsUsageView } from "./views/agents-usage.mjs";
 import { AgentsView } from "./views/agents.mjs";
+import { CodeExplorerView } from "./views/code-explorer.mjs";
 import { DebugView } from "./views/debug.mjs";
 import { EnvironmentView } from "./views/environment.mjs";
 import { HelpView } from "./views/help.mjs";
@@ -96,6 +97,9 @@ export function mountView() {
       break;
     case "node-projeto":
       app.view = new NodeProjectView(root, { navigate, name: app.route.project });
+      break;
+    case "codigo":
+      app.view = new CodeExplorerView(root, { navigate, route: app.route });
       break;
     case "prompts":
       app.view = new PromptsView(root, { navigate });

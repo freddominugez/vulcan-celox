@@ -125,7 +125,7 @@ class EditAndTurnScopeTest(CodeDiffCase):
 
 class SemGitTest(CodeDiffCase):
     def test_sem_o_comando_git_diz_o_motivo(self):
-        with mock.patch("vulcan_celox.core.code_diff.open_pipe", side_effect=OSError("sem git")):
+        with mock.patch("vulcan_celox.core.code_diff.capture", return_value=(None, b"", False)):
             status, data = self.diff("a.py", "git")
         self.assertEqual((status, data["available"], data["reason"]), (200, False, "no_git"))
 

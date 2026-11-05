@@ -4,19 +4,35 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-05
+
 ### Added
+- **Code screen.** A project's whole tree and what is being written to disk, live, by an agent or by any other program, with no session needed. New, changed and deleted marks, a Following mode, diff against Git, file tabs, quick open and search in the Git files. Read only. Opens from the sidebar and with Open in Code on sites, Node projects and sessions.
 - **Settings screen.** Choose which items and lists the sidebar shows, plus theme, language, opening screen, Lerd start, folder prompt, notices, PR check, the Anthropic key, version and data folder.
 - **Opening screen.** Home opens with the app until you check the box, and explains every item in cards. Each sidebar item also has a hint.
 
 - **Backup and restore.** Settings saves all of the app's data in a `.zip`, and restores one when you reopen the app. The current data moves to `.restauros/` and nothing is deleted.
+- **Check a backup before restoring.** Choosing a `.zip` shows its date, version, size and how many terminal sessions, tasks, notes, prompts and memories it holds. Restore only shows up after that, and never for a file with an error. The copies a restore set aside in `.restauros/` are listed, and each can go to the Trash.
+- **Collapsible sidebar.** A button at the top of the sidebar, or ⌘B, collapses it into a rail of icons; Sessions, Sites and Node projects open in a menu. A window under 1000 px starts collapsed until you choose.
+- **Git marks on the Code screen.** Each file shows M, U or D, like an editor, with a dot on a collapsed folder that has something marked inside, deleted files struck through and the branch above the tree. They come from the Git index compared with the disk, so nothing from the repository runs.
+- **Server log and restart.** The local server writes `logs/servidor.log` and keeps its error output in `logs/servidor-erro.log`, both masked. On macOS, when the server stops, a notice shows the cause with Show log and Restart server, without closing the app. `--doctor` shows both paths.
 - **New version notice.** The app checks GitHub at most once a day and tells you when a newer Release exists. It only reads the version number and never downloads anything. It is on by default and can be turned off in Settings.
 
 ### Security
+- **No program from the analyzed repository runs.** The Branches screen no longer uses `git status`, which ran the repository's `clean` filter, and a partial clone can no longer fetch by itself, which ran `core.sshCommand`. The comparison with Git has a time limit, and search stays inside the folder.
+- A hand-made backup can no longer replace the data without a copy, or stop the app from opening. A restore waits for the previous instance to leave, and a failed swap opens the app and says so.
+- More names count as sensitive: current SSH keys, `.netrc`, `.npmrc`, `.pypirc`, `.git-credentials`, `auth.json`, `*.p12`, `*.pfx` and `secrets.*`. The mask also covers `curl -u` and `sshpass -p`.
 - Session memory is now saved with recognized secrets masked. A **Mask** button in Settings rewrites memories saved earlier.
 - A password typed at a hidden prompt (`sudo`, `ssh`) no longer ends up in the command list. Windows cannot detect this prompt.
 
 ### Changed
+- The mask mark follows the interface language: `[secret]` in English, `[segredo]` in Portuguese. Both count as already masked, and older memories stay as they are.
+- Example prompts you never edited switch to the new language when you change it.
 - The empty terminal panel stays collapsed until you open a terminal or press ⌘J. The large logo is only on Home. The Anthropic key moved from Index to Settings.
+
+### Fixed
+- A command that wraps at the terminal width is saved whole in the session memory. ⌘J on screens without the bottom panel says why; ⇧⌘D detaches the panel's terminal; ⌘F on the Code screen searches only the open file. The Logs tab of a site that left the list shows an empty state. The native Environment menu warns without Lerd and opens the panel address Lerd gives.
+- Light theme: the tabs of a site page are readable again. Install Lerd and resume from Prompts show the terminal they create. Open in editor works on the Code screen. Settings no longer claims the local server is down. Site headers, task rows, dialogs and notices no longer cut anything in small windows, and English error messages are no longer garbled.
 
 ### Removed
 - The "PHP sites" sidebar item, which opened the same screen as Overview, and the Lerd state at the foot of the sidebar, already shown twice above. The site list stays.

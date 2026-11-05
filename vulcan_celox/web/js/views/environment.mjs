@@ -44,12 +44,13 @@ export class EnvironmentView {
       return;
     }
     const auto = (app.state && app.state.autostart) || {};
-    const failed = auto.phase === "failed" && !(app.state && app.state.status.running);
+    const running = Boolean(app.state && app.state.status.running);
+    const failed = auto.phase === "failed" && !running;
     this.root.innerHTML = `<div class="page env-page">
       ${failed ? `<p class="env-note is-warn" role="status">${icon("alert")}<span>${esc(auto.message)}</span></p>` : ""}
       <div class="env-head"><h1>Lerd</h1><span class="dim">${esc(d.label)} · ${t("PHP, nginx, banco e HTTPS dos sites locais")}</span><span class="spacer"></span>
-        <button class="btn btn-sm" data-service="start">${icon("play")}<span>${t("Ligar")}</span></button>
-        <button class="btn btn-sm" data-service="stop">${icon("stop")}<span>${t("Parar")}</span></button>
+        <button class="btn btn-sm" data-service="start" ${running ? "disabled" : ""}>${icon("play")}<span>${t("Ligar")}</span></button>
+        <button class="btn btn-sm" data-service="stop" ${running ? "" : "disabled"}>${icon("stop")}<span>${t("Parar")}</span></button>
         <button class="btn btn-sm" data-action="dashboard">${icon("gauge")}<span>${t("Painel do Lerd")}</span></button></div>
       ${this.servicesHtml()}
       ${this.phpHtml()}

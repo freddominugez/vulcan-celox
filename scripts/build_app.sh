@@ -60,14 +60,14 @@ if [ "${VULCAN_UNIVERSAL:-0}" = "1" ]; then
   # universal binary (Apple Silicon + Intel) for distribution
   UNI_TMP="$(mktemp -d)"
   for arch in arm64 x86_64; do
-    swiftc -O -target "${arch}-apple-macos13.0" -o "$UNI_TMP/vulcan-celox-$arch" packaging/macos/main.swift packaging/macos/notify.swift packaging/macos/pick_panel.swift \
+    swiftc -O -target "${arch}-apple-macos13.0" -o "$UNI_TMP/vulcan-celox-$arch" packaging/macos/main.swift packaging/macos/server.swift packaging/macos/notify.swift packaging/macos/pick_panel.swift \
       -framework AppKit -framework WebKit -framework Security
   done
   lipo -create -output "$APP/Contents/MacOS/vulcan-celox" "$UNI_TMP/vulcan-celox-arm64" "$UNI_TMP/vulcan-celox-x86_64"
   find "$UNI_TMP" -depth -delete
 else
   swiftc -O -target "${ARCH}-apple-macos13.0" \
-    -o "$APP/Contents/MacOS/vulcan-celox" packaging/macos/main.swift packaging/macos/notify.swift packaging/macos/pick_panel.swift \
+    -o "$APP/Contents/MacOS/vulcan-celox" packaging/macos/main.swift packaging/macos/server.swift packaging/macos/notify.swift packaging/macos/pick_panel.swift \
     -framework AppKit -framework WebKit -framework Security
 fi
 

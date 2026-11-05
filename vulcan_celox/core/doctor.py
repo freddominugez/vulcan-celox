@@ -6,7 +6,7 @@ import json
 from typing import Any, Dict, Mapping, Optional
 
 from vulcan_celox import __version__
-from vulcan_celox.core import lerd_quirks, paths
+from vulcan_celox.core import lerd_quirks, paths, server_log
 from vulcan_celox.core.agents import pricing, usage
 from vulcan_celox.core.agents.status import collect as agents_status
 from vulcan_celox.core.backends import detect_backend
@@ -36,6 +36,7 @@ def collect(env: Optional[Mapping[str, str]] = None, runner=None) -> Dict[str, A
         "agents": agents_status(env, paths.data_dir(env)),
         "precos": pricing.describe(paths.data_dir(env)),
         "uso_30_dias": usage.doctor_summary(paths.data_dir(env)),
+        "logs": dict(zip(("servidor", "erro"), map(str, server_log.log_paths(paths.data_dir(env))))),
         "memory_last_error": (Store(paths.data_dir(env)).load("memoria_status", {}) or {}).get("last_error"),
     }
 

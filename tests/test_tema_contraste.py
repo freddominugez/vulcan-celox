@@ -101,7 +101,7 @@ class AreaDoTerminalTest(unittest.TestCase):
     """Inside .ws-body the background is always dark, even in the light theme."""
 
     def test_texto_legivel(self):
-        match = re.search(r"\.ws-body \{(.*?)\n\}", TOKENS, re.S)
+        match = re.search(r"\.ws-body\.is-terminal \{(.*?)\n\}", TOKENS, re.S)
         scope = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", match.group(1)))
         for name in ("--fg", "--fg-2", "--fg-3", "--accent-text"):
             for back in ("--bg-raise", "--bg-input"):
@@ -121,6 +121,7 @@ class TokensTest(unittest.TestCase):
         known = set(THEMES["escuro"]) | set(re.findall(r"(--[\w-]+)\s*:", (STYLES / "app.css").read_text(encoding="utf-8")))
         known |= set(re.findall(r"(--[\w-]+)\s*:", (STYLES / "agents.css").read_text(encoding="utf-8")))
         known |= set(re.findall(r"(--[\w-]+)\s*:", (STYLES / "code.css").read_text(encoding="utf-8")))
+        known |= set(re.findall(r"(--[\w-]+)\s*:", (STYLES / "explorer.css").read_text(encoding="utf-8")))
         known |= {"--t", "--t-bg", "--t-ink", "--depth"}
         js = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "vulcan_celox" / "web" / "js").rglob("*.mjs"))
         known |= set(re.findall(r"(--[\w-]+)\s*:", js))

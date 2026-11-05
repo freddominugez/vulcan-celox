@@ -16,6 +16,7 @@ FILE = Path(__file__).resolve().parent.parent / "web" / "i18n" / "en.json"
 _language = os.environ.get("VULCAN_LANGUAGE") if os.environ.get("VULCAN_LANGUAGE") in LANGUAGES else DEFAULT
 _dictionary: Optional[Dict[str, str]] = None
 _patterns: List[Tuple[Pattern, str]] = []
+MIN_LITERAL = 4
 
 
 def dictionary() -> Dict[str, str]:
@@ -24,7 +25,8 @@ def dictionary() -> Dict[str, str]:
         _dictionary = json.loads(FILE.read_text(encoding="utf-8"))
         _patterns = []
         for key, value in _dictionary.items():
-            if "{" in key:
+            # a key like "{from} a {to}" would match any English sentence with the word "a" in it
+            if "{" in key and not (key.startswith("{") and len(re.findall(r"[^\W\d_]", re.sub(r"\{\w+\}", "", key))) < MIN_LITERAL):
                 regex = re.sub(r"\\\{(\w+)\\\}", r"(?P<\1>.+?)", re.escape(key))
                 _patterns.append((re.compile("^" + regex + "$", re.S), value))
     return _dictionary

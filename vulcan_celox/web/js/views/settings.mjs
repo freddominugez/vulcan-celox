@@ -32,7 +32,7 @@ export class SettingsView {
       const [prefs, guide, config, update] = await Promise.all([patch("/api/preferences", {}), get("/api/guide"), get("/api/ai/config"), get("/api/update")]);
       this.prefs = prefs;
       this.guide = guide;
-      this.update = update;
+      this.updateInfo = update;
       this.render();
       this.mountPanels(config);
     } catch (err) {
@@ -77,13 +77,13 @@ export class SettingsView {
       <section class="panel cf-panel"><header class="panel-head"><h2>${t("Avisos e rede")}</h2></header>
         ${toggle("notices", noticesEnabled(), t("Avisar quando um agente espera por você"), t("Notificação do sistema, com a janela em segundo plano."))}
         ${toggle("pr", prEnabled(), t("Consultar o estado do PR no GitHub"), t("Usa a rede e o comando gh. Desligado, o estado é estimado pelos comandos da sessão."))}
-        ${toggle("update", this.update.enabled, t("Avisar quando houver versão nova"), t("Consulta o GitHub no máximo uma vez por dia. Só lê o número da versão: não baixa nem instala nada."))}</section>
+        ${toggle("update", this.updateInfo.enabled, t("Avisar quando houver versão nova"), t("Consulta o GitHub no máximo uma vez por dia. Só lê o número da versão: não baixa nem instala nada."))}</section>
       <section class="panel cf-panel"><header class="panel-head"><h2>${t("Chave da Anthropic")}</h2></header>
         <div data-role="key"></div></section>
       <section class="panel cf-panel"><header class="panel-head"><h2>${t("Backup e segredos")}</h2></header>
         <div data-role="data"></div></section>
       <section class="panel cf-panel"><header class="panel-head"><h2>${t("Sobre")}</h2></header>
-        ${updateRow(this.update)}
+        ${updateRow(this.updateInfo)}
         <div class="cf-line"><b>${t("Seus dados")}</b><span class="mono cf-path" title="${esc(p.data_dir)}">${esc(p.data_dir)}</span>
           <button class="btn btn-ghost btn-sm" data-cf-action="open-data">${icon("folder")}<span>${t("Abrir pasta")}</span></button></div>
         <p class="dim cf-note"><a href="#/ajuda">${t("Ajuda: manual e perguntas frequentes")}</a></p></section>
@@ -111,7 +111,7 @@ export class SettingsView {
       }
       if (key === "notices") await setNoticesEnabled(target.checked);
       if (key === "pr") await setPrEnabled(target.checked);
-      if (key === "update") this.update = await put("/api/update", { enabled: target.checked });
+      if (key === "update") this.updateInfo = await put("/api/update", { enabled: target.checked });
     } catch (err) {
       target.checked = !target.checked;
       reportError(err);
@@ -136,12 +136,12 @@ export class SettingsView {
         this.root.querySelectorAll("[data-side]").forEach((i) => { i.checked = true; });
         toast(t("A barra lateral voltou a mostrar tudo."), { kind: "ok" });
       }
-      if (button.dataset.cfAction === "update-open") await post("/api/open", { kind: "url", target: this.update.url });
+      if (button.dataset.cfAction === "update-open") await post("/api/open", { kind: "url", target: this.updateInfo.url });
       if (button.dataset.cfAction === "update-check") {
-        this.update = await post("/api/update/check", {});
+        this.updateInfo = await post("/api/update/check", {});
         const row = this.root.querySelector("[data-role=update]");
-        if (row) row.outerHTML = updateRow(this.update);
-        if (!this.update.reason && !this.update.newer) toast(t("Você está na versão mais recente."), { kind: "ok" });
+        if (row) row.outerHTML = updateRow(this.updateInfo);
+        if (!this.updateInfo.reason && !this.updateInfo.newer) toast(t("Você está na versão mais recente."), { kind: "ok" });
       }
       if (button.dataset.cfAction === "open-data") await post("/api/open", { kind: "finder", target: this.prefs.data_dir });
     } catch (err) {

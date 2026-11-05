@@ -10,6 +10,9 @@ from tests.test_agents_api import AgentsServerCase
 SID = "44444444-5555-4666-8777-888888888888"
 
 
+from vulcan_celox.core import code_files  # noqa: E402
+
+
 class CodeFileApiTest(AgentsServerCase):
     def setUp(self):
         super().setUp()
@@ -83,10 +86,16 @@ class CodeFileApiTest(AgentsServerCase):
         self.assertEqual((status, data["lossy"]), (200, True))
 
     def test_nomes_sensiveis(self):
-        for name in (".env", ".env.local", "chave.pem", "x.KEY", "id_rsa", "id_rsa.pub", "credentials", "credentials.json"):
+        for name in (".env", ".env.local", "chave.pem", "x.KEY", "id_rsa", "id_rsa.pub", "credentials", "credentials.json",
+                     "id_ed25519", "id_ecdsa", "id_dsa", ".netrc", ".git-credentials", ".npmrc", ".pypirc", "auth.json", "secrets.yml", "server.p12", "a.pfx"):
             (self.project / name).write_text("segredo", encoding="utf-8")
             with self.subTest(nome=name):
                 self.assert_refused(name, 403, "sensitive")
+
+    def test_nome_parecido_com_chave_continua_abrindo(self):
+        for name in ("id_generator.js", "identity.py", "author.json"):
+            (self.project / name).write_text("x", encoding="utf-8")
+            self.assertFalse(code_files.is_sensitive(name), name)
 
     def test_sensivel_por_link_e_por_pasta(self):
         (self.project / ".env").write_text("segredo", encoding="utf-8")

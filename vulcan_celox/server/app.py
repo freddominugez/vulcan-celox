@@ -19,9 +19,10 @@ from vulcan_celox.core.progress import progress, progress_by_site
 from vulcan_celox.core.pty_session import TerminalManager
 from vulcan_celox.core.store import Store, migrate_legacy, secure_data_dir
 from vulcan_celox.core import i18n
-from vulcan_celox.core.backup import apply_pending_restore
+from vulcan_celox.core.backup import open_data_folder
 from vulcan_celox.server.autostart import failure_reason, wait_running
 from vulcan_celox.server.local_http import HttpError, LocalServer, Request
+from vulcan_celox.server.sidebar_prefs import SIDEBAR_ITEMS, apply_sidebar_prefs, sidebar_payload, valid_sidebar_hidden  # noqa: F401
 
 SERVICE_ACTIONS = ("start", "stop", "restart")
 NEW_TERMINAL_AGENTS = ("shell", "claude", "codex")
@@ -41,27 +42,13 @@ def site_payload(site) -> Dict[str, Any]:
     }
 
 
-# what Settings can hide; Settings itself stays, or there would be no way back
-SIDEBAR_ITEMS = frozenset({
-    "inicio", "overview", "node", "terminals", "ambiente", "depuracao", "agentes", "prompts", "agentes-uso",
-    "agentes-branches", "agentes-historico", "tasks", "notes", "tags", "index", "ajuda",
-    "section-sessions", "section-sites", "section-node",
-})
-
-
-def valid_sidebar_hidden(value: Any) -> List[str]:
-    if not isinstance(value, list) or not all(isinstance(item, str) and item in SIDEBAR_ITEMS for item in value):
-        raise HttpError(400, "sidebar_hidden deve ser uma lista de itens da barra lateral")
-    return sorted(set(value))
-
-
 class VulcanApp:
     def __init__(self, env: Optional[Mapping[str, str]] = None, runner=None, token: Optional[str] = None,
                  port: int = 0, keystore=None, ai_transport=None):
         self.env = dict(os.environ if env is None else env)
         paths.migrate_data_folder(self.env)
         self.data_dir = paths.data_dir(self.env)
-        apply_pending_restore(self.data_dir)  # before anything reads the data
+        self.data_lock, self.restore_error = open_data_folder(self.data_dir)  # before anything reads the data
         secure_data_dir(self.data_dir)  # 0700/0600: agent memories and events readable by the user only
         self.store = Store(self.data_dir)
         i18n.set_language(i18n.resolve(self.store.load("preferences", {}), self.env))
@@ -105,6 +92,8 @@ class VulcanApp:
         self.prompts = register_prompts_api(self)
         from vulcan_celox.server.code_api import register_code_api
         self.code = register_code_api(self)
+        from vulcan_celox.server.files_api import register_files_api
+        self.files = register_files_api(self)
         from vulcan_celox.server.pr_api import register_pr_api
         register_pr_api(self)
         from vulcan_celox.server.sites_api import register_sites_api
@@ -156,6 +145,7 @@ class VulcanApp:
             },
             "status": {"running": status.running, "summary": status.summary, "details": status.details},
             "autostart": self.autostart.state(),
+            "restore_error": self.restore_error,
             "sites": [site_payload(s) for s in self.sites()],
             "favorites": self.favorites(),
             "progress": {
@@ -262,8 +252,7 @@ class VulcanApp:
                 prefs["language"] = body["language"]
                 self.store.save("preferences", prefs)
                 i18n.set_language(i18n.resolve(prefs, self.env))
-            if "sidebar_hidden" in body:
-                prefs["sidebar_hidden"] = valid_sidebar_hidden(body["sidebar_hidden"])
+            if apply_sidebar_prefs(body, prefs):
                 self.store.save("preferences", prefs)
             if "pr_status" in body:
                 if not isinstance(body["pr_status"], bool):
@@ -273,7 +262,7 @@ class VulcanApp:
             return {"autostart": self.autostart.state(), "new_terminal": self.new_terminal_prefs(),
                     "attention_notify": prefs.get("attention_notify", True), "pr_status": prefs.get("pr_status", False),
                     "theme": prefs.get("theme", "sistema"), "language": i18n.language(),
-                    "sidebar_hidden": prefs.get("sidebar_hidden", []), "data_dir": str(self.data_dir), "version": __version__}
+                    **sidebar_payload(prefs), "data_dir": str(self.data_dir), "version": __version__}
 
         @srv.route("GET", "/api/i18n")
         def _i18n(_req: Request):
@@ -332,6 +321,10 @@ class VulcanApp:
                 if not path.is_file():
                     raise HttpError(404, "arquivo não encontrado")
                 argv = open_argv("editor", str(path), self.env)
+            elif kind == "code_file":
+                # Code screen: same folder, path and sensitive-name checks as reading the file
+                path = self.files.editor_path(body.get("root"), target)
+                argv = open_argv("editor", str(path), self.env)
             elif kind == "terminal_file":
                 # path clicked in the terminal: the server checks again, never what the page claims
                 found = self.code.resolve(str(body.get("terminal") or ""), [target]).get(target)
@@ -339,7 +332,7 @@ class VulcanApp:
                     raise HttpError(403, "este arquivo não pode ser aberto")
                 argv = open_argv("editor", found["path"], self.env)
             else:
-                raise HttpError(400, "kind deve ser url, dashboard, finder, editor, file, prompt, source, session_file ou terminal_file")
+                raise HttpError(400, "kind deve ser url, dashboard, finder, editor, file, prompt, source, session_file, code_file ou terminal_file")
             result = self.runner.run(argv, timeout=15)
             if not result.ok:
                 raise HttpError(500, (result.output or tr("falha ao abrir")).strip())
@@ -352,12 +345,14 @@ class VulcanApp:
         return self
 
     def shutdown(self) -> None:
+        self.files.stop()
         self.notebook_api.flush_index()
         self.hub.finalize_all()  # saves the memory of every open session before killing the PTYs
         self.terminals.close_all()
         self.hub.stop()
         self.server.shutdown()  # stops accepting requests before closing the agents database
         self.agents.stop()
+        self.data_lock.release()
 
 
 def _watch_parent(parent_pid: int, shutdown=None, getppid=os.getppid, exit=os._exit, interval: float = 1.0,
@@ -381,9 +376,12 @@ def _raise_interrupt(_signum, _frame):
 
 def serve(port: int = 0) -> int:
     import signal
+    from vulcan_celox.core import server_log
+    log = server_log.start_serving(paths.data_dir(), os.environ.get("VULCAN_TOKEN") or "")
     app = VulcanApp(port=port)
     # the native app exits with SIGTERM: treat it as an interrupt so memories and index get saved
     signal.signal(signal.SIGTERM, _raise_interrupt)
+    log.info("servidor %s no ar na porta %s", __version__, app.server.port)
     sys.stdout.write(f"VULCAN_PORT={app.server.port}\n")
     sys.stdout.flush()
     app.autostart.begin()  # the environment starts with the app, without delaying the window
@@ -395,5 +393,7 @@ def serve(port: int = 0) -> int:
     except KeyboardInterrupt:
         pass
     finally:
+        log.info("servidor encerrando")
         app.shutdown()
+        server_log.close()
     return 0

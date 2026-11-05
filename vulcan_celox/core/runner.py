@@ -173,6 +173,31 @@ def close_pipe(proc: subprocess.Popen, grace: float = 5.0) -> Optional[int]:
     return proc.returncode
 
 
+def capture(argv: Sequence[str], limit: int, timeout: float = 5.0) -> Tuple[Optional[int], bytes, bool]:
+    """(exit code or None if it did not run, up to limit + 1 bytes of raw output, timed out?). Never keeps more than that,
+    and the output stays as bytes: a file name does not have to be valid text."""
+    try:
+        proc = open_pipe(argv)
+    except (OSError, ValueError):
+        return None, b"", False
+    fired = threading.Event()
+
+    def _expire() -> None:
+        fired.set()
+        _kill_group(proc, getattr(signal, "SIGKILL", signal.SIGTERM))
+
+    timer = threading.Timer(timeout, _expire)
+    timer.daemon = True
+    timer.start()
+    try:
+        raw = proc.stdout.read(limit + 1)
+    finally:
+        timer.cancel()
+    if len(raw) > limit:
+        _terminate(proc)
+    return close_pipe(proc), raw, fired.is_set()
+
+
 # ── pseudo-terminal ──────────────────────────────────────────────────────────
 def set_winsize(fd: int, rows: int, cols: int) -> None:
     fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", max(1, rows), max(1, cols), 0, 0))

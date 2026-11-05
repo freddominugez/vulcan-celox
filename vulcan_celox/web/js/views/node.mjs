@@ -7,6 +7,7 @@ import { confirmDialog } from "../ai.mjs";
 import { t } from "../i18n.mjs";
 import { pickNative } from "../folder-dialog.mjs";
 import { terminals } from "../terminals.mjs";
+import { openInCode } from "./code/explorer-open.mjs";
 
 const NAME = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const MAIN_SCRIPTS = ["dev", "start", "build", "preview", "test", "lint"];
@@ -200,6 +201,7 @@ export class NodeProjectView {
       <div class="np-head"><span class="np-logo">${icon("hex")}</span>
         <div class="np-title"><h1>${esc(this.name)}</h1><span class="dim mono">${esc(shortPath(i.pasta))}</span></div><span class="spacer"></span>
         ${url ? `<button class="btn btn-sm" data-np-open="${esc(url)}">${icon("external")}<span>${t("Abrir no navegador")}</span></button>` : ""}
+        ${openInCode(i.pasta)}
         <button class="btn btn-sm" data-np-term>${icon("terminal")}<span>Terminal</span></button>
         <button class="btn btn-ghost btn-sm" data-np-remove title="${t("Só tira da lista do app; a pasta fica intacta")}">${icon("x")}<span>${t("Tirar da lista")}</span></button></div>
       <div class="np-grid">

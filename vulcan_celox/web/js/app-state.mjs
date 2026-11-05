@@ -10,6 +10,7 @@ export const NAV = [
   { id: "overview", label: t("Visão geral"), icon: "grid", hash: "#/overview", desc: t("Sites, tarefas abertas, terminais e sessões recentes numa página só.") },
   { id: "terminals", label: t("Terminais"), icon: "terminal", hash: "#/terminals", desc: t("Todos os terminais abertos, de todos os projetos, em tela cheia.") },
   { id: "node", label: t("Projetos Node"), icon: "hex", hash: "#/node", routes: ["node", "node-projeto"], desc: t("Apps Next.js, Vite e outros Node: abrir, ligar o servidor e ver os logs.") },
+  { id: "codigo", label: t("Código"), icon: "code", hash: "#/codigo", desc: t("A árvore inteira de um projeto e o que está sendo escrito no disco, ao vivo. Só leitura.") },
   { id: "tasks", label: t("Tarefas"), icon: "check-square", hash: "#/tasks", desc: t("As tarefas de todos os projetos num lugar só.") },
   { id: "notes", label: t("Post-its"), icon: "note", hash: "#/notes", desc: t("Anotações globais, fora de projeto. As de cada site ficam na página dele.") },
   { id: "tags", label: t("Tags"), icon: "tag", hash: "#/tags", desc: t("Etiquetas para organizar e encontrar sessões de terminal.") },
@@ -40,7 +41,7 @@ export const SIDE_SECTIONS = [
 // stable groups, in fixed order, collapsible (state remembered); the first one and Help, at the end, have no title
 export const NAV_GROUPS = [
   { id: "geral", label: "", title: t("Geral"), items: ["inicio", "overview"] },
-  { id: "projetos", label: t("Projetos"), items: ["node", "terminals"] },
+  { id: "projetos", label: t("Projetos"), items: ["node", "codigo", "terminals"] },
   { id: "ambiente", label: t("Ambiente"), items: ["ambiente", "depuracao"] },
   { id: "agentes", label: t("Agentes"), items: ["agentes", "prompts", "agentes-uso", "agentes-branches", "agentes-historico"] },
   { id: "organizar", label: t("Organizar"), items: ["tasks", "notes", "tags", "index"] },

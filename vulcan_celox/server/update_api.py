@@ -14,6 +14,14 @@ STORE_KEY = "update_check"
 INTERVAL = 24 * 3600
 
 
+def _when(data: Dict[str, Any]) -> float:
+    """A date that is not a number counts as never checked."""
+    try:
+        return float(data.get("checked_at") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def register_update_api(app) -> None:
     srv = app.server
     lock = threading.Lock()
@@ -49,7 +57,7 @@ def register_update_api(app) -> None:
     def _status(_req: Request):
         with lock:
             data = saved()
-            stale = time.time() - float(data.get("checked_at") or 0) >= INTERVAL
+            stale = time.time() - _when(data) >= INTERVAL
             if enabled(data) and stale:
                 data = query(data)
             return payload(data)

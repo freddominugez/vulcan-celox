@@ -5,7 +5,7 @@
 // screens mounted without the site list; an unknown route falls back to the overview, which uses the list
 const KEEP_ON_SITES = new Set([
   "site", "notes", "tags", "index", "agentes", "agente", "agentes-historico", "agentes-branches", "agentes-uso",
-  "ajuda", "inicio", "node", "node-projeto", "prompts", "ambiente",
+  "ajuda", "inicio", "node", "node-projeto", "codigo", "prompts", "ambiente",
 ]);
 
 export function remountsOnSites(routeName) {

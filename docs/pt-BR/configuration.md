@@ -33,15 +33,18 @@ Lançador do Linux: `vulcan-celox --check`, `vulcan-celox --instalar-dependencia
 | `%APPDATA%\VulcanCelox` | Pasta de dados no Windows |
 | `<dados>/agentes.db` | Índice SQLite descartável das sessões de agentes |
 | `<dados>/precos.json` | Seus preços; valem mais que a tabela embutida |
+| `<dados>/code_roots.json` | Pastas escolhidas na tela Código, no máximo 50 |
 | `<dados>/prompts/` | Prompts globais |
 | `<dados>/sessoes/` | Memórias de sessão em Markdown |
+| `<dados>/.app.lock` | Marca a pasta como em uso, para a restauração esperar a instância anterior sair. Não entra no backup |
 | `<dados>/.restauros/` | Dados guardados por uma restauração, uma pasta por data. Não entram no backup |
+| `<dados>/logs/` | `servidor.log` (log do servidor, 1 MB e 3 arquivos) e `servidor-erro.log` (saída de erro do processo, truncada na partida acima de 1 MB). Mascarados, 0600, fora do backup |
 | `<dados>/pairings/` | Gravado pelo hook opcional |
 | `<dados>/TAREFAS.md`, `INDICE.md` | Índices gerados |
 | `<projeto>/.vulcan/prompts/` | Prompts do projeto, criados só com confirmação |
 | `<projeto>/TAREFAS.md` | Opt-in, escrito só dentro de um bloco marcado |
 
-JSON ou banco corrompido vira `*.corrupt-<data>` e o app sobe com o padrão.
+Arquivo que não é JSON válido, ou banco corrompido, vira `*.corrupt-<data>` e o app sobe com o padrão. Arquivo válido com a forma errada é ignorado onde é lido, e o app abre mesmo assim.
 
 ## Variáveis de ambiente
 

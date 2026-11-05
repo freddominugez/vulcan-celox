@@ -25,6 +25,65 @@ CM_JS="(function () { var tag = 'CodeMirror não montou'; window.__vtErrors.push
 shot="$TMP_ROOT/snapshot-codemirror.png"
 isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "#/overview" --wait 3 --eval "$CM_JS"
 
+step "tela Code: árvore, estados do visor, teclado, nos dois temas e idiomas e em 900 px"
+"$PY" -I tests/tools/explorer_fixture.py "$TMP_ROOT/explorer/proj" > /dev/null
+EXPLORER="$(cd "$TMP_ROOT/explorer/proj" && pwd -P)"
+for combo in "claro pt 1280x820" "escuro en 1280x820" "escuro pt 900x640" "claro en 900x640"; do
+  set -- $combo
+  # shellcheck disable=SC2016
+  CE_JS="window.__ROOT = '$EXPLORER'; import('./js/theme.mjs').then(function (m) { return m.setThemePref('$1'); }); $(cat tests/tools/sensor_code_tela.js)"
+  SENSOR_LANGUAGE="$2" isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --size "$3" --snapshot "$TMP_ROOT/code-$1-$2-$3.png" --route "#/overview" --wait 9 --eval "$CE_JS"
+done
+
+step "tela Code ao vivo: escrita de outro programa na árvore e no visor, sem perder a rolagem"
+"$PY" -I tests/tools/explorer_fixture.py "$TMP_ROOT/explorer2/proj" > /dev/null
+EXPLORER2="$(cd "$TMP_ROOT/explorer2/proj" && pwd -P)"
+"$PY" -I tests/tools/explorer_escreve.py "$EXPLORER2" 4 &
+WRITER_PID=$!
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-vivo.png" --route "#/overview" --wait 18 --eval "window.__ROOT = '$EXPLORER2'; $(cat tests/tools/sensor_code_vivo.js)"
+wait "$WRITER_PID"
+
+step "tela Code acompanha: agente com nome, outro programa como mudança no disco, pausa e retomada"
+"$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/explorer3"
+EXPLORER3="$(cd "$TMP_ROOT/explorer3/projeto" && pwd -P)"
+( sleep 5; "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/explorer3" crescer 1; sleep 6; "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/explorer3" crescer 2
+  sleep 5; printf 'externo\n' > "$EXPLORER3/externo.txt"; sleep 3; printf 'S=1\n' > "$EXPLORER3/.env.novo" ) &
+GROW3_PID=$!
+isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/explorer3/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-acompanha.png" --route "#/overview" --wait 26 --eval "window.__ROOT = '$EXPLORER3'; $(cat tests/tools/sensor_code_segue.js)"
+wait "$GROW3_PID"
+
+step "tela Code: abas, abertura rápida, busca e pasta sem Git"
+"$PY" -I tests/tools/explorer_fixture.py "$TMP_ROOT/explorer4/proj" > /dev/null
+EXPLORER4="$(cd "$TMP_ROOT/explorer4/proj" && pwd -P)"
+git -C "$EXPLORER4" init -q; git -C "$EXPLORER4" -c user.name=t -c user.email=t@example.com add -A; git -C "$EXPLORER4" -c user.name=t -c user.email=t@example.com commit -qm i
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-abas.png" --route "#/overview" --wait 9 --eval "window.__ROOT = '$EXPLORER'; window.__REPO = '$EXPLORER4'; $(cat tests/tools/sensor_code_abas.js)"
+
+step "Wunderbaum vendorizada: CSP, 20 mil linhas, teclado e nome de arquivo como texto"
+WB_JS="(function () { var tag = 'Wunderbaum não montou'; window.__vtErrors.push(tag);
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'vendor/wunderbaum.css'; document.head.appendChild(css);
+  var s = document.createElement('script'); s.src = 'vendor/wunderbaum.umd.min.js';
+  s.onerror = function () { window.__vtErrors.push('vendor/wunderbaum.umd.min.js recusado'); };
+  s.onload = function () { var box = document.createElement('div'); box.style.cssText = 'position:fixed;left:0;top:0;width:300px;height:300px;z-index:99;background:#fff'; document.body.appendChild(box);
+    var kids = []; for (var i = 0; i < 20000; i++) kids.push({ title: 'arquivo-' + i + '.txt', key: 'k' + i });
+    kids[1].title = '<img src=x onerror=window.__xss=1>';
+    var t0 = performance.now();
+    var tree = new window.mar10.Wunderbaum({ element: box, debugLevel: 1, source: [{ title: 'pasta', key: 'p', expanded: true, children: kids }],
+      navigationModeOption: 'row', iconMap: { folder: '<i class=\"wb-icon\"></i>', folderOpen: '<i class=\"wb-icon\"></i>', folderLazy: '<i class=\"wb-icon\"></i>', doc: '<i class=\"wb-icon\"></i>',
+        expanderExpanded: '<i class=\"wb-expander\"></i>', expanderCollapsed: '<i class=\"wb-expander\"></i>', expanderLazy: '<i class=\"wb-expander\"></i>', loading: '<i class=\"wb-expander\"></i>', error: '<i class=\"wb-icon\"></i>', noData: '<i class=\"wb-icon\"></i>' },
+      init: function () { var ms = performance.now() - t0;
+        var linhas = box.querySelectorAll('.wb-row').length;
+        if (linhas < 3 || linhas > 200) window.__vtErrors.push('sem rolagem por janela: ' + linhas + ' linhas no DOM');
+        if (ms > 3000) window.__vtErrors.push('20 mil linhas levaram ' + Math.round(ms) + ' ms');
+        var first = tree.findKey('k0'); first.setActive(true, { noEvents: true }); first.setFocus();
+        tree.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+        setTimeout(function () { var a = tree.getActiveNode();
+          if (!a || a.key !== 'k1') window.__vtErrors.push('seta para baixo não andou: ' + (a && a.key));
+          if (box.querySelector('img') || window.__xss) window.__vtErrors.push('nome de arquivo virou HTML na árvore');
+          if (box.querySelector('.wb-row') && !box.querySelector('.wb-row[role], .wb-node-list[role], [role=tree], [role=treegrid], [role=grid]')) window.__vtErrors.push('árvore sem ARIA');
+          box.remove(); window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 400); } }); };
+  document.head.appendChild(s); })();"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-wunderbaum.png" --route "#/overview" --wait 5 --eval "$WB_JS"
+
 step "aba Código: árvore, arquivo, diff e nome de arquivo como texto"
 CODE_SID="cccccccc-dddd-4eee-8fff-000000000001"
 "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/code"
@@ -131,6 +190,15 @@ TURN_JS="(function () { var tag = 'linha do tempo por pedido incompleta'; window
   }, 150); })();"
 isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-turnos.png" --route "#/agentes/$CODE_SID" --wait 6 --eval "$TURN_JS"
 
+step "terminal criado fora do pool aparece na tela (instalar Lerd, retomar sessão)"
+POOL_JS="$UNHIDE_JS(function () { var tag = 'terminal criado pelo servidor não apareceu'; window.__vtErrors.push(tag);
+  import('./js/api.mjs').then(function (m) { return m.post('/api/terminals', { cwd: '$TMP_ROOT', title: 'de-fora' }); }).then(function (tab) {
+    location.hash = '#/terminals/terminal/' + encodeURIComponent(tab.id);
+    var t = setInterval(function () { var x = document.querySelector('.ws-body .xterm'); if (x && x.offsetParent) { clearInterval(t);
+      window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); } }, 150);
+  }).catch(function (e) { window.__vtErrors.push('terminal: ' + (e.message || e)); }); })();"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-pool.png" --route "#/overview" --wait 6 --eval "$POOL_JS"
+
 step "selo de porta na aba de um servidor de verdade"
 PORT_JS="$UNHIDE_JS(function () { var tag = 'selo de porta não apareceu'; window.__vtErrors.push(tag);
   import('./js/terminals.mjs').then(function (m) { return m.terminals.create({ cwd: '$TMP_ROOT', title: 'portas', command: 'exec /usr/bin/python3 -m http.server 0 --bind 127.0.0.1' }); }).then(function () {
@@ -151,7 +219,7 @@ for tema in claro escuro; do
     window.__vtErrors.splice(window.__vtErrors.indexOf(pendente), 1);
     if (getComputedStyle(document.body).backgroundColor !== '$fundo') window.__vtErrors.push('tema $tema: fundo ' + getComputedStyle(document.body).backgroundColor);
     if (document.documentElement.scrollWidth > window.innerWidth) window.__vtErrors.push('tema $tema: estourou a largura'); }, 1500); });"
-  for route in "#/overview" "#/agentes" "#/agentes/$CODE_SID/codigo" "#/agentes/$CODE_SID" "#/tasks" "#/notes" "#/ajuda"; do
+  for route in "#/overview" "#/codigo" "#/agentes" "#/agentes/$CODE_SID/codigo" "#/agentes/$CODE_SID" "#/tasks" "#/notes" "#/ajuda"; do
     shot="$TMP_ROOT/tema-$tema-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 5 --eval "$THEME_JS $CLIP_JS"
   done
@@ -184,7 +252,7 @@ EN_JS="$UNHIDE_JS setTimeout(function () {
   if (document.documentElement.lang !== 'en') found.push('lang=' + document.documentElement.lang);
   if (found.length) window.__vtErrors.push('português em ' + location.hash + ': ' + found.slice(0, 12).join(' | '));
 }, 2500);"
-for route in "#/inicio" "#/overview" "#/terminals" "#/agentes" "#/agentes/$CODE_SID" "#/agentes/$CODE_SID/codigo" "#/agentes/historico" "#/agentes/branches" "#/agentes/uso" "#/prompts" "#/tasks" "#/notes" "#/tags" "#/index" "#/ajuda" "#/lerd" "#/depuracao" "#/node"; do
+for route in "#/inicio" "#/overview" "#/terminals" "#/agentes" "#/agentes/$CODE_SID" "#/agentes/$CODE_SID/codigo" "#/agentes/historico" "#/agentes/branches" "#/agentes/uso" "#/prompts" "#/tasks" "#/notes" "#/tags" "#/index" "#/ajuda" "#/lerd" "#/depuracao" "#/node" "#/codigo"; do
   SENSOR_LANGUAGE=en isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/code4/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/en-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png" --route "$route" --wait 4 --eval "$EN_JS" || { echo "português em $route"; exit 1; }
 done
 
@@ -220,3 +288,46 @@ VERSION_JS="$UNHIDE_JS (function () { var tag = 'aviso de versão nova não apar
   setTimeout(function () { if (document.querySelector('#toasts').textContent.indexOf('99.0.0') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 9500); })();"
 isolated_env VULCAN_CELOX_HOME="$SEED_UPDATE" VULCAN_UPDATE_CHECK=1 "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-versao.png" --route "#/inicio" --wait 15 --eval "$VERSION_JS"
 grep -q '"dismissed": "99.0.0"' "$SEED_UPDATE/update_check.json" || { echo "aviso de versão não ficou marcado como visto"; exit 1; }
+
+step "backup: conferir antes de restaurar, zip montado recusado e cópias de restauração, nos dois temas e idiomas"
+"$PY" -c "import json,sys,zipfile; z=zipfile.ZipFile(sys.argv[1],'w'); z.writestr('vulcan-backup.json', json.dumps({'format':1})); z.writestr('.fase.json', '{}'); z.close()" "$TMP_ROOT/montado.zip"
+for combo in "claro pt" "escuro en"; do
+  set -- $combo
+  BK_HOME="$TMP_ROOT/home-backup-$1"; mkdir -p "$BK_HOME/.restauros/20261105-101500"
+  printf 'antigo\n' > "$BK_HOME/.restauros/20261105-101500/tasks.json"
+  BK_JS="window.__BKDIR = '$TMP_ROOT/backups-$1'; window.__BADZIP = '$TMP_ROOT/montado.zip';
+    import('./js/theme.mjs').then(function (m) { return m.setThemePref('$1'); }); $(cat tests/tools/sensor_backup.js)"
+  SENSOR_LANGUAGE="$2" isolated_env VULCAN_CELOX_HOME="$BK_HOME" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/backup-$1-$2.png" --route "#/overview" --wait 7 --eval "$BK_JS $CLIP_JS"
+done
+
+step "servidor que morreu: aviso com a causa, Ver log e Reiniciar, e a API de volta no servidor novo"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/servidor-caiu.png" --route "#/overview" --wait 14 \
+  --eval "$(cat tests/tools/sensor_servidor_caiu.js)" &
+DOWN_PID=$!
+sleep 7
+# the app runs inside a subshell here: its own pid comes from the command line, and the server is its child
+DOWN_APP="$(pgrep -f "MacOS/vulcan-celox.*servidor-caiu.png" | head -1)"
+pkill -9 -P "$DOWN_APP" -f "vulcan_celox --serve" || { echo "processo do servidor não encontrado"; exit 1; }
+wait "$DOWN_PID" || { echo "falhou: servidor que morreu"; exit 1; }
+
+step "tela Code: marcas do Git na árvore, nos dois temas e idiomas, com contraste medido"
+for combo in "claro pt" "escuro en"; do
+  set -- $combo
+  "$PY" -I tests/tools/explorer_fixture.py "$TMP_ROOT/explorer-git-$1/proj" git > /dev/null
+  GIT_ROOT="$(cd "$TMP_ROOT/explorer-git-$1/proj" && pwd -P)"
+  GIT_JS="window.__ROOT = '$GIT_ROOT'; import('./js/theme.mjs').then(function (m) { return m.setThemePref('$1'); }); $(cat tests/tools/sensor_code_git.js)"
+  SENSOR_LANGUAGE="$2" isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-git-$1-$2.png" --route "#/overview" --wait 9 --eval "$GIT_JS"
+done
+
+step "barra lateral recolhida em 900 px: ⌘B abre e recolhe, nos dois temas e idiomas"
+for combo in "claro pt" "escuro en"; do
+  set -- $combo
+  RAIL_JS="import('./js/theme.mjs').then(function (m) { return m.setThemePref('$1'); }); $(cat tests/tools/sensor_trilho.js)"
+  SENSOR_LANGUAGE="$2" isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --size 900x640 --snapshot "$TMP_ROOT/trilho-$1-$2.png" --route "#/codigo" --wait 5 --eval "$RAIL_JS $CLIP_JS"
+done
+
+step "atalhos do painel: ⌘J sem painel avisa, ⇧⌘D destaca no painel de baixo, ⌘F na tela Código é do visor"
+"$PY" -I tests/tools/explorer_fixture.py "$TMP_ROOT/explorer-atalhos/proj" > /dev/null
+ATALHOS_ROOT="$(cd "$TMP_ROOT/explorer-atalhos/proj" && pwd -P)"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/atalhos.png" --route "#/overview" --wait 14 \
+  --eval "$UNHIDE_JS window.__ROOT = '$ATALHOS_ROOT'; $(cat tests/tools/sensor_atalhos.js)"

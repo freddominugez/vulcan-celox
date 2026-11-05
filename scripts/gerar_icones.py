@@ -26,7 +26,9 @@ ICONES = {
     "chevron-down": "caret-down", "chevron-up": "caret-up", "clock": "clock", "book": "book-open", "dots": "dots-three",
     "edit": "pencil-simple", "user": "user", "columns": "columns", "list": "list", "spark": "sparkle", "branch": "git-branch",
     "tree": "tree-structure", "copy": "copy", "text": "text-align-left", "eye": "eye", "history": "clock-counter-clockwise",
-    "dot": "dot-fill", "gear": "gear",
+    "dot": "dot-fill", "gear": "gear", "folder-open": "folder-open", "file": "file", "file-code": "file-code",
+    "file-text": "file-text", "file-image": "file-image", "file-zip": "file-zip", "file-lock": "file-lock", "link": "link-simple",
+    "folder-plus": "folder-plus", "broadcast": "broadcast",
 }
 
 

@@ -27,6 +27,17 @@ class SidebarPrefsTest(ServerTestCase):
             self.assertEqual(self.prefs({"sidebar_hidden": bad})[0], 400, bad)
         self.assertEqual(self.prefs({})[1]["sidebar_hidden"], ["tags"])
 
+    def test_barra_recolhida(self):
+        self.assertIsNone(self.prefs({})[1]["sidebar_collapsed"], "sem escolha, a interface decide pela largura")
+        self.assertIs(self.prefs({"sidebar_collapsed": True})[1]["sidebar_collapsed"], True)
+        self.assertIs(self.prefs({})[1]["sidebar_collapsed"], True)
+        self.prefs({"sidebar_hidden": ["tags"]})
+        self.assertIs(self.prefs({})[1]["sidebar_collapsed"], True, "esconder item não muda o recolhido")
+        for bad in ("sim", 1, None):
+            self.assertEqual(self.prefs({"sidebar_collapsed": bad})[0], 400, bad)
+        self.assertIs(self.prefs({"sidebar_collapsed": False})[1]["sidebar_collapsed"], False)
+        self.assertEqual(self.prefs({})[1]["sidebar_hidden"], ["tags"])
+
     def test_responde_versao_e_pasta_de_dados(self):
         data = self.prefs({})[1]
         self.assertTrue(data["version"])

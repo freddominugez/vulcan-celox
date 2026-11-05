@@ -8,7 +8,7 @@ Um painel desktop para quem programa sozinho com agentes de código. Terminais r
 
 ![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](vulcan_celox/web/img/manual/visao-geral.png)
 
-**Situação:** a versão estável mais recente é a 1.2.1, para macOS. As versões de teste mais recentes para Windows e Linux estão na página de [Releases](https://github.com/freddominugez/vulcan-celox/releases). Nenhuma das versões de teste foi aceita ainda numa máquina real. A interface vem em inglês, com português disponível no ⌘K.
+**Situação:** a versão estável mais recente é a 1.3.0, para macOS. As versões de teste mais recentes para Windows e Linux estão na página de [Releases](https://github.com/freddominugez/vulcan-celox/releases). Nenhuma das versões de teste foi aceita ainda numa máquina real. A interface vem em inglês, com português disponível no ⌘K.
 
 ## Por que existe
 

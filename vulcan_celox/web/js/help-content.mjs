@@ -50,6 +50,7 @@ export const ROUTE_SECTION = {
   terminals: "terminais",
   node: "node",
   "node-projeto": "node",
+  codigo: "codigo",
   tasks: "organizar",
   notes: "organizar",
   tags: "organizar",

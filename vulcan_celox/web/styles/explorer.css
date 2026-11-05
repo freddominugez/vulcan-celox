@@ -1,0 +1,131 @@
+/* Code screen. Only tokens here: the colors live in tokens.css. */
+.view-codigo { display: flex; flex-direction: column; }
+.ce { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
+.ce-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; padding: 6px 12px; border-bottom: 1px solid var(--line); }
+.ce-root { min-width: 0; max-width: 42%; flex: 0 1 auto; }
+.ce-root .select { max-width: 100%; }
+.ce-follow .ce-follow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex: none; }
+.ce-follow.is-paused .ce-follow-dot { background: var(--warn); }
+.ce-status-who { display: inline-flex; align-items: center; gap: 5px; flex: none; color: var(--fg-2); }
+.ce-status-warn { display: inline-flex; align-items: center; gap: 5px; color: var(--warn-text); }
+.ce-status-warn .i { width: 13px; height: 13px; flex: none; }
+.ce-readonly { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-sm); }
+.ce-readonly .i { width: 13px; height: 13px; }
+.ce-addbar { padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.ce-add { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.ce-add-field { display: flex; flex-direction: column; gap: 3px; flex: 1 1 280px; min-width: 200px; font-size: var(--fs-sm); }
+.ce-add-field .input { width: 100%; }
+.ce-add-error { flex: 1 1 100%; margin: 0; color: var(--err-text); font-size: var(--fs-sm); }
+.ce-notice { flex: 1; min-height: 0; overflow: auto; }
+.ce-first { max-width: 560px; }
+.ce-path { overflow-wrap: anywhere; color: var(--fg-2); }
+.ce-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.ce-body { --ce-tree: 280px; flex: 1; min-height: 0; display: grid; grid-template-columns: var(--ce-tree) 5px minmax(0, 1fr); }
+.ce-body[hidden] { display: none; }
+.ce-side { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--bg-side); }
+.ce-tree[hidden] { display: none; }
+.ce-tree { flex: 1; min-height: 0; position: relative; }
+.ce-tree .loading { padding: 12px; }
+.ce-handle { cursor: col-resize; border-left: 1px solid var(--line); background: transparent; touch-action: none; }
+.ce-handle:hover { background: var(--accent-soft); box-shadow: inset 1px 0 0 var(--accent-line); }
+.ce-handle:focus-visible { background: var(--accent-soft); outline: 2px solid var(--accent-line); outline-offset: -2px; }
+.ce-main { background: var(--bg-raise); }
+.ce-view { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.ce-side-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+.ce-side-bar .btn { flex: 1; min-width: 0; justify-content: flex-start; }
+.ce-side-bar .btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ce-side-bar [data-ce=search][aria-pressed=true] { color: var(--accent-text); background: var(--accent-soft); }
+.ce-kbd { margin-left: auto; padding: 0 5px; border: 1px solid var(--line); border-radius: 4px; color: var(--fg-3); font: 11px var(--mono); white-space: nowrap; }
+.ce-tabs { display: flex; overflow-x: auto; flex: none; background: var(--bg-side); border-bottom: 1px solid var(--line); }
+.ce-tabs:empty { display: none; }
+.ce-tab { display: flex; align-items: center; flex: none; max-width: 220px; border-right: 1px solid var(--line); color: var(--fg-3); font-size: var(--fs-sm); }
+.ce-tab.is-on { background: var(--bg-raise); color: var(--fg); box-shadow: inset 0 2px 0 var(--accent); }
+.ce-tab-open { min-width: 0; height: 30px; padding: 0 4px 0 10px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ce-tab-close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 30px; border: 0; background: none; color: var(--fg-3); cursor: pointer; }
+.ce-tab-close:hover { color: var(--fg); }
+.ce-tab-close .i { width: 12px; height: 12px; }
+.ce-tab-open:focus-visible, .ce-tab-close:focus-visible { outline: 2px solid var(--accent-line); outline-offset: -2px; }
+.ce-searchpanel { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.ce-searchpanel[hidden] { display: none; }
+.ce-searchform { padding: 6px; }
+.ce-searchform .input { width: 100%; }
+.ce-results { flex: 1; min-height: 0; overflow: auto; padding-bottom: 8px; font-size: var(--fs-sm); }
+.ce-result-note { margin: 8px 10px; color: var(--fg-3); }
+.ce-result-file { padding: 6px 10px 2px; color: var(--fg-2); font-weight: 600; overflow-wrap: anywhere; }
+.ce-result { display: flex; gap: 8px; width: 100%; min-height: 26px; padding: 3px 10px; border: 0; background: none; color: var(--fg-2); font: 12px var(--mono); text-align: left; cursor: pointer; }
+.ce-result:hover { background: var(--accent-soft); }
+.ce-result:focus-visible { background: var(--accent-soft); outline: 2px solid var(--accent-line); outline-offset: -2px; }
+.ce-result-line { flex: none; min-width: 28px; color: var(--fg-3); text-align: right; }
+.ce-result-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ce-quick { position: fixed; left: 50%; top: 12vh; transform: translateX(-50%); width: min(560px, calc(100vw - 48px)); max-height: 60vh; display: flex; flex-direction: column; background: var(--bg-raise); border: 1px solid var(--line-strong); border-radius: var(--r-lg); box-shadow: 0 12px 40px var(--shade-2); overflow: hidden; z-index: 60; }
+.ce-quick input { flex: none; height: 40px; padding: 0 12px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--fg); font: 14px var(--mono); }
+.ce-quick input:focus-visible { outline: 2px solid var(--accent-line); outline-offset: -2px; }
+.ce-quick-list { overflow: auto; padding: 4px; }
+.ce-quick-item { display: block; width: 100%; min-height: 28px; padding: 4px 8px; border: 0; border-radius: 5px; background: none; color: var(--fg-2); font: 12.5px var(--mono); text-align: left; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ce-quick-item.is-on { background: var(--accent-soft); color: var(--fg); }
+.ce-quick-note { margin: 8px; color: var(--fg-3); font-size: var(--fs-sm); }
+.ce-quick-back { position: fixed; inset: 0; z-index: 59; background: transparent; }
+.code-body .ce-changed-line { background: var(--code-added); }
+.ce-gone { color: var(--warn-text); }
+.ce-status { display: flex; align-items: center; gap: 14px; min-height: 26px; padding: 3px 12px; border-top: 1px solid var(--line); background: var(--bg-side); color: var(--fg-3); font-size: var(--fs-xs, 11.5px); white-space: nowrap; overflow: hidden; }
+.ce-status:empty { display: none; }
+.ce-status > span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* the library's tree, on the app's tokens, in both themes */
+.ce-tree div.wunderbaum {
+  --wb-font-stack: inherit;
+  --wb-node-text-color: var(--fg-2);
+  --wb-background-color: transparent;
+  --wb-alternate-row-color: transparent;
+  --wb-alternate-row-color-hover: var(--bg-input);
+  --wb-hover-color: var(--bg-input);
+  --wb-active-color: var(--accent-soft);
+  --wb-active-border-color: transparent;
+  --wb-active-hover-color: var(--accent-soft);
+  --wb-active-hover-border-color: transparent;
+  --wb-active-color-grayscale: var(--accent-soft);
+  --wb-active-border-color-grayscale: transparent;
+  --wb-active-hover-color-grayscale: var(--accent-soft);
+  --wb-focus-border-color: var(--accent-line);
+  --wb-border-color: transparent;
+  --wb-grid-color: transparent;
+  --wb-grid-color-grayscale: transparent;
+  --wb-dim-color: var(--fg-3);
+  --wb-error-color: var(--err-text);
+  --wb-error-background-color: var(--err-soft);
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg-2);
+  font-size: var(--fs-sm);
+}
+.ce-tree div.wunderbaum:focus-within { outline: 2px solid var(--accent-line); outline-offset: -2px; }
+.ce-tree div.wunderbaum div.wb-row.wb-focus span.wb-col:first-of-type,
+.ce-tree div.wunderbaum:focus-within div.wb-row.wb-active { box-shadow: inset 2px 0 0 var(--accent); }
+.ce-tree div.wunderbaum div.wb-row { color: var(--fg-2); }
+.ce-tree div.wunderbaum div.wb-row:hover { background: var(--bg-input); }
+.ce-tree div.wunderbaum div.wb-row.wb-active,
+.ce-tree div.wunderbaum div.wb-row.wb-active:hover { background: var(--accent-soft); border-color: transparent; color: var(--fg); }
+.ce-tree div.wunderbaum div.wb-row.ce-ignored { color: var(--fg-3); }
+.ce-tree div.wunderbaum div.wb-row.ce-cut { color: var(--fg-3); font-style: italic; }
+.ce-tree div.wunderbaum div.wb-row.ce-badname { color: var(--fg-3); }
+.ce-tree div.wunderbaum i.wb-icon, .ce-tree div.wunderbaum i.wb-expander { display: inline-flex; align-items: center; justify-content: center; color: var(--fg-3); }
+.ce-tree div.wunderbaum i.wb-icon .i, .ce-tree div.wunderbaum i.wb-expander .i { width: 14px; height: 14px; pointer-events: none; }
+.ce-tree div.wunderbaum i.ce-spin .i { animation: ce-spin 900ms linear infinite; }
+@keyframes ce-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ce-tree div.wunderbaum i.ce-spin .i { animation: none; } }
+.ce-mark { position: absolute; right: 10px; top: 0; bottom: 0; display: inline-flex; align-items: center; gap: 4px; font: 600 11px var(--mono); pointer-events: auto; }
+.ce-mark[data-mark="A"] { color: var(--ok-text); }
+.ce-mark[data-mark="M"] { color: var(--warn-text); }
+.ce-mark[data-mark="D"] { color: var(--err-text); }
+.ce-mark[data-mark="•"] { color: var(--accent-text); }
+.ce-who { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); }
+.ce-who-claude { background: var(--agent-claude); }
+.ce-who-codex { background: var(--us-codex); }
+.wb-node.ce-deleted span.wb-title { text-decoration: line-through; }
+.ce-mark[data-src="git"] { font-weight: 400; }
+.ce-mark[data-src="git"][data-mark="U"] { color: var(--ok-text); }
+.ce-branch { display: inline-flex; align-items: center; gap: 4px; min-width: 0; max-width: 40%; margin-left: auto; font-size: var(--fs-sm); color: var(--fg-2); }
+.ce-branch span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ce-branch .i { flex: none; }

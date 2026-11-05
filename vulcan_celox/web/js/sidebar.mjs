@@ -5,6 +5,7 @@ import { NAV_GROUPS, SIDE_SECTIONS, app, lerdUnavailable, navById } from "./app-
 import { $, esc, icon } from "./dom.mjs";
 import { t } from "./i18n.mjs";
 import { isHidden } from "./sidebar-prefs.mjs";
+import { isRail } from "./sidebar-rail.mjs";
 import { terminals } from "./terminals.mjs";
 
 window.addEventListener("vulcan-attention", () => {
@@ -35,7 +36,7 @@ export function renderSidebar() {
       const word = run ? t("rodando") : up ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente");
       dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available && !up ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
     }
-    return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" title="${esc(n.desc || "")}" ${active ? 'aria-current="page"' : ""}>
+    return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" title="${esc(isRail() ? label : n.desc || "")}" ${active ? 'aria-current="page"' : ""}>
       ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${t("{n} aguardando você", { n: count })}"` : ""}>${count}</span>` : ""}${dot}</a>`;
   };
   // the redraw replaces the #nav elements; remember what had focus (group or link) to restore it
@@ -46,7 +47,7 @@ export function renderSidebar() {
   nav.innerHTML = NAV_GROUPS.map((g) => {
     const items = g.items.map((id) => navById[id]).filter((n) => !isHidden(n.id) && !(n.id === "ambiente" && lerdUnavailable()));
     if (!items.length) return "";
-    const closed = Boolean(g.label && app.tree && app.tree.isOpen(`nav:${g.id}-closed`));
+    const closed = Boolean(g.label && !isRail() && app.tree && app.tree.isOpen(`nav:${g.id}-closed`));  // the rail shows every icon
     // collapsed, the group still shows the current screen's item
     const shown = closed ? items.filter((n) => (n.routes || [n.id]).includes(app.route.name)) : items;
     return `<div class="nav-group ${closed ? "is-collapsed" : ""}" data-group="${g.id}">

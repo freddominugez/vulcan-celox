@@ -59,6 +59,7 @@ class PromptsService:
         context = self.app.agents.context(session)
         root = (session.project_root or session.cwd) if session else ""
         project = prompts.project_dir(root) if root else None
+        prompts.follow_language(self.global_dir)  # examples nobody edited follow a language change
         loaded, warnings = prompts.load_all(self.global_dir, project)
         items = []
         for p in loaded:
