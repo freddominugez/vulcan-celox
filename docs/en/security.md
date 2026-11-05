@@ -17,6 +17,10 @@ Who this protects: one developer on their own machine, whose terminals and agent
 - Anthropic key in the Keychain (macOS), Secret Service (Linux) or Credential Manager (Windows). On macOS and Linux it is always passed by stdin, never by argv. Never shown in the interface or written to a file.
 - AI documentation happens only on click. A dialog first shows the size of the text and how many secrets were masked. Masking runs before the text is cut.
 - `.env` files of projects are never opened.
+- Session memory is masked when saved, before the 2,000 line cut, using the same patterns as AI documentation. Input typed with echo off in canonical mode, which is what `sudo`, `ssh` and `getpass` use, is left out of the command list. Windows does not expose that mode, so there it is still recorded. Patterns can miss an unusual secret.
+- Not masked: `notes.json` and `tasks.json`, which hold your own editable text, and `agentes.db`, which indexes what is already in the agent JSONL files. Memories saved before this change stay as they are until you use **Mask** in Settings.
+- A backup is a `.zip` with mode 0600, not encrypted. It holds everything in the data folder except temporary files and `.restauros/`, and it does not hold the Anthropic key. Restoring refuses absolute paths, `..`, links, an unknown format and a size above the free disk space. The swap happens on the next start, and the previous data moves to `.restauros/`.
+- The new version check is on by default, at most once a day. It sends one `GET` to the GitHub API with the app version in the `User-Agent`. The link it shows must be a release page of this repository. It never downloads or installs anything. Turn it off in Settings or with `VULCAN_UPDATE_CHECK=0`.
 
 ## Agent folders
 

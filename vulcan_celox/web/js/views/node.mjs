@@ -11,7 +11,7 @@ import { terminals } from "../terminals.mjs";
 const NAME = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const MAIN_SCRIPTS = ["dev", "start", "build", "preview", "test", "lint"];
 // broken-project states, shown in place of the framework
-const ESTADOS = { sumiu: t("pasta ausente"), nenhum: t("sem package.json"), erro: t("package.json ilegível") };
+const ESTADOS = { sumiu: t("pasta ausente"), nenhum: t("sem package.json"), ilegivel: t("package.json ilegível") };
 
 function slug(text) {
   return (text.split("/").filter(Boolean).pop() || "projeto").toLowerCase().replace(/[^a-z0-9._-]+/g, "-")

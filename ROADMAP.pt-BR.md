@@ -22,6 +22,8 @@ Ainda espera: a Release de Linux, depois do aceite no Mint.
 
 ## Depois, sem decisão
 
+- Backup agendado e criptografado.
+- Árvore completa do projeto com mudanças ao vivo, além da aba Código da sessão. Em planejamento.
 - App do macOS assinado e notarizado, e Python embutido.
 - Outros agentes: Gemini CLI e Cursor CLI estão suspensos.
 - Pareamento exato para o Codex. Depende de mudança no próprio Codex.

@@ -79,6 +79,16 @@ class GuideApiTest(AgentsServerCase):
         if os.name != "nt":
             self.assertEqual(self.get("/api/state")["backend"]["name"], "lerd")
 
+    def test_abre_com_o_app_ate_marcar_a_caixa_mesmo_com_tudo_feito(self):
+        shutil.copytree(FIXTURES / "node" / "painel", self.tmp / "painel")
+        self.app.store.save("node_projects", {"painel": str(self.tmp / "painel")})
+        self.app.store.save("guide", {"first_terminal": True})
+        data = self.get("/api/guide")
+        self.assertTrue(data["done"])
+        self.assertTrue(data["show_on_open"])
+        self.request("PUT", "/api/guide", {"skipped": True})
+        self.assertFalse(self.get("/api/guide")["show_on_open"])
+
     def test_caixa_nao_mostrar_mais_liga_e_desliga(self):
         """The Home checkbox records `skipped`; unchecking it makes the guide open again with the app."""
         for value, shown in ((True, False), (False, True), (True, False)):

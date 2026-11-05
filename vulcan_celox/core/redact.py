@@ -1,4 +1,4 @@
-"""Masks secrets before any text leaves the machine (AI documentation)."""
+"""Masks secrets before text is saved to a memory file or leaves the machine (AI documentation)."""
 
 from __future__ import annotations
 
@@ -6,13 +6,17 @@ import re
 from typing import Callable, List, Pattern, Tuple, Union
 
 MASK = "[segredo]"
+KEY_MASK = "[chave privada removida]"
 
 _SECRET_WORDS = r"(?:PASSWORD|PASSWD|PASS|PWD|SECRET|TOKEN|API_?KEY|ACCESS_?KEY|PRIVATE_?KEY|APP_KEY|AUTH|CREDENTIALS?|DSN)"
 
 # (pattern, replacement): the replacement preserves variable names and prefixes useful for understanding the command
 _RULES: List[Tuple[Pattern[str], Union[str, Callable]]] = [
     (re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----", re.S),
-     "[chave privada removida]"),
+     KEY_MASK),
+    # cut in half by the size limit of the terminal history: only one of the two markers is left
+    (re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----(?:\s*\n[A-Za-z0-9+/=]+)*"), KEY_MASK),
+    (re.compile(r"(?:^[A-Za-z0-9+/=]{16,}\n)*^[^\n]*-----END [A-Z0-9 ]*PRIVATE KEY-----", re.M), KEY_MASK),
     (re.compile(r"\bsk-ant-[A-Za-z0-9_\-]{10,}"), MASK),
     (re.compile(r"\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_\-]{20,}"), MASK),
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}"), MASK),
@@ -35,6 +39,11 @@ _RULES: List[Tuple[Pattern[str], Union[str, Callable]]] = [
     # mysql -psenha
     (re.compile(r"(\bmysql(?:dump|admin)?\b[^\n]*?\s-p)(?!\[segredo\])([^\s\-]\S*)"), lambda m: m.group(1) + MASK),
 ]
+
+
+def masked_count(text: str) -> int:
+    """How many masks a text already holds. The session memory arrives masked, and the count must still be true."""
+    return text.count(MASK) + text.count(KEY_MASK)
 
 
 def redact(text: str) -> Tuple[str, int]:

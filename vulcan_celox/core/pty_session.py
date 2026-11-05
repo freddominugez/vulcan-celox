@@ -130,6 +130,18 @@ class PtySession:
         except ChildProcessError:
             self.exit_code = self.exit_code if self.exit_code is not None else -1
 
+    def input_hidden(self) -> bool:
+        """True at a password prompt: echo off in canonical mode. Shell line editors and TUIs also turn echo off,
+        but they read key by key (non canonical), so they do not match. Windows has no way to tell."""
+        if WINDOWS or self._fds_closed:
+            return False
+        import termios
+        try:
+            flags = termios.tcgetattr(self.fd)[3]
+        except (termios.error, OSError, ValueError):
+            return False
+        return bool(flags & termios.ICANON) and not flags & termios.ECHO
+
     def write(self, data: bytes, timeout: float = WRITE_TIMEOUT) -> bool:
         """Writes everything or gives up after `timeout` seconds without the tab reading anything. True only if everything was written."""
         with self._write_lock:

@@ -24,5 +24,8 @@ Primeiro passo para quase tudo: `python3 -m vulcan_celox --doctor`. Mais pergunt
 | Modelo sem custo | Sem preço conhecido. Acrescente em `precos.json` |
 | Removi um site por engano | Saiu da lista, a pasta está intacta. Pasta apagada está na Lixeira |
 | Duas sessões do Codex trocaram de aba | Limitação conhecida: o Codex não oferece vínculo exato |
+| A consulta de versão diz que não foi possível consultar | Enquanto o repositório for privado, a consulta depende do `gh` com acesso a ele. Nunca é um erro: Configurações mostra o motivo, e dá para desligar a consulta |
+| Restaurei um backup e nada mudou | A troca acontece quando o app abre de novo. Reabra. Os dados anteriores ficam em `.restauros/`, dentro da pasta de dados |
+| Um segredo ainda aparece numa memória antiga | Memórias gravadas antes da máscara ficam como estão. Use **Mascarar** em Configurações. Senha digitada num pedido oculto não tem formato reconhecível, então confira a lista de comandos das sessões antigas e apague a sessão se precisar |
 
 Não está aqui? [Abra uma issue](https://github.com/freddominugez/vulcan-celox/issues/new/choose) com a saída do `--doctor`, depois de tirar o que não quer publicar.

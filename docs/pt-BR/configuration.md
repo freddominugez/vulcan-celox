@@ -35,6 +35,7 @@ Lançador do Linux: `vulcan-celox --check`, `vulcan-celox --instalar-dependencia
 | `<dados>/precos.json` | Seus preços; valem mais que a tabela embutida |
 | `<dados>/prompts/` | Prompts globais |
 | `<dados>/sessoes/` | Memórias de sessão em Markdown |
+| `<dados>/.restauros/` | Dados guardados por uma restauração, uma pasta por data. Não entram no backup |
 | `<dados>/pairings/` | Gravado pelo hook opcional |
 | `<dados>/TAREFAS.md`, `INDICE.md` | Índices gerados |
 | `<projeto>/.vulcan/prompts/` | Prompts do projeto, criados só com confirmação |
@@ -50,6 +51,7 @@ JSON ou banco corrompido vira `*.corrupt-<data>` e o app sobe com o padrão.
 | `CLAUDE_CONFIG_DIR` | Pasta do Claude Code |
 | `CODEX_HOME` | Pasta ou pastas do Codex, separadas por vírgula |
 | `VULCAN_AUTOSTART=0` | Não inicia o Lerd junto com o app |
+| `VULCAN_UPDATE_CHECK=0` | Nunca consulta versão nova (testes e capturas) |
 | `VULCAN_AGENTS=0` | Não liga o índice de agentes |
 | `VULCAN_LERD_BIN`, `VULCAN_VALET_BIN`, `VULCAN_ZSTD_BIN` | Caminho de cada ferramenta |
 | `VULCAN_LERD_API`, `VULCAN_LERD_DATA`, `VULCAN_VALET_HOME` | Endereço da API do Lerd, dados do Lerd, pasta do Valet |

@@ -4,6 +4,28 @@ Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O form
 
 ## [Não lançado]
 
+### Adicionado
+- **Tela de Configurações.** Escolha quais itens e listas a barra lateral mostra, além de tema, idioma, tela de abertura, início do Lerd, pergunta da pasta, avisos, consulta de PR, chave da Anthropic, versão e pasta de dados.
+- **Tela de abertura.** O Início abre com o app até você marcar a caixa, e explica cada item em cartões. Cada item da barra lateral também tem uma dica.
+
+- **Backup e restauração.** Configurações salva todos os dados do app num `.zip` e restaura um deles ao reabrir o app. Os dados atuais vão para `.restauros/` e nada é apagado.
+- **Aviso de versão nova.** O app consulta o GitHub no máximo uma vez por dia e avisa quando há uma Release mais nova. Só lê o número da versão e nunca baixa nada. Vem ligado e pode ser desligado em Configurações.
+
+### Segurança
+- A memória da sessão agora é gravada com os segredos reconhecidos mascarados. Um botão **Mascarar** em Configurações reescreve as memórias gravadas antes.
+- Senha digitada num pedido oculto (`sudo`, `ssh`) não vai mais para a lista de comandos. O Windows não permite detectar esse pedido.
+
+### Alterado
+- O painel de terminal vazio fica recolhido até você abrir um terminal ou apertar ⌘J. O logo grande fica só no Início. A chave da Anthropic saiu do Índice e foi para Configurações.
+
+### Removido
+- O item "Sites PHP" da barra lateral, que abria a mesma tela da Visão geral, e o estado do Lerd no rodapé da barra lateral, já mostrado duas vezes acima. A lista de sites continua.
+
+### Corrigido
+- O manual afirmava coisas que o código não faz: que o ponto verde cobre DNS e PHP (ele indica o nginx), que nada é apagado de verdade, que o Índice tem busca, e o que a memória da sessão guarda. Ela mantém a saída recente do terminal em disco sem mascarar segredos, e o manual agora diz isso.
+- Os menus e alertas nativos apareciam em português na interface em inglês.
+- ⇧⌘T não fazia nada no app nativo. Projeto Node com `package.json` quebrado mostrava uma palavra interna crua. Os atalhos na Ajuda e no Início mostravam ⌘ no Windows e no Linux.
+
 ## [1.2.1] - 2026-11-04
 
 ### Alterado

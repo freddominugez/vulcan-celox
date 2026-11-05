@@ -286,7 +286,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         case "relaunch":
             app?.relaunch()
         case "pickFolder":
-            pickFolder(id: body["id"] as? String ?? "", start: body["start"] as? String)
+            pickFolder(id: body["id"] as? String ?? "", start: body["start"] as? String, purpose: body["purpose"] as? String)
         case "copy":
                         // clipboard through the shell: does not depend on the user gesture or on WebKit permission
             if let text = body["text"] as? String {
@@ -299,14 +299,8 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
     }
 
         /// Native folder picker; answers the interface with the `vulcan-folder-picked` event (null path if cancelled).
-    private func pickFolder(id: String, start: String?) {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
-        panel.allowsMultipleSelection = false
-        panel.canCreateDirectories = true
-        panel.prompt = "Abrir terminal aqui"
-        panel.message = "Escolha a pasta onde o terminal vai abrir"
+    private func pickFolder(id: String, start: String?, purpose: String?) {
+        let panel = makePickPanel(purpose: purpose)
         if let start = start, !start.isEmpty {
             panel.directoryURL = URL(fileURLWithPath: (start as NSString).expandingTildeInPath, isDirectory: true)
         }

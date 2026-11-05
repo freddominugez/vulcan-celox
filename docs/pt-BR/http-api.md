@@ -81,11 +81,18 @@ Arquivos estáticos: qualquer caminho fora de `/api/` e `/ws/` serve a interface
 |--------|---------|----------|---------------------|-------------------|
 | GET | `/api/state` | App, backend, estado do ambiente, início automático, sites, favoritos e progresso | | |
 | GET | `/api/app/build` | Versão e impressão digital da interface carregada e da instalada | | |
-| PATCH | `/api/preferences` | Mudar preferências | `autostart_env` (bool), `new_terminal` (`skip_folder`, `agent`) | 400 |
+| PATCH | `/api/preferences` | Mudar preferências | `autostart_env` (bool), `new_terminal` (`skip_folder`, `agent`), `sidebar_hidden` (lista de itens da barra lateral) | 400 |
 | POST | `/api/open` | Abrir algo fora do app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source` ou `file`; `target` | 400, 404, 409, 500 |
 | GET | `/api/guide` | Passos do guia do Início | | |
 | PUT | `/api/guide` | Pular ou restaurar o guia, ou dispensar o passo do Lerd | `skipped`, `lerd_skipped` (bool) | 400 |
 | POST | `/api/guide/lerd/install` | Abre um terminal à vista com o instalador oficial do Lerd | | 409 no Windows |
+| GET | `/api/update` | Estado do aviso de versão. Consulta o GitHub se ligado e se a última consulta tem mais de um dia | | |
+| PUT | `/api/update` | Ligar ou desligar o aviso, ou marcar uma versão como vista | `enabled` (bool), `dismissed` (versão) | 400 |
+| POST | `/api/update/check` | Consultar agora | | 409 com `VULCAN_UPDATE_CHECK=0` |
+| GET | `/api/data/backup` | Pasta do backup, último backup e se há restauração preparada | | |
+| POST | `/api/data/backup` | Grava um `.zip` da pasta de dados | `folder` | 400 dentro da pasta de dados |
+| POST | `/api/data/restore` | Confere um backup e o prepara para o próximo início | `path` | 400 se recusado |
+| POST | `/api/data/mask-saved` | Mascara segredos em memórias e comandos já gravados. Não tem volta | | |
 | GET | `/api/themes` | Temas das abas, rotação, temas em uso e preferências de terminal | | |
 
 `POST /api/open` limita cada `kind`: `url` exige `http://` ou `https://`; `finder` e `editor` exigem pasta existente, e `finder` recusa pacotes de aplicativo; `prompt` abre só arquivos `.md` de uma pasta de prompts; `source` abre só arquivos dentro de um site registrado; `file` abre só arquivos `.md` da pasta de dados do app.

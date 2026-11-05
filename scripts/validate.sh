@@ -37,7 +37,7 @@ isolated_env() {
       VULCAN_LERD_DATA="$TMP_ROOT/lerd-data" \
       VULCAN_LERD_API="http://127.0.0.1:1" \
       VULCAN_KEYSTORE=memory \
-      VULCAN_AUTOSTART=0 \
+      VULCAN_AUTOSTART=0 VULCAN_UPDATE_CHECK=0 \
       VULCAN_LANGUAGE="${SENSOR_LANGUAGE:-pt}" \
       CLAUDE_CONFIG_DIR="$ROOT/tests/fixtures/agents/claude" \
       CODEX_HOME="$ROOT/tests/fixtures/agents/codex" \
@@ -124,8 +124,9 @@ if [ -f scripts/build_app.sh ]; then
         window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); } }, 4500); }, 150); })();"
   lerd_ok=0
   for pair in "#/ambiente|'[data-xdebug]', '.env-panel'" \
-              "#/inicio|'.in-steps', '.in-shot img', '.in-area:nth-child(6)', '.in-dismiss input[type=checkbox]'" \
+              "#/inicio|'.in-steps', '.in-area[data-card=depuracao]', '.in-area[data-card=prompts]', '.in-area[data-card=config]', '.in-area.is-static', '.in-dismiss input[type=checkbox]'" \
               "#/ajuda|'.hp-toc', '.hp-search input', '.hp-faq details:nth-of-type(15)'" \
+              "#/config|'[data-side=tags]', '[data-theme=escuro]', '[data-lang=pt]', '[data-cf=welcome]', '[data-role=key] .key-form', '[data-cf-action=open-data]', '[data-data=backup]', '[data-data=restore]', '[data-data=mask]', '[data-cf=update]', '[data-role=update]'" \
               "#/lerd|'.nav-item.is-on .nav-dot.dot-ok', '.env-panel', '.env-head [data-service=start]'" \
               "#/depuracao|'.debug-group', '.debug-repeat', '.k-log.log-err'" \
               "#/sites/loja/debug|'.debug-group'" \
@@ -161,7 +162,7 @@ if [ -f scripts/build_app.sh ]; then
       var i = document.querySelector('.pc-field input[name=branch]'); if (!i || !document.querySelector('.pc-preview mark')) return;
       i.value = 'teste-do-sensor'; i.dispatchEvent(new Event('input', { bubbles: true }));
       if (document.querySelector('.pc-preview').textContent.indexOf('teste-do-sensor') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 2500);"; wait_s=5; fi
-    # fixed groups, no item lost (17: the previous 16 plus Sites PHP) and the Agentes group collapses and comes back
+    # fixed groups, no item lost (17, with Configurações and without the Sites PHP shortcut) and the Agentes group collapses and comes back
     # keyboard focus stays on the group header after collapsing
     # the palette (⌘K) opens and lists: it was the only part of the old app.mjs without a script
     if [ "$route" = "#/overview" ]; then extra="setTimeout(function () {
@@ -180,13 +181,20 @@ if [ -f scripts/build_app.sh ]; then
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
       var inp = document.getElementById('palette-input'); inp.value = 'ajuda'; inp.dispatchEvent(new Event('input', { bubbles: true }));
       setTimeout(function () { if (document.querySelectorAll('.pal-item').length) window.__vtErrors.splice(window.__vtErrors.indexOf(pal), 1); }, 800); }, 2500);"; wait_s=6; fi
-    # Enter on the last step of the guide selects the step and focus stays on it
-    if [ "$route" = "#/inicio" ]; then extra="setTimeout(function () { var i = document.querySelector('.in-shot img');
-      if (!i || !i.naturalWidth) window.__vtErrors.push('captura do guia não carregou');
-      var s = document.querySelectorAll('.in-step'); var alvo = s[s.length - 1]; if (!alvo) return;
-      var spot = alvo.dataset.spot; alvo.focus(); alvo.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-      var on = document.querySelector('.in-step.is-on'); if (!on || on.dataset.spot !== spot) window.__vtErrors.push('Enter no passo do guia não selecionou');
-      else if (document.activeElement !== on) window.__vtErrors.push('foco saiu do passo do guia'); }, 3000);"; fi
+    # every sidebar item has its card and its hint; the empty terminal panel does not cover the page
+    if [ "$route" = "#/inicio" ]; then extra="setTimeout(function () {
+      Array.prototype.forEach.call(document.querySelectorAll('#nav .nav-item'), function (n) {
+        if (!n.title) window.__vtErrors.push('item sem dica: ' + n.textContent.trim());
+        var h = n.getAttribute('href'); var has = Array.prototype.some.call(document.querySelectorAll('.in-area'), function (c) { return c.getAttribute('href') === h; }); if (h !== '#/inicio' && !has) window.__vtErrors.push('item sem cartão: ' + h); });
+      var tp = document.getElementById('term-panel'); if (tp.classList.contains('is-open') || tp.getBoundingClientRect().height > 40) window.__vtErrors.push('painel de terminal vazio aberto'); }, 3000);"; fi
+    # Settings: hiding an item takes it out of the sidebar and survives a reload; showing all brings it back; Settings cannot be hidden
+    if [ "$route" = "#/config" ]; then extra="var tag = 'esconder item nas Configurações'; window.__vtErrors.push(tag); setTimeout(function () {
+      var box = document.querySelector('[data-side=tags]'); box.click();
+      if (!document.querySelector('[data-side=config]').disabled) window.__vtErrors.push('Configurações pode ser escondida');
+      setTimeout(function () {
+        var still = Array.prototype.some.call(document.querySelectorAll('#nav .nav-item'), function (n) { return n.getAttribute('href') === '#/tags'; }); if (still) window.__vtErrors.push('item escondido continua na barra');
+        else window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
+        document.querySelector('[data-cf-action=sidebar-reset]').click(); }, 900); }, 2500);"; wait_s=6; fi
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \
       --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
   done

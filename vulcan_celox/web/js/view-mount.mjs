@@ -19,6 +19,7 @@ import { NotesView } from "./views/notes.mjs";
 import { OverviewView } from "./views/overview.mjs";
 import { PromptsView } from "./views/prompts.mjs";
 import { SiteView, TerminalsView } from "./views/site.mjs";
+import { SettingsView } from "./views/settings.mjs";
 import { TagsView } from "./views/tags.mjs";
 import { TasksView } from "./views/tasks.mjs";
 
@@ -80,6 +81,9 @@ export function mountView() {
       break;
     case "agentes-uso":
       app.view = new AgentsUsageView(root, { navigate, until: app.route.until });
+      break;
+    case "config":
+      app.view = new SettingsView(root, { navigate, onChange });
       break;
     case "ajuda":
       app.view = new HelpView(root, { navigate, section: app.route.section });

@@ -2,7 +2,7 @@
 // docs/pt-BR/user-guide.md (scripts/manual_md.py). Only loading and text rendering live here.
 
 import { esc } from "./dom.mjs";
-import { currentLanguage } from "./i18n.mjs";
+import { currentLanguage, keyText } from "./i18n.mjs";
 
 let cache = null;
 
@@ -10,7 +10,7 @@ export async function loadHelp() {
   if (!cache) {
     const res = await fetch(currentLanguage() === "pt" ? "help/conteudo.json" : "help/conteudo.en.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`Ajuda: HTTP ${res.status}`);
-    cache = await res.json();
+    cache = JSON.parse(keyText(await res.text()));
   }
   return cache;
 }
@@ -47,7 +47,6 @@ export function fold(text) {
 export const ROUTE_SECTION = {
   inicio: "primeiros-passos",
   overview: "projetos-php",
-  sites: "projetos-php",
   terminals: "terminais",
   node: "node",
   "node-projeto": "node",
@@ -65,6 +64,7 @@ export const ROUTE_SECTION = {
   prompts: "prompts",
   site: "projetos-php",
   ajuda: "primeiros-passos",
+  config: "configuracoes",
 };
 
 export function sectionFor(route) {

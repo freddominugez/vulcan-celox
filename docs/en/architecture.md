@@ -73,6 +73,12 @@ Startup: the Swift executable generates a random token, starts `python3 -m vulca
 
 One real PTY per tab (`os.forkpty`, or ConPTY on Windows), with the user's shell in login mode. One reader thread per PTY keeps up to 256 KB of history. WebSocket `/ws/terminals/<id>` carries input and output as binary frames, and `resize`, `input` and `exit` as JSON. Each client has a bounded queue (4 MB) and its own sender thread; a client that falls behind is dropped without stopping the reader. The server token is removed from the tab's environment.
 
+Session memory is masked when saved (`core/redact.py`), before the 2,000 line cut. Input typed with echo off in canonical mode is a password prompt and stays out of the command list.
+
+## Your data
+
+`core/backup.py` writes a `.zip` of the data folder, with SQLite copied through its backup API. Restoring validates the zip and extracts it next to the data, and the swap runs on the next start, before anything reads the data. `core/update_check.py` reads the latest stable Release version from GitHub, at most once a day, with the user's `gh` as a fallback.
+
 ## Known debt
 
 Six files above 400 lines are frozen by a test and cannot grow: `packaging/macos/main.swift`, `ui/app.py`, `web/js/views/tasks.mjs`, `core/notebook.py`, `core/harness.py`, `web/js/views/site.mjs`. Risks are listed in section 17 of the [technical manual](technical-manual.md).

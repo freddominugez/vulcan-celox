@@ -1,7 +1,7 @@
 // Interface shell: routing, top bar and native commands. State and sidebar in app-state.mjs and
 // sidebar.mjs; palette in palette.mjs; screen mounting in view-mount.mjs; listeners in global-events.mjs.
 
-import { api, every, get, isMac, isNative, native, patch, token } from "./api.mjs";
+import { api, every, get, isMac, isNative, native, patch, post, put, token } from "./api.mjs";
 import { $, $$, debounce, esc, icon, reportError, toast } from "./dom.mjs";
 import { mountPopout, terminals } from "./terminals.mjs";
 import { remountsOnSites } from "./remount.mjs";
@@ -24,6 +24,7 @@ function parseRoute(hash) {
   if (parts[0] === "popout" && parts[1]) return { name: "popout", id: parts[1] };
   if (parts[0] === "prompts") return { name: "prompts" };
   if (parts[0] === "lerd") return { name: "ambiente" };
+  if (parts[0] === "config") return { name: "config" };
   if (parts[0] === "ajuda") return { name: "ajuda", section: parts[1] || null };
   if (parts[0] === "node") return parts[1] ? { name: "node-projeto", project: parts[1] } : { name: "node" };
   if (parts[0] === "agentes") {
@@ -88,6 +89,31 @@ export async function loadNodeProjects(draw = true) {
   if (draw && app.state) renderSidebar();
 }
 
+let updateAsked = false;
+
+/** Once per launch. There is one toast slot and startup messages use it, so the notice waits for them, and it only
+ * counts as seen if it stayed on screen; otherwise it comes back next launch. The About row in Settings always says it. */
+async function noticeNewVersion() {
+  if (updateAsked) return;
+  updateAsked = true;
+  try {
+    const info = await get("/api/update");
+    if (!info.newer || info.dismissed === info.latest) return;
+    const message = t("Versão {version} disponível.", { version: info.latest });
+    setTimeout(() => {
+      toast(message, {
+        timeout: 20000,
+        action: { label: t("Ver versão"), run: () => post("/api/open", { kind: "url", target: info.url }).catch(reportError) },
+      });
+      setTimeout(() => {
+        if ($("#toasts").textContent.includes(message)) put("/api/update", { dismissed: info.latest }).catch(() => {});
+      }, 5000);
+    }, 8000);
+  } catch {
+    /* offline or no answer: the check is never worth an error on screen */
+  }
+}
+
 export async function refreshState() {
   try {
     const previous = app.state;
@@ -98,6 +124,7 @@ export async function refreshState() {
     reportAutostart(app.state.autostart);
     if (app.tree) app.tree.load();
     if (!previous) {
+      noticeNewVersion();
       renderSidebar();
       renderToolbar();
       $("#app").classList.remove("is-offline");
@@ -292,7 +319,7 @@ function boot() {
   if (!isMac) $$("kbd[data-mac-shortcut]").forEach((kbd) => { kbd.textContent = kbd.textContent.replace("⌘", "Ctrl+⇧+"); });
   bindGlobalEvents();
   const explicit = Boolean(location.hash && location.hash !== "#" && location.hash !== "#/");
-  terminals.sync().catch(reportError);
+  terminals.sync().then(() => { if (app.panel) app.panel.collapseIfEmpty(); }).catch(reportError);
   refreshState().then(async () => {
     if (!explicit && app.state) navigate(await initialRoute(app.state), { replace: true });
     else route();

@@ -1,8 +1,8 @@
-// Índice screen: general index, general AI documentation, Anthropic key and per-session documentation.
+// Índice screen: general index, general AI documentation and per-session documentation.
 
-import { confirmDialog, documentGeneral, documentSession, onJobsChange } from "../ai.mjs";
-import { del, get, patch, post, put } from "../api.mjs";
-import { $, esc, icon, reportError, toast } from "../dom.mjs";
+import { documentGeneral, documentSession, onJobsChange } from "../ai.mjs";
+import { get, post } from "../api.mjs";
+import { $, esc, icon, reportError } from "../dom.mjs";
 import { t } from "../i18n.mjs";
 import { renderMarkdown } from "../markdown.mjs";
 import { sessionHash } from "../session-tree.mjs";
@@ -25,8 +25,6 @@ export class IndexView {
     this.running = new Set();
     this.docs = { index: null, documentation: null };
     this.root.addEventListener("click", (e) => this.onClick(e));
-    this.root.addEventListener("change", (e) => this.onChange(e));
-    this.root.addEventListener("submit", (e) => this.onSubmit(e));
     this.offJobs = onJobsChange(() => this.load());
     this.renderShell();
     this.load();
@@ -65,7 +63,6 @@ export class IndexView {
             <article class="index-doc md" data-role="doc"><div class="loading"><span class="skeleton w-40"></span><span class="skeleton w-70"></span></div></article>
           </section>
           <aside class="index-side">
-            <section class="panel" data-role="key"></section>
             <section class="panel">
               <header class="panel-head"><h2>${t("Sessões")}</h2><span class="count" data-role="session-count"></span></header>
               <ul class="index-sessions" data-role="sessions"></ul>
@@ -82,7 +79,6 @@ export class IndexView {
       b.setAttribute("aria-selected", String(on));
     });
     this.renderDoc();
-    this.renderKey();
     this.renderSessions();
   }
 
@@ -107,36 +103,8 @@ export class IndexView {
       <div class="index-empty">
         <h3>${t("A documentação geral ainda não existe")}</h3>
         <p>${t("A IA lê as sessões de terminal (e as documentações de sessão já geradas) e escreve um documento por site, com linha do tempo, decisões, pendências e comandos recorrentes, gravado em {file}.", { file: "<code>DOCUMENTACAO.md</code>" })}</p>
-        ${configured ? generate : `<p class="dim">${t("Cadastre a chave da Anthropic ao lado para começar.")}</p>`}
+        ${configured ? generate : `<p class="dim">${t("Cadastre a chave da Anthropic em {link} para começar.", { link: `<a href="#/config">${t("Configurações")}</a>` })}</p>`}
         ${!this.sessions.length ? `<p class="dim">${t("Abra e use um terminal primeiro: sem sessões não há o que documentar.")}</p>` : ""}
-      </div>`;
-  }
-
-  renderKey() {
-    const box = $("[data-role=key]", this.root);
-    const cfg = this.config;
-    if (!cfg) return;
-    if (!cfg.configured) {
-      box.innerHTML = `
-        <header class="panel-head"><h2>${t("Chave da Anthropic")}</h2></header>
-        <form class="key-form" data-role="key-form" autocomplete="off">
-          <p class="dim">${t("Usada só quando você pede uma documentação. Fica no Keychain do macOS; o app nunca mostra nem grava a chave em arquivo.")}</p>
-          <label class="field-label" for="ai-key">${t("Chave de API")}</label>
-          <input id="ai-key" class="input" name="key" type="password" placeholder="sk-ant-…" spellcheck="false" autocomplete="off" required>
-          <button class="btn btn-primary" type="submit">${icon("lock")}<span>${t("Validar e salvar")}</span></button>
-        </form>`;
-      return;
-    }
-    const models = cfg.models.length ? cfg.models : [{ id: cfg.model, name: cfg.model }];
-    box.innerHTML = `
-      <header class="panel-head"><h2>${t("Chave da Anthropic")}</h2><span class="badge badge-ok">${icon("check")}${t("ativa")}</span></header>
-      <div class="key-form">
-        <div class="key-row"><span class="mono">${esc(cfg.masked)}</span><div class="spacer"></div>
-          <button class="btn btn-ghost btn-sm" data-action="remove-key">${icon("trash")}<span>${t("Remover")}</span></button></div>
-        <label class="field-label" for="ai-model">${t("Modelo")}</label>
-        <select id="ai-model" class="select" data-role="model">
-          ${models.map((m) => `<option value="${esc(m.id)}" ${m.id === cfg.model ? "selected" : ""}>${esc(m.name)}</option>`).join("")}
-        </select>
       </div>`;
   }
 
@@ -181,14 +149,6 @@ export class IndexView {
         const job = await documentSession(target.dataset.id, target.dataset.title);
         if (job) { this.running.add(target.dataset.id); this.renderSessions(); }
       }
-      if (action === "remove-key") {
-        const ok = await confirmDialog({ title: t("Remover a chave da Anthropic?"), confirmLabel: t("Remover"),
-          body: `<p>${t("A chave sai do Keychain. As documentações já geradas continuam nos arquivos.")}</p>` });
-        if (!ok) return;
-        this.config = await del("/api/ai/key");
-        toast(t("Chave removida."), { kind: "ok" });
-        this.render();
-      }
     } catch (err) {
       reportError(err);
     }
@@ -203,37 +163,6 @@ export class IndexView {
     const session = this.sessions.find((s) => s.memory_file && s.memory_file.split("/").pop().replace(/\.md$/, "") === name);
     if (session) this.options.navigate(sessionHash(session));
     else if (this.docs.index) post("/api/open", { kind: "file", target: this.docs.index.path.replace(/INDICE\.md$/, decode(href)) }).catch(reportError);
-  }
-
-  async onChange(event) {
-    if (event.target.dataset.role !== "model") return;
-    try {
-      this.config = await patch("/api/ai/config", { model: event.target.value });
-      toast(t("Modelo trocado para {model}.", { model: event.target.selectedOptions[0].textContent }), { kind: "ok" });
-    } catch (err) {
-      reportError(err);
-      this.renderKey();
-    }
-  }
-
-  async onSubmit(event) {
-    if (event.target.dataset.role !== "key-form") return;
-    event.preventDefault();
-    const input = event.target.elements.key;
-    const button = event.target.querySelector("button[type=submit]");
-    button.disabled = true;
-    button.querySelector("span").textContent = t("Validando…");
-    try {
-      this.config = await put("/api/ai/key", { key: input.value.trim() });
-      input.value = "";
-      toast(t("Chave validada e guardada no Keychain."), { kind: "ok" });
-      this.render();
-    } catch (err) {
-      input.value = "";
-      reportError(err);
-      button.disabled = false;
-      button.querySelector("span").textContent = t("Validar e salvar");
-    }
   }
 
   destroy() {

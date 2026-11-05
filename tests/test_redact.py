@@ -45,3 +45,23 @@ class RedactTest(unittest.TestCase):
         once, _ = redact(f"TOKEN={ANT}")
         self.assertEqual(redact(once), (once, 0))
         self.assertIn(MASK, once)
+
+
+class CutPrivateKeyTest(unittest.TestCase):
+    BODY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7\nabcdefghijklmnopqrstuvwxyz0123456789ABCDEF"
+
+    def test_so_o_fim_sobrou(self):
+        masked, _ = redact(f"antes\n{self.BODY}\n-----END RSA PRIVATE KEY-----\ndepois")
+        self.assertNotIn("MIIEvQ", masked)
+        self.assertIn("antes", masked)
+        self.assertIn("depois", masked)
+
+    def test_so_o_comeco_sobrou(self):
+        masked, _ = redact(f"-----BEGIN PRIVATE KEY-----\n{self.BODY}")
+        self.assertNotIn("MIIEvQ", masked)
+
+    def test_mascarar_de_novo_nao_muda_nada(self):
+        text = ("DB_PASSWORD=abc123 mysql://u:p4ss@host/db --token xyz Bearer abcdefghijklmnop "
+                "ghp_abcdefghijklmnopqrstuvwxyz mysql -psenha\n-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----")
+        once, _ = redact(text)
+        self.assertEqual(redact(once)[0], once)

@@ -15,6 +15,7 @@
 - [Prompts](#prompts): Ready-made instructions you send to the agent with one click.
 - [Harness](#harness): Contract, items and handoff that the agents follow.
 - [Tasks, sticky notes, tags and index](#organizar): What gets recorded for each project.
+- [Settings](#configuracoes): What the sidebar shows and the app's settings, on one screen.
 - [Keyboard shortcuts](#atalhos): The shortcuts that save the most time.
 - [Security and privacy](#seguranca): What the app reads, what it writes and what it never does.
 - [Frequently asked questions](#frequently-asked-questions)
@@ -25,18 +26,18 @@
 
 *What Vulcan Celox does and how to start in a few steps.*
 
-The app has a light and a dark theme. Press ⌘K, search for "Theme" and pick System, Light or Dark. The terminal area stays dark in both, with each tab's own color.
+The app has a light and a dark theme: pick one in **Settings**, under Appearance. The terminal area stays dark in both, with each tab's own color.
 
 Vulcan Celox is a panel for solo developers who code with coding agents. It puts in one place the PHP sites that **Lerd** runs on your Mac, your Node projects (Next.js, Vite and the like), the terminals of each project and the **Claude Code** and **Codex** sessions.
 
 ![Overview with PHP sites, a Node project, tasks and the terminal panel](../../vulcan_celox/web/img/manual/visao-geral.png)
 
-1. **Start Lerd.** The green dot at the top right, and on the Lerd item in the sidebar, shows that nginx, `.test` DNS and PHP are responding. Without Lerd, Node projects and agents work the same way.
+1. **Start Lerd.** The green dot at the top right, and on the Lerd item in the sidebar, means nginx is running. The text beside it shows `.test` DNS and the PHP version. Without Lerd, Node projects and agents work the same way.
 2. **Find your projects.** Sites registered in Lerd show up on their own. Node projects come in through the + in the Node projects section, or through suggestions taken from the folders where your agents worked.
 3. **Let the app read the agent sessions.** It reads the Claude Code and Codex files from disk, line by line, with no API key and without writing anything in those folders.
-4. **Open a terminal in a project** with ⌘T. Tasks, sticky notes and tags created there become the session memory in Markdown when the terminal closes.
+4. **Open a terminal in a project** with ⌘T. Its commands, tasks, sticky notes, tags and recent output are kept as the session's Markdown memory.
 
-The **Home** screen checks these steps by itself and stops opening at launch once the essential steps are done. The Lerd step is optional: **Install** shows the official command and runs it in a visible terminal, and **I don't use it** dismisses the step. Check **Don't show the guide again** to make the app open straight on the Overview. The guide stays available in the Home item of the sidebar.
+The **Home** screen opens with the app: it checks these steps by itself and explains, in cards, what each item does. The Lerd step is optional: **Install** shows the official command and runs it in a visible terminal, and **I don't use it** dismisses the step. Check **Don't show this screen on startup** so the app stops opening on it. It stays in the Home item of the sidebar, and you can turn it back on in Settings.
 
 <a id="projetos-php"></a>
 
@@ -49,7 +50,7 @@ Each Lerd site shows up in the Overview and in the Sites section of the sidebar,
 - **Add a site:** the + in the Sites section links a folder to a domain (`lerd link`) or registers a folder full of projects (`lerd park`). Lerd writes `.php-version` in the folder when it registers it.
 - **Switch the site's PHP, HTTPS or Node:** from the site page. Actions that build an image run in a terminal tab, with the output in view.
 - **Share:** opens a public tunnel and shows the address when it appears in the output.
-- **Remove:** taking a site off the app's list deletes nothing. Deleting the folder sends it to the Trash, never permanently.
+- **Remove:** unregisters the site from Lerd, so it stops being served. The folder stays unless you choose to send it to the Trash.
 
 The sites belong to Lerd. The app only calls Lerd's own CLI and API and never edits its global files.
 
@@ -99,9 +100,9 @@ Node projects do not use Lerd. The app reads `package.json`, finds the package m
 Each terminal is a session. It opens in the folder you chose, with a color theme that identifies the session, and can start with Claude Code or Codex already running.
 
 - **Ports:** the tab shows the ports its processes opened, such as `:5173 +2`, in the tab bar and in the session list. Clicking opens `http://localhost:<port>` in the browser. Only the tab's own processes count.
-- **⌘T** opens a new terminal; **⌘J** shows or hides the bottom terminal panel, which follows you across all screens.
+- **⌘T** opens a new terminal; **⌘J** shows or hides the bottom terminal panel, on screens that do not already show a terminal.
 - **Quick commands** for the project (composer, artisan, npm) sit in the terminal bar.
-- **Memory:** when a terminal closes, its commands, tasks, sticky notes and tags become a Markdown file, which shows up in Recent sessions and in the Index.
+- **Memory:** while a terminal is open, the app keeps a Markdown file with typed commands, tasks, sticky notes, tags and the last 2,000 lines of output. Passwords and keys it recognizes are saved as `[segredo]`, and what you type at a hidden password prompt is not recorded. Recognition is by pattern, so an unusual secret can get through, and on Windows the hidden prompt cannot be detected. After it closes, the file shows up in Recent sessions and in the Index.
 - **Detach:** a tab can become its own window and come back later.
 
 <a id="depuracao"></a>
@@ -120,21 +121,21 @@ In an agent session, the **Debug during the period** panel shows only what happe
 
 *Claude Code and Codex sessions read from disk.*
 
-The **Agents** screen lists the Claude Code and Codex sessions on this machine, with project, branch, last request, files touched and state (active, idle, looping). Clicking a session opens its timeline.
+The **Agents** screen lists the Claude Code and Codex sessions on this machine, with project, branch, title or first request, files touched and state (active, idle, looping). Clicking a session opens its summary, with Code, Files, Commands and Timeline tabs.
 
 ![List of agent sessions with project, branch and activity](../../vulcan_celox/web/img/manual/agentes.png)
 
-- **Who is waiting for you:** the tab gets a ring and the sidebar shows how many sessions finished their turn or may be waiting. The notice clears when you focus the tab or open the session, and ⌘⇧U jumps to the most recent one. "May be waiting" is a guess: the tool may just be slow. Programs that notify through the terminal (OSC 9, 99 and 777, or the bell) also light the ring. With the window unfocused, the app sends a system notification with only the agent, project and state, and shows the count on the Dock icon; to turn it on or off, press ⌘K and search for "System notification".
+- **Who is waiting for you:** the tab gets a ring and the sidebar shows how many sessions finished their turn or may be waiting. The notice clears when you focus the tab or open the session, and ⌘⇧U jumps to the most recent one. "May be waiting" is a guess: the tool may just be slow. Programs that notify through the terminal (OSC 9, 99 and 777, or the bell) also light the ring. With the window unfocused, the app sends a system notification with only the agent, project and state, and shows the count on the Dock icon; to turn it on or off, press ⌘K and search for "System notice".
 - **Agent history:** search everything the agents did, by text, file or command.
 - **Branches and worktrees:** which branch each agent is working on, so work does not get mixed up.
-- **Resume:** opens a terminal in the session's folder with the agent's resume command already typed.
+- **Resume:** opens a terminal in the session's folder and runs the agent's resume command.
 - **Pairing:** the terminal that opened an agent stays linked to its session, so prompts come out filled in. For Codex the link is by folder and time: two sessions opened almost together in the same folder can still swap tabs. Subagents and the Codex desktop app do not link to tabs.
 
 **⌘-click on a path.** In the terminal, with ⌘ held, paths such as `a/b.py`, `/abs/b.py`, `b.py:12` and `b.py(12)` become links, if the file exists inside a known folder. With a paired session it opens in the Code tab, at the line. Without a session it opens in the editor. A folder opens in Finder. A relative path counts from the session's folder or from the folder where the tab opened: after a `cd` it may not be found.
 
 **Navigate by request.** ⌘⇧↑ and ⌘⇧↓ jump between requests. In the terminal, each Enter in a tab with a live agent becomes a mark, without drawing anything on screen. If the agent uses the whole terminal screen, there is no history to navigate, and the app warns you once. In the session, the **Timeline** groups by request, with files and commands, and each edited file leads to the diff of that request.
 
-**PR state.** By default the app estimates it from the session's commands and says so on screen. Turn on "PR state from GitHub" in ⌘K to see number, draft, state and checks through your own `gh`. Only this option uses the network.
+**PR state.** By default the app estimates it from the session's commands and says so on screen. Turn on "Check the PR state on GitHub" in Settings to see number, draft, state and checks through your own `gh`. Only this option uses the network.
 
 **Code tab.** Inside a session, the **Code** tab shows the files the agent touched, marked as new, edited, read or deleted. You see the file with syntax highlighting or the diff: of one edit, of a whole request or against the last commit, side by side or unified. ⌘F searches the file. In an active session the viewer follows the agent, opening each edited file and scrolling to the changed part. Scrolling, clicking or selecting text pauses it, and **Resume following** brings it back. In paired tabs, the **Code** button in the bar above the terminal takes you straight here.
 
@@ -142,7 +143,7 @@ The **Agents** screen lists the Claude Code and Codex sessions on this machine, 
 
 The viewer is read only: nothing is edited in the app. It opens files inside the session folder, up to 1 MB, and does not show binaries or sensitive names such as `.env`, keys and credentials. The edit contents come from the agent's log, so they vanish when the agent deletes the old session.
 
-The app only reads these files, line by line. It never writes to `~/.claude` or `~/.codex`. The only exception is the pairing hook, which you install on purpose with `--instalar-hook` and which keeps a backup.
+The app only reads these files, line by line. It never writes to `~/.claude` or `~/.codex`. The only exception is the pairing and attention hooks, which you install on purpose with `--instalar-hook`, editing `~/.claude/settings.json` with a backup.
 
 <a id="custo"></a>
 
@@ -198,7 +199,21 @@ The harness is the contract with verifiable items, the run state and the handoff
 - **Tasks:** per site or global, with a due date and state. Open ones show in the Overview.
 - **Sticky notes:** quick notes per site or global.
 - **Tags:** mark sessions, tasks and notes so you can find them later.
-- **Index:** all session memories in Markdown, with search. AI documentation is optional, only on click, and uses your own Anthropic key stored in the Keychain.
+- **Index:** a Markdown list of all sessions; each entry opens that session's memory. AI documentation is optional, only on click, and uses your own Anthropic key, added in Settings and stored in the system's password store.
+
+<a id="configuracoes"></a>
+
+## Settings
+
+*What the sidebar shows and the app's settings, on one screen.*
+
+- **Sidebar:** check what you want to see. It covers the menu items and the lists below them (Sessions, Sites and Node projects). Whatever you hide stays in the search (⌘K), and **Show all** undoes it. Settings cannot be hidden, so you can always come back.
+- **Appearance:** theme (System, Light or Dark) and language (English or Português).
+- **On startup:** whether to show the opening screen, start Lerd with the app, and ask for the folder when opening a terminal.
+- **Notices and network:** a notification when an agent is waiting for you, checking the PR state on GitHub (off by default), and the new version notice (on by default, at most once a day, reads only the version number). You can turn each of them off.
+- **Backup and secrets:** **Back up now** saves all of the app's data in a .zip outside the data folder. It includes tasks, sticky notes, tags, memories, prompts, preferences and the agent index, but not the Anthropic key, which stays in the system. The file is not encrypted. **Restore** checks the file and swaps the data when you reopen the app; the current data stays in the `.restauros` folder. **Mask** rewrites memories saved before masking existed, and cannot be undone.
+- **Anthropic key:** used only when you ask for AI documentation.
+- **About:** the installed version, whether a newer one exists, and the folder with your data. The app never downloads or installs anything by itself: the button opens the release page.
 
 <a id="atalhos"></a>
 
@@ -208,7 +223,7 @@ The harness is the contract with verifiable items, the run state and the handoff
 
 | Shortcut | Action |
 |----------|--------|
-| `⌘K` | Search sites, projects, tasks and commands |
+| `⌘K` | Search PHP sites, tasks, sticky notes, tags and commands |
 | `⌘T` | New terminal |
 | `⇧⌘T` | New terminal, asking for the folder |
 | `⌘J` | Show or hide the terminal panel |
@@ -227,10 +242,10 @@ The harness is the contract with verifiable items, the run state and the handoff
 
 - The internal server only listens on `127.0.0.1`, with a token per run. Nothing is exposed on the network.
 - Agent sessions: read only, line by line. The app never writes to `~/.claude`, `~/.codex` or their configuration files, except the pairing hook that you install on purpose, with a backup.
-- Nothing is deleted permanently: a removed folder goes to the Trash.
-- In a project folder, the app writes only with your confirmation and inside a marked block.
+- Folders and session memory files go to the Trash. Tasks, sticky notes and tags are deleted from the app; only the last deleted task can be undone.
+- In a project folder, the app writes only when you ask: new harness, contract and prompt files, never overwriting, and a marked block in an existing `CLAUDE.md` or `AGENTS.md`. Terminal memory stays in the app's data folder and holds output without masking; AI documentation sends a masked copy to Anthropic.
 - The projects' `.env` is never opened.
-- The Anthropic key, if you add one, stays in the Keychain and is used only when you click to document a session.
+- The Anthropic key, if you add one, stays in the system's password store (the Keychain on macOS) and is used only when you click to document a session.
 
 <a id="frequently-asked-questions"></a>
 
@@ -238,7 +253,7 @@ The harness is the contract with verifiable items, the run state and the handoff
 
 **What is Lerd for?**
 
-It is the environment that runs your PHP and Laravel sites on the Mac: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. It is optional: terminals, agents and Node projects work without it. Install it from Home if you want it.
+It is the environment that runs your PHP and Laravel sites on this machine: `.test` domain, a PHP version per project, database and local HTTPS, without configuring a server by hand. It is optional: terminals, agents and Node projects work without it. Install it from Home if you want it (macOS and Linux).
 
 **Do I need Lerd to use the app?**
 
@@ -250,7 +265,7 @@ Yes. Add the folder under Node projects: the app starts and stops the developmen
 
 **Lerd is stopped. How do I start it?**
 
-Click Start on the Lerd screen, or the play button at the top. The first time can take up to a minute, because Lerd brings up the containers. To always start it with the app, use the lightning button.
+Click Start on the Lerd screen, or the play button at the top. The first start can take several minutes if Lerd needs to download images. To always start it with the app, use the lightning button.
 
 **I clicked Run and saw nothing.**
 
@@ -262,7 +277,7 @@ Another process is using the same port, often an old `dev` left running. Stop th
 
 **Does the app write to the Claude Code or Codex folders?**
 
-No. It only reads the sessions, line by line. The only exception is the pairing hook, which you install on purpose with `--instalar-hook` and which keeps a backup of the original file.
+No. It only reads the sessions, line by line. The only exception is the pairing and attention hooks, which you install on purpose with `--instalar-hook`, keeping a backup of the original file.
 
 **Is the cost shown what I paid?**
 
@@ -270,7 +285,7 @@ No. It is an estimate at each model's public API price. Anyone on a subscription
 
 **How do I change a model's price?**
 
-Edit `precos.json` in the app's data folder (`~/Library/Application Support/VulcanCelox/`). The value in the file wins over the built-in table.
+Edit `precos.json` in the app's data folder (Settings, under About, shows where it is). The value in the file wins over the built-in table.
 
 **An agent does not show up in the list.**
 
@@ -286,11 +301,11 @@ As `.md` files: global ones in the app's data folder and project ones in `.vulca
 
 **What happens when I close a terminal?**
 
-Its commands, tasks, sticky notes and tags become a Markdown memory file. It shows up in Recent sessions, in the Overview, and in the Index.
+Its Markdown memory, with commands, tasks, sticky notes, tags and recent output, is finished. It shows up in Recent sessions, in the Overview, and in the Index.
 
 **I removed a site by mistake. Did I lose the folder?**
 
-No. Taking it off the list deletes nothing. Even when you ask to delete the folder, it goes to the Mac's Trash and can be restored.
+No. Removing it unregisters the site from Lerd and keeps the folder. Even when you ask to delete the folder, it goes to the system's Trash and can be restored.
 
 **What is the harness?**
 
@@ -300,9 +315,9 @@ It is the contract the agents follow: items with a sensor, run state and handoff
 
 Only with your confirmation, and after showing the exact list. An existing file is never overwritten; in `CLAUDE.md` or `AGENTS.md` only a marked block is added, which can be replaced later.
 
-**How do I see the Home guide again?**
+**How do I see the opening screen again?**
 
-Click Home in the sidebar. To make it open with the app again, uncheck Don't show the guide again.
+Click Home in the sidebar. To make it open with the app again, turn it on in Settings, or uncheck the box on the screen itself.
 
 **I opened it in the browser and it asks for a token.**
 
@@ -311,3 +326,27 @@ The interface needs the token that the native app creates on each run. Open it t
 **Does the prompt sent to the terminal run already?**
 
 No. The text goes into the agent's input as a paste and nothing is sent by itself. You review it in the terminal and press Enter.
+
+**How do I hide items from the sidebar?**
+
+In Settings, uncheck what you don't use. Nothing is deleted: the item leaves the sidebar, stays in the search (⌘K), and Show all brings it back.
+
+**How do I back up my data?**
+
+In Settings, under Backup and secrets, choose the folder and click Back up now. You get a .zip with everything except the Anthropic key. It is not encrypted, so keep it somewhere safe. To go back, use Restore in the same place and reopen the app.
+
+**Is a password shown in the terminal saved?**
+
+The app masks what it recognizes before saving the memory, and does not record what you type at a hidden password prompt. Recognition is by pattern and can miss an unusual secret. Older memories are only masked by the Mask button in Settings. The agent index is not masked: it repeats what is already in the Claude Code and Codex files.
+
+**Does the app update itself?**
+
+No. It checks at most once a day whether a new version exists, reading only the number, and tells you. You download and install it from the release page. You can turn this off in Settings.
+
+**Where do I change the theme and language?**
+
+In Settings, under Appearance.
+
+**Where do I add the Anthropic key?**
+
+In Settings. You only need it to generate AI documentation; the rest of the app works without it.

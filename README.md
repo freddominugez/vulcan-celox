@@ -45,7 +45,7 @@ Details, limits and building from source: [docs/en/installation.md](docs/en/inst
 
 ## Principles
 
-- **Local.** The server listens only on `127.0.0.1` with a per-run token. No telemetry. Nothing leaves your machine unless you ask: AI documentation runs on click, and the GitHub PR lookup is off by default.
+- **Local.** The server listens only on `127.0.0.1` with a per-run token. No telemetry. Your data does not leave your machine unless you ask: AI documentation runs on click, and the GitHub PR lookup is off by default. The one automatic request asks GitHub for the latest version number, at most once a day, and can be turned off in Settings.
 - **Read-only toward agents.** The app never writes to `~/.claude` or `~/.codex`. The one exception is the optional pairing hook, which you install yourself and which keeps a backup.
 - **Nothing is deleted for good.** Removed folders go to the Trash.
 - **Zero dependencies to install.** Python standard library, a web interface with no build step, a thin Swift shell. xterm.js is vendored.

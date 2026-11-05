@@ -9,7 +9,7 @@ LIMIT = 400
 SUFFIXES = {".py", ".mjs", ".swift", ".sh"}
 FOLDERS = ("vulcan_celox", "scripts", "tests", "packaging")
 LEGACY = {
-    "packaging/macos/main.swift": 687,
+    "packaging/macos/main.swift": 681,
     "vulcan_celox/ui/app.py": 594,
     "vulcan_celox/web/js/views/tasks.mjs": 523,
     "vulcan_celox/core/notebook.py": 493,

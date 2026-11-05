@@ -78,8 +78,8 @@ export function confirmDialog({ title, body, confirmLabel = t("Confirmar"), conf
 
 function previewBody(preview, what) {
   if (!preview.configured) {
-    return `<p>${t("Para documentar com IA, cadastre a chave da Anthropic na tela Índice.")}</p>
-      <p><a class="btn btn-sm" href="#/index" data-go="#/index">${icon("book")}<span>${t("Abrir Índice")}</span></a></p>`;
+    return `<p>${t("Para documentar com IA, cadastre a chave da Anthropic em Configurações.")}</p>
+      <p><a class="btn btn-sm" href="#/config" data-go="#/config">${icon("gear")}<span>${t("Abrir Configurações")}</span></a></p>`;
   }
   const kb = Math.max(1, Math.round(preview.chars / 1000));
   return `

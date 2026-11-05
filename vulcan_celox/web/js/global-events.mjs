@@ -4,9 +4,10 @@ import { onJobsChange } from "./ai.mjs";
 import { startNotices } from "./attention-notify.mjs";
 import { startPrStatus } from "./pr-status.mjs";
 import { startPorts } from "./terminal-ports.mjs";
+import { startSidebarPrefs } from "./sidebar-prefs.mjs";
 import { startTheme } from "./theme.mjs";
 import { clearTab, dismissSession, latestAttention, startAttention } from "./attention-state.mjs";
-import { isMac, isNative, post } from "./api.mjs";
+import { isMac, isNative } from "./api.mjs";
 import { app } from "./app-state.mjs";
 import { stepTerminalTurn } from "./terminal-watch.mjs";
 import { loadNodeProjects, navigate, refreshState, reportDragRegions, route, runCommand, service, toggleAutostart } from "./app.mjs";
@@ -20,7 +21,6 @@ import { addSiteDialog } from "./site-add.mjs";
 import { TerminalPanel } from "./terminal-panel.mjs";
 import { terminals } from "./terminals.mjs";
 import { addNodeDialog } from "./views/node.mjs";
-import { OverviewView } from "./views/overview.mjs";
 
 export function bindGlobalEvents() {
   window.addEventListener("hashchange", route);
@@ -32,8 +32,6 @@ export function bindGlobalEvents() {
     if (go) navigate(go.dataset.go);
     const svc = event.target.closest("[data-service]");
     if (svc) service(svc.dataset.service);
-    const dash = event.target.closest("[data-action='dashboard']");
-    if (dash && dash.closest("#side-env")) post("/api/open", { kind: "dashboard" }).catch(reportError);
     if (event.target.closest("#open-palette")) palette.open();
     if (event.target.closest("#help-here")) runCommand("help");  // Help already at the section of the current screen
     if (event.target.closest("#add-node")) {
@@ -96,6 +94,7 @@ export function bindGlobalEvents() {
     }
   });
   startTheme();
+  startSidebarPrefs();
   startNotices();
   startPorts();
   startPrStatus();
@@ -154,7 +153,8 @@ export function bindGlobalEvents() {
       event.preventDefault();
       runCommand("find");
     }
-    if (!isNative && key === "t") { event.preventDefault(); runCommand(event.shiftKey ? "newTerminalOptions" : "newTerminal"); }
+    // on the native app ⌘T comes from the menu; ⇧⌘T has no menu item and arrives here
+    if ((!isNative || event.shiftKey) && key === "t") { event.preventDefault(); runCommand(event.shiftKey ? "newTerminalOptions" : "newTerminal"); }
     if (/^[1-9]$/.test(key) && (!isMac || !event.shiftKey) && (app.route.name === "site" || app.route.name === "terminals") && !isNative) {
       event.preventDefault();
       runCommand(`tab:${key}`);
@@ -164,6 +164,5 @@ export function bindGlobalEvents() {
   terminals.subscribe(() => {
     renderSidebar();
     reloadTree();
-    if (app.view instanceof OverviewView) return;
   });
 }

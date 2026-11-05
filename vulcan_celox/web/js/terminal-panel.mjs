@@ -15,9 +15,9 @@ const HIDDEN_ON = ["site", "terminals", "popout"];
 function load() {
   try {
     const data = JSON.parse(localStorage.getItem(KEY) || "{}");
-    return { open: data.open !== false, height: Number(data.height) || DEFAULT_HEIGHT };
+    return { open: data.open === true, height: Number(data.height) || DEFAULT_HEIGHT };
   } catch {
-    return { open: true, height: DEFAULT_HEIGHT };
+    return { open: false, height: DEFAULT_HEIGHT };
   }
 }
 
@@ -67,6 +67,11 @@ export class TerminalPanel {
     this.el.style.height = this.state.open ? `${Math.min(this.maxHeight(), Math.max(MIN, this.state.height))}px` : `${MIN}px`;
     this.el.querySelector("[data-tp-chevron]").innerHTML = icon(this.state.open ? "chevron-down" : "chevron-up");
     this.updateCount();
+  }
+
+  /** No terminal open: an empty panel only takes room from the screen. ⌘J still opens it on request. */
+  collapseIfEmpty() {
+    if (this.state.open && !terminals.list().length) this.toggle(false);
   }
 
   updateCount() {

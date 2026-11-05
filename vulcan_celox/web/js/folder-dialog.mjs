@@ -9,7 +9,7 @@ const AGENTS = [["claude", "Claude Code"], ["codex", "Codex"], ["shell", t("Só 
 
 let pickSeq = 0;
 
-export function pickNative(start) {
+export function pickNative(start, purpose = null) {
   return new Promise((resolve) => {
     const id = `p${++pickSeq}`;
     const onPicked = (event) => {
@@ -18,7 +18,7 @@ export function pickNative(start) {
       resolve(event.detail.path || null);
     };
     window.addEventListener("vulcan-folder-picked", onPicked);
-    if (!native({ type: "pickFolder", id, start })) {
+    if (!native({ type: "pickFolder", id, start, purpose })) {
       window.removeEventListener("vulcan-folder-picked", onPicked);
       resolve(null);
     }
