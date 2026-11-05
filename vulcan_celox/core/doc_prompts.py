@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 
 from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.models import Note, Tag, Task
-from vulcan_celox.core.redact import redact
+from vulcan_celox.core.redact import masked_count, redact
 from vulcan_celox.core.session_memory import agent_lines, format_duration, format_when
 
 TRANSCRIPT_LIMIT = 60_000
@@ -89,7 +89,7 @@ def _items_block(tasks: List[Task], notes: List[Note], tags: Dict[str, Tag], not
 def session_doc_prompt(record, tasks: List[Task], notes: List[Note], tags: Dict[str, Tag], transcript: str,
                        limit: int = TRANSCRIPT_LIMIT, agents=None) -> Prompt:
     # mask before truncating: a secret cut in half would lose the prefix that the mask recognizes
-    transcript, early = redact(transcript)
+    transcript, _ = redact(transcript)
     truncated = len(transcript) > limit
     tail = transcript[-limit:] if truncated else transcript
     commands = record.commands[-300:]
@@ -114,8 +114,10 @@ def session_doc_prompt(record, tasks: List[Task], notes: List[Note], tags: Dict[
         tail.replace("```", "ˋˋˋ"),
         "```",
     ]
-    user, count = redact("\n".join(lines))
-    return Prompt(tr(SESSION_SYSTEM), user, count + early, truncated,
+    user, _ = redact("\n".join(lines))
+    # counts the whole record, including what was cut, whether it was masked now or when the memory was saved
+    count = masked_count(user) - masked_count(tail) + masked_count(transcript)
+    return Prompt(tr(SESSION_SYSTEM), user, count, truncated,
                   {"commands": len(record.commands), "tasks": len(tasks), "notes": len(notes), "transcript": len(tail)})
 
 

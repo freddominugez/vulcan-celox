@@ -9,6 +9,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.models import PRIORITY_LABELS, Note, Tag, Task
+from vulcan_celox.core.redact import redact
 from vulcan_celox.core.textutil import normalize
 
 MAX_TRANSCRIPT_LINES = 2000
@@ -86,6 +87,8 @@ def strip_terminal(data) -> Tuple[str, bool]:
         compact.pop()
     while compact and compact[0] == "":
         compact.pop(0)
+    # mask before cutting: a secret cut in half would lose the prefix that the mask recognizes
+    compact = redact("\n".join(compact))[0].split("\n")
     truncated = len(compact) > MAX_TRANSCRIPT_LINES
     if truncated:
         compact = compact[-MAX_TRANSCRIPT_LINES:]
@@ -294,7 +297,7 @@ def render_session_md(record, tasks: List[Task], notes: List[Note], tags: Dict[s
     else:
         lines.append(tr("_Sem saída registrada._"))
     lines += [TRANSCRIPT_END, ""]
-    return "\n".join(lines)
+    return redact("\n".join(lines))[0]  # also covers an older record brought back from a file saved without the mask
 
 
 # ── general index ─────────────────────────────────────────────────────────────

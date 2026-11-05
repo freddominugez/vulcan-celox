@@ -45,7 +45,7 @@ Detalhes, limites e como compilar: [docs/pt-BR/installation.md](docs/pt-BR/insta
 
 ## Princípios
 
-- **Local.** O servidor só atende em `127.0.0.1`, com token por execução. Sem telemetria. Nada sai da máquina sem você pedir: a documentação com IA roda por clique, e a consulta de PR ao GitHub vem desligada.
+- **Local.** O servidor só atende em `127.0.0.1`, com token por execução. Sem telemetria. Seus dados não saem da máquina sem você pedir: a documentação com IA roda por clique, e a consulta de PR ao GitHub vem desligada. O único pedido automático consulta no GitHub o número da última versão, no máximo uma vez por dia, e pode ser desligado em Configurações.
 - **Só leitura diante dos agentes.** O app nunca escreve em `~/.claude` ou `~/.codex`. A única exceção é o hook opcional de pareamento, instalado por você, com backup.
 - **Nada é apagado de vez.** Pastas removidas vão para a Lixeira.
 - **Nada para instalar.** Biblioteca padrão do Python, interface web sem build e uma casca fina em Swift. O xterm.js é vendorizado.

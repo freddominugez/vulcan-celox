@@ -80,7 +80,7 @@ def register_guide_api(app) -> None:
             app.store.save(STORE_KEY, data)
         done = all(s["ok"] for s in items if not s.get("optional"))
         return {"steps": items, "done": done, "skipped": bool(data.get("skipped")),
-                "show_on_open": not done and not data.get("skipped")}
+                "show_on_open": not data.get("skipped")}
 
     @srv.route("GET", "/api/guide")
     def get_guide(req: Request):

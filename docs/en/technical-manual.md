@@ -138,7 +138,10 @@ In the last two modes the token never goes on a command line. A 0600 page, `<dat
 | `core/trash.py` | `move_to_trash`: Finder on macOS, `gio trash` on Linux, and `<data>/lixeira/` with a date in the name if neither works. |
 | `core/debounce.py` | `Debouncer` with an injectable clock. |
 | `core/textutil.py` | Search normalization (no accents, no case) and `headline`, the short title of a pasted request. |
-| `core/redact.py` | Masks secrets before text leaves the machine. Returns the text and the count. |
+| `core/redact.py` | Masks secrets before text is saved to a memory file or leaves the machine. Returns the text and the count. |
+| `core/memory_mask.py` | Rewrites memories saved before masking existed, only when the user asks. |
+| `core/backup.py` | Backup `.zip` of the data folder, restore validation, and the swap on start. |
+| `core/update_check.py` | Reads the latest stable Release version from GitHub, with the user's `gh` as a fallback. |
 | `core/doctor.py` | Builds the `--doctor` JSON. |
 | `core/miniyaml.py` | Minimal block YAML parser with no dependency, used for Lerd files and prompt headers. |
 | `core/tables.py` | Parser of the ASCII tables printed by the Valet CLI. |
@@ -241,6 +244,8 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 | `server/debug_api.py` | `/api/debug/*`: bridge events, switch, clear, errors for an agent session. |
 | `server/node_api.py` | `/api/node-projects/*`. |
 | `server/guide_api.py` | `/api/guide`: the four steps of the Home screen and the choice to skip them. |
+| `server/data_api.py` | `/api/data/*`: backup, restore and masking what was already saved. Also registers the version notice. |
+| `server/update_api.py` | `/api/update*`: new version notice, at most one check a day. |
 | `server/fs_api.py` | Folder check and recent folders for the "open terminal in" dialog. |
 | `server/autostart.py` | `EnvAutostart`: starts Lerd or Valet with the app, in the background, if it is stopped. |
 | `server/ai_api.py` | Key, validation against Anthropic, choice of model. |
@@ -317,6 +322,8 @@ On the interface side, `web/js/terminal-session.mjs` uses xterm.js 6 with the ad
 `SessionRecord {id, title, site, cwd, tags[], commands[{ts, cmd}], created_at, closed_at, exit_code, memory_file, theme}` lives in `terminal_sessions.json`, with up to 2000 commands per session.
 
 `InputTracker` rebuilds typed lines from the bytes the WebSocket receives: editing keys, escape sequences, bracketed paste, and UTF-8 split between chunks. It is a conscious approximation: a command recalled from shell history with the arrow keys is not visible in the input, and stays only in the output record.
+
+Input typed with echo off in canonical mode is what `sudo`, `ssh` and `getpass` use. `PtySession.input_hidden` reads that mode before each write, and `SessionHub.on_input` leaves such input out. Shell line editors and TUIs read key by key, so they do not match. Commands are masked before they are stored.
 
 `server/session_hub.py` writes the memory:
 
@@ -573,6 +580,8 @@ The data folder is `~/Library/Application Support/VulcanCelox/` on macOS and `$X
 | `precos.json` | Optional price overrides |
 | `prompts/` | Global prompts, seeded with examples on first use |
 | `sessoes/` | Memories and `.doc.md` files |
+| `backup.json`, `update_check.json` | Backup folder and last backup, version notice state |
+| `.restauros/`, `.restauro-pendente/` | Data set aside by a restore; a restore waiting for the next start |
 | `TAREFAS.md`, `INDICE.md`, `DOCUMENTACAO.md` | Generated indexes and documentation |
 | `pairings/`, `hooks/` | Files written by the hook; `vulcan-pareamento.py`, `php-ini-editor.sh` |
 | `lixeira/` | Fallback when no system Trash is available |
@@ -670,7 +679,7 @@ Base classes: `tests/helpers.py` (`TempDirTestCase`) and `tests/server_helpers.p
 
 | Item | Situation |
 |------|-----------|
-| Six files above 400 lines: `packaging/macos/main.swift` (687), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Accepted for 1.0, because splitting terminal and window code with no browser test carries more risk than gain. `tests/test_tamanho_arquivos.py` stops them from growing and blocks new files above 400 |
+| Six files above 400 lines: `packaging/macos/main.swift` (681), `ui/app.py` (594), `web/js/views/tasks.mjs` (523), `core/notebook.py` (493), `core/harness.py` (462), `web/js/views/site.mjs` (440) | Accepted for 1.0, because splitting terminal and window code with no browser test carries more risk than gain. `tests/test_tamanho_arquivos.py` stops them from growing and blocks new files above 400 |
 | macOS package has no embedded Python and is not notarized | It has only an ad hoc signature. `--verificar-dependencias` explains and offers to install. `packaging/LEIA-ME.md` explains how to open an app that is not signed with an Apple certificate |
 | Linux | Test builds as pre-releases; no stable release until acceptance on a real desktop |
 | Windows | Test builds as pre-releases, tested only on CI machines. Not available: Lerd and Valet, the optional hook, clicking `C:\...` paths, the foreground check before writing to a tab. No installer or code signature |
@@ -679,7 +688,7 @@ Base classes: `tests/helpers.py` (`TempDirTestCase`) and `tests/server_helpers.p
 | Codex pairing | No exact link exists on Codex 0.166.0, and no stable hook. Pairing is by folder and time, so two Codex sessions started in the same folder less than 60 seconds apart can swap tabs |
 | `.jsonl.zst` rollouts | Read through the `zstd` command when present, always from the start. Otherwise they are ignored and counted in `--doctor` |
 | Gemini CLI and Cursor CLI | Not supported. `procinfo.AGENT_EXECUTABLES` has entries for them, but no reader exists |
-| Typed commands | Commands recalled from shell history with the arrow keys are not captured |
+| Typed commands | Commands recalled from shell history with the arrow keys are not captured. On Windows, a password typed at a hidden prompt is still recorded, because the console mode is not visible |
 | Lerd commands that ask for an administrator password | The app only calls the CLI and shows the output. It never asks for or stores a password |
 | Lerd CLI or API changes between versions | Parsers are tested against fixtures, and a failure shows the raw output |
 | Server token | Another process of the same user can read the app's memory. Outside the threat model |

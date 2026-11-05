@@ -73,6 +73,12 @@ Abertura: o executável Swift gera um token aleatório, inicia `python3 -m vulca
 
 Um PTY real por aba (`os.forkpty`, ou ConPTY no Windows), com o shell do usuário em modo login. Uma thread leitora por PTY guarda até 256 KB de histórico. O WebSocket `/ws/terminals/<id>` leva entrada e saída em quadros binários, e `resize`, `input` e `exit` em JSON. Cada cliente tem fila limitada (4 MB) e thread de envio própria; quem não acompanha é desligado sem parar a leitora. O token do servidor é tirado do ambiente da aba.
 
+A memória da sessão é mascarada ao gravar (`core/redact.py`), antes do corte de 2.000 linhas. Entrada digitada com eco desligado em modo canônico é um pedido de senha e fica fora da lista de comandos.
+
+## Seus dados
+
+`core/backup.py` grava um `.zip` da pasta de dados, com o SQLite copiado pela API de backup dele. A restauração valida o zip e o extrai ao lado dos dados, e a troca roda no próximo início, antes de qualquer leitura. `core/update_check.py` lê no GitHub a versão da última Release estável, no máximo uma vez por dia, com o `gh` do usuário como alternativa.
+
 ## Dívida conhecida
 
 Seis arquivos acima de 400 linhas estão travados por teste e não podem crescer: `packaging/macos/main.swift`, `ui/app.py`, `web/js/views/tasks.mjs`, `core/notebook.py`, `core/harness.py`, `web/js/views/site.mjs`. Os riscos estão na seção 17 do [manual técnico](technical-manual.md).

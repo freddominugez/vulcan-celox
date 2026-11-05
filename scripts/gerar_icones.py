@@ -26,7 +26,7 @@ ICONES = {
     "chevron-down": "caret-down", "chevron-up": "caret-up", "clock": "clock", "book": "book-open", "dots": "dots-three",
     "edit": "pencil-simple", "user": "user", "columns": "columns", "list": "list", "spark": "sparkle", "branch": "git-branch",
     "tree": "tree-structure", "copy": "copy", "text": "text-align-left", "eye": "eye", "history": "clock-counter-clockwise",
-    "dot": "dot-fill",
+    "dot": "dot-fill", "gear": "gear",
 }
 
 

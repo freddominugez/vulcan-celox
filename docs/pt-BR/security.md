@@ -17,6 +17,10 @@ Quem isto protege: um dev na própria máquina, cujos terminais e agentes já t�
 - Chave da Anthropic no Keychain (macOS), no Secret Service (Linux) ou no Gerenciador de Credenciais (Windows). No macOS e no Linux, sempre pelo stdin, nunca por argv. Nunca aparece na interface nem em arquivo.
 - Documentação com IA só por clique. Um diálogo mostra antes o tamanho do texto e quantos segredos foram mascarados. A máscara roda antes de cortar o texto.
 - O `.env` dos projetos nunca é aberto.
+- A memória da sessão é mascarada ao gravar, antes do corte de 2.000 linhas, com os mesmos padrões da documentação com IA. O que é digitado com eco desligado em modo canônico, que é o que `sudo`, `ssh` e `getpass` usam, fica fora da lista de comandos. O Windows não expõe esse modo, então lá ainda é registrado. Os padrões podem deixar passar um segredo incomum.
+- Não são mascarados: `notes.json` e `tasks.json`, que guardam o seu próprio texto editável, e `agentes.db`, que indexa o que já está nos JSONL dos agentes. Memórias gravadas antes desta mudança ficam como estão até você usar **Mascarar** em Configurações.
+- O backup é um `.zip` com modo 0600, sem criptografia. Leva tudo da pasta de dados, menos temporários e `.restauros/`, e não leva a chave da Anthropic. A restauração recusa caminho absoluto, `..`, links, formato desconhecido e tamanho acima do espaço livre. A troca acontece no próximo início, e os dados anteriores vão para `.restauros/`.
+- A consulta de versão nova vem ligada, no máximo uma vez por dia. Ela manda um `GET` à API do GitHub com a versão do app no `User-Agent`. O link mostrado precisa ser uma página de versão deste repositório. Nunca baixa nem instala nada. Desligue em Configurações ou com `VULCAN_UPDATE_CHECK=0`.
 
 ## Pastas dos agentes
 

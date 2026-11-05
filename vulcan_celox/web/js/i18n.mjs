@@ -23,8 +23,12 @@ export function currentLanguage() {
   return language;
 }
 
+// the shortcuts are written the Mac way; elsewhere ⌘ is Ctrl+Shift
+const IS_MAC = typeof navigator === "undefined" || /Mac/.test(navigator.platform || navigator.userAgent);
+export const keyText = (text) => (IS_MAC ? text : String(text).replace(/⌘⇧|⇧⌘|⌘/g, "Ctrl+⇧+"));
+
 export function t(text, values) {
-  const out = dictionary[text] ?? text;
+  const out = keyText(dictionary[text] ?? text);
   return values ? out.replace(/\{(\w+)\}/g, (all, name) => (name in values ? String(values[name]) : all)) : out;
 }
 

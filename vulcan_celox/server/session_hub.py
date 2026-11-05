@@ -49,6 +49,10 @@ class SessionHub:
             tracker = self._trackers.get(session_id)
         if tracker is None:
             return
+        pty = self.app.terminals.get(session_id)
+        if pty is not None and pty.input_hidden():  # read before the write: a password never becomes a "command"
+            tracker.reset()
+            return
         commands = tracker.feed(data)
         if commands:
             self.sessions.add_commands(session_id, commands)
@@ -157,6 +161,13 @@ class SessionHub:
         if index:
             self.write_index()
         return path
+
+    def flush_open(self) -> None:
+        """Brings the memory of every open session up to date on disk (before a backup)."""
+        for record in self.sessions.list():
+            if record.is_open:
+                self.write_memory(record.id, index=False)
+        self.write_index()
 
     # ── general index ──────────────────────────────────────────────────
     def index_path(self) -> Path:

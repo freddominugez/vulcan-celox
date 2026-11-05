@@ -24,5 +24,8 @@ First step for almost everything: `python3 -m vulcan_celox --doctor`.
 | Model without a cost | No known price. Add it to `precos.json` |
 | Removed a site by accident | The list entry is gone, the folder is intact. A deleted folder is in the Trash |
 | Two Codex sessions swapped tabs | Known limitation: Codex offers no exact link |
+| The new version check says it could not check | While the repository is private, the check needs `gh` with access to it. It is never an error: Settings shows the reason, and you can turn the check off |
+| I restored a backup and nothing changed | The swap happens when the app opens again. Reopen it. The previous data stays in `.restauros/` inside the data folder |
+| A secret still appears in an old session memory | Memories saved before masking stay as they are. Use **Mask** in Settings. A password typed at a hidden prompt has no recognizable format, so check the command list of older sessions and delete the session if needed |
 
 Not listed? [Open an issue](https://github.com/freddominugez/vulcan-celox/issues/new/choose) with the `--doctor` output, after removing what you do not want to publish.

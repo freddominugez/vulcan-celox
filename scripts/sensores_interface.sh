@@ -171,7 +171,7 @@ for tema in claro escuro; do
     document.fonts.load('14px Inter').then(function (f) { if (!f.length || !document.fonts.check('14px Inter')) window.__vtErrors.push('Inter não carregou'); });
     if (getComputedStyle(document.body).fontFamily.indexOf('Inter') < 0) window.__vtErrors.push('Inter não é a fonte do app');
   }, 1200);"
-  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/marca-$tema.png" --route "#/overview" --wait 3 --eval "$BRAND_JS"
+  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/marca-$tema.png" --route "#/inicio" --wait 3 --eval "$BRAND_JS"
 done
 
 step "interface em inglês: nenhuma tela com texto em português"
@@ -213,3 +213,10 @@ DIALOG_JS="$UNHIDE_JS(function () { var tag = 'diálogo de novo terminal não ab
   }, 150); })();"
 isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-dialogo.png" --route "#/terminals" --wait 7 --eval "$DIALOG_JS"
 
+step "aviso de versão nova: sobrevive às mensagens do início e só conta como visto se ficou na tela"
+SEED_UPDATE="$TMP_ROOT/home-versao"; mkdir -p "$SEED_UPDATE"
+"$PY" -c "import json,sys,time; json.dump({'schema_version':1,'data':{'latest':'99.0.0','url':'https://github.com/freddominugez/vulcan-celox/releases/tag/v99.0.0','checked_at':time.time()}}, open(sys.argv[1],'w'))" "$SEED_UPDATE/update_check.json"
+VERSION_JS="$UNHIDE_JS (function () { var tag = 'aviso de versão nova não apareceu'; window.__vtErrors.push(tag);
+  setTimeout(function () { if (document.querySelector('#toasts').textContent.indexOf('99.0.0') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 9500); })();"
+isolated_env VULCAN_CELOX_HOME="$SEED_UPDATE" VULCAN_UPDATE_CHECK=1 "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/snapshot-versao.png" --route "#/inicio" --wait 15 --eval "$VERSION_JS"
+grep -q '"dismissed": "99.0.0"' "$SEED_UPDATE/update_check.json" || { echo "aviso de versão não ficou marcado como visto"; exit 1; }

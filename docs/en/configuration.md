@@ -35,6 +35,7 @@ Linux launcher: `vulcan-celox --check`, `vulcan-celox --instalar-dependencias`.
 | `<data>/precos.json` | Your price overrides; beats the built-in table |
 | `<data>/prompts/` | Global prompts |
 | `<data>/sessoes/` | Session memories in Markdown |
+| `<data>/.restauros/` | Data set aside by a restore, one folder per date. Not included in backups |
 | `<data>/pairings/` | Written by the optional hook |
 | `<data>/TAREFAS.md`, `INDICE.md` | Generated indexes |
 | `<project>/.vulcan/prompts/` | Project prompts, created only with confirmation |
@@ -50,6 +51,7 @@ A corrupted JSON file or database is renamed to `*.corrupt-<timestamp>` and the 
 | `CLAUDE_CONFIG_DIR` | Claude Code folder |
 | `CODEX_HOME` | Codex folder or folders, comma separated |
 | `VULCAN_AUTOSTART=0` | Do not start Lerd with the app |
+| `VULCAN_UPDATE_CHECK=0` | Never check for a new version (tests and captures) |
 | `VULCAN_AGENTS=0` | Do not start the agent index |
 | `VULCAN_LERD_BIN`, `VULCAN_VALET_BIN`, `VULCAN_ZSTD_BIN` | Path of each tool |
 | `VULCAN_LERD_API`, `VULCAN_LERD_DATA`, `VULCAN_VALET_HOME` | Lerd API address, Lerd data, Valet folder |

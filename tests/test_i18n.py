@@ -30,6 +30,18 @@ class DicionarioTest(unittest.TestCase):
     def test_todo_texto_da_interface_tem_traducao(self):
         self.assertEqual(sorted(web_keys() - set(EN)), [])
 
+    def test_todo_texto_da_casca_nativa_tem_traducao(self):
+        """Menus, alerts and buttons of the macOS shell: English is the default there too."""
+        source = "".join(p.read_text(encoding="utf-8") for p in sorted((ROOT / "shell").glob("*.swift")))
+        source = re.sub(r'"\s*\+\s*\n\s*"', "", source)
+        keys = {json.loads(f'"{k}"') for k in re.findall(r'\b(?:L|item)\("((?:[^"\\]|\\.)*)"', source) if "\\(" not in k}
+        self.assertEqual(sorted(keys - set(EN)), [])
+
+    def test_valores_fixos_traduzidos_em_tempo_de_execucao_tem_traducao(self):
+        from vulcan_celox.core.backends.null import MESSAGE
+        from vulcan_celox.server.sites_api import SITE_ACTIONS
+        self.assertEqual(sorted({MESSAGE, *SITE_ACTIONS.values()} - set(EN)), [])
+
     def test_todo_texto_do_servidor_tem_traducao(self):
         missing = []
         for folder in ("server", "core"):

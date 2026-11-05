@@ -7,6 +7,8 @@ import threading
 from dataclasses import asdict, dataclass, field, fields
 from typing import Dict, List, Optional
 
+from vulcan_celox.core.redact import redact
+
 from vulcan_celox.core.models import now_iso
 
 SESSIONS_FILE = "terminal_sessions"
@@ -57,6 +59,12 @@ class InputTracker:
     def __init__(self):
         self._decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
         self._line: List[str] = []
+        self._pending = ""
+        self._pasting = False
+
+    def reset(self) -> None:
+        """Forgets the line being typed. Used on a password prompt, whose text is never kept."""
+        self._line.clear()
         self._pending = ""
         self._pasting = False
 
@@ -197,10 +205,24 @@ class SessionStore:
             if record is None:
                 return
             stamp = now_iso()
-            record.commands.extend({"ts": stamp, "cmd": c} for c in commands)
+            record.commands.extend({"ts": stamp, "cmd": redact(c)[0]} for c in commands)
             if len(record.commands) > MAX_COMMANDS:
                 record.commands = record.commands[-MAX_COMMANDS:]
             self._save()
+
+    def mask_commands(self) -> int:
+        """Masks the commands saved before the mask existed. Returns how many changed."""
+        changed = 0
+        with self._lock:
+            for record in self._records.values():
+                for item in record.commands:
+                    masked = redact(item["cmd"])[0]
+                    if masked != item["cmd"]:
+                        item["cmd"] = masked
+                        changed += 1
+            if changed:
+                self._save()
+        return changed
 
     def close(self, session_id: str, exit_code: Optional[int] = None) -> Optional[SessionRecord]:
         with self._lock:

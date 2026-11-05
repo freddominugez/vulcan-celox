@@ -22,7 +22,7 @@ shot() {  # shot <name> <route> [extra js]
   N=$((N + 1))
   env VULCAN_CELOX_HOME="$TMP/home-$N" VULCAN_LEGACY_HOME="$TMP/legacy" VULCAN_VALET_HOME="$TMP/valet" \
     VULCAN_VALET_BIN="$TMP/sem-valet" VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_DATA="$TMP/lerd-data" \
-    VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP/port")" VULCAN_KEYSTORE=memory VULCAN_AUTOSTART=0 \
+    VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP/port")" VULCAN_KEYSTORE=memory VULCAN_AUTOSTART=0 VULCAN_UPDATE_CHECK=0 \
     CLAUDE_CONFIG_DIR="${SHOT_CLAUDE:-$ROOT/tests/fixtures/agents/claude}" CODEX_HOME="$ROOT/tests/fixtures/agents/codex" \
     "$APP" --snapshot "$TMP/$1.png" --route "$2" --wait 5 --eval "$THEME_JS ${3:-}" > /dev/null
   sips -Z 1600 "$TMP/$1.png" --out "$OUT/$1.png" > /dev/null

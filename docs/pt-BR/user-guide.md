@@ -15,6 +15,7 @@
 - [Prompts](#prompts): Instruções prontas que você manda ao agente com um clique.
 - [Harness](#harness): Contrato, itens e handoff que os agentes seguem.
 - [Tarefas, post-its, tags e índice](#organizar): O que fica registrado de cada projeto.
+- [Configurações](#configuracoes): O que aparece na barra lateral e os ajustes do app, numa tela só.
 - [Atalhos de teclado](#atalhos): Os atalhos que mais economizam tempo.
 - [Segurança e privacidade](#seguranca): O que o app lê, o que grava e o que nunca faz.
 - [Perguntas frequentes](#perguntas-frequentes)
@@ -25,18 +26,18 @@
 
 *O que o Vulcan Celox faz e como começar em poucos passos.*
 
-O app tem tema claro e escuro. Em ⌘K, busque "Tema" e escolha Sistema, Claro ou Escuro. A área do terminal fica escura nos dois, com a cor de cada aba.
+O app tem tema claro e escuro: escolha em **Configurações**, em Aparência. A área do terminal fica escura nos dois, com a cor de cada aba.
 
 O Vulcan Celox é um painel para quem programa sozinho com agentes de código. Ele junta num lugar só os sites PHP que o **Lerd** roda no seu Mac, os projetos Node (Next.js, Vite e afins), os terminais de cada projeto e as sessões do **Claude Code** e do **Codex**.
 
 ![Visão geral com sites PHP, projeto Node, tarefas e o painel de terminal](../../vulcan_celox/web/img/manual/visao-geral.png)
 
-1. **Ligue o Lerd.** O ponto verde no alto, à direita, e no item Lerd da barra lateral mostra que nginx, DNS `.test` e PHP respondem. Sem o Lerd, projetos Node e agentes funcionam do mesmo jeito.
+1. **Ligue o Lerd.** O ponto verde no alto, à direita, e no item Lerd da barra lateral indica que o nginx está rodando. O texto ao lado mostra o DNS `.test` e a versão do PHP. Sem o Lerd, projetos Node e agentes funcionam do mesmo jeito.
 2. **Encontre seus projetos.** Sites registrados no Lerd aparecem sozinhos. Projetos Node entram pelo + da seção Projetos Node, ou pelas sugestões tiradas das pastas onde seus agentes trabalharam.
 3. **Deixe o app ler as sessões dos agentes.** Ele lê os arquivos do Claude Code e do Codex do disco, linha por linha, sem chave de API e sem escrever nada nessas pastas.
-4. **Abra um terminal num projeto** com ⌘T. Tarefas, post-its e tags criados nele viram a memória da sessão em Markdown quando o terminal fecha.
+4. **Abra um terminal num projeto** com ⌘T. Os comandos, tarefas, post-its, tags e a saída recente dele ficam guardados como memória da sessão, em Markdown.
 
-A tela **Início** confere esses passos sozinha e sai da abertura do app quando os passos essenciais estão feitos. O passo do Lerd é opcional: **Instalar** mostra o comando oficial e o roda num terminal à vista, e **Não uso** dispensa o passo. Marque **Não mostrar mais o guia** para o app abrir direto na Visão geral. O guia continua no item Início da barra lateral.
+A tela **Início** abre junto com o app: confere esses passos sozinha e explica, em cartões, o que cada item faz. O passo do Lerd é opcional: **Instalar** mostra o comando oficial e o roda num terminal à vista, e **Não uso** dispensa o passo. Marque **Não mostrar esta tela ao iniciar** para o app deixar de abrir nela. Ela continua no item Início da barra lateral, e você pode reativá-la em Configurações.
 
 <a id="projetos-php"></a>
 
@@ -49,7 +50,7 @@ Cada site do Lerd aparece na Visão geral e na seção Sites da barra lateral, c
 - **Adicionar site:** o + da seção Sites liga uma pasta a um domínio (`lerd link`) ou registra uma pasta cheia de projetos (`lerd park`). O Lerd grava `.php-version` na pasta ao registrar.
 - **Trocar PHP, HTTPS ou Node do site:** pela página do site. Ações que constroem imagem rodam numa aba de terminal, com a saída à vista.
 - **Compartilhar:** abre um túnel público e mostra o endereço quando ele aparece na saída.
-- **Remover:** tirar da lista do app não apaga nada. Apagar a pasta manda para a Lixeira, nunca de forma definitiva.
+- **Remover:** desregistra o site do Lerd, e ele deixa de ser servido. A pasta fica, a menos que você escolha mandá-la para a Lixeira.
 
 Os sites são do Lerd. O app só chama a CLI e a API do próprio Lerd e nunca edita os arquivos globais dele.
 
@@ -99,9 +100,9 @@ Projetos Node não usam o Lerd. O app lê o `package.json`, descobre o gerenciad
 Cada terminal é uma sessão. Ele abre na pasta escolhida, com um tema de cor que identifica a sessão, e pode já começar com o Claude Code ou o Codex rodando.
 
 - **Portas:** a aba mostra as portas que os processos dela abriram, como `:5173 +2`, na barra de abas e na lista de sessões. O clique abre `http://localhost:<porta>` no navegador. Só os processos da própria aba contam.
-- **⌘T** abre um terminal novo; **⌘J** mostra ou esconde o painel de terminal de baixo, que acompanha todas as telas.
+- **⌘T** abre um terminal novo; **⌘J** mostra ou esconde o painel de terminal de baixo, nas telas que ainda não mostram um terminal.
 - **Comandos rápidos** do projeto (composer, artisan, npm) ficam na barra do terminal.
-- **Memória:** ao fechar um terminal, os comandos, tarefas, post-its e tags dele viram um arquivo Markdown, que aparece em Sessões recentes e no Índice.
+- **Memória:** enquanto o terminal está aberto, o app mantém um arquivo Markdown com os comandos digitados, tarefas, post-its, tags e as últimas 2.000 linhas da saída. Senhas e chaves reconhecidas ficam gravadas como `[segredo]`, e o que você digita num pedido de senha oculto não é registrado. O reconhecimento é por padrão, então um segredo incomum pode passar, e no Windows o pedido oculto não pode ser detectado. Depois de fechar, o arquivo aparece em Sessões recentes e no Índice.
 - **Destacar:** uma aba pode virar janela própria e voltar depois.
 
 <a id="depuracao"></a>
@@ -120,21 +121,21 @@ Na sessão de um agente, o painel **Depuração no período** mostra só o que a
 
 *Sessões do Claude Code e do Codex lidas do disco.*
 
-A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, com projeto, branch, último pedido, arquivos tocados e estado (ativa, parada, em loop). Clicar numa sessão abre a linha do tempo dela.
+A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, com projeto, branch, título ou primeiro pedido, arquivos tocados e estado (ativa, parada, em loop). Clicar numa sessão abre o resumo, com abas Código, Arquivos, Comandos e Linha do tempo.
 
 ![Lista de sessões de agentes com projeto, branch e atividade](../../vulcan_celox/web/img/manual/agentes.png)
 
 - **Quem espera por você:** a aba ganha um anel e a barra lateral mostra quantas sessões terminaram o turno ou podem estar esperando. O aviso some ao focar a aba ou abrir a sessão, e ⌘⇧U vai para o mais recente. "Talvez esperando" é uma suposição: a ferramenta pode só estar demorando. Programas que avisam pelo terminal (OSC 9, 99 e 777, ou o sino) também acendem o anel. Com a janela sem foco, o app manda um aviso do sistema só com agente, projeto e estado, e mostra o número no ícone do Dock; para ligar ou desligar, use ⌘K e busque "Aviso do sistema".
 - **Histórico de agentes:** busca em tudo o que os agentes fizeram, por texto, arquivo ou comando.
 - **Branches e worktrees:** em que branch cada agente está trabalhando, para não misturar trabalho.
-- **Retomar:** abre um terminal na pasta da sessão já com o comando de retomada do agente.
+- **Retomar:** abre um terminal na pasta da sessão e executa o comando de retomada do agente.
 - **Pareamento:** o terminal que abriu um agente fica ligado à sessão dele, para os prompts saírem preenchidos. No Codex a ligação é por pasta e horário: duas sessões abertas quase juntas na mesma pasta ainda podem trocar de aba. Subagentes e o app desktop do Codex não se ligam a abas.
 
 **⌘-clique em caminho.** No terminal, com ⌘ pressionado, caminhos como `a/b.py`, `/abs/b.py`, `b.py:12` e `b.py(12)` viram links, se o arquivo existir dentro de uma pasta conhecida. Com sessão pareada, abre na aba Código, na linha. Sem sessão, abre no editor. Pasta abre no Finder. Caminho relativo conta a partir da pasta da sessão ou da pasta em que a aba abriu: depois de um `cd`, ele pode não ser encontrado.
 
 **Navegar por pedido.** ⌘⇧↑ e ⌘⇧↓ saltam entre os pedidos. No terminal, cada Enter numa aba com agente vivo vira uma marca, sem desenhar nada na tela. Se o agente usar a tela inteira do terminal, não há histórico para navegar, e o app avisa uma vez. Na sessão, a **Linha do tempo** agrupa por pedido, com arquivos e comandos, e cada arquivo editado leva ao diff daquele pedido.
 
-**Estado do PR.** Por padrão o app estima pelos comandos da sessão e diz isso na tela. Ligue "Estado do PR pelo GitHub" no ⌘K para ver número, rascunho, estado e checagens pelo seu próprio `gh`. Só essa opção usa a rede.
+**Estado do PR.** Por padrão o app estima pelos comandos da sessão e diz isso na tela. Ligue "Consultar o estado do PR no GitHub" em Configurações para ver número, rascunho, estado e checagens pelo seu próprio `gh`. Só essa opção usa a rede.
 
 **Aba Código.** Dentro de uma sessão, a aba **Código** mostra os arquivos que o agente tocou, com a marca de novo, editado, lido ou apagado. Você vê o arquivo com realce de sintaxe ou o diff: de uma edição, de um pedido inteiro ou contra o último commit, lado a lado ou unificado. ⌘F busca no arquivo. Numa sessão ativa o visor segue o agente, abrindo cada arquivo editado e rolando até o trecho. Rolar, clicar ou selecionar texto pausa, e **Voltar a seguir** retoma. Nas abas pareadas, o botão **Código** da barra acima do terminal leva direto para cá.
 
@@ -142,7 +143,7 @@ A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, c
 
 O visor só lê: nada é editado no app. Ele abre arquivos dentro da pasta da sessão, até 1 MB, e não mostra binários nem nomes sensíveis como `.env`, chaves e credenciais. O conteúdo das edições vem do registro do agente, então some quando o agente apaga a sessão antiga.
 
-O app só lê esses arquivos, linha por linha. Ele nunca escreve em `~/.claude` nem em `~/.codex`. A única exceção é o hook de pareamento, que você instala de propósito com `--instalar-hook`, e que guarda um backup.
+O app só lê esses arquivos, linha por linha. Ele nunca escreve em `~/.claude` nem em `~/.codex`. A única exceção são os hooks de pareamento e de atenção, que você instala de propósito com `--instalar-hook`, editando `~/.claude/settings.json` com backup.
 
 <a id="custo"></a>
 
@@ -198,7 +199,21 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 - **Tarefas:** por site ou globais, com prazo e estado. As abertas aparecem na Visão geral.
 - **Post-its:** notas rápidas por site ou globais.
 - **Tags:** marcam sessões, tarefas e notas para achar depois.
-- **Índice:** todas as memórias de sessão em Markdown, com busca. A documentação com IA é opcional, só por clique, e usa a sua própria chave da Anthropic guardada no Keychain.
+- **Índice:** lista em Markdown de todas as sessões; cada item abre a memória da sessão. A documentação com IA é opcional, só por clique, e usa a sua própria chave da Anthropic, cadastrada em Configurações e guardada no cofre de senhas do sistema.
+
+<a id="configuracoes"></a>
+
+## Configurações
+
+*O que aparece na barra lateral e os ajustes do app, numa tela só.*
+
+- **Barra lateral:** marque o que quer ver. Vale para os itens do menu e para as listas abaixo dele (Sessões, Sites e Projetos Node). O que você esconder continua na busca (⌘K), e **Mostrar tudo** desfaz. Configurações não pode ser escondida, para você sempre poder voltar.
+- **Aparência:** tema (Sistema, Claro ou Escuro) e idioma (English ou Português).
+- **Ao iniciar:** mostrar ou não a tela de abertura, ligar o Lerd junto com o app, e perguntar a pasta ao abrir um terminal.
+- **Avisos e rede:** notificação quando um agente espera por você, consulta do estado do PR no GitHub (vem desligada) e aviso de versão nova (vem ligado, no máximo uma vez por dia, só lê o número da versão). Dá para desligar cada um.
+- **Backup e segredos:** **Fazer backup** salva todos os dados do app num .zip fora da pasta de dados. Vão tarefas, post-its, tags, memórias, prompts, preferências e o índice dos agentes, mas não a chave da Anthropic, que fica no sistema. O arquivo não é criptografado. **Restaurar** confere o arquivo e troca os dados quando você reabre o app; os dados atuais ficam na pasta `.restauros`. **Mascarar** reescreve as memórias gravadas antes de a máscara existir, e não tem volta.
+- **Chave da Anthropic:** usada só quando você pede uma documentação com IA.
+- **Sobre:** a versão instalada, se existe uma mais nova e a pasta com os seus dados. O app nunca baixa nem instala nada sozinho: o botão abre a página da versão.
 
 <a id="atalhos"></a>
 
@@ -208,7 +223,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 
 | Atalho | Faz |
 |--------|-----|
-| `⌘K` | Buscar sites, projetos, tarefas e comandos |
+| `⌘K` | Buscar sites PHP, tarefas, post-its, tags e comandos |
 | `⌘T` | Terminal novo |
 | `⇧⌘T` | Terminal novo perguntando a pasta |
 | `⌘J` | Mostrar ou esconder o painel de terminal |
@@ -227,10 +242,10 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 
 - O servidor interno só atende em `127.0.0.1`, com um token por execução. Nada fica exposto na rede.
 - Sessões dos agentes: só leitura, linha por linha. O app nunca escreve em `~/.claude`, `~/.codex` ou nos arquivos de configuração deles, exceto o hook de pareamento que você instala de propósito, com backup.
-- Nada é apagado de forma definitiva: pasta removida vai para a Lixeira.
-- Em pasta de projeto, o app só escreve com a sua confirmação e dentro de um bloco marcado.
+- Pastas e arquivos de memória vão para a Lixeira. Tarefas, post-its e tags são apagados do app; só a última tarefa apagada pode ser desfeita.
+- Em pasta de projeto, o app só escreve quando você pede: arquivos novos de harness, contrato e prompt, sem sobrescrever, e um bloco marcado em `CLAUDE.md` ou `AGENTS.md` existente. A memória dos terminais fica na pasta de dados do app e guarda a saída sem máscara; a documentação com IA envia uma cópia mascarada à Anthropic.
 - O `.env` dos projetos nunca é aberto.
-- A chave da Anthropic, se você cadastrar uma, fica no Keychain e só é usada quando você clica para documentar uma sessão.
+- A chave da Anthropic, se você cadastrar uma, fica no cofre de senhas do sistema (Keychain no macOS) e só é usada quando você clica para documentar uma sessão.
 
 <a id="perguntas-frequentes"></a>
 
@@ -238,7 +253,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 
 **Para que serve o Lerd?**
 
-É o ambiente que roda seus sites PHP e Laravel no Mac: domínio `.test`, versão de PHP por projeto, banco e HTTPS local, sem configurar servidor na mão. É opcional: terminais, agentes e projetos Node funcionam sem ele. Instale pelo Início, se quiser.
+É o ambiente que roda seus sites PHP e Laravel nesta máquina: domínio `.test`, versão de PHP por projeto, banco e HTTPS local, sem configurar servidor na mão. É opcional: terminais, agentes e projetos Node funcionam sem ele. Instale pelo Início, se quiser (macOS e Linux).
 
 **Preciso do Lerd para usar o app?**
 
@@ -250,7 +265,7 @@ Sim. Adicione a pasta em Projetos Node: o app liga e para o servidor de desenvol
 
 **O Lerd está parado. Como ligo?**
 
-Clique em Ligar na tela Lerd, ou no botão de play no alto. A primeira vez pode levar até um minuto, porque o Lerd sobe os contêineres. Para ligar sempre junto com o app, use o botão de raio.
+Clique em Ligar na tela Lerd, ou no botão de play no alto. A primeira vez pode levar alguns minutos, se o Lerd precisar baixar imagens. Para ligar sempre junto com o app, use o botão de raio.
 
 **Cliquei em Rodar e não vi nada.**
 
@@ -260,9 +275,21 @@ O script roda numa aba do painel de terminal de baixo. Se o painel estiver escon
 
 Outro processo usa a mesma porta, muitas vezes um `dev` antigo esquecido. Pare o script pela página do projeto ou feche a aba antiga. O app não mata processo por porta: só manda Ctrl-C para as abas do próprio projeto.
 
+**Como faço backup dos meus dados?**
+
+Em Configurações, Backup e segredos, escolha a pasta e clique em Fazer backup. Sai um .zip com tudo, menos a chave da Anthropic. Ele não é criptografado, então guarde-o em lugar seguro. Para voltar, use Restaurar no mesmo lugar e reabra o app.
+
+**Uma senha que apareceu no terminal fica gravada?**
+
+O app mascara o que reconhece antes de gravar a memória, e não registra o que você digita num pedido de senha oculto. O reconhecimento é por padrão e pode deixar passar um segredo incomum. Memórias antigas só são mascaradas pelo botão Mascarar, em Configurações. O índice dos agentes não é mascarado: ele repete o que já está nos arquivos do Claude Code e do Codex.
+
+**O app atualiza sozinho?**
+
+Não. Ele consulta no máximo uma vez por dia se há versão nova, só lendo o número, e avisa. Você baixa e instala pela página da versão. Dá para desligar em Configurações.
+
 **O app escreve nas pastas do Claude Code ou do Codex?**
 
-Não. Ele só lê as sessões, linha por linha. A única exceção é o hook de pareamento, que você instala de propósito com `--instalar-hook`, e que guarda um backup do arquivo original.
+Não. Ele só lê as sessões, linha por linha. A única exceção são os hooks de pareamento e de atenção, que você instala de propósito com `--instalar-hook`, com backup do arquivo original.
 
 **O custo mostrado é o que eu paguei?**
 
@@ -270,7 +297,7 @@ Não. É uma estimativa pelo preço público da API de cada modelo. Quem usa pla
 
 **Como mudo o preço de um modelo?**
 
-Edite o `precos.json` na pasta de dados do app (`~/Library/Application Support/VulcanCelox/`). O valor do arquivo vale mais que a tabela embutida.
+Edite o `precos.json` na pasta de dados do app (Configurações, em Sobre, mostra onde fica). O valor do arquivo vale mais que a tabela embutida.
 
 **Um agente não aparece na lista.**
 
@@ -286,11 +313,11 @@ Arquivos `.md`: os globais na pasta de dados do app e os do projeto em `.vulcan/
 
 **O que acontece quando fecho um terminal?**
 
-Os comandos, tarefas, post-its e tags dele viram um arquivo Markdown de memória. Ele aparece em Sessões recentes, na Visão geral, e no Índice.
+A memória em Markdown dele, com comandos, tarefas, post-its, tags e a saída recente, é concluída. Ela aparece em Sessões recentes, na Visão geral, e no Índice.
 
 **Removi um site por engano. Perdi a pasta?**
 
-Não. Tirar da lista não apaga nada. Mesmo quando você pede para apagar a pasta, ela vai para a Lixeira do Mac e pode ser restaurada.
+Não. Remover desregistra o site do Lerd e mantém a pasta. Mesmo quando você pede para apagar a pasta, ela vai para a Lixeira do sistema e pode ser restaurada.
 
 **O que é o harness?**
 
@@ -300,9 +327,9 @@ Não. Tirar da lista não apaga nada. Mesmo quando você pede para apagar a past
 
 Só com a sua confirmação, e depois de mostrar a lista exata. Arquivo existente nunca é sobrescrito; em `CLAUDE.md` ou `AGENTS.md` entra só um bloco marcado, que pode ser trocado depois.
 
-**Como vejo o guia do Início de novo?**
+**Como vejo a tela de abertura de novo?**
 
-Clique em Início na barra lateral. Para ele voltar a abrir junto com o app, desmarque Não mostrar mais o guia.
+Clique em Início na barra lateral. Para ela voltar a abrir junto com o app, ligue em Configurações, ou desmarque a caixa na própria tela.
 
 **Abri pelo navegador e pede token.**
 
@@ -311,3 +338,15 @@ A interface precisa do token que o app nativo cria a cada execução. Abra pelo 
 **O prompt enviado ao terminal já executa?**
 
 Não. O texto entra no campo do agente como colagem e nada é enviado sozinho. Você revisa no terminal e aperta Enter.
+
+**Como escondo itens da barra lateral?**
+
+Em Configurações, desmarque o que não usa. Nada é apagado: o item some da barra, continua na busca (⌘K), e Mostrar tudo traz de volta.
+
+**Onde mudo o tema e o idioma?**
+
+Em Configurações, na parte Aparência.
+
+**Onde cadastro a chave da Anthropic?**
+
+Em Configurações. Ela só é necessária para gerar documentação com IA; o resto do app funciona sem ela.

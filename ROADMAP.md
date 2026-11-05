@@ -22,6 +22,8 @@ Still waiting: the Linux release after the acceptance on Mint.
 
 ## Later, not decided
 
+- Scheduled and encrypted backups.
+- A full project file tree with live changes, beyond the Code tab of a session. Being planned.
 - Signed and notarized macOS build, and a bundled Python.
 - Other agents: Gemini CLI and Cursor CLI are suspended.
 - Exact pairing for Codex. It depends on a change in Codex itself.

@@ -4,6 +4,28 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 
 ## [Unreleased]
 
+### Added
+- **Settings screen.** Choose which items and lists the sidebar shows, plus theme, language, opening screen, Lerd start, folder prompt, notices, PR check, the Anthropic key, version and data folder.
+- **Opening screen.** Home opens with the app until you check the box, and explains every item in cards. Each sidebar item also has a hint.
+
+- **Backup and restore.** Settings saves all of the app's data in a `.zip`, and restores one when you reopen the app. The current data moves to `.restauros/` and nothing is deleted.
+- **New version notice.** The app checks GitHub at most once a day and tells you when a newer Release exists. It only reads the version number and never downloads anything. It is on by default and can be turned off in Settings.
+
+### Security
+- Session memory is now saved with recognized secrets masked. A **Mask** button in Settings rewrites memories saved earlier.
+- A password typed at a hidden prompt (`sudo`, `ssh`) no longer ends up in the command list. Windows cannot detect this prompt.
+
+### Changed
+- The empty terminal panel stays collapsed until you open a terminal or press ⌘J. The large logo is only on Home. The Anthropic key moved from Index to Settings.
+
+### Removed
+- The "PHP sites" sidebar item, which opened the same screen as Overview, and the Lerd state at the foot of the sidebar, already shown twice above. The site list stays.
+
+### Fixed
+- The manual claimed things the code does not do: that the green dot covers DNS and PHP (it means nginx), that nothing is ever deleted, that the Index has search, and what session memory holds. It keeps recent terminal output on disk without masking secrets, and the manual now says so.
+- The native menus and alerts appeared in Portuguese in the English interface.
+- ⇧⌘T did nothing in the native app. A Node project with a broken `package.json` showed a raw internal word. Shortcuts in Help and on Home showed ⌘ on Windows and Linux.
+
 ## [1.2.1] - 2026-11-04
 
 ### Changed

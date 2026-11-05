@@ -1,15 +1,17 @@
 // Sidebar; split out of app.mjs.
 
 import { attentionCount } from "./attention-state.mjs";
-import { AGENT_NAV, HELP_NAV, NAV, NAV_GROUPS, app } from "./app-state.mjs";
+import { NAV_GROUPS, SIDE_SECTIONS, app, lerdUnavailable, navById } from "./app-state.mjs";
 import { $, esc, icon } from "./dom.mjs";
 import { t } from "./i18n.mjs";
+import { isHidden } from "./sidebar-prefs.mjs";
 import { terminals } from "./terminals.mjs";
 
 window.addEventListener("vulcan-attention", () => {
   const badge = document.querySelector("[data-attention-count]");
   if (!badge || Number(badge.dataset.attentionCount) !== attentionCount()) renderSidebar();
 });
+window.addEventListener("vulcan-sidebar", () => renderSidebar());
 
 // while the environment comes up it is not "stopped": no alarm color for a start that is still going
 const envStarting = (state) => Boolean(state.autostart && ["starting", "checking"].includes(state.autostart.phase));
@@ -33,18 +35,17 @@ export function renderSidebar() {
       const word = run ? t("rodando") : up ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente");
       dot = `<span class="nav-dot dot ${run ? "dot-ok" : state.backend.available && !up ? "dot-err" : "dot-idle"}" title="${word}" aria-label="${word}"></span>`;
     }
-    return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" ${active ? 'aria-current="page"' : ""}>
+    return `<a class="nav-item ${active ? "is-on" : ""}" href="${n.hash}" title="${esc(n.desc || "")}" ${active ? 'aria-current="page"' : ""}>
       ${icon(n.icon)}<span>${esc(label)}</span>${count ? `<span class="count"${n.id === "agentes" ? ` data-attention-count="${count}" aria-label="${t("{n} aguardando você", { n: count })}"` : ""}>${count}</span>` : ""}${dot}</a>`;
   };
-  const byId = Object.fromEntries([...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => [n.id, n]));
   // the redraw replaces the #nav elements; remember what had focus (group or link) to restore it
   const nav = $("#nav");
   const had = nav.contains(document.activeElement) ? document.activeElement : null;
   const refocus = had && (had.dataset.navGroup ? `[data-nav-group="${CSS.escape(had.dataset.navGroup)}"]`
     : had.getAttribute("href") ? `.nav-item[href="${CSS.escape(had.getAttribute("href"))}"]` : null);
   nav.innerHTML = NAV_GROUPS.map((g) => {
-    const noLerd = app.state && app.state.backend && app.state.backend.installable === false && !app.state.backend.available;
-    const items = g.items.map((id) => byId[id]).filter((n) => !(noLerd && n.id === "ambiente"));
+    const items = g.items.map((id) => navById[id]).filter((n) => !isHidden(n.id) && !(n.id === "ambiente" && lerdUnavailable()));
+    if (!items.length) return "";
     const closed = Boolean(g.label && app.tree && app.tree.isOpen(`nav:${g.id}-closed`));
     // collapsed, the group still shows the current screen's item
     const shown = closed ? items.filter((n) => (n.routes || [n.id]).includes(app.route.name)) : items;
@@ -57,6 +58,7 @@ export function renderSidebar() {
     const again = nav.querySelector(refocus);
     if (again) again.focus();
   }
+  SIDE_SECTIONS.forEach((section) => { $(section.el).hidden = isHidden(section.id); });
 
   if (app.tree) app.tree.render();
   if (!state) return;
@@ -95,12 +97,4 @@ export function renderSidebar() {
   };
   $("#node-list").innerHTML = app.nodeProjects.length ? app.nodeProjects.map(nodeHtml).join("")
     : `<div class="side-empty">${t("Nenhum projeto. Use + para adicionar a pasta de um app Next.js, Vite ou outro Node.")}</div>`;
-
-  $("#side-env").innerHTML = `
-    <button class="side-env-btn" data-action="dashboard" ${state.backend.dashboard ? "" : "disabled"} title="${esc(state.status.summary)}">
-      <span class="dot ${running ? "dot-ok" : state.backend.available && !envStarting(state) ? "dot-err" : "dot-idle"}"></span>
-      <span class="side-env-label">${esc(state.backend.label)}</span>
-      <span class="dim">${running ? t("rodando") : envStarting(state) ? t("iniciando…") : state.backend.available ? t("parado") : t("ausente")}</span>
-      ${state.backend.dashboard ? icon("external", "i-sm") : ""}
-    </button>`;
 }

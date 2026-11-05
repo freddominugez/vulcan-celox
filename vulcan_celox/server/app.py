@@ -19,6 +19,7 @@ from vulcan_celox.core.progress import progress, progress_by_site
 from vulcan_celox.core.pty_session import TerminalManager
 from vulcan_celox.core.store import Store, migrate_legacy, secure_data_dir
 from vulcan_celox.core import i18n
+from vulcan_celox.core.backup import apply_pending_restore
 from vulcan_celox.server.autostart import failure_reason, wait_running
 from vulcan_celox.server.local_http import HttpError, LocalServer, Request
 
@@ -40,12 +41,27 @@ def site_payload(site) -> Dict[str, Any]:
     }
 
 
+# what Settings can hide; Settings itself stays, or there would be no way back
+SIDEBAR_ITEMS = frozenset({
+    "inicio", "overview", "node", "terminals", "ambiente", "depuracao", "agentes", "prompts", "agentes-uso",
+    "agentes-branches", "agentes-historico", "tasks", "notes", "tags", "index", "ajuda",
+    "section-sessions", "section-sites", "section-node",
+})
+
+
+def valid_sidebar_hidden(value: Any) -> List[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) and item in SIDEBAR_ITEMS for item in value):
+        raise HttpError(400, "sidebar_hidden deve ser uma lista de itens da barra lateral")
+    return sorted(set(value))
+
+
 class VulcanApp:
     def __init__(self, env: Optional[Mapping[str, str]] = None, runner=None, token: Optional[str] = None,
                  port: int = 0, keystore=None, ai_transport=None):
         self.env = dict(os.environ if env is None else env)
         paths.migrate_data_folder(self.env)
         self.data_dir = paths.data_dir(self.env)
+        apply_pending_restore(self.data_dir)  # before anything reads the data
         secure_data_dir(self.data_dir)  # 0700/0600: agent memories and events readable by the user only
         self.store = Store(self.data_dir)
         i18n.set_language(i18n.resolve(self.store.load("preferences", {}), self.env))
@@ -101,6 +117,8 @@ class VulcanApp:
         self.node = register_node_api(self)
         from vulcan_celox.server.guide_api import register_guide_api
         register_guide_api(self)
+        from vulcan_celox.server.data_api import register_data_api
+        register_data_api(self)
 
     # ── dados ────────────────────────────────────────────────────────────
     def manual_sites(self) -> Dict[str, str]:
@@ -226,6 +244,8 @@ class VulcanApp:
             if "new_terminal" in body:
                 self.save_new_terminal_prefs(body["new_terminal"])
             prefs = self.store.load("preferences", {})
+            if not isinstance(prefs, dict):
+                prefs = {}
             if "attention_notify" in body:
                 if not isinstance(body["attention_notify"], bool):
                     raise HttpError(400, "attention_notify deve ser verdadeiro ou falso")
@@ -242,6 +262,9 @@ class VulcanApp:
                 prefs["language"] = body["language"]
                 self.store.save("preferences", prefs)
                 i18n.set_language(i18n.resolve(prefs, self.env))
+            if "sidebar_hidden" in body:
+                prefs["sidebar_hidden"] = valid_sidebar_hidden(body["sidebar_hidden"])
+                self.store.save("preferences", prefs)
             if "pr_status" in body:
                 if not isinstance(body["pr_status"], bool):
                     raise HttpError(400, "pr_status deve ser verdadeiro ou falso")
@@ -249,7 +272,8 @@ class VulcanApp:
                 self.store.save("preferences", prefs)
             return {"autostart": self.autostart.state(), "new_terminal": self.new_terminal_prefs(),
                     "attention_notify": prefs.get("attention_notify", True), "pr_status": prefs.get("pr_status", False),
-                    "theme": prefs.get("theme", "sistema"), "language": i18n.language()}
+                    "theme": prefs.get("theme", "sistema"), "language": i18n.language(),
+                    "sidebar_hidden": prefs.get("sidebar_hidden", []), "data_dir": str(self.data_dir), "version": __version__}
 
         @srv.route("GET", "/api/i18n")
         def _i18n(_req: Request):

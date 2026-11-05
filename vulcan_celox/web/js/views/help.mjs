@@ -40,7 +40,7 @@ export class HelpView {
         <div class="hp-toc-label">${t("Manual")}</div>
         ${d.secoes.map((s) => `<a href="#/ajuda/${s.id}" class="hp-toc-item" data-sec="${s.id}"><span>${esc(s.titulo)}</span></a>`).join("")}
         <div class="hp-toc-label">${t("Guia")}</div>
-        <button class="hp-toc-item" data-hp="guide">${icon("home")}<span>${t("Rever o guia do Início")}</span></button>
+        <button class="hp-toc-item" data-hp="guide">${icon("home")}<span>${t("Ver a tela de abertura")}</span></button>
       </aside>
       <div class="hp-main">
         <label class="hp-search">${icon("search")}<input type="search" placeholder="${t("Procure uma dúvida: porta em uso, custo, Lerd parado")}" aria-label="${t("Buscar na Ajuda")}" spellcheck="false"></label>

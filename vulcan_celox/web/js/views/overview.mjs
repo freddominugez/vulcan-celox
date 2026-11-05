@@ -1,6 +1,5 @@
 // Visão geral: sites in a dense table, open tasks, active terminals, recent sessions and the general index.
 
-import { brandLogo } from "../brand.mjs";
 import { get, isMac, post } from "../api.mjs";
 import { esc, formatDue, icon, progressBar, reportError, shortPath, todayISO } from "../dom.mjs";
 import { t } from "../i18n.mjs";
@@ -106,7 +105,6 @@ export class OverviewView {
 
     this.root.innerHTML = `
       <div class="page overview">
-        ${brandLogo()}
         <div class="overview-grid">
           <div class="overview-main">
           <section class="panel">

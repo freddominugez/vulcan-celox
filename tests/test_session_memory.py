@@ -1,5 +1,7 @@
 import os
+import sys
 import time
+import unittest
 from pathlib import Path
 
 from tests.helpers import GOLDEN, TempDirTestCase
@@ -122,3 +124,62 @@ class MemoryIntegrationTest(ServerTestCase):
         record = self.app.hub.sessions.get(info["id"])
         self.assertFalse(record.is_open)
         self.assertTrue(Path(record.memory_file).is_file())
+
+
+class MaskOnSaveTest(TempDirTestCase):
+    def test_registro_sai_mascarado_mesmo_cortado(self):
+        key = b"-----BEGIN PRIVATE KEY-----\r\n" + b"QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo\r\n" * 3
+        key += b"-----END PRIVATE KEY-----\r\n"
+        noise = b"".join(b"linha %d\r\n" % i for i in range(MAX_TRANSCRIPT_LINES - 2))
+        text, truncated = strip_terminal(key + noise)  # the cut falls inside the key if the mask runs after it
+        self.assertTrue(truncated or "linha" in text)
+        self.assertNotIn("QUJDREVG", text)
+
+    def test_arquivo_inteiro_mascarado(self):
+        record, tasks, notes, tags = example()
+        record.commands.append({"ts": "2026-09-13T20:33:00Z", "cmd": "export API_KEY=abc123456"})
+        notes[0].text = "Título\nDB_PASSWORD=do-post-it"
+        md = render_session_md(record, tasks, notes, tags, "ghp_abcdefghijklmnopqrstuvwxyz0123", False)
+        for secret in ("abc123456", "do-post-it", "ghp_abcdef"):
+            self.assertNotIn(secret, md)
+        self.assertIn("[segredo]", md)
+
+    def test_registro_antigo_e_mascarado_ao_regravar(self):
+        record, tasks, notes, tags = example()
+        old = render_session_md(record, tasks, notes, tags, "ok", False).replace("ok", "TOKEN=antigo-aberto")
+        transcript, _ = extract_transcript(old)
+        self.assertNotIn("antigo-aberto", render_session_md(record, tasks, notes, tags, transcript, False))
+
+
+class HiddenInputTest(ServerTestCase):
+    """Real PTY: a password asked by getpass never reaches the command list; an ordinary prompt does."""
+
+    def wait_for(self, check, seconds=8):
+        limit = time.time() + seconds
+        while time.time() < limit:
+            if check():
+                return True
+            time.sleep(0.05)
+        return False
+
+    @unittest.skipIf(os.name == "nt", "o Windows não informa o modo do console")
+    def test_senha_nao_vira_comando(self):
+        script = ("import getpass,sys;getpass.getpass('senha: ');print('PASSOU',flush=True);"
+                  "line=input('nome: ');print('FIM',flush=True)")
+        pty = self.app.terminals.create(str(self.tmp), command=f'"{sys.executable}" -c "{script}"', title="t", site=None,
+                                        rows=24, cols=80, theme=None)
+        self.app.hub.on_created(pty)
+        self.addCleanup(lambda: self.app.terminals.close(pty.id) if self.app.terminals.get(pty.id) else None)
+        self.assertTrue(self.wait_for(lambda: b"senha:" in pty.history()), pty.history())
+        self.assertTrue(self.wait_for(pty.input_hidden))
+        self.app.hub.on_input(pty.id, b"senha-escondida\r")
+        pty.write(b"senha-escondida\r")
+        self.assertTrue(self.wait_for(lambda: b"PASSOU" in pty.history()), pty.history())
+        self.assertTrue(self.wait_for(lambda: b"nome:" in pty.history()))
+        self.assertTrue(self.wait_for(lambda: not pty.input_hidden()))
+        self.app.hub.on_input(pty.id, b"resposta-comum\r")
+        pty.write(b"resposta-comum\r")
+        self.assertTrue(self.wait_for(lambda: b"FIM" in pty.history()), pty.history())
+        cmds = [c["cmd"] for c in self.app.hub.sessions.get(pty.id).commands]
+        self.assertEqual(cmds, ["resposta-comum"])
+        self.assertNotIn(b"senha-escondida", pty.history())
