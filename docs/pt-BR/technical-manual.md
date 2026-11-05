@@ -1,6 +1,6 @@
 # Vulcan Celox: manual técnico
 
-Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.2.1. Para um passeio mais curto, leia [architecture.md](architecture.md).
+Referência para quem desenvolve e nunca viu este projeto. Descreve a versão 1.3.0. Para um passeio mais curto, leia [architecture.md](architecture.md).
 
 Caminhos escritos como `core/...`, `server/...`, `web/...` e `ui/...` são relativos a `vulcan_celox/`.
 
@@ -23,7 +23,7 @@ Objetivos que moldam o código:
 - Nunca apagar nada de forma definitiva.
 - Tudo testável sem janela, sem Lerd real e sem agentes reais.
 
-Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.2.1. Desde a 1.2.0 há versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
+Estado da entrega: as Releases estáveis saem para macOS 13 ou mais novo, Apple Silicon e Intel; a mais recente é a 1.3.0. Desde a 1.2.0 há versões de teste para Windows 10 (1809 ou mais novo) e 11 e para Linux, publicadas como pre-release até passar no aceite em máquinas reais.
 
 ## 2. Decisões de arquitetura
 

@@ -62,7 +62,11 @@ class MudancasTest(WatchCase):
         (self.root / "a.txt").write_text("dois longo", encoding="utf-8")
         self.assertEqual(self.changes(self.wait_events()), [("a.txt", "modified")])
         (self.root / "a.txt").unlink()
-        self.assertEqual(self.changes(self.wait_events()), [("a.txt", "deleted")])
+        # writing truncates and then fills the file: a slow sweep can see two changes, so the deletion may come after one more
+        got = self.changes(self.wait_events())
+        if got == [("a.txt", "modified")]:
+            got = self.changes(self.wait_events())
+        self.assertEqual(got, [("a.txt", "deleted")])
 
     def test_renomear_vira_apagado_e_novo(self):
         (self.root / "a.txt").write_text("um", encoding="utf-8")

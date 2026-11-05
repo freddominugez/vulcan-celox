@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-import os
 import re
 import time
 from typing import Callable, Dict, List, Optional, Sequence

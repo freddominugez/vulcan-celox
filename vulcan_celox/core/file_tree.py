@@ -143,7 +143,8 @@ def git_search(root: str, text: str, limit: int = SEARCH_RESULTS, seconds: float
             line = int(parts[1])
         except ValueError:
             continue
-        results.append({"rel": rel, "line": line, "text": parts[2].decode("utf-8", "replace")[:SEARCH_LINE]})
+        # a file with CRLF line ends (autocrlf on Windows) would show the carriage return in the result
+        results.append({"rel": rel, "line": line, "text": parts[2].decode("utf-8", "replace").rstrip("\r")[:SEARCH_LINE]})
     return {"available": True, "results": results, "truncated": cut}
 
 

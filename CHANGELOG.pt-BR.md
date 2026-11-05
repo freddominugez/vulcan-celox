@@ -4,6 +4,8 @@ Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O form
 
 ## [Não lançado]
 
+## [1.3.0] - 2026-11-05
+
 ### Adicionado
 - **Tela Código.** A árvore inteira de um projeto e o que está sendo escrito no disco, ao vivo, por agente ou por qualquer outro programa, sem precisar de sessão. Marcas de novo, alterado e apagado, modo Acompanhando, diff contra o Git, abas de arquivo, abertura rápida e busca nos arquivos do Git. Só leitura. Abre pela barra lateral e por Abrir em Código em sites, projetos Node e sessões.
 - **Tela de Configurações.** Escolha quais itens e listas a barra lateral mostra, além de tema, idioma, tela de abertura, início do Lerd, pergunta da pasta, avisos, consulta de PR, chave da Anthropic, versão e pasta de dados.

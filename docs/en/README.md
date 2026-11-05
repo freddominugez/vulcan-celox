@@ -2,7 +2,7 @@
 
 [Português](../pt-BR/README.md)
 
-Describes version 1.2.1. The interface is in English by default, with Portuguese available from ⌘K.
+Describes version 1.3.0. The interface is in English by default, with Portuguese available from ⌘K.
 
 | To... | Read |
 |-------|------|

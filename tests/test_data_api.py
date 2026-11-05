@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
@@ -78,8 +79,10 @@ class RestoresApiTest(ServerTestCase):
         status, data = self.request("POST", "/api/data/restores/trash", {"name": "20261105-101500"})[:2]
         self.assertEqual(status, 200)
         self.assertEqual(data["restores"], [])
-        self.assertTrue(any("osascript" in c.argv[0] or "gio" in c.argv[0] for c in self.fake.calls))
-        # the fake Trash does nothing: the folder ends up in the app's own trash folder, whole
+        self.assertFalse(self.copy.exists())
+        if os.name == "nt":
+            return  # the Recycle Bin of Windows is real here: the folder went there
+        # the fake Finder or gio does nothing, and without gio there is no call: the folder ends up in the app's own trash folder, whole
         kept = list((Path(self.app.data_dir) / "lixeira").glob("*-20261105-101500/tasks.json"))
         self.assertEqual(len(kept), 1)
         self.assertEqual(kept[0].read_text(encoding="utf-8"), "antigo")

@@ -19,7 +19,8 @@ class FormaErradaTest(TempDirTestCase):
         home.mkdir(exist_ok=True)
         (home / f"{name}.json").write_text(json.dumps(value), encoding="utf-8")
         app = VulcanApp(env=self.env(), runner=FakeRunner(), token="token-de-teste-123")
-        app.data_lock.release()
+        app.start()
+        self.addCleanup(app.shutdown)  # closes the agent index: on Windows an open file keeps the folder from being deleted
         return app
 
     def test_migrations_lista(self):

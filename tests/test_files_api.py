@@ -193,6 +193,8 @@ class ArvoreTest(FilesCase):
 
     def test_nome_com_caracteres_especiais(self):
         nomes = ["<img src=x onerror=alert(1)>.php", "com espaço & #hash?.txt", "çãõ-日本語.md", "aspas\"'.js"]
+        if os.name == "nt":  # <, >, ? and " are not allowed in a Windows file name
+            nomes = ["com espaço & #hash.txt", "çãõ-日本語.md", "aspas'.js"]
         for nome in nomes:
             (self.project / nome).write_text(nome, encoding="utf-8")
         data = self.get("tree")[1]

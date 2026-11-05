@@ -4,6 +4,8 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-05
+
 ### Added
 - **Code screen.** A project's whole tree and what is being written to disk, live, by an agent or by any other program, with no session needed. New, changed and deleted marks, a Following mode, diff against Git, file tabs, quick open and search in the Git files. Read only. Opens from the sidebar and with Open in Code on sites, Node projects and sessions.
 - **Settings screen.** Choose which items and lists the sidebar shows, plus theme, language, opening screen, Lerd start, folder prompt, notices, PR check, the Anthropic key, version and data folder.
