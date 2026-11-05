@@ -4,6 +4,7 @@ import sqlite3
 import stat
 import zipfile
 from pathlib import Path
+from unittest import mock
 
 from tests.helpers import TempDirTestCase
 from vulcan_celox.core.backup import (ASIDE_DIR, MANIFEST, PENDING_DIR, PHASE_FILE, BackupError, apply_pending_restore,
@@ -122,9 +123,30 @@ class RestoreTest(BackupCase):
         self.assertTrue((self.data / "sessoes" / "global" / "a.md").is_file())
         self.assertFalse((self.data / PENDING_DIR).exists())
 
+    def test_arquivo_preso_nao_troca_nada_e_tenta_depois(self):
+        backup = create_backup(self.data, self.dest, "1")["path"]
+        (self.data / "tasks.json").write_text('{"tarefa": 2}', encoding="utf-8")
+        prepare_restore(backup, self.data)
+        real = os.replace
+
+        def locked(source, target):
+            if Path(source).name == "tasks.json":
+                raise PermissionError(32, "em uso")
+            real(source, target)
+
+        with mock.patch("vulcan_celox.core.backup.os.replace", locked), mock.patch("vulcan_celox.core.backup.SWAP_WAIT", 0):
+            self.assertIsNone(apply_pending_restore(self.data))
+        self.assertEqual((self.data / "tasks.json").read_text(encoding="utf-8"), '{"tarefa": 2}')
+        self.assertTrue((self.data / "sessoes" / "global" / "a.md").is_file())  # what had moved came back
+        self.assertTrue((self.data / PENDING_DIR).is_dir())
+        apply_pending_restore(self.data)  # next start: free now
+        self.assertEqual((self.data / "tasks.json").read_text(encoding="utf-8"), '{"tarefa": 1}')
+
     def test_recusas_nao_tocam_nos_dados(self):
         bad = [({"x.json": "{}"}, False), ({"../fora.json": "{}"}, True), ({"/abs.json": "{}"}, True),
-               ({f"{ASIDE_DIR}/x": "{}"}, True), ({"a\\b": "{}"}, True)]
+               ({f"{ASIDE_DIR}/x": "{}"}, True)]
+        if os.name != "nt":  # on Windows, zipfile itself turns the backslash into a plain folder separator
+            bad.append(({"a\\b": "{}"}, True))
         for members, manifest in bad:
             with self.assertRaises(BackupError, msg=str(members)):
                 prepare_restore(self.zip_with(members, manifest), self.data)

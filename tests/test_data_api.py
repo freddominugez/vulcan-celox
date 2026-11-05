@@ -1,5 +1,4 @@
 import json
-import time
 from pathlib import Path
 
 from tests.server_helpers import ServerTestCase
@@ -56,7 +55,8 @@ class PendingRestoreOnStartTest(ServerTestCase):
         backup = create_backup(self.app.data_dir, self.tmp / "bk", "1")["path"]
         self.app.store.save("marcador", {"v": 2})
         prepare_restore(backup, self.app.data_dir)
-        other = VulcanApp(env=self.env(), runner=self.app.runner, token=self.token)
-        other.start()
-        self.addCleanup(other.shutdown)
-        self.assertEqual(other.store.load("marcador", {}), {"v": 1})
+        runner = self.app.runner
+        self.app.shutdown()  # as when reopening: the previous app no longer holds the files
+        self.app = VulcanApp(env=self.env(), runner=runner, token=self.token)
+        self.app.start()  # tearDown closes this one
+        self.assertEqual(self.app.store.load("marcador", {}), {"v": 1})

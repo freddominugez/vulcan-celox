@@ -27,6 +27,8 @@ SQLITE_SIDE_FILES = ("-wal", "-shm", "-journal")
 MAX_TOTAL = 50 * 1024 ** 3
 MAX_FILES = 500_000
 SESSIONS_FILE = "terminal_sessions.json"
+SWAP_TRIES = 10  # on Windows, the app being replaced may hold files for a moment after it closes
+SWAP_WAIT = 0.5
 
 
 class BackupError(Exception):
@@ -196,9 +198,27 @@ def _fix_memory_paths(data_dir: Path, old_root: Optional[str]) -> None:
     path.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _move_out(data_dir: Path, aside: Path) -> bool:
+    """Moves the current data aside, all or nothing. False if something stayed locked: whatever moved goes back."""
+    for attempt in range(SWAP_TRIES):
+        moved: List[Path] = []
+        try:
+            for entry in _entries(data_dir, KEPT_OUT):
+                os.replace(entry, aside / entry.name)
+                moved.append(entry)
+            return True
+        except OSError:
+            for entry in moved:
+                os.replace(aside / entry.name, entry)
+            if attempt < SWAP_TRIES - 1:
+                time.sleep(SWAP_WAIT)
+    return False
+
+
 def apply_pending_restore(data_dir) -> Optional[Path]:
     """Swaps the prepared backup in, and returns where the old data went. Writes the phase first, so a crash in the
-    middle resumes instead of moving restored files away as if they were the old ones."""
+    middle resumes instead of moving restored files away as if they were the old ones. If the current data stays
+    locked, the app opens with it untouched, and the restore waits for the next start."""
     data_dir = Path(data_dir)
     pending = data_dir / PENDING_DIR
     if not pending.is_dir():
@@ -209,8 +229,8 @@ def apply_pending_restore(data_dir) -> Optional[Path]:
     if phase.get("step") != "entering":
         aside.mkdir(parents=True, exist_ok=True)
         phase_path.write_text(json.dumps({"step": "leaving", "stamp": aside.name}), encoding="utf-8")
-        for entry in _entries(data_dir, KEPT_OUT):
-            os.replace(entry, aside / entry.name)
+        if not _move_out(data_dir, aside):
+            return None
         phase_path.write_text(json.dumps({"step": "entering", "stamp": aside.name}), encoding="utf-8")
     try:
         old_root = json.loads((pending / MANIFEST).read_text(encoding="utf-8")).get("data_dir")
