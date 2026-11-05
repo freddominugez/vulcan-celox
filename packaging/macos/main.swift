@@ -42,111 +42,7 @@ func randomToken() -> String {
 
 let bgColor = NSColor.windowBackgroundColor  // follows the system until the page paints the theme
 
-// MARK: - Python server
-
-final class BackendServer {
-    let token = randomToken()
-    private(set) var port: Int?
-    private var process: Process?
-
-        /// Runs a windowless executable and returns the exit code (nil if it could not run).
-    static func exitStatus(_ path: String, _ arguments: [String]) -> Int32? {
-        let proc = Process()
-        proc.executableURL = URL(fileURLWithPath: path)
-        proc.arguments = arguments
-        proc.standardOutput = FileHandle.nullDevice
-        proc.standardError = FileHandle.nullDevice
-        do { try proc.run() } catch { return nil }
-        proc.waitUntilExit()
-        return proc.terminationStatus
-    }
-
-        /// Python 3.9+ that really works. macOS's /usr/bin/python3 is only a stub that opens the installer for
-        /// Apple's Command Line Tools when they are missing: it is only tested if `xcode-select -p` confirms they exist.
-    static func usablePython() -> String? {
-        let env = ProcessInfo.processInfo.environment
-        var candidates: [String] = []
-        if let custom = env["VULCAN_PYTHON"] { candidates.append(custom) }
-        if env["VULCAN_PYTHON_ONLY"] != "1" {
-            candidates += ["/opt/homebrew/bin/python3", "/usr/local/bin/python3", "/usr/bin/python3"]
-        }
-        let versionCheck = ["-c", "import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)"]
-        for path in candidates where FileManager.default.isExecutableFile(atPath: path) {
-            if path == "/usr/bin/python3", exitStatus("/usr/bin/xcode-select", ["-p"]) != 0 { continue }
-            if exitStatus(path, versionCheck) == 0 { return path }
-        }
-        return nil
-    }
-
-    func pythonPath() -> String {
-        return BackendServer.usablePython() ?? "/usr/bin/python3"
-    }
-
-    func start() throws -> Int {
-        let resources = Bundle.main.resourceURL?.path ?? FileManager.default.currentDirectoryPath
-        let proc = Process()
-        proc.executableURL = URL(fileURLWithPath: pythonPath())
-        proc.arguments = ["-m", "vulcan_celox", "--serve"]
-                // with -m the current folder goes to the start of sys.path: runs inside the bundle resources
-        proc.currentDirectoryURL = URL(fileURLWithPath: resources)
-        var env = ProcessInfo.processInfo.environment
-        env["PYTHONPATH"] = resources
-        env["PYTHONDONTWRITEBYTECODE"] = "1"
-        env["VULCAN_TOKEN"] = token
-        env["VULCAN_WATCH_PARENT"] = "1"
-        if env["SHELL"] == nil { env["SHELL"] = "/bin/zsh" }
-        if env["LANG"] == nil { env["LANG"] = "pt_BR.UTF-8" }
-        proc.environment = env
-        let out = Pipe()
-        proc.standardOutput = out
-        proc.standardError = FileHandle.standardError
-
-        let found = DispatchSemaphore(value: 0)
-        var buffer = ""
-        var parsed: Int?
-        out.fileHandleForReading.readabilityHandler = { handle in
-            let data = handle.availableData
-            if data.isEmpty { handle.readabilityHandler = nil; found.signal(); return }
-            buffer += String(decoding: data, as: UTF8.self)
-            if parsed == nil, let range = buffer.range(of: "VULCAN_PORT=") {
-                let digits = buffer[range.upperBound...].prefix { $0.isNumber }
-                if let value = Int(digits) {
-                    parsed = value
-                    found.signal()
-                }
-            }
-        }
-        try proc.run()
-        process = proc
-        _ = found.wait(timeout: .now() + 20)
-        guard let value = parsed else {
-            proc.terminate()
-            throw NSError(domain: "VulcanCelox", code: 1,
-                          userInfo: [NSLocalizedDescriptionKey: L("O servidor local não iniciou ({python}).", ["python": pythonPath()])])
-        }
-        port = value
-        return value
-    }
-
-    func stop() {
-        guard let proc = process, proc.isRunning else { return }
-        proc.terminate()
-                // waits with a deadline: the server saves the memories and closes the tabs; the window never freezes
-        let deadline = Date().addingTimeInterval(6)
-        while proc.isRunning && Date() < deadline { usleep(50_000) }
-        if proc.isRunning { kill(proc.processIdentifier, SIGKILL) }
-    }
-
-    func post(_ path: String) {
-        guard let port = port, let url = URL(string: "http://127.0.0.1:\(port)\(path)") else { return }
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue(token, forHTTPHeaderField: "X-Vulcan-Token")
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = Data("{}".utf8)
-        URLSession.shared.dataTask(with: req).resume()
-    }
-}
+// MARK: - Python server: packaging/macos/server.swift
 
 // MARK: - WebView with a window drag area
 
@@ -193,16 +89,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         let controller = WKUserContentController()
         let origin = "http://127.0.0.1:\(app.server.port ?? 0)"
         self.appOrigin = origin
-                // the token only exists on the app's own page: another origin that manages to load here does not see it
-        let bootstrap = """
-        if (location.origin === "\(origin)") {
-          window.VULCAN = { token: "\(app.server.token)", native: true, kind: "\(kind)" };
-        }
-        window.__vtErrors = [];
-        window.addEventListener("error", function (e) { window.__vtErrors.push(String(e.message || e)); });
-        window.addEventListener("unhandledrejection", function (e) { window.__vtErrors.push(String(e.reason)); });
-        """
-        controller.addUserScript(WKUserScript(source: bootstrap, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        controller.addUserScript(bootstrapScript(origin: origin, token: app.server.token, kind: kind))
         config.userContentController = controller
         let inspect = ProcessInfo.processInfo.environment["VULCAN_INSPECT"] == "1"  // inspector for development only
         configureWebPreferences(config.preferences, inspect: inspect)
@@ -218,7 +105,7 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
         window.titlebarAppearsTransparent = true
         window.appearance = nil  // follows the system: the WebView's prefers-color-scheme depends on this
         window.backgroundColor = bgColor
-        window.minSize = NSSize(width: 760, height: 480)
+        window.minSize = NSSize(width: 900, height: 480)
         window.isReleasedWhenClosed = false
         window.contentView = webView
         super.init()
@@ -285,6 +172,10 @@ final class WebWindowController: NSObject, NSWindowDelegate, WKScriptMessageHand
             window.performClose(nil)
         case "relaunch":
             app?.relaunch()
+        case "openServerLog":
+            NSWorkspace.shared.open(BackendServer.logToShow())
+        case "restartServer":
+            app?.restartServer()
         case "pickFolder":
             pickFolder(id: body["id"] as? String ?? "", start: body["start"] as? String, purpose: body["purpose"] as? String)
         case "copy":
@@ -372,6 +263,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             fputs("erro: \(error.localizedDescription)\n", stderr)
             exit(1)
         }
+        server.onUnexpectedExit = { [weak self] code in self?.serverDied(code) }
         buildMenus()
         if options.snapshotPath != nil {
             runSnapshot()
@@ -486,6 +378,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let envItem = NSMenuItem()
         let envMenu = NSMenu(title: L("Ambiente"))
+        envMenu.delegate = self
+        envMenu.addItem(EnvMenu.notice())
         envMenu.addItem(item("Iniciar ambiente", #selector(startEnv), ""))
         envMenu.addItem(item("Parar ambiente", #selector(stopEnv), ""))
         envMenu.addItem(item("Reiniciar ambiente", #selector(restartEnv), ""))
@@ -529,9 +423,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             button.image = NSImage(systemSymbolName: "terminal", accessibilityDescription: "Vulcan Celox")
         }
         let menu = NSMenu()
+        menu.delegate = self
         menu.addItem(item("Abrir Vulcan Celox", #selector(showMain), ""))
         menu.addItem(item("Novo terminal", #selector(newTerminal), ""))
         menu.addItem(.separator())
+        menu.addItem(EnvMenu.notice())
         menu.addItem(item("Abrir painel do Lerd", #selector(openDashboard), ""))
         menu.addItem(item("Iniciar ambiente", #selector(startEnv), ""))
         menu.addItem(item("Parar ambiente", #selector(stopEnv), ""))
@@ -575,7 +471,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func stopEnv() { server.post("/api/services/stop"); main?.command("refresh") }
     @objc func restartEnv() { server.post("/api/services/restart"); main?.command("refresh") }
     @objc func openDashboard() {
-        NSWorkspace.shared.open(URL(string: "http://127.0.0.1:7073/")!)
+        if let url = EnvMenu.dashboard { NSWorkspace.shared.open(url) }
     }
 
     // MARK: snapshot (visual sensor)

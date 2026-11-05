@@ -5,18 +5,32 @@ Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O form
 ## [Não lançado]
 
 ### Adicionado
+- **Tela Código.** A árvore inteira de um projeto e o que está sendo escrito no disco, ao vivo, por agente ou por qualquer outro programa, sem precisar de sessão. Marcas de novo, alterado e apagado, modo Acompanhando, diff contra o Git, abas de arquivo, abertura rápida e busca nos arquivos do Git. Só leitura. Abre pela barra lateral e por Abrir em Código em sites, projetos Node e sessões.
 - **Tela de Configurações.** Escolha quais itens e listas a barra lateral mostra, além de tema, idioma, tela de abertura, início do Lerd, pergunta da pasta, avisos, consulta de PR, chave da Anthropic, versão e pasta de dados.
 - **Tela de abertura.** O Início abre com o app até você marcar a caixa, e explica cada item em cartões. Cada item da barra lateral também tem uma dica.
 
 - **Backup e restauração.** Configurações salva todos os dados do app num `.zip` e restaura um deles ao reabrir o app. Os dados atuais vão para `.restauros/` e nada é apagado.
+- **Conferir um backup antes de restaurar.** Escolher um `.zip` mostra data, versão, tamanho e quantas sessões de terminal, tarefas, post-its, prompts e memórias ele tem. Restaurar só aparece depois disso, e nunca para um arquivo com erro. As cópias que uma restauração guardou em `.restauros/` aparecem numa lista, e cada uma pode ir para a Lixeira.
+- **Barra lateral recolhível.** Um botão no alto da barra, ou ⌘B, recolhe a barra num trilho de ícones; Sessões, Sites e Projetos Node abrem num menu. A janela abaixo de 1000 px começa recolhida até você escolher.
+- **Marcas do Git na tela Código.** Cada arquivo mostra M, U ou D, como num editor, com um ponto na pasta recolhida que tem algo marcado dentro, o apagado riscado e a branch acima da árvore. Vêm do índice do Git comparado com o disco, então nada do repositório roda.
+- **Log e reinício do servidor.** O servidor local grava `logs/servidor.log` e guarda a saída de erro em `logs/servidor-erro.log`, os dois mascarados. No macOS, quando o servidor para, um aviso mostra a causa com Ver log e Reiniciar servidor, sem fechar o app. O `--doctor` mostra os dois caminhos.
 - **Aviso de versão nova.** O app consulta o GitHub no máximo uma vez por dia e avisa quando há uma Release mais nova. Só lê o número da versão e nunca baixa nada. Vem ligado e pode ser desligado em Configurações.
 
 ### Segurança
+- **Nenhum programa do repositório analisado roda.** A tela Branches não usa mais `git status`, que rodava o filtro `clean` do repositório, e um clone parcial não busca mais nada sozinho, o que rodava `core.sshCommand`. A comparação com o Git tem tempo limite, e a busca fica dentro da pasta.
+- Um backup montado à mão não troca mais os dados sem cópia nem impede o app de abrir. A restauração espera a instância anterior sair, e uma troca que falha abre o app e avisa.
+- Mais nomes contam como sensíveis: chaves SSH atuais, `.netrc`, `.npmrc`, `.pypirc`, `.git-credentials`, `auth.json`, `*.p12`, `*.pfx` e `secrets.*`. A máscara também cobre `curl -u` e `sshpass -p`.
 - A memória da sessão agora é gravada com os segredos reconhecidos mascarados. Um botão **Mascarar** em Configurações reescreve as memórias gravadas antes.
 - Senha digitada num pedido oculto (`sudo`, `ssh`) não vai mais para a lista de comandos. O Windows não permite detectar esse pedido.
 
 ### Alterado
+- A marca da máscara segue o idioma da interface: `[segredo]` em português, `[secret]` em inglês. As duas contam como já mascaradas, e as memórias antigas ficam como estão.
+- Os prompts de exemplo que você nunca editou passam para o idioma novo quando você troca.
 - O painel de terminal vazio fica recolhido até você abrir um terminal ou apertar ⌘J. O logo grande fica só no Início. A chave da Anthropic saiu do Índice e foi para Configurações.
+
+### Corrigido
+- O comando que quebra na largura do terminal fica inteiro na memória da sessão. ⌘J nas telas sem o painel de baixo diz por quê; ⇧⌘D destaca o terminal do painel; ⌘F na tela Código busca só no arquivo aberto. A aba Logs de um site que saiu da lista mostra o estado vazio. O menu Ambiente nativo avisa sem Lerd e abre o painel no endereço que o Lerd informa.
+- Tema claro: as abas da página do site voltam a ser legíveis. Instalar Lerd e retomar pelos Prompts mostram o terminal que criam. Abrir no editor funciona na tela Código. Configurações não diz mais que o servidor local caiu. Cabeçalho do site, linha de tarefa, diálogos e avisos não cortam mais nada em janela pequena, e as mensagens de erro em inglês não saem mais deformadas.
 
 ### Removido
 - O item "Sites PHP" da barra lateral, que abria a mesma tela da Visão geral, e o estado do Lerd no rodapé da barra lateral, já mostrado duas vezes acima. A lista de sites continua.

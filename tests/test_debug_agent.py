@@ -14,6 +14,12 @@ def log(ts, level="error", message="Falhou", site="loja"):
 
 
 class JanelaTest(TempDirTestCase):
+    def setUp(self):
+        super().setUp()
+        from vulcan_celox.core import i18n
+        self.addCleanup(i18n.set_language, i18n.language())
+        i18n.set_language("pt")  # the mask mark follows the interface language
+
     def test_site_e_janela(self):
         events = [log("2026-10-31T10:00:00.100Z"), log("2026-10-31T10:30:00Z", site="vitrine"),
                   log("2026-10-31T09:59:00Z"), log("2026-10-31T10:20:00Z", level="info"),

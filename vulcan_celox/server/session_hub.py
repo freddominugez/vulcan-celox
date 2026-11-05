@@ -109,7 +109,7 @@ class SessionHub:
         if pty is None:
             pty = self.app.terminals.get(record.id)
         if pty is not None:
-            transcript, truncated = strip_terminal(pty.history())
+            transcript, truncated = strip_terminal(pty.history(), getattr(pty, "cols", None))
         else:
             existing = self._read_memory(record)
             transcript, truncated = extract_transcript(existing) if existing else ("", False)

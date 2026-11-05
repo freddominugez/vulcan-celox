@@ -3,6 +3,7 @@
 import { get, isMac, post } from "./api.mjs";
 import { attentionTerminal, syncTabs as syncAttention } from "./attention-state.mjs";
 import { reportError, toast } from "./dom.mjs";
+import { codeHash } from "./views/code/explorer-open.mjs";
 import { t } from "./i18n.mjs";
 import { watchTerminal as watchAttention } from "./terminal-attention.mjs";
 import { pathLinkProvider } from "./terminal-path-links.mjs";
@@ -46,6 +47,8 @@ export function openTarget(terminal, event, target) {
   } else if (target.session) {
     const line = target.line ? `/${target.line}` : "";
     location.hash = `#/agentes/${encodeURIComponent(target.session)}/codigo/${encodeURIComponent(target.path)}${line}`;
+  } else if (target.root) {
+    location.hash = codeHash(target.root, target.rel, target.line || 0);
   } else {
     post("/api/open", { kind: "terminal_file", terminal, target: target.path }).catch(reportError);
   }

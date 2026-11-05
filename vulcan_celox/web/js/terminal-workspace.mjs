@@ -72,6 +72,7 @@ export class TerminalWorkspace {
     this.root.addEventListener("dblclick", (e) => this.onDblClick(e));
     this.root.addEventListener("keydown", (e) => this.onTabKey(e));
     this.render();
+    if (this.activeId && !this.isLive(this.activeId)) terminals.sync();
     this.loadSessions();
     this.project.loadRuntime();
     this.project.loadCommands();
@@ -175,7 +176,10 @@ export class TerminalWorkspace {
     if (MODES.includes(mode)) this.mode = mode;
     if (id) {
       this.activeId = id;
-      if (!this.isLive(id)) this.requestedId = id;
+      if (!this.isLive(id)) {
+        this.requestedId = id;
+        terminals.sync();  // created by the server a moment ago (installer, resumed session): the pool does not know it yet
+      }
       if (this.splitId === id) this.splitId = null;
     }
     this.focus = focus || null;
@@ -356,6 +360,8 @@ export class TerminalWorkspace {
   }
 
   renderContent() {
+    // the dark scope is for the terminal: tasks, notes, harness and logs follow the app's theme
+    this.body.classList.toggle("is-terminal", this.mode === "terminal");
     return renderContent(this);
   }
 

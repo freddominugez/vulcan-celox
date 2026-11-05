@@ -246,7 +246,7 @@
 }
 
 /* The terminal area is dark in both themes: what appears inside it (empty state, memory, buttons) uses the dark values. */
-.ws-body {
+.ws-body.is-terminal {
   color-scheme: dark;
   background: var(--bg-term);
   color: var(--on-dark);

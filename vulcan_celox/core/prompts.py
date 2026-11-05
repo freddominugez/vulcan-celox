@@ -325,18 +325,64 @@ EXAMPLES = [
 ]
 
 
+def _in(language: str, text: str) -> str:
+    """Text of an example in a given language, whatever the current one is."""
+    from vulcan_celox.core import i18n
+    return text if language == "pt" else i18n.dictionary().get(text, text)
+
+
+def _example(example, language: str) -> Tuple[str, str]:
+    """(category, file text) of an example exactly as seed_global writes it in that language."""
+    category, pid, title, pin, body = example
+    category, title, body = _in(language, category), _in(language, title), _in(language, body)
+    return category, (f"---\nid: {pid}\ntitle: {title}\ncategory: {category}\npin: {'true' if pin else 'false'}\n---\n"
+                      f"{body}\n")
+
+
 def seed_global(root) -> List[Path]:
     """Creates the examples on first run. If the folder already exists, it touches nothing."""
     root = Path(root)
     if root.exists():
         return []
+    from vulcan_celox.core import i18n
     created = []
-    for category, pid, title, pin, body in EXAMPLES:
-        category, title, body = tr(category), tr(title), tr(body)
+    for example in EXAMPLES:
+        category, text = _example(example, i18n.language())
         folder = create_category(root, category)
-        path = folder / f"{pid}.md"
-        path.write_text(f"---\nid: {pid}\ntitle: {title}\ncategory: {category}\npin: {'true' if pin else 'false'}\n---\n"
-                        f"{body}\n", encoding="utf-8")
+        path = folder / f"{example[1]}.md"
+        path.write_text(text, encoding="utf-8")
         make_private(path)
         created.append(path)
     return created
+
+
+def _same(path: Path, text: str) -> bool:
+    try:
+        return path.is_file() and not path.is_symlink() and path.read_text(encoding="utf-8") == text
+    except (OSError, UnicodeDecodeError):
+        return False
+
+
+def follow_language(root) -> List[Path]:
+    """The examples nobody edited (same text as seed_global wrote in the other language) move to the current language,
+    in place. An edited example stays as it is. Returns what was rewritten."""
+    from vulcan_celox.core import i18n
+    root = Path(root)
+    current = i18n.language()
+    changed = []
+    for language in (lang for lang in i18n.LANGUAGES if lang != current):
+        for example in EXAMPLES:
+            old_category, old_text = _example(example, language)
+            new_category, new_text = _example(example, current)
+            # the folder keeps the name of the language the examples were born in
+            path = next((c for c in sorted(root.glob(f"*/{example[1]}.md")) if _same(c, old_text)), None)
+            if path is None or old_text == new_text:
+                continue
+            path.write_text(new_text, encoding="utf-8")
+            make_private(path)
+            name = path.parent / NAME_FILE
+            if _category_name(path.parent) == old_category and not name.is_symlink():
+                name.write_text(new_category + "\n", encoding="utf-8")
+                make_private(name)
+            changed.append(path)
+    return changed

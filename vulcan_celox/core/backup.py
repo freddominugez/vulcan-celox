@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import sqlite3
 import stat
@@ -12,9 +13,11 @@ import tempfile
 import time
 import zipfile
 from pathlib import Path, PurePosixPath
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+from vulcan_celox.core.data_lock import LOCK_NAME, DataLock
 from vulcan_celox.core.i18n import tr
+from vulcan_celox.core.server_log import LOG_DIR
 
 MANIFEST = "vulcan-backup.json"
 FORMAT = 1
@@ -22,7 +25,9 @@ ASIDE_DIR = ".restauros"
 PENDING_DIR = ".restauro-pendente"
 STAGING_PREFIX = ".restauro-preparando-"
 PHASE_FILE = ".fase.json"
-KEPT_OUT = (ASIDE_DIR, PENDING_DIR)
+KEPT_OUT = (ASIDE_DIR, PENDING_DIR, LOCK_NAME, LOG_DIR)  # the log in use stays where it is
+RESTORE_WAIT = 15.0
+STAMP = re.compile(r"^\d{8}-\d{6}$")
 SQLITE_SIDE_FILES = ("-wal", "-shm", "-journal")
 MAX_TOTAL = 50 * 1024 ** 3
 MAX_FILES = 500_000
@@ -46,7 +51,7 @@ def _backup_files(data_dir: Path) -> Iterator[Path]:
             dirs[:] = [d for d in dirs if d not in KEPT_OUT and not d.startswith(STAGING_PREFIX)]
         for name in sorted(files):
             path = here / name
-            if path.is_symlink() or _is_temporary(name) or name.endswith(SQLITE_SIDE_FILES):
+            if path.is_symlink() or _is_temporary(name) or name.endswith(SQLITE_SIDE_FILES) or name == LOCK_NAME:
                 continue
             yield path
 
@@ -108,7 +113,10 @@ def _safe_name(name: str) -> bool:
     if not name or name.startswith("/") or "\\" in name or ":" in name:
         return False
     parts = PurePosixPath(name).parts
-    return ".." not in parts and "." not in parts and parts[0] not in KEPT_OUT
+    # no case difference: on the usual macOS disk .RESTAUROS and .restauros are the same folder. The phase file is the app's own record
+    # of a swap in progress: coming from a zip, it could say the swap had already moved the current data away
+    refused = {name.lower() for name in (*KEPT_OUT, PHASE_FILE)}
+    return ".." not in parts and "." not in parts and parts[0].lower() not in refused
 
 
 def read_manifest(archive: zipfile.ZipFile) -> Dict[str, Any]:
@@ -215,6 +223,35 @@ def _move_out(data_dir: Path, aside: Path) -> bool:
     return False
 
 
+def _read_phase(path: Path) -> Dict[str, Any]:
+    """What a swap in progress wrote. Anything unexpected counts as no swap in progress, so the current data is moved aside first."""
+    try:
+        phase = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(phase, dict) or not STAMP.match(str(phase.get("stamp") or "")) or phase.get("step") not in ("leaving", "entering"):
+        return {}
+    return phase
+
+
+def open_data_folder(data_dir) -> Tuple[DataLock, Optional[str]]:
+    """Holds the data folder for this run and applies a prepared restore. The swap needs the folder alone: an instance closing writes on its
+    way out, and those writes would land on the restored data. A failed swap never stops the app: it opens with the data as it is, and says so."""
+    lock = DataLock(data_dir)
+    if not restore_pending(data_dir):
+        lock.share()
+        return lock, None
+    alone = lock.alone(RESTORE_WAIT)
+    try:
+        if alone:
+            apply_pending_restore(data_dir)
+        return lock, None
+    except (OSError, ValueError) as exc:
+        return lock, tr("a restauração não foi aplicada: {reason}", reason=exc)
+    finally:
+        lock.share()
+
+
 def apply_pending_restore(data_dir) -> Optional[Path]:
     """Swaps the prepared backup in, and returns where the old data went. Writes the phase first, so a crash in the
     middle resumes instead of moving restored files away as if they were the old ones. If the current data stays
@@ -224,7 +261,7 @@ def apply_pending_restore(data_dir) -> Optional[Path]:
     if not pending.is_dir():
         return None
     phase_path = pending / PHASE_FILE
-    phase = json.loads(phase_path.read_text(encoding="utf-8")) if phase_path.is_file() else {}
+    phase = _read_phase(phase_path)
     aside = data_dir / ASIDE_DIR / (phase.get("stamp") or time.strftime("%Y%m%d-%H%M%S"))
     if phase.get("step") != "entering":
         aside.mkdir(parents=True, exist_ok=True)
@@ -236,8 +273,9 @@ def apply_pending_restore(data_dir) -> Optional[Path]:
         old_root = json.loads((pending / MANIFEST).read_text(encoding="utf-8")).get("data_dir")
     except (OSError, ValueError):
         old_root = None
-    for entry in _entries(pending, (PHASE_FILE, MANIFEST)):
-        os.replace(entry, data_dir / entry.name)
+    for entry in _entries(pending, (PHASE_FILE, MANIFEST, *KEPT_OUT)):
+        if entry.name.lower() not in {name.lower() for name in KEPT_OUT}:
+            os.replace(entry, data_dir / entry.name)
     _fix_memory_paths(data_dir, old_root)
     _clear_folder(pending)
     return aside

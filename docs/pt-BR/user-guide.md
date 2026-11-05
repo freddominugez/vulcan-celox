@@ -8,6 +8,7 @@
 - [Sites PHP](#projetos-php): Sites do Lerd: abrir, trocar PHP, HTTPS, logs e terminal.
 - [Lerd](#lerd): O ambiente que roda PHP, nginx, banco e HTTPS dos sites.
 - [Projetos Node](#node): Next.js, Vite, Supabase local e vínculo com a Vercel.
+- [Código](#codigo): A árvore inteira de um projeto e o que está sendo escrito no disco, ao vivo.
 - [Terminais e sessões](#terminais): Abas, painel de baixo e a memória de cada sessão.
 - [Depuração e logs](#depuracao): Dumps, queries, exceções e o laravel.log.
 - [Agentes](#agentes): Sessões do Claude Code e do Codex lidas do disco.
@@ -91,6 +92,26 @@ Projetos Node não usam o Lerd. O app lê o `package.json`, descobre o gerenciad
 - **Vercel:** o app só mostra se a pasta está vinculada (`.vercel/project.json`). Deploy e logs ficam no painel da Vercel ou no `vercel` do terminal.
 - O app nunca abre o `.env` do projeto e não fala com a Vercel nem com o Supabase remoto.
 
+<a id="codigo"></a>
+
+## Código
+
+*A árvore inteira de um projeto e o que está sendo escrito no disco, ao vivo.*
+
+A tela **Código** mostra a árvore inteira de uma pasta e acompanha o que é escrito no disco, por agente ou por qualquer outro programa, sem precisar de sessão. É só leitura: nada aqui escreve no projeto. A aba Código de uma sessão de agente continua existindo e mostra só o que aquela sessão tocou.
+
+1. Abra pela barra lateral, ou pelo botão **Abrir em Código** na página de um site, de um projeto Node ou de uma sessão. Sites, projetos Node e pastas de sessões aparecem sozinhos na lista; **Abrir pasta** acrescenta outra.
+2. Clique num arquivo, ou use as setas e Enter. Até 12 abas ficam abertas, e cada pasta lembra as suas.
+3. Deixe **Acompanhando** ligado para o visor ir ao arquivo que acabou de mudar. Qualquer gesto na árvore ou no visor pausa, e um clique no botão volta, indo à última mudança.
+
+- **Marcas:** A, M e D dizem o que é novo, alterado ou apagado desde que a tela abriu, comparando com uma foto do disco. Pasta recolhida com mudança dentro ganha um ponto. Arquivo apagado continua à vista, com um aviso.
+- **Quem escreveu:** o ponto colorido e a barra de baixo dizem o agente só quando a sessão daquela pasta registrou a mesma edição em até 60 s. Sem esse registro aparece **Mudança no disco**. O registro pode chegar um pouco depois da escrita, e a marca é atualizada.
+- **Diff contra o Git:** compara com o último commit.
+- **Marcas do Git:** numa pasta com Git, cada arquivo mostra **M** (alterado desde o último commit), **U** (novo, fora do Git) ou **D** (apagado do disco, ainda no Git, riscado). A pasta recolhida ganha um ponto quando tem algo marcado dentro, e a branch aparece acima da árvore. As marcas ao vivo ficam por cima. O app lê o índice do Git e compara tamanho e data com o disco, sem rodar `git status`: um arquivo só tocado também aparece como **M**.
+- **Ir para arquivo** (⌘P, ou Ctrl+Shift+P fora do Mac) filtra pelo nome. A lupa busca texto nos arquivos do Git; sem Git, a tela diz que a busca precisa dele.
+- **Recusas:** a pasta pessoal inteira, a raiz do disco, a pasta de dados do app e as dos agentes não abrem. `.env`, chaves e credenciais aparecem na árvore, mas o conteúdo não é exibido. Arquivo acima de 1 MB, binário e link para fora da pasta também não abrem.
+- **Limites:** mudança em pasta ignorada só aparece com a pasta aberta. Acima de 20 mil itens, só as pastas abertas e o arquivo aberto são observados, e a barra de baixo avisa. Em sistema de arquivos de rede, a data de modificação pode não ser confiável.
+
 <a id="terminais"></a>
 
 ## Terminais e sessões
@@ -102,7 +123,7 @@ Cada terminal é uma sessão. Ele abre na pasta escolhida, com um tema de cor qu
 - **Portas:** a aba mostra as portas que os processos dela abriram, como `:5173 +2`, na barra de abas e na lista de sessões. O clique abre `http://localhost:<porta>` no navegador. Só os processos da própria aba contam.
 - **⌘T** abre um terminal novo; **⌘J** mostra ou esconde o painel de terminal de baixo, nas telas que ainda não mostram um terminal.
 - **Comandos rápidos** do projeto (composer, artisan, npm) ficam na barra do terminal.
-- **Memória:** enquanto o terminal está aberto, o app mantém um arquivo Markdown com os comandos digitados, tarefas, post-its, tags e as últimas 2.000 linhas da saída. Senhas e chaves reconhecidas ficam gravadas como `[segredo]`, e o que você digita num pedido de senha oculto não é registrado. O reconhecimento é por padrão, então um segredo incomum pode passar, e no Windows o pedido oculto não pode ser detectado. Depois de fechar, o arquivo aparece em Sessões recentes e no Índice.
+- **Memória:** enquanto o terminal está aberto, o app mantém um arquivo Markdown com os comandos digitados, tarefas, post-its, tags e as últimas 2.000 linhas da saída. Senhas e chaves reconhecidas ficam gravadas como `[segredo]` (`[secret]` com a interface em inglês), e o que você digita num pedido de senha oculto não é registrado. O reconhecimento é por padrão, então um segredo incomum pode passar, e no Windows o pedido oculto não pode ser detectado. Depois de fechar, o arquivo aparece em Sessões recentes e no Índice.
 - **Destacar:** uma aba pode virar janela própria e voltar depois.
 
 <a id="depuracao"></a>
@@ -135,7 +156,7 @@ A tela **Agentes** lista as sessões do Claude Code e do Codex desta máquina, c
 
 **Navegar por pedido.** ⌘⇧↑ e ⌘⇧↓ saltam entre os pedidos. No terminal, cada Enter numa aba com agente vivo vira uma marca, sem desenhar nada na tela. Se o agente usar a tela inteira do terminal, não há histórico para navegar, e o app avisa uma vez. Na sessão, a **Linha do tempo** agrupa por pedido, com arquivos e comandos, e cada arquivo editado leva ao diff daquele pedido.
 
-**Estado do PR.** Por padrão o app estima pelos comandos da sessão e diz isso na tela. Ligue "Consultar o estado do PR no GitHub" em Configurações para ver número, rascunho, estado e checagens pelo seu próprio `gh`. Só essa opção usa a rede.
+**Estado do PR.** Por padrão o app estima pelos comandos da sessão e diz isso na tela. Ligue "Consultar o estado do PR no GitHub" em Configurações para ver número, rascunho, estado e checagens pelo seu próprio `gh`. Essa opção usa a rede só para essa consulta.
 
 **Aba Código.** Dentro de uma sessão, a aba **Código** mostra os arquivos que o agente tocou, com a marca de novo, editado, lido ou apagado. Você vê o arquivo com realce de sintaxe ou o diff: de uma edição, de um pedido inteiro ou contra o último commit, lado a lado ou unificado. ⌘F busca no arquivo. Numa sessão ativa o visor segue o agente, abrindo cada arquivo editado e rolando até o trecho. Rolar, clicar ou selecionar texto pausa, e **Voltar a seguir** retoma. Nas abas pareadas, o botão **Código** da barra acima do terminal leva direto para cá.
 
@@ -208,10 +229,11 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 *O que aparece na barra lateral e os ajustes do app, numa tela só.*
 
 - **Barra lateral:** marque o que quer ver. Vale para os itens do menu e para as listas abaixo dele (Sessões, Sites e Projetos Node). O que você esconder continua na busca (⌘K), e **Mostrar tudo** desfaz. Configurações não pode ser escondida, para você sempre poder voltar.
+- **Barra recolhida:** o botão no alto da barra, ou ⌘B, deixa só os ícones, num trilho estreito; passe o mouse para ver o nome. Sessões, Sites e Projetos Node viram um ícone cada, que abre a lista num menu. A escolha fica guardada; sem escolha, a janela abaixo de 1000 px já abre recolhida.
 - **Aparência:** tema (Sistema, Claro ou Escuro) e idioma (English ou Português).
 - **Ao iniciar:** mostrar ou não a tela de abertura, ligar o Lerd junto com o app, e perguntar a pasta ao abrir um terminal.
 - **Avisos e rede:** notificação quando um agente espera por você, consulta do estado do PR no GitHub (vem desligada) e aviso de versão nova (vem ligado, no máximo uma vez por dia, só lê o número da versão). Dá para desligar cada um.
-- **Backup e segredos:** **Fazer backup** salva todos os dados do app num .zip fora da pasta de dados. Vão tarefas, post-its, tags, memórias, prompts, preferências e o índice dos agentes, mas não a chave da Anthropic, que fica no sistema. O arquivo não é criptografado. **Restaurar** confere o arquivo e troca os dados quando você reabre o app; os dados atuais ficam na pasta `.restauros`. **Mascarar** reescreve as memórias gravadas antes de a máscara existir, e não tem volta.
+- **Backup e segredos:** **Fazer backup** salva todos os dados do app num .zip fora da pasta de dados. Vão tarefas, post-its, tags, memórias, prompts, preferências e o índice dos agentes, mas não a chave da Anthropic, que fica no sistema. O arquivo não é criptografado. **Conferir** lê o .zip sem extrair nada e mostra data, versão, tamanho e quanto há de cada coisa; só então **Restaurar** aparece, e nunca para um arquivo com erro. A troca acontece quando você reabre o app, e os dados atuais ficam na pasta `.restauros`. As **Cópias de restauração** listam essas pastas, e cada uma pode ir para a Lixeira. **Mascarar** reescreve as memórias gravadas antes de a máscara existir, e não tem volta.
 - **Chave da Anthropic:** usada só quando você pede uma documentação com IA.
 - **Sobre:** a versão instalada, se existe uma mais nova e a pasta com os seus dados. O app nunca baixa nem instala nada sozinho: o botão abre a página da versão.
 
@@ -227,11 +249,13 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 | `⌘T` | Terminal novo |
 | `⇧⌘T` | Terminal novo perguntando a pasta |
 | `⌘J` | Mostrar ou esconder o painel de terminal |
+| `⌘B` | Recolher a barra lateral num trilho de ícones, ou abri-la de novo |
 | `⌘⇧U` | Ir para o aviso de agente mais recente |
 | `⌘F` | Buscar no terminal |
 | `⇧⌘P` | Prompts |
 | `⇧⌘E` | Depuração |
 | `⌘1 a ⌘5` | Visão geral, Terminais, Tarefas, Post-its e Tags |
+| `⌘P` | Ir para um arquivo na tela Código |
 | `⌘?` | Ajuda |
 
 <a id="seguranca"></a>
@@ -243,7 +267,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 - O servidor interno só atende em `127.0.0.1`, com um token por execução. Nada fica exposto na rede.
 - Sessões dos agentes: só leitura, linha por linha. O app nunca escreve em `~/.claude`, `~/.codex` ou nos arquivos de configuração deles, exceto o hook de pareamento que você instala de propósito, com backup.
 - Pastas e arquivos de memória vão para a Lixeira. Tarefas, post-its e tags são apagados do app; só a última tarefa apagada pode ser desfeita.
-- Em pasta de projeto, o app só escreve quando você pede: arquivos novos de harness, contrato e prompt, sem sobrescrever, e um bloco marcado em `CLAUDE.md` ou `AGENTS.md` existente. A memória dos terminais fica na pasta de dados do app e guarda a saída sem máscara; a documentação com IA envia uma cópia mascarada à Anthropic.
+- Em pasta de projeto, o app só escreve quando você pede: arquivos novos de harness, contrato e prompt, sem sobrescrever, e um bloco marcado em `CLAUDE.md` ou `AGENTS.md` existente. A memória dos terminais fica na pasta de dados do app, com os segredos reconhecidos mascarados ao gravar; a documentação com IA envia à Anthropic só esse texto mascarado.
 - O `.env` dos projetos nunca é aberto.
 - A chave da Anthropic, se você cadastrar uma, fica no cofre de senhas do sistema (Keychain no macOS) e só é usada quando você clica para documentar uma sessão.
 
@@ -277,7 +301,11 @@ Outro processo usa a mesma porta, muitas vezes um `dev` antigo esquecido. Pare o
 
 **Como faço backup dos meus dados?**
 
-Em Configurações, Backup e segredos, escolha a pasta e clique em Fazer backup. Sai um .zip com tudo, menos a chave da Anthropic. Ele não é criptografado, então guarde-o em lugar seguro. Para voltar, use Restaurar no mesmo lugar e reabra o app.
+Em Configurações, Backup e segredos, escolha a pasta e clique em Fazer backup. Sai um .zip com tudo, menos a chave da Anthropic. Ele não é criptografado, então guarde-o em lugar seguro. Para voltar, escolha o arquivo, clique em Conferir, depois em Restaurar, e reabra o app.
+
+**Apareceu o aviso de que o servidor local parou.**
+
+O aviso mostra o código de saída e a última linha do erro. Ver log abre o arquivo `logs/servidor-erro.log` da pasta de dados, e Reiniciar servidor sobe outro sem fechar o app. Os terminais abertos morrem junto: a memória fica, e eles voltam como encerrados, com Retomar. O registro de cada execução fica em `logs/servidor.log`, sempre mascarado.
 
 **Uma senha que apareceu no terminal fica gravada?**
 
@@ -350,3 +378,15 @@ Em Configurações, na parte Aparência.
 **Onde cadastro a chave da Anthropic?**
 
 Em Configurações. Ela só é necessária para gerar documentação com IA; o resto do app funciona sem ela.
+
+**Como vejo um arquivo que o agente não tocou?**
+
+Abra a tela **Código**: ela mostra a árvore inteira da pasta. A aba Código da sessão mostra só o que aquela sessão tocou.
+
+**Por que aparece Mudança no disco em vez do agente?**
+
+O app só diz o nome do agente quando a sessão daquela pasta registrou a mesma edição em até 60 s. Formatador, gerador, `npm install` e outro editor não têm esse registro. O registro do agente também pode chegar um pouco depois da escrita: aí a marca muda sozinha.
+
+**As marcas de Git da tela Código rodam git status?**
+
+Não. `git status` e `git diff` no arquivo de trabalho executam programas definidos no próprio repositório, e o repositório pode ser de terceiros. As marcas M, U e D vêm do índice do Git comparado com o disco, sem ler conteúdo. Por isso um arquivo só tocado aparece como alterado. **Diff contra o Git** lê o último commit sem passar por esses programas.

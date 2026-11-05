@@ -95,7 +95,7 @@ if [ -f scripts/build_app.sh ]; then
 
   step "snapshot do app nativo (servidor embutido + interface web)"
   # the agent fixtures (CLAUDE_CONFIG_DIR, CODEX_HOME) enter through isolated_env; the snapshot fails on a JS error
-  for route in "#/overview" "#/terminals" "#/tasks" "#/agentes" "#/agentes/11111111-2222-4333-8444-555555555555" "#/agentes/historico" "#/agentes/branches" "#/prompts" "#/ambiente" "#/depuracao"; do
+  for route in "#/overview" "#/codigo" "#/terminals" "#/tasks" "#/agentes" "#/agentes/11111111-2222-4333-8444-555555555555" "#/agentes/historico" "#/agentes/branches" "#/prompts" "#/ambiente" "#/depuracao"; do
     shot="$TMP_ROOT/snapshot-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait 3 \
       --eval "$CLIP_JS"
@@ -126,11 +126,12 @@ if [ -f scripts/build_app.sh ]; then
   for pair in "#/ambiente|'[data-xdebug]', '.env-panel'" \
               "#/inicio|'.in-steps', '.in-area[data-card=depuracao]', '.in-area[data-card=prompts]', '.in-area[data-card=config]', '.in-area.is-static', '.in-dismiss input[type=checkbox]'" \
               "#/ajuda|'.hp-toc', '.hp-search input', '.hp-faq details:nth-of-type(15)'" \
-              "#/config|'[data-side=tags]', '[data-theme=escuro]', '[data-lang=pt]', '[data-cf=welcome]', '[data-role=key] .key-form', '[data-cf-action=open-data]', '[data-data=backup]', '[data-data=restore]', '[data-data=mask]', '[data-cf=update]', '[data-role=update]'" \
+              "#/config|'[data-side=tags]', '[data-theme=escuro]', '[data-lang=pt]', '[data-cf=welcome]', '[data-role=key] .key-form', '[data-cf-action=open-data]', '[data-data=backup]', '[data-data=inspect]', '[data-data=mask]', '[data-cf=update]', '[data-role=update]'" \
               "#/lerd|'.nav-item.is-on .nav-dot.dot-ok', '.env-panel', '.env-head [data-service=start]'" \
               "#/depuracao|'.debug-group', '.debug-repeat', '.k-log.log-err'" \
               "#/sites/loja/debug|'.debug-group'" \
               "#/sites/loja/logs|'.logs'" \
+              "#/sites/loja/tasks|'.ws-body'" \
               "#/agentes/11111111-2222-4333-8444-555555555555|'[data-action=debug-copy]'" \
               "#/sites/vulcan-demo/harness|'.hs-bar', '.hs-item.is-bloqueado', '.hs-pre'" \
               "#/agentes/uso/2026-10-31|'.us-kpis', '.us-seg.us-claude', '.us-seg.us-codex', '.us-note', '.us-link'" \
@@ -140,6 +141,8 @@ if [ -f scripts/build_app.sh ]; then
     shot="$TMP_ROOT/lerd-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     extra=""; wait_s=4
     if [ "$route" = "#/depuracao" ]; then extra="$SEL_JS"; wait_s=7; fi
+    # light theme: the tabs of a site follow the page, and the title of a task can be read
+    if [ "$route" = "#/sites/loja/tasks" ]; then extra="$(cat tests/tools/sensor_abas_tema_claro.js)"; wait_s=6; fi
     # the guide screenshot must really load
     # searching for "custo" leaves only sections and questions with that word in view
     # the ? button on the Uso e custo screen leads to the custo section of Help
@@ -162,13 +165,13 @@ if [ -f scripts/build_app.sh ]; then
       var i = document.querySelector('.pc-field input[name=branch]'); if (!i || !document.querySelector('.pc-preview mark')) return;
       i.value = 'teste-do-sensor'; i.dispatchEvent(new Event('input', { bubbles: true }));
       if (document.querySelector('.pc-preview').textContent.indexOf('teste-do-sensor') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 2500);"; wait_s=5; fi
-    # fixed groups, no item lost (17, with Configurações and without the Sites PHP shortcut) and the Agentes group collapses and comes back
+    # fixed groups, no item lost (18, with Configurações and without the Sites PHP shortcut) and the Agentes group collapses and comes back
     # keyboard focus stays on the group header after collapsing
     # the palette (⌘K) opens and lists: it was the only part of the old app.mjs without a script
     if [ "$route" = "#/overview" ]; then extra="setTimeout(function () {
       var ids = Array.prototype.map.call(document.querySelectorAll('.nav-group'), function (g) { return g.dataset.group; }).join(',');
       if (ids !== 'geral,projetos,ambiente,agentes,organizar,ajuda') window.__vtErrors.push('grupos: ' + ids);
-      var n = document.querySelectorAll('#nav .nav-item').length; if (n !== 17) window.__vtErrors.push('itens na barra: ' + n);
+      var n = document.querySelectorAll('#nav .nav-item').length; if (n !== 18) window.__vtErrors.push('itens na barra: ' + n);
       document.querySelector('[data-nav-group=agentes]').click();
       var c = document.querySelectorAll('.nav-group[data-group=agentes] .nav-item').length;
       document.querySelector('[data-nav-group=agentes]').click();
@@ -194,7 +197,8 @@ if [ -f scripts/build_app.sh ]; then
       setTimeout(function () {
         var still = Array.prototype.some.call(document.querySelectorAll('#nav .nav-item'), function (n) { return n.getAttribute('href') === '#/tags'; }); if (still) window.__vtErrors.push('item escondido continua na barra');
         else window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
-        document.querySelector('[data-cf-action=sidebar-reset]').click(); }, 900); }, 2500);"; wait_s=6; fi
+        document.querySelector('[data-cf-action=sidebar-reset]').click(); }, 900); }, 2500);
+      setTimeout(function () { if (document.querySelector('#app.is-offline')) window.__vtErrors.push('aviso de servidor indisponível com o servidor no ar'); }, 5500);"; wait_s=6; fi
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \
       --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
   done
@@ -205,6 +209,18 @@ if [ -f scripts/build_app.sh ]; then
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/lerd-node.png" --route "#/node" --wait 5 \
       --eval "$NODE_JS $(expect "'.np-scripts', '.np-supabase', '.np-vercel', '#node-list .site-item'") $CLIP_JS" \
       || { lerd_ok=1; echo "falhou com Lerd simulado: #/node/painel"; }
+  fi
+  # no control out of the window, no horizontal scroll and targets at the minimum, from the smallest accepted width to the default window
+  if [ "$lerd_ok" -eq 0 ]; then
+    for size in 900x640 1280x820 1320x840; do
+      for route in "#/sites/loja/terminal" "#/overview" "#/config" "#/codigo"; do
+        lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --size "$size" --snapshot "$TMP_ROOT/largura.png" --route "$route" --wait 4 \
+          --eval "$(cat tests/tools/sensor_larguras.js)" || { lerd_ok=1; echo "falhou em $size: $route"; }
+      done
+    done
+    TASKS_JS="import('./js/api.mjs').then(function (m) { return m.post('/api/tasks', { title: 'Revisar o fluxo de pagamento com um nome bem longo que precisa caber', tags: ['etiqueta-longa'], priority: 1, assignee: 'alguem', due: '2026-12-01' }); }).then(function () { location.hash = '#/tasks'; });"
+    lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --size 900x640 --snapshot "$TMP_ROOT/largura.png" --route "#/overview" --wait 5 \
+      --eval "$TASKS_JS $(cat tests/tools/sensor_larguras.js)" || { lerd_ok=1; echo "falhou: tarefas em 900 px"; }
   fi
   kill "$LERD_API_PID" 2>/dev/null || true
   wait "$LERD_API_PID" 2>/dev/null || true
@@ -226,9 +242,18 @@ if [ -f scripts/build_app.sh ]; then
   isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-alterna.port")" \
     "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/lerd-alterna.png" --route "#/prompts" \
     --wait 16 --eval "$KEEP_JS" || alt_ok=1
+  # the Logs tab of a site that leaves the list: an empty state with the message, never an error on its own
+  LOGS_JS="(function () { var tag = 'aba Logs sem o estado vazio do site que saiu'; window.__vtErrors.push(tag);
+    var t = setInterval(function () { var e = document.querySelector('.logs-body .empty-block h3, .page .empty-block h3');
+      if (e && /alterna/.test(e.textContent)) { clearInterval(t); window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); } }, 200); })();"
+  isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-alterna.port")" \
+    "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/lerd-alterna-logs.png" --route "#/sites/alterna/logs" \
+    --wait 12 --eval "$LOGS_JS" || alt_ok=2
+  isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/logs-sem-site.png" --route "#/sites/nao-existe/logs" \
+    --wait 3 --eval "$(expect "'.page .empty-block h3'")" || alt_ok=3
   kill "$ALT_PID" 2>/dev/null || true
   wait "$ALT_PID" 2>/dev/null || true
-  [ "$alt_ok" -eq 0 ] || { echo "falhou: #/prompts com a lista de sites mudando"; exit 1; }
+  [ "$alt_ok" -eq 0 ] || { echo "falhou: telas com a lista de sites mudando ($alt_ok)"; exit 1; }
 
   step "janela presa à origem do app"
   # another origin that really responds: without the navigation policy the window would go there and the snapshot exits with 4

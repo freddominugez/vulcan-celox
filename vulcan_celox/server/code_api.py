@@ -179,6 +179,10 @@ class CodeService:
             return None
         out = {"path": str(real), "kind": "dir" if real.is_dir() else "file",
                "sensitive": code_files.is_sensitive(candidate) or code_files.is_sensitive(str(real))}
+        if out["kind"] == "file":
+            # without a session the click goes to the Code screen, in the deepest known folder that holds the file
+            holder = max((r for r in roots if real.is_relative_to(r)), key=lambda r: len(r.parts))
+            out["root"], out["rel"] = str(holder), real.relative_to(holder).as_posix()
         if paired is not None and out["kind"] == "file":
             try:
                 if self._inside(str(real), self.roots(paired)):

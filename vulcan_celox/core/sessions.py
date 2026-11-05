@@ -40,12 +40,12 @@ class SessionRecord:
 
     @classmethod
     def from_dict(cls, data) -> Optional["SessionRecord"]:
-        if not isinstance(data, dict) or not data.get("id"):
+        if not isinstance(data, dict) or not data.get("id") or not isinstance(data["id"], str):
             return None
         names = {f.name for f in fields(cls)}
         record = cls(**{k: v for k, v in data.items() if k in names})
-        record.tags = [t for t in (record.tags or []) if isinstance(t, str)]
-        record.commands = [c for c in (record.commands or []) if isinstance(c, dict) and c.get("cmd")]
+        record.tags = [t for t in (record.tags if isinstance(record.tags, list) else []) if isinstance(t, str)]
+        record.commands = [c for c in (record.commands if isinstance(record.commands, list) else []) if isinstance(c, dict) and c.get("cmd")]
         return record
 
 
@@ -137,7 +137,8 @@ class SessionStore:
         self.store = store
         self._lock = threading.RLock()
         self._records: Dict[str, SessionRecord] = {}
-        for raw in store.load(SESSIONS_FILE, []):
+        saved = store.load(SESSIONS_FILE, [])
+        for raw in saved if isinstance(saved, list) else []:
             record = SessionRecord.from_dict(raw)
             if record:
                 self._records[record.id] = record

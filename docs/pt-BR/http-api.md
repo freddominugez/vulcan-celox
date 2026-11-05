@@ -81,8 +81,8 @@ Arquivos estáticos: qualquer caminho fora de `/api/` e `/ws/` serve a interface
 |--------|---------|----------|---------------------|-------------------|
 | GET | `/api/state` | App, backend, estado do ambiente, início automático, sites, favoritos e progresso | | |
 | GET | `/api/app/build` | Versão e impressão digital da interface carregada e da instalada | | |
-| PATCH | `/api/preferences` | Mudar preferências | `autostart_env` (bool), `new_terminal` (`skip_folder`, `agent`), `sidebar_hidden` (lista de itens da barra lateral) | 400 |
-| POST | `/api/open` | Abrir algo fora do app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source` ou `file`; `target` | 400, 404, 409, 500 |
+| PATCH | `/api/preferences` | Mudar preferências | `autostart_env`, `attention_notify`, `pr_status` (bool), `theme` (`sistema`, `claro`, `escuro`), `language` (`en`, `pt`), `new_terminal` (`skip_folder`, `agent`), `sidebar_hidden` (lista de itens da barra lateral), `sidebar_collapsed` (bool; `null` na resposta enquanto ninguém escolheu) | 400 |
+| POST | `/api/open` | Abrir algo fora do app | `kind`: `url`, `dashboard`, `finder`, `editor`, `prompt`, `source`, `file`, `session_file`, `code_file` ou `terminal_file`; `target` (mais `session`, `root` ou `terminal` nos três últimos) | 400, 403, 404, 409, 500 |
 | GET | `/api/guide` | Passos do guia do Início | | |
 | PUT | `/api/guide` | Pular ou restaurar o guia, ou dispensar o passo do Lerd | `skipped`, `lerd_skipped` (bool) | 400 |
 | POST | `/api/guide/lerd/install` | Abre um terminal à vista com o instalador oficial do Lerd | | 409 no Windows |
@@ -92,6 +92,9 @@ Arquivos estáticos: qualquer caminho fora de `/api/` e `/ws/` serve a interface
 | GET | `/api/data/backup` | Pasta do backup, último backup e se há restauração preparada | | |
 | POST | `/api/data/backup` | Grava um `.zip` da pasta de dados | `folder` | 400 dentro da pasta de dados |
 | POST | `/api/data/restore` | Confere um backup e o prepara para o próximo início | `path` | 400 se recusado |
+| POST | `/api/data/backup/inspect` | Lê um backup sem extrair nada: data, versão, tamanho, contagem por tipo e avisos. Acima de 20 mil membros ou 2 GB descomprimidos, é recusado | `path` | 400 se o arquivo não existe |
+| GET | `/api/data/restores` | As cópias que uma restauração guardou em `.restauros/`, com nome, data e tamanho | | |
+| POST | `/api/data/restores/trash` | Manda uma cópia para a Lixeira | `name` (precisa estar na lista) | 400 |
 | POST | `/api/data/mask-saved` | Mascara segredos em memórias e comandos já gravados. Não tem volta | | |
 | GET | `/api/themes` | Temas das abas, rotação, temas em uso e preferências de terminal | | |
 
@@ -299,6 +302,23 @@ Id desconhecido devolve 404. Valor inválido devolve 400. Em `site`, `*` signifi
 |--------|---------|----------|---------------------|-------------------|
 | GET | `/api/fs/folder` | Conferir uma pasta digitada; aceita `~` | Query: `path` | 400 |
 | GET | `/api/fs/recent` | Pasta pessoal e até 12 pastas recentes | | |
+
+### Tela Código
+
+Só leitura: a única escrita põe ou tira uma pasta da lista do próprio app. `root` precisa ser uma pasta que o app conhece ou que foi escolhida; `path` é relativo a ela.
+
+| Método | Caminho | Para quê | Parâmetros ou corpo | Status relevantes |
+|--------|---------|----------|---------------------|-------------------|
+| GET | `/api/files/roots` | Pastas da tela Código: as conhecidas e as escolhidas | | |
+| POST | `/api/files/roots` | Escolher uma pasta (no máximo 50) | `path` | 400, 403 |
+| DELETE | `/api/files/roots` | Tirar uma pasta escolhida da lista. Nada é apagado | Query: `path` | 400 |
+| GET | `/api/files/tree` | Uma pasta da árvore, com os ignorados marcados | Query: `root`, `path` | 400, 403, 404 |
+| GET | `/api/files/read` | Texto de um arquivo, com as mesmas regras do visor de código | Query: `root`, `path` | 400, 403, 404, 413 |
+| GET | `/api/files/diff` | O arquivo contra o último commit, lido com `cat-file` | Query: `root`, `path` | 400, 403 |
+| GET | `/api/files/changes` | O que mudou no disco desde o cursor, com o autor quando uma sessão de agente registrou | Query: `root`, `since`, `open` (repetível), `file` | 400, 403 |
+| GET | `/api/files/search` | Busca de texto nos arquivos do Git, sem textconv | Query: `root`, `q` | 400 |
+| GET | `/api/files/photo` | Arquivos da foto atual do disco, para a abertura rápida | Query: `root` | 400, 403 |
+| GET | `/api/files/git` | Estado do Git por arquivo (`M`, `U`, `D`), do índice comparado com o disco, com a branch. Guardado por raiz | Query: `root` | 400, 403 |
 
 ## WebSocket
 

@@ -10,6 +10,7 @@ import { AGENT_NAV, HELP_NAV, NAV, app } from "./app-state.mjs";
 import { renderSidebar } from "./sidebar.mjs";
 import { palette } from "./palette.mjs";
 import { bindGlobalEvents } from "./global-events.mjs";
+import { bindServerDown } from "./server-down.mjs";
 import { mountView } from "./view-mount.mjs";
 import { t, translateStatic } from "./i18n.mjs";
 
@@ -26,6 +27,7 @@ function parseRoute(hash) {
   if (parts[0] === "lerd") return { name: "ambiente" };
   if (parts[0] === "config") return { name: "config" };
   if (parts[0] === "ajuda") return { name: "ajuda", section: parts[1] || null };
+  if (parts[0] === "codigo") return { name: "codigo", root: parts[1] || null, file: parts[2] || null, line: Number(parts[3]) || 0 };
   if (parts[0] === "node") return parts[1] ? { name: "node-projeto", project: parts[1] } : { name: "node" };
   if (parts[0] === "agentes") {
     if (parts[1] === "historico") return { name: "agentes-historico" };
@@ -115,19 +117,29 @@ async function noticeNewVersion() {
 }
 
 export async function refreshState() {
+  let fresh;
+  try {
+    fresh = await get("/api/state");
+  } catch (err) {
+    // only a failed request means the server is gone: an error drawing a screen is not this notice
+    $("#app").classList.add("is-offline");
+    if (err.status === 401) toast(t("Sessão inválida: abra o app pelo Vulcan Celox."), { kind: "error", timeout: 10000 });
+    return;
+  }
+  $("#app").classList.remove("is-offline");
   try {
     const previous = app.state;
-    app.state = await get("/api/state");
+    app.state = fresh;
     await loadNodeProjects(false);
     if (app.current) app.current.refresh();
     const sitesChanged = !previous || JSON.stringify(previous.sites) !== JSON.stringify(app.state.sites);
     reportAutostart(app.state.autostart);
     if (app.tree) app.tree.load();
     if (!previous) {
+      if (app.state.restore_error) toast(app.state.restore_error, { kind: "error", timeout: 20000 });
       noticeNewVersion();
       renderSidebar();
       renderToolbar();
-      $("#app").classList.remove("is-offline");
       return;
     }
     if (sitesChanged && remountsOnSites(app.route.name)) {
@@ -137,10 +149,8 @@ export async function refreshState() {
     }
     renderSidebar();
     renderToolbar();
-    $("#app").classList.remove("is-offline");
   } catch (err) {
-    $("#app").classList.add("is-offline");
-    if (err.status === 401) toast(t("Sessão inválida: abra o app pelo Vulcan Celox."), { kind: "error", timeout: 10000 });
+    console.error(err);  // eslint-disable-line no-console
   }
 }
 
@@ -256,7 +266,12 @@ export async function runCommand(name) {
   if ((name === "newTerminal" || name === "newTerminalOptions") && app.panel && app.panel.available) {
     return app.panel.newTerminal(name === "newTerminalOptions" ? { ask: true } : {});
   }
-  if (name === "togglePanel") return app.panel && app.panel.available ? app.panel.toggle() : null;
+  if (name === "togglePanel") {
+    if (app.panel && app.panel.available) return app.panel.toggle();
+    // site and Terminals screens already show the terminals: the bottom panel stays hidden there
+    return toast(t("Esta tela já mostra os terminais. O painel de baixo fica nas outras telas."), { timeout: 3500 });
+  }
+  if (name === "popoutTerminal" && app.panel && app.panel.available && app.panel.ws) return app.panel.ws.popoutActive();
   if (name === "find" && app.panel && app.panel.available) return app.panel.find() || null;
   if (name === "newTerminal" || name === "newTerminalOptions") {
     const site = currentSite();
@@ -317,7 +332,9 @@ function boot() {
   }
   if (!isNative) document.body.classList.add("is-browser");
   if (!isMac) $$("kbd[data-mac-shortcut]").forEach((kbd) => { kbd.textContent = kbd.textContent.replace("⌘", "Ctrl+⇧+"); });
+  $(".toolbar").dataset.offline = t("servidor local indisponível, tentando reconectar");
   bindGlobalEvents();
+  bindServerDown();
   const explicit = Boolean(location.hash && location.hash !== "#" && location.hash !== "#/");
   terminals.sync().then(() => { if (app.panel) app.panel.collapseIfEmpty(); }).catch(reportError);
   refreshState().then(async () => {

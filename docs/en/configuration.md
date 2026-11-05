@@ -33,15 +33,18 @@ Linux launcher: `vulcan-celox --check`, `vulcan-celox --instalar-dependencias`.
 | `%APPDATA%\VulcanCelox` | Windows data folder |
 | `<data>/agentes.db` | Disposable SQLite index of agent sessions |
 | `<data>/precos.json` | Your price overrides; beats the built-in table |
+| `<data>/code_roots.json` | Folders chosen on the Code screen, at most 50 |
 | `<data>/prompts/` | Global prompts |
 | `<data>/sessoes/` | Session memories in Markdown |
+| `<data>/.app.lock` | Marks the folder as in use, so a restore waits for the previous instance to leave. Not included in backups |
 | `<data>/.restauros/` | Data set aside by a restore, one folder per date. Not included in backups |
+| `<data>/logs/` | `servidor.log` (server log, 1 MB and 3 files) and `servidor-erro.log` (process error output, cut at startup above 1 MB). Masked, 0600, left out of backups |
 | `<data>/pairings/` | Written by the optional hook |
 | `<data>/TAREFAS.md`, `INDICE.md` | Generated indexes |
 | `<project>/.vulcan/prompts/` | Project prompts, created only with confirmation |
 | `<project>/TAREFAS.md` | Opt-in, written only inside a marked block |
 
-A corrupted JSON file or database is renamed to `*.corrupt-<timestamp>` and the app starts with defaults.
+A file that is not valid JSON, or a corrupted database, is renamed to `*.corrupt-<timestamp>` and the app starts with defaults. A valid file of the wrong shape is ignored where it is read, and the app still opens.
 
 ## Environment variables
 

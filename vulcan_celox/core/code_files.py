@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable
 
 MAX_BYTES = 1024 * 1024
-SENSITIVE_NAMES = (".env*", "*.pem", "*.key", "id_rsa*", "credentials*")
+SENSITIVE_NAMES = (".env*", "*.pem", "*.key", "*.p12", "*.pfx", "id_rsa*", "id_dsa*", "id_ecdsa*", "id_ed25519*", "credentials*", ".netrc",
+                   ".git-credentials", ".npmrc", ".pypirc", "auth.json", "secrets.*")
 SENSITIVE_DIRS = (".git", ".ssh", ".aws", ".gnupg")
 LANGUAGES = {
     ".php": "php", ".phtml": "php", ".js": "javascript", ".mjs": "javascript", ".cjs": "javascript", ".jsx": "jsx",

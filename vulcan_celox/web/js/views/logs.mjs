@@ -44,7 +44,20 @@ export class LogsView {
   async load() {
     if (this.paused) return;
     const url = `/api/sites/${encodeURIComponent(this.site.name)}/log${this.offset === null ? "" : `?offset=${this.offset}`}`;
-    const data = await get(url);
+    let data;
+    try {
+      data = await get(url);
+    } catch (err) {
+      // the site left the list while the tab was open (removed, or the environment stopped): say so, and keep asking
+      if (err.status === 404) {
+        this.offset = null;
+        this.entries = [];
+        const title = t("Site “{site}” não encontrado", { site: esc(this.site.name) });
+        const note = t("O site saiu da lista do ambiente. Os logs voltam quando ele voltar.");
+        this.body.innerHTML = `<div class="empty-block"><h3>${title}</h3><p>${note}</p></div>`;
+      }
+      return;
+    }
     this.path = data.path;
     this.folder = data.folder;
     this.exists = data.exists;

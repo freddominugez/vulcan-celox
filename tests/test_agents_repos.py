@@ -14,7 +14,7 @@ NOW = datetime(2026, 10, 30, 12, 0, tzinfo=timezone.utc)
 WRITE_VERBS = ("commit", "push", "add", "remove", "prune", "checkout", "reset", "stash")
 
 
-SAFE = ["git", "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false", "--no-optional-locks"]
+SAFE = list(repos.SAFE_GIT)
 
 
 def git(path, *args):
@@ -24,7 +24,8 @@ def git(path, *args):
 def repo(runner, path, branch="main", status="", ahead="0", worktrees=None):
     runner.respond(git(path, "rev-parse", "--is-inside-work-tree"), Result(0, "true\n"))
     runner.respond(git(path, "rev-parse", "--abbrev-ref", "HEAD"), Result(0, branch + "\n"))
-    runner.respond(git(path, "status", "--porcelain"), Result(0, status))
+    runner.respond(git(path, "ls-files", "-s", "--debug"), Result(0, ""))
+    runner.respond(git(path, "ls-files", "-o", "--exclude-standard", "--directory"), Result(0, status))
     runner.respond(git(path, "rev-list", "--count", "@{u}..HEAD"),
                    Result(0, ahead + "\n") if ahead is not None else Result(128, "", "no upstream"))
     if worktrees is not None:

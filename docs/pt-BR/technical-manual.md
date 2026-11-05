@@ -141,6 +141,12 @@ Nos dois últimos modos o token nunca vai para uma linha de comando. Uma página
 | `core/redact.py` | Mascara segredos antes de o texto ir para um arquivo de memória ou sair da máquina. Devolve o texto e a contagem. |
 | `core/memory_mask.py` | Reescreve memórias gravadas antes de a máscara existir, só a pedido do usuário. |
 | `core/backup.py` | `.zip` de backup da pasta de dados, validação da restauração e a troca ao abrir. |
+| `core/backup_inspect.py` | Lê um backup sem extrair (data, versão, tamanho, contagens, avisos; no máximo 20 mil membros e 2 GB), lista as cópias de `.restauros/` e confere o nome antes de ir para a Lixeira. |
+| `core/data_lock.py` | Trava compartilhada da pasta de dados: a restauração espera a instância anterior sair. |
+| `core/server_log.py` | `logs/servidor.log` (1 MB, 3 arquivos) e a saída de erro em `logs/servidor-erro.log`, 0600, mascarados linha a linha, com o token trocado por `[token]`. |
+| `core/file_tree.py` | Tela Código: uma pasta por vez, ignorados por `ls-files -o -i`, caminho relativo conferido, busca de texto com `grep --no-textconv`. |
+| `core/file_watch.py` | Tela Código: foto do disco com `os.scandir` (tamanho, data, tipo), comparada a cada varredura, com orçamento de 20 mil entradas. |
+| `core/git_marks.py` | Estado do Git por arquivo (`M`, `D`, `U`) a partir de `ls-files -s --debug` comparado com `lstat` e de `ls-files -o`, sem rodar os filtros do repositório. Também a contagem `dirty` de Branches. |
 | `core/update_check.py` | Lê no GitHub a versão da última Release estável, com o `gh` do usuário como alternativa. |
 | `core/doctor.py` | Monta o JSON do `--doctor`. |
 | `core/miniyaml.py` | Parser mínimo de YAML em bloco, sem dependência, usado nos arquivos do Lerd e nos cabeçalhos de prompt. |
@@ -245,6 +251,10 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 | `server/node_api.py` | `/api/node-projects/*`. |
 | `server/guide_api.py` | `/api/guide`: os quatro passos da tela Início e a escolha de pular. |
 | `server/data_api.py` | `/api/data/*`: backup, restauração e máscara do que já foi gravado. Também registra o aviso de versão. |
+| `server/files_api.py` | `/api/files/*`: a tela Código, só leitura, mais `/api/files/git` com as marcas guardadas por raiz. |
+| `server/code_roots.py` | Pastas que a tela Código pode abrir: as conhecidas e até 50 escolhidas, com as recusas. |
+| `server/files_agents.py` | Quem escreveu um arquivo na tela Código: uma sessão de agente que registrou a mesma edição em até 60 s. |
+| `server/sidebar_prefs.py` | O que as Configurações podem esconder da barra lateral, e a barra recolhida num trilho (`sidebar_collapsed`). |
 | `server/update_api.py` | `/api/update*`: aviso de versão nova, no máximo uma consulta por dia. |
 | `server/fs_api.py` | Conferência de pasta e pastas recentes para o diálogo "abrir terminal em". |
 | `server/autostart.py` | `EnvAutostart`: inicia o Lerd ou o Valet junto com o app, em segundo plano, se estiver parado. |

@@ -47,6 +47,56 @@ class DataApiTest(ServerTestCase):
         self.assertEqual(mask_saved_memories(self.app.data_dir), (0, 0))  # a second run finds nothing
 
 
+class RestoresApiTest(ServerTestCase):
+    def setUp(self):
+        super().setUp()
+        aside = Path(self.app.data_dir) / ".restauros"
+        self.copy = aside / "20261105-101500"
+        self.copy.mkdir(parents=True)
+        (self.copy / "tasks.json").write_text("antigo", encoding="utf-8")
+        (aside / "solto.txt").write_text("x", encoding="utf-8")
+        self.outside = self.tmp / "fora"
+        self.outside.mkdir()
+        (self.outside / "importante.txt").write_text("x", encoding="utf-8")
+        (aside / "20261105-101501").symlink_to(self.outside)
+
+    def test_lista_so_copias_de_verdade(self):
+        status, data = self.request("GET", "/api/data/restores")[:2]
+        self.assertEqual(status, 200)
+        self.assertEqual([r["name"] for r in data["restores"]], ["20261105-101500"])
+        self.assertEqual(data["restores"][0]["size"], len("antigo"))
+
+    def test_recusas_sem_tocar_em_nada(self):
+        for name in ("../..", "20261105-101500/..", "..", "20991231-000000", "20261105-101501", "solto.txt", 3, None):
+            with self.subTest(name=name):
+                self.assertEqual(self.request("POST", "/api/data/restores/trash", {"name": name})[0], 400)
+        self.assertTrue((self.outside / "importante.txt").is_file())
+        self.assertTrue(self.copy.is_dir())
+        self.assertEqual(self.fake.calls, [])
+
+    def test_vai_para_a_lixeira_e_nada_e_apagado(self):
+        status, data = self.request("POST", "/api/data/restores/trash", {"name": "20261105-101500"})[:2]
+        self.assertEqual(status, 200)
+        self.assertEqual(data["restores"], [])
+        self.assertTrue(any("osascript" in c.argv[0] or "gio" in c.argv[0] for c in self.fake.calls))
+        # the fake Trash does nothing: the folder ends up in the app's own trash folder, whole
+        kept = list((Path(self.app.data_dir) / "lixeira").glob("*-20261105-101500/tasks.json"))
+        self.assertEqual(len(kept), 1)
+        self.assertEqual(kept[0].read_text(encoding="utf-8"), "antigo")
+
+
+class InspectApiTest(ServerTestCase):
+    def test_confere_sem_preparar(self):
+        made = self.request("POST", "/api/data/backup", {"folder": str(self.tmp / "bk")})[1]["created"]["path"]
+        status, data = self.request("POST", "/api/data/backup/inspect", {"path": made})[:2]
+        self.assertEqual(status, 200)
+        self.assertTrue(data["ok"])
+        self.assertIn("counts", data)
+        self.assertFalse((Path(self.app.data_dir) / PENDING_DIR).exists())
+        self.assertEqual(self.request("POST", "/api/data/backup/inspect", {"path": str(self.tmp / "x.zip")})[0], 400)
+        self.assertEqual(self.request("POST", "/api/data/backup/inspect", {"path": ""})[0], 400)
+
+
 class PendingRestoreOnStartTest(ServerTestCase):
     def test_app_aplica_ao_abrir(self):
         from vulcan_celox.core.backup import create_backup, prepare_restore

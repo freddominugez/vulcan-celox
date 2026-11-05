@@ -4,6 +4,7 @@ import { get, post } from "./api.mjs";
 import { esc, reportError } from "./dom.mjs";
 import { t } from "./i18n.mjs";
 import { confirmDialog } from "./ai.mjs";
+import { terminals } from "./terminals.mjs";
 
 export async function installLerd() {
   try {
@@ -19,6 +20,7 @@ export async function installLerd() {
     });
     if (!yes) return;
     const session = await post("/api/guide/lerd/install", {});
+    await terminals.sync();
     location.hash = `#/terminals/terminal/${encodeURIComponent(session.id)}`;
   } catch (err) {
     reportError(err);

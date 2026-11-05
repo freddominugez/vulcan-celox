@@ -69,9 +69,50 @@ function extensions(CM, language, phrases = PHRASES) {
   ];
 }
 
+let lineMarks = null;
+
+/** Lines marked by the Code screen until the next change. Follows the text if something above them changes. */
+function lineMarksField(CM) {
+  if (lineMarks) return lineMarks;
+  const set = CM.StateEffect.define();
+  const field = CM.StateField.define({
+    create: () => CM.Decoration.none,
+    update(marks, tr) {
+      let next = marks.map(tr.changes);
+      for (const effect of tr.effects) if (effect.is(set)) next = effect.value;
+      return next;
+    },
+    provide: (f) => CM.EditorView.decorations.from(f),
+  });
+  lineMarks = { set, field, line: CM.Decoration.line({ class: "ce-changed-line" }) };
+  return lineMarks;
+}
+
+/** New content in the same editor, changing only the stretch that differs: scroll and selection stay, and the changed lines light up. */
+export function updateFile(CM, viewer, next, lines = [], { reveal = false } = {}) {
+  const view = viewer.editor;
+  const { set, line } = lineMarksField(CM);
+  const current = view.state.doc.toString();
+  let start = 0;
+  const shortest = Math.min(current.length, next.length);
+  while (start < shortest && current[start] === next[start]) start += 1;
+  let endA = current.length;
+  let endB = next.length;
+  while (endA > start && endB > start && current[endA - 1] === next[endB - 1]) {
+    endA -= 1;
+    endB -= 1;
+  }
+  const changes = current === next ? [] : { from: start, to: endA, insert: next.slice(start, endB) };
+  const doc = CM.EditorState.create({ doc: next }).doc;
+  const ranges = lines.filter((n) => n >= 1 && n <= doc.lines).map((n) => line.range(doc.line(n).from));
+  const effects = [set.of(CM.Decoration.set(ranges))];
+  if (reveal && ranges.length) effects.push(CM.EditorView.scrollIntoView(ranges[0].from, { y: "center" }));
+  view.dispatch({ changes, effects });
+}
+
 /** Whole file. `setText` swaps the content without remounting, and `reveal` scrolls to the range and marks it. */
 export function mountFile(CM, parent, text, language, phrases) {
-  const view = new CM.EditorView({ parent, state: CM.EditorState.create({ doc: text, extensions: extensions(CM, language, phrases) }) });
+  const view = new CM.EditorView({ parent, state: CM.EditorState.create({ doc: text, extensions: [...extensions(CM, language, phrases), lineMarksField(CM).field] }) });
   return {
     editor: view,
     setText(next) {

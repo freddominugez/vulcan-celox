@@ -4,7 +4,7 @@ import time
 import unittest
 from pathlib import Path
 
-from tests.helpers import GOLDEN, TempDirTestCase
+from tests.helpers import FIXTURES, GOLDEN, TempDirTestCase
 from tests.server_helpers import ServerTestCase
 from vulcan_celox.core.models import Note, Tag, Task
 from vulcan_celox.core.session_memory import (MAX_TRANSCRIPT_LINES, extract_transcript, format_duration,
@@ -40,6 +40,16 @@ class RenderTest(TempDirTestCase):
         transcript, _ = strip_terminal(RAW)
         text = render_session_md(record, tasks, notes, tags, transcript)
         self.assertEqual(extract_transcript(text), (transcript, False))
+
+    def test_comando_que_quebra_em_80_colunas(self):
+        """Real zsh output, 80 columns: at the edge zsh writes a space and a carriage return to open the next row."""
+        raw = (FIXTURES / "terminal" / "zsh-80-colunas.bin").read_bytes()
+        command = "echo " + "abcdefghijklmnopqrstuvwxyz0123456789" * 3 + " fim-do-comando-comprido1234567890"
+        self.assertIn(command, strip_terminal(raw, 80)[0].splitlines())
+        self.assertNotIn(command, strip_terminal(raw)[0].splitlines(), "sem a largura, o fim cobria o começo")
+        self.assertEqual(strip_terminal(b"12345678" + b" \r" + b"\x1b[Kfim\r\n", 8)[0], "12345678fim")
+        self.assertEqual(strip_terminal(b"abcdefghij\r\n", 4)[0], "abcdefghij")
+        self.assertEqual(strip_terminal(b"12345678\r\nx\r\n", 8)[0], "12345678\nx")
 
     def test_strip_terminal(self):
         self.assertEqual(strip_terminal(b"\x1b[1;31merro\x1b[0m\r\n")[0], "erro")
@@ -127,6 +137,12 @@ class MemoryIntegrationTest(ServerTestCase):
 
 
 class MaskOnSaveTest(TempDirTestCase):
+    def setUp(self):
+        super().setUp()
+        from vulcan_celox.core import i18n
+        self.addCleanup(i18n.set_language, i18n.language())
+        i18n.set_language("pt")  # the mask mark follows the interface language
+
     def test_registro_sai_mascarado_mesmo_cortado(self):
         key = b"-----BEGIN PRIVATE KEY-----\r\n" + b"QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo\r\n" * 3
         key += b"-----END PRIVATE KEY-----\r\n"

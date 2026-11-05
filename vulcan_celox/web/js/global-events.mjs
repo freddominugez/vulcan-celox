@@ -5,6 +5,7 @@ import { startNotices } from "./attention-notify.mjs";
 import { startPrStatus } from "./pr-status.mjs";
 import { startPorts } from "./terminal-ports.mjs";
 import { startSidebarPrefs } from "./sidebar-prefs.mjs";
+import { startRail, toggleRail } from "./sidebar-rail.mjs";
 import { startTheme } from "./theme.mjs";
 import { clearTab, dismissSession, latestAttention, startAttention } from "./attention-state.mjs";
 import { isMac, isNative } from "./api.mjs";
@@ -86,6 +87,7 @@ export function bindGlobalEvents() {
   window.addEventListener("vulcan-show-terminal", async (event) => {
     const id = event.detail && event.detail.id;
     if (!id) return;
+    if (!terminals.get(id)) await terminals.sync();
     if (app.panel && app.panel.available) {
       app.panel.toggle(true);
       if (app.panel.ws) app.panel.ws.select(id);
@@ -95,6 +97,7 @@ export function bindGlobalEvents() {
   });
   startTheme();
   startSidebarPrefs();
+  startRail();
   startNotices();
   startPorts();
   startPrStatus();
@@ -128,6 +131,7 @@ export function bindGlobalEvents() {
     if (key === "k") { event.preventDefault(); palette.open(); }
     if (key === "p" && event.shiftKey) { event.preventDefault(); navigate("#/prompts"); }
     if (key === "j") { event.preventDefault(); runCommand("togglePanel"); }
+    if (key === "b" && !event.altKey) { event.preventDefault(); toggleRail(); }
     if (event.shiftKey && (key === "arrowup" || key === "arrowdown")) {
       event.preventDefault();
       const direction = key === "arrowup" ? -1 : 1;
@@ -149,7 +153,10 @@ export function bindGlobalEvents() {
     if (key === "?" || (key === "/" && event.shiftKey)) { event.preventDefault(); navigate(`#/ajuda/${sectionFor(app.route)}`); }
     if (key === "e" && event.shiftKey) { event.preventDefault(); navigate("#/depuracao"); }  // shortcut for the Depuração screen
     // ⌘F (Ctrl+Shift+F on Linux) searches the terminal when there is one on screen; otherwise normal behavior
-    if (key === "f" && (!isMac || !event.shiftKey) && document.querySelector(".term-workspace .tab")) {
+    // on the Code screen ⌘F belongs to the viewer: the terminal search only answers inside a terminal
+    if (key === "f" && !inTerminal(event) && findInViewer()) {
+      event.preventDefault();
+    } else if (key === "f" && (!isMac || !event.shiftKey) && document.querySelector(".term-workspace .tab")) {
       event.preventDefault();
       runCommand("find");
     }
@@ -165,4 +172,16 @@ export function bindGlobalEvents() {
     renderSidebar();
     reloadTree();
   });
+}
+
+const inTerminal = (event) => Boolean(event.target && event.target.closest && event.target.closest(".xterm"));
+
+/** The open file of the Code screen (or of a session's Code tab) gets the ⌘F: its own search panel opens. */
+function findInViewer() {
+  const content = document.querySelector(".ce-main .cm-content, .code-body .cm-content");
+  if (!content || !content.offsetParent || !window.CM) return false;
+  const view = window.CM.EditorView.findFromDOM(content);
+  if (!view) return false;
+  window.CM.openSearchPanel(view);
+  return true;
 }

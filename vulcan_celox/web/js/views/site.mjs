@@ -8,6 +8,8 @@ import { t } from "../i18n.mjs";
 const NEW_TERMINAL_KEY = isMac ? "⌘T" : "Ctrl+Shift+T";
 import { $, esc, icon, progressBar, reportError, toast } from "../dom.mjs";
 import { terminals, TerminalWorkspace } from "../terminals.mjs";
+import { openInCodeIcon } from "./code/explorer-open.mjs";
+import { siteBadges } from "./site-badges.mjs";
 
 const TABS = [
   { id: "terminal", label: "Terminal", icon: "terminal" },
@@ -170,16 +172,7 @@ export class SiteView extends SessionTabsView {
     const live = Boolean(this.options.state.backend && this.options.state.backend.available && s.kind !== "manual");
     const lerd = live && this.options.state.backend.name === "lerd";
     const starred = (this.options.state.favorites || []).includes(s.name);
-    const chip = (action, cls, inner, title) => live
-      ? `<button type="button" class="badge badge-btn ${cls}" data-action="${action}" title="${esc(title)}">${inner}</button>`
-      : `<span class="badge ${cls}" title="${esc(title)}">${inner}</span>`;
-    const badges = [
-      chip("site-php", "", `PHP ${esc(s.php || "?")}`, live ? t("Trocar a versão de PHP do site") : t("Versão de PHP")),
-      s.node || live ? chip("site-node", "", `Node ${esc(s.node || "?")}`, live ? t("Trocar a versão de Node do site") : t("Versão de Node")) : "",
-      chip("site-https", s.secured ? "badge-ok" : "", `${icon(s.secured ? "lock" : "unlock")}${s.secured ? "HTTPS" : "HTTP"}`,
-        live ? (s.secured ? t("Desligar HTTPS") : t("Ligar HTTPS")) : (s.secured ? t("Servido com HTTPS") : t("Sem HTTPS"))),
-      !s.exists ? `<span class="badge badge-err">${icon("alert")}${t("pasta não encontrada")}</span>` : "",
-    ].join("");
+    const badges = siteBadges(s, live);
     this.root.innerHTML = `
       <section class="site">
         <header class="site-bar">
@@ -201,6 +194,7 @@ export class SiteView extends SessionTabsView {
             <button class="icon-btn" data-action="site-dashboard" title="${t("Abrir este site no painel do Lerd")}" aria-label="${t("Abrir no painel do Lerd")}">${icon("gauge")}</button>` : ""}
             ${s.has_artisan ? `<button class="icon-btn" data-action="tinker" title="Tinker" aria-label="${t("Abrir Tinker")}">${icon("bolt")}</button>` : ""}
             <button class="icon-btn" data-action="finder" title="${t("Mostrar no Finder")}" aria-label="${t("Mostrar no Finder")}" ${s.exists ? "" : "disabled"}>${icon("folder")}</button>
+            ${openInCodeIcon(s.path, !s.exists)}
             <button class="icon-btn" data-action="editor" title="${t("Abrir no editor")}" aria-label="${t("Abrir no editor")}" ${s.exists ? "" : "disabled"}>${icon("code")}</button>
             <button class="icon-btn" data-action="site-remove" title="${t("Remover o site")}" aria-label="${t("Remover o site")}">${icon("trash")}</button>
             <button class="btn btn-primary" data-action="new-terminal" title="${t("Novo terminal ({key})", { key: NEW_TERMINAL_KEY })}" ${s.exists ? "" : "disabled"}>${icon("plus")}<span>Terminal</span></button>

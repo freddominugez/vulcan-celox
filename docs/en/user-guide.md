@@ -8,6 +8,7 @@
 - [PHP sites](#projetos-php): Lerd sites: open, switch PHP, HTTPS, logs and terminal.
 - [Lerd](#lerd): The environment that runs the PHP, nginx, database and HTTPS of your sites.
 - [Node projects](#node): Next.js, Vite, local Supabase and Vercel link.
+- [Code](#codigo): A project's whole tree and what is being written to disk, live.
 - [Terminals and sessions](#terminais): Tabs, the bottom panel and each session's memory.
 - [Debug and logs](#depuracao): Dumps, queries, exceptions and laravel.log.
 - [Agents](#agentes): Claude Code and Codex sessions read from disk.
@@ -91,6 +92,26 @@ Node projects do not use Lerd. The app reads `package.json`, finds the package m
 - **Vercel:** the app only shows whether the folder is linked (`.vercel/project.json`). Deploys and logs stay in the Vercel dashboard or in the `vercel` command in the terminal.
 - The app never opens the project's `.env` and does not talk to Vercel or to remote Supabase.
 
+<a id="codigo"></a>
+
+## Code
+
+*A project's whole tree and what is being written to disk, live.*
+
+The **Code** screen shows the whole tree of a folder and follows what is written to disk, by an agent or by any other program, with no session needed. It is read only: nothing here writes to the project. The Code tab of an agent session stays and shows only what that session touched.
+
+1. Open it from the sidebar, or with the **Open in Code** button on a site, Node project or session page. Sites, Node projects and session folders show up in the list on their own; **Open folder** adds another.
+2. Click a file, or use the arrow keys and Enter. Up to 12 tabs stay open, and each folder remembers its own.
+3. Leave **Following** on so the viewer goes to the file that just changed. Any gesture in the tree or the viewer pauses, and one click on the button resumes, going to the last change.
+
+- **Marks:** A, M and D say what is new, changed or deleted since the screen opened, compared with a photo of the disk. A collapsed folder with a change inside gets a dot. A deleted file stays in view, with a notice.
+- **Who wrote it:** the colored dot and the bottom bar name the agent only when that folder's session recorded the same edit within 60 s. Without that record it says **Disk change**. The record may arrive a little after the write, and the mark is updated.
+- **Diff vs Git:** compares with the last commit.
+- **Git marks:** in a folder with Git, each file shows **M** (changed since the last commit), **U** (new, not in Git) or **D** (deleted from disk, still in Git, struck through). A collapsed folder gets a dot when something inside is marked, and the branch shows above the tree. The live marks go on top. The app reads the Git index and compares size and date with the disk, without running `git status`: a file that was only touched also shows as **M**.
+- **Go to file** (⌘P, or Ctrl+Shift+P outside the Mac) filters by name. The magnifier searches text in the Git files; without Git, the screen says the search needs it.
+- **Refusals:** the whole home folder, the root of the disk, the app's data folder and the agents' do not open. `.env`, keys and credentials appear in the tree, but their content is not shown. Files above 1 MB, binaries and links out of the folder do not open either.
+- **Limits:** a change in an ignored folder only shows with the folder open. Above 20 thousand items, only the open folders and the open file are watched, and the bottom bar says so. On a network file system, the modification date may not be reliable.
+
 <a id="terminais"></a>
 
 ## Terminals and sessions
@@ -102,7 +123,7 @@ Each terminal is a session. It opens in the folder you chose, with a color theme
 - **Ports:** the tab shows the ports its processes opened, such as `:5173 +2`, in the tab bar and in the session list. Clicking opens `http://localhost:<port>` in the browser. Only the tab's own processes count.
 - **⌘T** opens a new terminal; **⌘J** shows or hides the bottom terminal panel, on screens that do not already show a terminal.
 - **Quick commands** for the project (composer, artisan, npm) sit in the terminal bar.
-- **Memory:** while a terminal is open, the app keeps a Markdown file with typed commands, tasks, sticky notes, tags and the last 2,000 lines of output. Passwords and keys it recognizes are saved as `[segredo]`, and what you type at a hidden password prompt is not recorded. Recognition is by pattern, so an unusual secret can get through, and on Windows the hidden prompt cannot be detected. After it closes, the file shows up in Recent sessions and in the Index.
+- **Memory:** while a terminal is open, the app keeps a Markdown file with typed commands, tasks, sticky notes, tags and the last 2,000 lines of output. Passwords and keys it recognizes are saved as `[secret]` (`[segredo]` with the interface in Portuguese), and what you type at a hidden password prompt is not recorded. Recognition is by pattern, so an unusual secret can get through, and on Windows the hidden prompt cannot be detected. After it closes, the file shows up in Recent sessions and in the Index.
 - **Detach:** a tab can become its own window and come back later.
 
 <a id="depuracao"></a>
@@ -135,7 +156,7 @@ The **Agents** screen lists the Claude Code and Codex sessions on this machine, 
 
 **Navigate by request.** ⌘⇧↑ and ⌘⇧↓ jump between requests. In the terminal, each Enter in a tab with a live agent becomes a mark, without drawing anything on screen. If the agent uses the whole terminal screen, there is no history to navigate, and the app warns you once. In the session, the **Timeline** groups by request, with files and commands, and each edited file leads to the diff of that request.
 
-**PR state.** By default the app estimates it from the session's commands and says so on screen. Turn on "Check the PR state on GitHub" in Settings to see number, draft, state and checks through your own `gh`. Only this option uses the network.
+**PR state.** By default the app estimates it from the session's commands and says so on screen. Turn on "Check the PR state on GitHub" in Settings to see number, draft, state and checks through your own `gh`. This option uses the network only for that lookup.
 
 **Code tab.** Inside a session, the **Code** tab shows the files the agent touched, marked as new, edited, read or deleted. You see the file with syntax highlighting or the diff: of one edit, of a whole request or against the last commit, side by side or unified. ⌘F searches the file. In an active session the viewer follows the agent, opening each edited file and scrolling to the changed part. Scrolling, clicking or selecting text pauses it, and **Resume following** brings it back. In paired tabs, the **Code** button in the bar above the terminal takes you straight here.
 
@@ -208,10 +229,11 @@ The harness is the contract with verifiable items, the run state and the handoff
 *What the sidebar shows and the app's settings, on one screen.*
 
 - **Sidebar:** check what you want to see. It covers the menu items and the lists below them (Sessions, Sites and Node projects). Whatever you hide stays in the search (⌘K), and **Show all** undoes it. Settings cannot be hidden, so you can always come back.
+- **Collapsed sidebar:** the button at the top of the bar, or ⌘B, leaves only the icons, in a narrow rail; hover to see the name. Sessions, Sites and Node projects become one icon each, which opens the list in a menu. The choice is kept; without a choice, a window under 1000 px opens collapsed.
 - **Appearance:** theme (System, Light or Dark) and language (English or Português).
 - **On startup:** whether to show the opening screen, start Lerd with the app, and ask for the folder when opening a terminal.
 - **Notices and network:** a notification when an agent is waiting for you, checking the PR state on GitHub (off by default), and the new version notice (on by default, at most once a day, reads only the version number). You can turn each of them off.
-- **Backup and secrets:** **Back up now** saves all of the app's data in a .zip outside the data folder. It includes tasks, sticky notes, tags, memories, prompts, preferences and the agent index, but not the Anthropic key, which stays in the system. The file is not encrypted. **Restore** checks the file and swaps the data when you reopen the app; the current data stays in the `.restauros` folder. **Mask** rewrites memories saved before masking existed, and cannot be undone.
+- **Backup and secrets:** **Back up now** saves all of the app's data in a .zip outside the data folder. It includes tasks, sticky notes, tags, memories, prompts, preferences and the agent index, but not the Anthropic key, which stays in the system. The file is not encrypted. **Check** reads the .zip without extracting anything and shows date, version, size and how much of each thing it holds; only then does **Restore** show up, and never for a file with an error. The swap happens when you reopen the app, and the current data stays in the `.restauros` folder. **Restore copies** lists those folders, and each one can go to the Trash. **Mask** rewrites memories saved before masking existed, and cannot be undone.
 - **Anthropic key:** used only when you ask for AI documentation.
 - **About:** the installed version, whether a newer one exists, and the folder with your data. The app never downloads or installs anything by itself: the button opens the release page.
 
@@ -227,11 +249,13 @@ The harness is the contract with verifiable items, the run state and the handoff
 | `⌘T` | New terminal |
 | `⇧⌘T` | New terminal, asking for the folder |
 | `⌘J` | Show or hide the terminal panel |
+| `⌘B` | Collapse the sidebar into a rail of icons, or open it again |
 | `⌘⇧U` | Jump to the most recent agent notice |
 | `⌘F` | Search in the terminal |
 | `⇧⌘P` | Prompts |
 | `⇧⌘E` | Debug |
 | `⌘1 to ⌘5` | Overview, Terminals, Tasks, Sticky notes and Tags |
+| `⌘P` | Go to a file on the Code screen |
 | `⌘?` | Help |
 
 <a id="seguranca"></a>
@@ -243,7 +267,7 @@ The harness is the contract with verifiable items, the run state and the handoff
 - The internal server only listens on `127.0.0.1`, with a token per run. Nothing is exposed on the network.
 - Agent sessions: read only, line by line. The app never writes to `~/.claude`, `~/.codex` or their configuration files, except the pairing hook that you install on purpose, with a backup.
 - Folders and session memory files go to the Trash. Tasks, sticky notes and tags are deleted from the app; only the last deleted task can be undone.
-- In a project folder, the app writes only when you ask: new harness, contract and prompt files, never overwriting, and a marked block in an existing `CLAUDE.md` or `AGENTS.md`. Terminal memory stays in the app's data folder and holds output without masking; AI documentation sends a masked copy to Anthropic.
+- In a project folder, the app writes only when you ask: new harness, contract and prompt files, never overwriting, and a marked block in an existing `CLAUDE.md` or `AGENTS.md`. Terminal memory stays in the app's data folder, with recognized secrets masked when saved; AI documentation sends only that masked text to Anthropic.
 - The projects' `.env` is never opened.
 - The Anthropic key, if you add one, stays in the system's password store (the Keychain on macOS) and is used only when you click to document a session.
 
@@ -333,7 +357,11 @@ In Settings, uncheck what you don't use. Nothing is deleted: the item leaves the
 
 **How do I back up my data?**
 
-In Settings, under Backup and secrets, choose the folder and click Back up now. You get a .zip with everything except the Anthropic key. It is not encrypted, so keep it somewhere safe. To go back, use Restore in the same place and reopen the app.
+In Settings, under Backup and secrets, choose the folder and click Back up now. You get a .zip with everything except the Anthropic key. It is not encrypted, so keep it somewhere safe. To go back, choose the file, click Check, then Restore, and reopen the app.
+
+**A notice says the local server stopped.**
+
+The notice shows the exit code and the last error line. Show log opens the `logs/servidor-erro.log` file in the data folder, and Restart server starts another one without closing the app. Open terminals end with it: their memory stays, and they come back as ended, with Resume. Each run's record stays in `logs/servidor.log`, always masked.
 
 **Is a password shown in the terminal saved?**
 
@@ -350,3 +378,15 @@ In Settings, under Appearance.
 **Where do I add the Anthropic key?**
 
 In Settings. You only need it to generate AI documentation; the rest of the app works without it.
+
+**How do I see a file the agent did not touch?**
+
+Open the **Code** screen: it shows the folder's whole tree. A session's Code tab only shows what that session touched.
+
+**Why does it say Disk change instead of the agent?**
+
+The app only names the agent when that folder's session recorded the same edit within 60 s. A formatter, a generator, `npm install` and another editor leave no such record. The agent's record may also arrive a little after the write: then the mark changes by itself.
+
+**Do the Git marks on the Code screen run git status?**
+
+No. `git status` and `git diff` on the working file run programs defined in the repository itself, and the repository may belong to someone else. The M, U and D marks come from the Git index compared with the disk, without reading content. That is why a file that was only touched shows as changed. **Diff vs Git** reads the last commit without going through those programs.

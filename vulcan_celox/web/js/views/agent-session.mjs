@@ -9,6 +9,7 @@ import { CodeView } from "./code/code-view.mjs";
 import { renderTurns, stepTurn } from "./agent-turns.mjs";
 import { loadPr, prHtml } from "../pr-status.mjs";
 import { AGENT_NAMES, agentMark, clock, copy, keepScroll, loopPrompt, relPath, relTime, RevisionWatch, splitPath, tokens, track } from "../agents-ui.mjs";
+import { openInCode } from "./code/explorer-open.mjs";
 
 const TABS = [
   { id: "resumo", label: t("Resumo") },
@@ -131,6 +132,7 @@ export class AgentSessionView {
               : `<button class="btn btn-sm ag-primary" data-action="resume" title="${t("Abre um terminal na pasta da sessão e digita {cmd}", { cmd: s.agent === "codex" ? "codex resume" : "claude --resume" })}">${icon("play")}<span>${t("Retomar numa aba")}</span></button>`}
             <button class="btn btn-sm" data-action="copy-id">${icon("copy")}<span>${t("Copiar ID")}</span></button>
             <button class="btn btn-sm" data-action="folder">${icon("folder")}<span>${t("Abrir pasta")}</span></button>
+            ${openInCode(s.project_root || s.cwd)}
             <button class="btn btn-sm" data-action="task">${icon("check-square")}<span>${t("Criar tarefa")}</span></button>
           </div>
         </section>

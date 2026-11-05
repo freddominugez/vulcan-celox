@@ -282,9 +282,14 @@ def main(argv=None) -> int:
         print(render())
         return 0
 
+    from vulcan_celox.core import paths, server_log
     from vulcan_celox.server.app import VulcanApp
     token = secrets.token_urlsafe(32)
+    if not args.check:
+        server_log.redirect_stderr(paths.data_dir(), [token])  # a crash leaves its traceback in the error log
+    log = server_log.setup(paths.data_dir(), [token])
     app = VulcanApp(token=token).start()
+    log.info("servidor %s no ar na porta %s", __version__, app.server.port)
     try:
         if args.check:
             return check(app, token)
@@ -301,7 +306,9 @@ def main(argv=None) -> int:
     except KeyboardInterrupt:
         return 0
     finally:
+        log.info("servidor encerrando")
         app.shutdown()
+        server_log.close()
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ class AiConfig:
     def client(self, key=None) -> AnthropicClient:
         key = key or self.key()
         if not key:
-            raise HttpError(409, "configure a chave da Anthropic na tela Índice")
+            raise HttpError(409, "configure a chave da Anthropic nas Configurações")
         return AnthropicClient(key, transport=self.app.ai_transport, base=self.base())
 
     def base(self) -> str:

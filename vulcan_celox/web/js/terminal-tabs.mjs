@@ -46,7 +46,7 @@ export function renderTabs(ws) {
     <button class="icon-btn ${ws.splitId ? "is-on" : ""}" data-action="split" title="${t("Dividir")}" aria-label="${t("Dividir")}">${icon("split")}</button>
     <button class="icon-btn" data-action="find" title="${t("Buscar no terminal ({key})", { key: isMac ? "⌘F" : "Ctrl+⇧+F" })}" aria-label="${t("Buscar no terminal")}">${icon("search")}</button>
     <button class="icon-btn" data-action="copy-output" title="${t("Copiar a saída do terminal")}" aria-label="${t("Copiar a saída do terminal")}">${icon("copy")}</button>
-    <button class="icon-btn" data-action="popout" title="${t("Destacar em janela (⇧⌘D)")}" aria-label="${t("Destacar em janela")}">${icon("external")}</button>
+    <button class="icon-btn" data-action="popout" title="${isNative ? t("Destacar em janela (⇧⌘D)") : t("Destacar em janela")}" aria-label="${t("Destacar em janela")}">${icon("external")}</button>
     <button class="icon-btn" data-action="document" data-id="${ws.activeId}" title="${t("Documentar esta sessão com IA")}" aria-label="${t("Documentar com IA")}">${icon("book")}</button>` : "";
 
   const viewing = ws.isHistory() ? ws.records.get(ws.activeId) : null;

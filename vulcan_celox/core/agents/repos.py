@@ -1,13 +1,14 @@
 """Branches and worktrees with unreconciled work: agent sessions crossed with the real git.
 
-Read-only: `git --no-optional-locks` stops `status` from rewriting .git/index, and every command goes
-through core/runner.py with a timeout. The app never commits, pushes or removes a worktree; it only shows and copies prompts.
+Read-only: every command goes through core/runner.py with a timeout, with SAFE_GIT below. The app never commits, pushes or removes a worktree; it only shows and copies prompts.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+import os
+import re
 import time
 from typing import Callable, Dict, List, Optional, Sequence
 
@@ -16,12 +17,18 @@ from vulcan_celox.core.agents.model import AgentSession, parse_iso
 
 TIMEOUT = 5.0
 IDLE_DAYS = 3
+GITLINK = "160000"  # a submodule: its folder has no size or date of its own in the index
+_ESCAPE = re.compile(rb"\\(?:([0-7]{3})|(.))", re.S)
 STATE_ORDER = ("sem commit", "sem push", "sem upstream", "PR aberto", "publicado", "nada editado", "sem git")
 
 
-# the analyzed repository is third-party: core.fsmonitor would make git status run a program defined
-# in its .git/config, and untrackedCache would write to .git; --no-optional-locks stops the index from being rewritten
-SAFE_GIT = ("git", "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false", "--no-optional-locks")
+# The analyzed repository is third-party. core.fsmonitor would run a program named in its .git/config, untrackedCache would write
+# to .git and --no-optional-locks stops the index from being rewritten. In a partial clone git fetches a missing object by itself,
+# which runs core.sshCommand or remote.*.uploadpack: every protocol is closed by name, because the repository can reopen one by name
+# and -c wins. git status is not here: it runs the clean filter, and nothing turns that off.
+SAFE_GIT = ("git", "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false", "-c", "protocol.allow=never",
+            *(item for name in ("ssh", "file", "git", "http", "https", "ext") for item in ("-c", f"protocol.{name}.allow=never")),
+            "--no-optional-locks")
 
 
 def _git(path: str, *args: str) -> List[str]:
@@ -38,6 +45,30 @@ class GitState:
     worktrees: List[Dict[str, str]] = field(default_factory=list)
 
 
+def _unquote(raw: str) -> str:
+    """A path as git prints it: between quotes and with octal escapes when it is not plain ASCII."""
+    if not raw.startswith('"'):
+        return raw
+    body = raw[1:-1].encode("latin-1", "replace")
+    simple = {b"n": b"\n", b"t": b"\t", b"\\": b"\\", b'"': b'"', b"a": b"\a", b"b": b"\b", b"f": b"\f", b"r": b"\r", b"v": b"\v"}
+    out = _ESCAPE.sub(lambda m: bytes([int(m.group(1), 8)]) if m.group(1) else simple.get(m.group(2), m.group(2)), body)
+    return out.decode("utf-8", "surrogateescape")
+
+
+def changed_on_disk(path: str, index_listing: str) -> int:
+    """Tracked files whose size or date differ from what the index recorded, or that disappeared (core/git_marks.py)."""
+    from vulcan_celox.core.git_marks import index_marks
+    return len(index_marks(path, index_listing)[0])
+
+
+def dirty_count(runner, path: str) -> int:
+    """What `git status --porcelain` would count, without running the repository's filters."""
+    from vulcan_celox.core.git_marks import from_listings
+    tracked = runner.run(_git(path, "ls-files", "-s", "--debug"), timeout=TIMEOUT)
+    loose = runner.run(_git(path, "ls-files", "-o", "--exclude-standard", "--directory"), timeout=TIMEOUT)
+    return len(from_listings(path, tracked.stdout if tracked.ok else "", loose.stdout if loose.ok else "")["marks"])
+
+
 def git_state(runner, path: str, worktrees: bool = False) -> GitState:
     state = GitState(path)
     probe = runner.run(_git(path, "rev-parse", "--is-inside-work-tree"), timeout=TIMEOUT)
@@ -46,8 +77,7 @@ def git_state(runner, path: str, worktrees: bool = False) -> GitState:
     state.is_repo = True
     head = runner.run(_git(path, "rev-parse", "--abbrev-ref", "HEAD"), timeout=TIMEOUT)
     state.branch = head.stdout.strip() or None if head.ok else None
-    status = runner.run(_git(path, "status", "--porcelain"), timeout=TIMEOUT)
-    state.dirty = len([line for line in status.stdout.splitlines() if line.strip()]) if status.ok else 0
+    state.dirty = dirty_count(runner, path)
     ahead = runner.run(_git(path, "rev-list", "--count", "@{u}..HEAD"), timeout=TIMEOUT)
     if ahead.ok and ahead.stdout.strip().isdigit():
         state.ahead = int(ahead.stdout.strip())

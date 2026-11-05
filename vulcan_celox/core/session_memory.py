@@ -23,17 +23,21 @@ _ESC2 = re.compile(r"\x1b[@-Z\\-_]")
 
 
 # ── registro do terminal ─────────────────────────────────────────────────────
-def strip_terminal(data) -> Tuple[str, bool]:
+def strip_terminal(data, cols: Optional[int] = None) -> Tuple[str, bool]:
     """Converts the raw PTY output into readable text. Returns (text, truncated).
 
         Removes colors and control sequences, applies carriage return, backspace and
-        line erase the way the terminal would show them.
+        line erase the way the terminal would show them. With `cols`, a line longer than the
+        width wraps into rows of one logical line, as in the terminal: zsh writes a space and a
+        carriage return at the edge to move to the next row, and without the rows the rest of a
+        long command overwrote its start.
     """
     text = data.decode("utf-8", errors="replace") if isinstance(data, (bytes, bytearray)) else str(data)
     text = _OSC.sub("", text)
     lines: List[str] = []
     line: List[str] = []
     col = 0
+    row = 0  # where the current row starts inside the logical line (0 without `cols`)
     i = 0
     while i < len(text):
         ch = text[i]
@@ -41,20 +45,25 @@ def strip_terminal(data) -> Tuple[str, bool]:
             m = _CSI.match(text, i)
             if m:
                 params, final = m.group(1), m.group(2)
+                n = int(params) if params.isdigit() else 1
                 if final == "K":  # erase to the end of the line (mode 0)
                     if params in ("", "0"):
                         del line[col:]
                     elif params == "2":
-                        line.clear()
-                        col = 0
+                        del line[row:]
+                        col = row
                 elif final == "J" and params in ("", "0"):
                     del line[col:]
                 elif final == "C":
-                    col += int(params or 1) if params.isdigit() else 1
+                    col += n
                 elif final == "D":
-                    col = max(0, col - (int(params or 1) if params.isdigit() else 1))
+                    col = max(row, col - n)
                 elif final == "G":
-                    col = max(0, (int(params) if params.isdigit() else 1) - 1)
+                    col = row + max(0, n - 1)
+                elif final == "A" and cols:  # up, into an earlier row of the same wrapped line
+                    up = min(n, row // cols)
+                    row -= up * cols
+                    col -= up * cols
                 i = m.end()
                 continue
             m2 = _ESC2.match(text, i)
@@ -62,17 +71,20 @@ def strip_terminal(data) -> Tuple[str, bool]:
             continue
         if ch == "\n":
             lines.append("".join(line).rstrip())
-            line, col = [], 0
+            line, col, row = [], 0, 0
         elif ch == "\r":
-            col = 0
+            col = row
         elif ch == "\b":
-            col = max(0, col - 1)
+            col = max(row, col - 1)
         elif ch == "\t":
-            target = (col // 8 + 1) * 8
+            target = row + ((col - row) // 8 + 1) * 8
             while col < target:
                 _put(line, col, " ")
                 col += 1
         elif ord(ch) >= 0x20:
+            if cols and col - row >= cols:  # the cursor waits at the edge; the next character opens a row
+                row += cols
+                col = max(col, row)
             _put(line, col, ch)
             col += 1
         i += 1

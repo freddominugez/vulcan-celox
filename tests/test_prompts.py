@@ -1,5 +1,8 @@
 """Markdown prompts with a header, global and per project, rendered with the session variables."""
 
+import unittest
+from pathlib import Path
+
 from tests.helpers import TempDirTestCase
 from vulcan_celox.core import prompts
 
@@ -141,3 +144,39 @@ class CardTest(TempDirTestCase):
         self.assertNotIn("{{", text)
         self.assertLessEqual(len(text), prompts.DESCRIPTION_MAX)
         self.assertTrue(text.startswith("Rode php artisan … e mais"))
+
+class IdiomaDosExemplosTest(unittest.TestCase):
+    """Examples nobody edited follow the interface language; an edited one stays as it is."""
+
+    def setUp(self):
+        import tempfile
+        from vulcan_celox.core import i18n
+        self.i18n = i18n
+        self.addCleanup(i18n.set_language, i18n.language())
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.root = Path(self._tmp.name) / "prompts"
+
+    def test_troca_de_idioma(self):
+        self.i18n.set_language("en")
+        prompts.seed_global(self.root)
+        edited = next(self.root.glob("*/seguranca.md"))
+        edited.write_text(edited.read_text(encoding="utf-8") + "Minha regra.\n", encoding="utf-8")
+        intact = next(self.root.glob("*/publicar.md"))
+        self.assertIn("title: Publish and open PR", intact.read_text(encoding="utf-8"))
+        self.i18n.set_language("pt")
+        changed = prompts.follow_language(self.root)
+        self.assertIn(intact, changed)
+        self.assertNotIn(edited, changed)
+        self.assertIn("title: Publicar e abrir PR", intact.read_text(encoding="utf-8"))
+        self.assertIn("Minha regra.", edited.read_text(encoding="utf-8"))
+        self.assertNotIn("title: Regras", edited.read_text(encoding="utf-8"))
+        loaded, _ = prompts.load_all(self.root)
+        titles = {p.id: (p.title, p.category) for p in loaded}
+        self.assertEqual(titles["publicar"], ("Publicar e abrir PR", "Publicação"))
+        self.assertIn("Publicação", prompts.categories(self.root))
+        self.assertEqual(prompts.follow_language(self.root), [], "uma segunda vez não muda nada")
+        self.i18n.set_language("en")
+        self.assertIn(intact, prompts.follow_language(self.root))
+        self.assertIn("title: Publish and open PR", intact.read_text(encoding="utf-8"))
+

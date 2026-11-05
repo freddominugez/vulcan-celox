@@ -189,6 +189,13 @@ def rows_of(index, session_id: str, start: int = 0, limit: int = 200, path: Opti
     return [{c: r[c] for c in COLUMNS} for r in rows]
 
 
+def recent_rows(index, session_id: str, limit: int = 200) -> List[Dict]:
+    """The last edits of a session, newest first."""
+    with index.lock:
+        rows = index.db.execute("SELECT * FROM session_edits WHERE session_id = ? ORDER BY seq DESC LIMIT ?", (session_id, limit)).fetchall()
+    return [{c: r[c] for c in COLUMNS} for r in rows]
+
+
 def row_at(index, session_id: str, seq: int) -> Optional[Dict]:
     with index.lock:
         row = index.db.execute("SELECT * FROM session_edits WHERE session_id = ? AND seq = ?", (session_id, seq)).fetchone()

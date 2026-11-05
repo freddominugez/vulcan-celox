@@ -60,7 +60,10 @@ def _new_file_mode(path: Path) -> int:
 def write_text_atomic(path: Path, text: str) -> None:
     """Writes to a temporary file in the same directory and swaps with os.replace."""
     path = Path(path)
+    created = [p for p in (path.parent, *path.parent.parents) if not p.exists()]
     path.parent.mkdir(parents=True, exist_ok=True)
+    for folder in created:
+        make_private(folder)  # a folder born after the opening, such as sessoes/, is private from the first file on
     try:
         mode = path.stat().st_mode & 0o777  # preserves the permission of an existing file
     except FileNotFoundError:
@@ -128,11 +131,15 @@ class Store:
         return self.path(name).exists()
 
     # ── migrations ────────────────────────────────────────────────────
+    def _migrations(self) -> Dict[str, Any]:
+        data = self.load(MIGRATIONS_FILE, {})
+        return data if isinstance(data, dict) else {}
+
     def migration_done(self, key: str) -> bool:
-        return bool(self.load(MIGRATIONS_FILE, {}).get(key))
+        return bool(self._migrations().get(key))
 
     def mark_migration(self, key: str) -> None:
-        done = self.load(MIGRATIONS_FILE, {})
+        done = self._migrations()
         done[key] = time.strftime("%Y-%m-%dT%H:%M:%S")
         self.save(MIGRATIONS_FILE, done)
 
