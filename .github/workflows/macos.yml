@@ -1,9 +1,8 @@
 name: macOS
 
+# On request, before each release. The interface sensors are timed for a Mac at the desk and still fail on the hosted
+# runner, a different one each run; pull requests are checked with validate.sh on a Mac.
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 permissions:

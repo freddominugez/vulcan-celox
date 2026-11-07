@@ -659,7 +659,7 @@ Os pacotes de Linux deixam `ui/` de fora, e o `.deb` instala em `/opt/vulcan-cel
 
 `.github/workflows/linux-mint.yml` roda no Ubuntu 22.04: `scripts/test_linux.sh`, `scripts/package_linux.py`, conferência das somas, instalação do `.deb`, `--check` e `--doctor`, e instalação pelo `.tar.gz`.
 
-`.github/workflows/windows.yml` roda `tests.test_windows` e a suíte inteira, gera o `.zip` com `scripts/package_windows.py`, extrai e roda `scripts/smoke_windows.py` a partir dele. `.github/workflows/macos.yml` gera o app e roda a suíte no macOS, em todo pull request e push na `main`.
+`.github/workflows/windows.yml` roda `tests.test_windows` e a suíte inteira, gera o `.zip` com `scripts/package_windows.py`, extrai e roda `scripts/smoke_windows.py` a partir dele. `.github/workflows/macos.yml` gera o app e roda a suíte no macOS, sob demanda, antes de cada Release.
 
 Os passos de uma versão estão em [development.md](development.md).
 
