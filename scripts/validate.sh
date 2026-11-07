@@ -141,6 +141,8 @@ if [ -f scripts/build_app.sh ]; then
     shot="$TMP_ROOT/lerd-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     extra=""; wait_s=4
     if [ "$route" = "#/depuracao" ]; then extra="$SEL_JS"; wait_s=7; fi
+    # the green dot waits for the first status of the simulated Lerd, slower on a clean CI machine
+    if [ "$route" = "#/lerd" ]; then wait_s=8; fi
     # light theme: the tabs of a site follow the page, and the title of a task can be read
     if [ "$route" = "#/sites/loja/tasks" ]; then extra="$(cat tests/tools/sensor_abas_tema_claro.js)"; wait_s=6; fi
     # the guide screenshot must really load
