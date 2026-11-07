@@ -110,9 +110,16 @@ if [ -f scripts/build_app.sh ]; then
   # the vulcan-demo site points to the fixture with a harness in the repository format
   "$PY" -I tests/tools/fake_lerd_api.py --site-path loja=/Users/dev/projeto \
     --site-path vulcan-demo="$ROOT/tests/fixtures/harness/repo" --dumps-at 2026-10-31T01:10 \
-    > "$TMP_ROOT/lerd-api.port" 2>/dev/null &
+    > "$TMP_ROOT/lerd-api.port" 2>"$TMP_ROOT/lerd-api.err" &
   LERD_API_PID=$!
   for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$TMP_ROOT/lerd-api.port" ] && break; sleep 0.3; done
+  # on a failure, what the simulated API answered and what the app's core concluded from it
+  lerd_diag() {
+    echo "porta da API simulada: '$(cat "$TMP_ROOT/lerd-api.port")'"; head -c 1500 "$TMP_ROOT/lerd-api.err"
+    curl -s -m 3 "http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")/api/status" | head -c 300; echo
+    lerd_env "$PY" -m vulcan_celox --doctor 2>&1 | head -c 1200; echo
+    tail -n 40 "$(ls -td "$TMP_ROOT"/home-* | head -1)/logs/"*.log 2>/dev/null
+  }
   lerd_env() {
     isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")" "$@"
   }
@@ -141,6 +148,10 @@ if [ -f scripts/build_app.sh ]; then
     shot="$TMP_ROOT/lerd-$(printf '%s' "$route" | tr -c 'a-z0-9' '_').png"
     extra=""; wait_s=4
     if [ "$route" = "#/depuracao" ]; then extra="$SEL_JS"; wait_s=7; fi
+    # the green dot waits for the first status of the simulated Lerd, slower on a clean CI machine
+    if [ "$route" = "#/lerd" ]; then wait_s=8; extra="setTimeout(function () { var d = document.querySelector('.nav-item.is-on .nav-dot');
+      if (d && !d.classList.contains('dot-ok')) { window.__vtErrors.push('bolinha do Lerd: ' + d.className + ' / ' + d.title);
+        import('./js/api.mjs').then(function (m) { return m.get('/api/state'); }).then(function (st) { window.__vtErrors.push('estado: ' + JSON.stringify(st.status) + ' ' + JSON.stringify(st.backend)); }); } }, 6500);"; fi
     # light theme: the tabs of a site follow the page, and the title of a task can be read
     if [ "$route" = "#/sites/loja/tasks" ]; then extra="$(cat tests/tools/sensor_abas_tema_claro.js)"; wait_s=6; fi
     # the guide screenshot must really load
@@ -200,7 +211,7 @@ if [ -f scripts/build_app.sh ]; then
         document.querySelector('[data-cf-action=sidebar-reset]').click(); }, 900); }, 2500);
       setTimeout(function () { if (document.querySelector('#app.is-offline')) window.__vtErrors.push('aviso de servidor indisponível com o servidor no ar'); }, 5500);"; wait_s=6; fi
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \
-      --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
+      --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; lerd_diag; break; }
   done
   # Node project registered through the page's own API (read-only fixture) and opened on its own screen
   if [ "$lerd_ok" -eq 0 ]; then

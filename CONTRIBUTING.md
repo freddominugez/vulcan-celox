@@ -28,7 +28,7 @@ These are checked by tests or reviewed by hand, and a pull request that breaks t
 ## Pull requests
 
 1. Write a test that fails first, then the fix.
-2. Run `bash scripts/validate.sh` on a Mac before opening the pull request. While the repository is private, this local run is the macOS check: pull requests run Linux, Windows and lint automatically, and the macOS workflow runs only on request. On Linux, or to test Linux from a Mac, run `bash scripts/test_linux.sh`.
+2. Run `bash scripts/validate.sh` on a Mac before opening the pull request. This local run is the macOS check: pull requests run Linux, Windows and lint automatically, and the macOS workflow runs only on request. On Linux, or to test Linux from a Mac, run `bash scripts/test_linux.sh`.
 3. One logical change per commit. Commit messages follow `type(scope): summary`, for example `fix(terminal): ...`.
 4. Update the docs affected by the change, in both languages when the page exists in both. Do not edit `docs/pt-BR/user-guide.md` by hand: it is generated from `vulcan_celox/web/help/conteudo.json` by `scripts/manual_md.py`.
 5. Never weaken a test to make it pass. If a behavior changed on purpose, explain it in the pull request.
