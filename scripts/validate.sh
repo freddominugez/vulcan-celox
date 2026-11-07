@@ -110,9 +110,15 @@ if [ -f scripts/build_app.sh ]; then
   # the vulcan-demo site points to the fixture with a harness in the repository format
   "$PY" -I tests/tools/fake_lerd_api.py --site-path loja=/Users/dev/projeto \
     --site-path vulcan-demo="$ROOT/tests/fixtures/harness/repo" --dumps-at 2026-10-31T01:10 \
-    > "$TMP_ROOT/lerd-api.port" 2>/dev/null &
+    > "$TMP_ROOT/lerd-api.port" 2>"$TMP_ROOT/lerd-api.err" &
   LERD_API_PID=$!
   for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$TMP_ROOT/lerd-api.port" ] && break; sleep 0.3; done
+  # on a failure, what the simulated API answered and what the app's core concluded from it
+  lerd_diag() {
+    echo "porta da API simulada: '$(cat "$TMP_ROOT/lerd-api.port")'"; head -c 1500 "$TMP_ROOT/lerd-api.err"
+    curl -s -m 3 "http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")/api/status" | head -c 300; echo
+    lerd_env "$PY" -m vulcan_celox --doctor 2>&1 | head -c 1200; echo
+  }
   lerd_env() {
     isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")" "$@"
   }
@@ -203,7 +209,7 @@ if [ -f scripts/build_app.sh ]; then
         document.querySelector('[data-cf-action=sidebar-reset]').click(); }, 900); }, 2500);
       setTimeout(function () { if (document.querySelector('#app.is-offline')) window.__vtErrors.push('aviso de servidor indisponível com o servidor no ar'); }, 5500);"; wait_s=6; fi
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \
-      --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; break; }
+      --eval "$(expect "${pair#*|}") $CLIP_JS $extra" || { lerd_ok=1; echo "falhou com Lerd simulado: $route"; lerd_diag; break; }
   done
   # Node project registered through the page's own API (read-only fixture) and opened on its own screen
   if [ "$lerd_ok" -eq 0 ]; then
