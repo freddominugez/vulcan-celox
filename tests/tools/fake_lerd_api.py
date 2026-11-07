@@ -66,7 +66,10 @@ def make_server(site_paths=None, dumps_at="", sites_alternam=0.0):
                 return self.send(403, {"error": "csrf"})
             self.send(200, {})
 
-    return http.server.HTTPServer(("127.0.0.1", 0), Handler)
+    # one slow connection must not hold the status the sidebar waits for
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    server.daemon_threads = True
+    return server
 
 
 def main(argv=None):
