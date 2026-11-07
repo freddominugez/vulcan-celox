@@ -118,6 +118,7 @@ if [ -f scripts/build_app.sh ]; then
     echo "porta da API simulada: '$(cat "$TMP_ROOT/lerd-api.port")'"; head -c 1500 "$TMP_ROOT/lerd-api.err"
     curl -s -m 3 "http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")/api/status" | head -c 300; echo
     lerd_env "$PY" -m vulcan_celox --doctor 2>&1 | head -c 1200; echo
+    tail -n 40 "$(ls -td "$TMP_ROOT"/home-* | head -1)/logs/"*.log 2>/dev/null
   }
   lerd_env() {
     isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")" "$@"
@@ -149,7 +150,8 @@ if [ -f scripts/build_app.sh ]; then
     if [ "$route" = "#/depuracao" ]; then extra="$SEL_JS"; wait_s=7; fi
     # the green dot waits for the first status of the simulated Lerd, slower on a clean CI machine
     if [ "$route" = "#/lerd" ]; then wait_s=8; extra="setTimeout(function () { var d = document.querySelector('.nav-item.is-on .nav-dot');
-      if (d && !d.classList.contains('dot-ok')) window.__vtErrors.push('bolinha do Lerd: ' + d.className + ' / ' + d.title); }, 7500);"; fi
+      if (d && !d.classList.contains('dot-ok')) { window.__vtErrors.push('bolinha do Lerd: ' + d.className + ' / ' + d.title);
+        import('./js/api.mjs').then(function (m) { return m.get('/api/state'); }).then(function (st) { window.__vtErrors.push('estado: ' + JSON.stringify(st.status) + ' ' + JSON.stringify(st.backend)); }); } }, 6500);"; fi
     # light theme: the tabs of a site follow the page, and the title of a task can be read
     if [ "$route" = "#/sites/loja/tasks" ]; then extra="$(cat tests/tools/sensor_abas_tema_claro.js)"; wait_s=6; fi
     # the guide screenshot must really load
