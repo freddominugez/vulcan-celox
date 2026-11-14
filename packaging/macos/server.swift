@@ -182,7 +182,11 @@ func bootstrapScript(origin: String, token: String, kind: String, restarted: Boo
       window.VULCAN = { token: "\(token)", native: true, kind: "\(kind)", restarted: \(restarted) };
     }
     window.__vtErrors = [];
-    window.addEventListener("error", function (e) { window.__vtErrors.push(String(e.message || e)); });
+    // the browser's ResizeObserver loop notice is not a page error; a slow machine produces it while the layout settles
+    window.addEventListener("error", function (e) {
+      var text = String(e.message || e);
+      if (text.indexOf("ResizeObserver loop") < 0) window.__vtErrors.push(text);
+    });
     window.addEventListener("unhandledrejection", function (e) { window.__vtErrors.push(String(e.reason)); });
     """
     return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true)

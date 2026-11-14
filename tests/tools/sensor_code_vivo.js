@@ -8,6 +8,9 @@
   function mark(name) { var r = row(name); var m = r && r.querySelector('.ce-mark'); return m ? m.dataset.mark : ''; }
   function text() { var c = document.querySelector('.code-body .cm-content'); return c ? c.textContent : ''; }
   function scroller() { return document.querySelector('.code-body .cm-scroller'); }
+  // the tree and the viewer repaint apart: the second sign gets up to 1.5 s after the first before it counts as missing
+  var since = {};
+  function late(key, ok) { if (ok) return false; since[key] = since[key] || Date.now(); return Date.now() - since[key] > 1500; }
   var steps = [
     function () { var r = row('longo.txt'); if (!r) return false; r.querySelector('.wb-title').click(); return true; },
     function () { if (text().indexOf('linha 1') < 0) return false; var s = row('src'); s.querySelector('.wb-title').click(); return true; },
@@ -26,13 +29,16 @@
       if (Math.abs(box.scrollTop - window.__ceTop) > 40) fail('a rolagem mudou de ' + window.__ceTop + ' para ' + box.scrollTop);
       box.scrollTop = 0; return true; },
     function () { if (text().indexOf('gravado =') < 0 && !document.querySelector('.ce-changed-line')) return false;
-      var m = /gravado = (\d+)/.exec(text()); var atraso = m ? Date.now() - Number(m[1]) : -1;
-      if (!document.querySelector('.ce-changed-line')) fail('linha alterada sem destaque');
-      if (atraso > 2000) fail('a escrita levou ' + atraso + ' ms até a tela');
-      window.__ceAtraso = atraso; return true; },
+      if (window.__ceAtraso === undefined) { var m = /gravado = (\d+)/.exec(text()); window.__ceAtraso = m ? Date.now() - Number(m[1]) : -1; }
+      var atraso = window.__ceAtraso;
+      var lit = document.querySelector('.ce-changed-line'); if (!lit && !late('lit', lit)) return false;
+      if (!lit) fail('linha alterada sem destaque');
+      if (atraso > (window.__ceLimite || 2000)) fail('a escrita levou ' + atraso + ' ms até a tela');
+      return true; },
     function () { return mark('novo-arquivo.js') === 'A'; },
     function () { if (mark('longo.txt') !== 'D') return false;
-      if (!document.querySelector('.ce-gone')) fail('sem o aviso de arquivo apagado');
+      var gone = document.querySelector('.ce-gone'); if (!gone && !late('gone', gone)) return false;
+      if (!gone) fail('sem o aviso de arquivo apagado');
       if (text().indexOf('linha 1') < 0) fail('o último conteúdo sumiu');
       return true; },
     function () { if (mark('renomeado.bin') !== 'A' || mark('binario.bin') !== 'D') return false;

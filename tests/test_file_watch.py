@@ -66,6 +66,8 @@ class MudancasTest(WatchCase):
         got = self.changes(self.wait_events())
         if got == [("a.txt", "modified")]:
             got = self.changes(self.wait_events())
+        while got[:1] == [("a.txt", "modified")]:  # or in the same poll as the deletion
+            got = got[1:]
         self.assertEqual(got, [("a.txt", "deleted")])
 
     def test_renomear_vira_apagado_e_novo(self):

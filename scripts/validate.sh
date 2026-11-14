@@ -112,16 +112,19 @@ if [ -f scripts/build_app.sh ]; then
     --site-path vulcan-demo="$ROOT/tests/fixtures/harness/repo" --dumps-at 2026-10-31T01:10 \
     > "$TMP_ROOT/lerd-api.port" 2>"$TMP_ROOT/lerd-api.err" &
   LERD_API_PID=$!
-  for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$TMP_ROOT/lerd-api.port" ] && break; sleep 0.3; done
+  # a cold Python on the hosted runner takes seconds to announce the port; every screen below needs it
+  for _ in $(seq 1 100); do [ -s "$TMP_ROOT/lerd-api.port" ] && break; sleep 0.3; done
+  LERD_PORT="$(head -n 1 "$TMP_ROOT/lerd-api.port")"
+  [ -n "$LERD_PORT" ] || { echo "a API simulada do Lerd não anunciou a porta em 30 s"; cat "$TMP_ROOT/lerd-api.err"; exit 1; }
   # on a failure, what the simulated API answered and what the app's core concluded from it
   lerd_diag() {
-    echo "porta da API simulada: '$(cat "$TMP_ROOT/lerd-api.port")'"; head -c 1500 "$TMP_ROOT/lerd-api.err"
-    curl -s -m 3 "http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")/api/status" | head -c 300; echo
+    echo "porta da API simulada: '$LERD_PORT'"; head -c 1500 "$TMP_ROOT/lerd-api.err"
+    curl -s -m 3 "http://127.0.0.1:$LERD_PORT/api/status" | head -c 300; echo
     lerd_env "$PY" -m vulcan_celox --doctor 2>&1 | head -c 1200; echo
     tail -n 40 "$(ls -td "$TMP_ROOT"/home-* | head -1)/logs/"*.log 2>/dev/null
   }
   lerd_env() {
-    isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$(cat "$TMP_ROOT/lerd-api.port")" "$@"
+    isolated_env VULCAN_LERD_BIN="$ROOT/tests/tools/fake-lerd" VULCAN_LERD_API="http://127.0.0.1:$LERD_PORT" "$@"
   }
   # text selected in a dump stays selected after two refresh cycles (2 s each)
   SEL_JS="(function () { var tag = 'seleção perdida na Depuração'; window.__vtErrors.push(tag);

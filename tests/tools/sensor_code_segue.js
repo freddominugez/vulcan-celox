@@ -15,7 +15,7 @@
       import('./js/api.mjs').then(function (m) { return m.get('/api/files/read?root=' + encodeURIComponent(ROOT) + '&path=passo-1.py'); }).then(function (d) {
         var m = /gravado = (\d+)/.exec(d.text); var atraso = m ? seen - Number(m[1]) : -1;
         window.__ceAtraso = atraso;
-        if (atraso < 0 || atraso > 2000) fail('a escrita do agente levou ' + atraso + ' ms até o visor'); });
+        if (atraso < 0 || atraso > (window.__ceLimite || 2000)) fail('a escrita do agente levou ' + atraso + ' ms até o visor'); });
       return true; },
     function () { var r = row('passo-1.py'); if (!r || !r.querySelector('.ce-who-claude')) return false;
       if (status().indexOf('Claude Code') < 0) fail('status sem o agente: ' + status());

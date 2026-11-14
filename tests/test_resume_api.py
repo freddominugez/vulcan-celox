@@ -10,6 +10,12 @@ CLAUDE_ID = "44444444-5555-4666-8777-888888888888"
 CODEX_ID = "019a7777-0000-7000-8000-000000000001"
 
 
+def flat(data: bytes) -> bytes:
+    """The typed line without spaces and line ends: a long prompt makes the shell wrap and redraw it at the margin."""
+    return data.replace(b"\r", b"").replace(b"\n", b"").replace(b" ", b"")
+
+
+
 class ResumeApiTest(test_agents_api.AgentsServerCase):
     def setUp(self):
         super().setUp()
@@ -40,14 +46,14 @@ class ResumeApiTest(test_agents_api.AgentsServerCase):
         self.assertIn(info["theme"], ("homebrew", "classico", "oceano", "ardosia"))
         pty = self.app.terminals.get(info["id"])
         expected = f"claude --resume {CLAUDE_ID}".encode()
-        self.assertTrue(wait_for(lambda: expected in strip_ansi(pty.history()).replace(b"\r\n", b""), timeout=15), pty.history())
+        self.assertTrue(wait_for(lambda: flat(expected) in flat(strip_ansi(pty.history())), timeout=15), pty.history())
         self.assertEqual([c["cmd"] for c in self.app.hub.sessions.get(info["id"]).commands], [f"claude --resume {CLAUDE_ID}"])
 
     def test_codex_usa_o_subcomando_resume(self):
         status, info = self.resume(CODEX_ID)
         self.assertEqual(status, 201, info)
         pty = self.app.terminals.get(info["id"])
-        self.assertTrue(wait_for(lambda: f"codex resume {CODEX_ID}".encode() in strip_ansi(pty.history()).replace(b"\r\n", b""), timeout=15), pty.history())
+        self.assertTrue(wait_for(lambda: flat(f"codex resume {CODEX_ID}".encode()) in flat(strip_ansi(pty.history())), timeout=15), pty.history())
 
     def test_tema_da_aba_pareada_e_reaproveitado(self):
         record = self.app.hub.sessions.create("aba000000777", "loja", None, str(self.project), theme="ardosia")
