@@ -36,11 +36,13 @@ for combo in "claro pt 1280x820" "escuro en 1280x820" "escuro pt 900x640" "claro
 done
 
 step "tela Code ao vivo: escrita de outro programa na árvore e no visor, sem perder a rolagem"
+# a write reaches the screen within 2 s on a Mac at the desk; the hosted CI runner, slower and virtual, gets 3 s
+CE_LIMITE=2000; [ "${CI:-}" = "true" ] && CE_LIMITE=3000
 "$PY" -I tests/tools/explorer_fixture.py "$TMP_ROOT/explorer2/proj" > /dev/null
 EXPLORER2="$(cd "$TMP_ROOT/explorer2/proj" && pwd -P)"
 "$PY" -I tests/tools/explorer_escreve.py "$EXPLORER2" 4 &
 WRITER_PID=$!
-isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-vivo.png" --route "#/overview" --wait 18 --eval "window.__ROOT = '$EXPLORER2'; $(cat tests/tools/sensor_code_vivo.js)"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-vivo.png" --route "#/overview" --wait 18 --eval "window.__ceLimite = $CE_LIMITE; window.__ROOT = '$EXPLORER2'; $(cat tests/tools/sensor_code_vivo.js)"
 wait "$WRITER_PID"
 
 step "tela Code acompanha: agente com nome, outro programa como mudança no disco, pausa e retomada"
@@ -49,7 +51,7 @@ EXPLORER3="$(cd "$TMP_ROOT/explorer3/projeto" && pwd -P)"
 ( sleep 5; "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/explorer3" crescer 1; sleep 6; "$PY" -I tests/tools/code_fixture.py "$TMP_ROOT/explorer3" crescer 2
   sleep 5; printf 'externo\n' > "$EXPLORER3/externo.txt"; sleep 3; printf 'S=1\n' > "$EXPLORER3/.env.novo" ) &
 GROW3_PID=$!
-isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/explorer3/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-acompanha.png" --route "#/overview" --wait 26 --eval "window.__ROOT = '$EXPLORER3'; $(cat tests/tools/sensor_code_segue.js)"
+isolated_env env CLAUDE_CONFIG_DIR="$TMP_ROOT/explorer3/claude" "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/code-acompanha.png" --route "#/overview" --wait 26 --eval "window.__ceLimite = $CE_LIMITE; window.__ROOT = '$EXPLORER3'; $(cat tests/tools/sensor_code_segue.js)"
 wait "$GROW3_PID"
 
 step "tela Code: abas, abertura rápida, busca e pasta sem Git"

@@ -33,7 +33,7 @@
       var atraso = window.__ceAtraso;
       var lit = document.querySelector('.ce-changed-line'); if (!lit && !late('lit', lit)) return false;
       if (!lit) fail('linha alterada sem destaque');
-      if (atraso > 2000) fail('a escrita levou ' + atraso + ' ms até a tela');
+      if (atraso > (window.__ceLimite || 2000)) fail('a escrita levou ' + atraso + ' ms até a tela');
       return true; },
     function () { return mark('novo-arquivo.js') === 'A'; },
     function () { if (mark('longo.txt') !== 'D') return false;
