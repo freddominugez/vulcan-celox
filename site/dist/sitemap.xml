@@ -1,1 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://vulcan-celox.vercel.app/pt-br/</loc></url><url><loc>https://vulcan-celox.vercel.app/en-us/</loc></url><url><loc>https://vulcan-celox.vercel.app/es-es/</loc></url></urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://celox.byvulcan.com/</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://celox.byvulcan.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://celox.byvulcan.com/en-us/" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://celox.byvulcan.com/es-es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://celox.byvulcan.com/" />
+  </url>
+  <url>
+    <loc>https://celox.byvulcan.com/en-us/</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://celox.byvulcan.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://celox.byvulcan.com/en-us/" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://celox.byvulcan.com/es-es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://celox.byvulcan.com/" />
+  </url>
+  <url>
+    <loc>https://celox.byvulcan.com/es-es/</loc>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://celox.byvulcan.com/" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://celox.byvulcan.com/en-us/" />
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://celox.byvulcan.com/es-es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://celox.byvulcan.com/" />
+  </url>
+</urlset>

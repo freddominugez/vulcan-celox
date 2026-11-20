@@ -10,7 +10,7 @@ A desktop panel for developers who work alone with code agents. Real terminals, 
 
 **Status:** the latest stable release is 1.4.0, for macOS. The latest test builds for Windows and Linux are on the [Releases](https://github.com/freddominugez/vulcan-celox/releases) page. Neither test build has been accepted on a real machine yet. Choose English (US), Português (Brasil), or Español (España) in Settings.
 
-[Product website](https://vulcan-celox.vercel.app/)
+[Product website](https://celox.byvulcan.com/)
 
 ## Why it exists
 

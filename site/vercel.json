@@ -7,6 +7,22 @@
   "trailingSlash": true,
   "redirects": [
     {
+      "source": "/pt-br/",
+      "destination": "https://celox.byvulcan.com/",
+      "permanent": true
+    },
+    {
+      "source": "/:path(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "vulcan-celox.vercel.app"
+        }
+      ],
+      "destination": "https://celox.byvulcan.com/:path",
+      "permanent": true
+    },
+    {
       "source": "/downloads/Vulcan-Celox-1.4.0-macos-universal.zip",
       "destination": "https://github.com/freddominugez/vulcan-celox/releases/download/v1.4.0/Vulcan-Celox-1.4.0-macos.zip",
       "permanent": false

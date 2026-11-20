@@ -10,7 +10,11 @@ python3 check.py
 node --check dist/assets/site.js
 ```
 
-`content/` owns the three versions of the copy. `build.py` renders real HTML with locale-specific title, description, Open Graph, hreflang and structured data. The root page is Portuguese. `settings.json` holds the verified origin and the real download path. The Vercel project uses `site/` as its root and serves the checked-in `dist/`.
+`content/` owns the three versions of the copy. `build.py` renders real HTML with locale-specific title, description, Open Graph, hreflang and structured data. The Vercel project uses `site/` as its root and serves the checked-in `dist/`.
+
+## Indexing
+
+The origin in `settings.json` is `https://celox.byvulcan.com`. Brazilian Portuguese uses `/` and is the default language. American English and Spanish use `/en-us/` and `/es-es/`. The former `/pt-br/` route and the `vulcan-celox.vercel.app` hostname redirect permanently. The sitemap lists the three canonical URLs with matching language alternates. The robots file points to the sitemap at `https://celox.byvulcan.com/sitemap.xml`.
 
 ## Assets and screenshots
 

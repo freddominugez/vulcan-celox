@@ -2,6 +2,7 @@
 """Build three complete static pages, with no runtime framework or external asset."""
 import html
 import json
+import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -9,7 +10,10 @@ OUT = ROOT / "dist"
 SETTINGS = json.loads((ROOT / "settings.json").read_text())
 ORIGIN = SETTINGS["origin"].rstrip("/")
 REPO = "https://github.com/freddominugez/vulcan-celox"
-LANGUAGES = [("pt-br", "pt-BR", "PT"), ("en-us", "en-US", "EN"), ("es-es", "es-ES", "ES")]
+LANGUAGES = [("pt-br", "pt-BR", "PT", "/"), ("en-us", "en-US", "EN", "/en-us/"), ("es-es", "es-ES", "ES", "/es-es/")]
+PATHS = {slug: path for slug, _, _, path in LANGUAGES}
+ALTERNATES = {lang: ORIGIN + path for _, lang, _, path in LANGUAGES}
+ALTERNATES["x-default"] = ORIGIN + "/"
 
 
 def esc(text):
@@ -24,14 +28,66 @@ def button(label, href, primary=True):
     return f'<a class="button {"primary" if primary else "secondary"}" href="{esc(href)}">{esc(label)}</a>'
 
 
+def structured_data(c, url, image_url):
+    website_id = ORIGIN + "/#website"
+    software_id = ORIGIN + "/#software"
+    return {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": website_id,
+                "url": ORIGIN + "/",
+                "name": "Vulcan Celox",
+                "inLanguage": [lang for _, lang, _, _ in LANGUAGES],
+            },
+            {
+                "@type": "WebPage",
+                "@id": url + "#page",
+                "url": url,
+                "name": c["title"],
+                "description": c["description"],
+                "inLanguage": c["lang"],
+                "isPartOf": {"@id": website_id},
+                "mainEntity": {"@id": software_id},
+            },
+            {
+                "@type": "SoftwareApplication",
+                "@id": software_id,
+                "name": "Vulcan Celox",
+                "url": ORIGIN + "/",
+                "description": c["description"],
+                "applicationCategory": "DeveloperApplication",
+                "operatingSystem": "macOS 13+",
+                "softwareVersion": SETTINGS["version"],
+                "softwareRequirements": "Python 3.9+",
+                "inLanguage": [lang for _, lang, _, _ in LANGUAGES],
+                "offers": {"@type": "Offer", "price": 0},
+                "license": REPO + "/blob/main/LICENSE",
+                "sameAs": REPO,
+                "downloadUrl": SETTINGS["downloadUrl"],
+                "screenshot": image_url,
+                "featureList": c["terminalItems"],
+            },
+        ],
+    }
+
+
 def page(slug, c):
+    path = PATHS[slug]
+    url = ORIGIN + path
     nav_ids = ["product", "inside", "workflow", "faq"]
     docs_lang = "pt-BR" if slug == "pt-br" else "en"
     docs = REPO + "/blob/main/docs/" + docs_lang
     nav = "".join(f'<a href="#{section}">{esc(label)}</a>' for label, section in zip(c["nav"], nav_ids))
-    languages = "".join(f'<a href="/{path}/" lang="{lang}" hreflang="{lang}" data-language="{path}" {"aria-current=page" if path == slug else ""}>{label}</a>' for path, lang, label in LANGUAGES)
-    alternates = "".join(f'<link rel="alternate" hreflang="{lang}" href="{ORIGIN}/{path}/">' for path, lang, _ in LANGUAGES)
+    languages = "".join(f'<a href="{target}" lang="{lang}" hreflang="{lang}" data-language="{code}" {"aria-current=page" if code == slug else ""}>{label}</a>' for code, lang, label, target in LANGUAGES)
+    alternates = "\n".join(f'<link rel="alternate" hreflang="{lang}" href="{href}">' for lang, href in ALTERNATES.items())
+    og_alternates = "\n".join(f'<meta property="og:locale:alternate" content="{lang.replace("-", "_")}">' for _, lang, _, _ in LANGUAGES if lang != c["lang"])
     image_path = f'/assets/screens/overview-{c["screenLang"]}.png'
+    image_url = ORIGIN + image_path
+    image_alt = c["screens"][0]["alt"]
+    with (OUT / image_path.lstrip("/")).open("rb") as image:
+        image_width, image_height = struct.unpack(">II", image.read(24)[16:24])
     terminal_screen = next(screen for screen in c["screens"] if screen["id"] == "terminals")
     terminal_path = f'/assets/screens/terminals-{c["screenLang"]}.png'
     tabs = "".join(f'<button type="button" role="tab" id="tab-{s["id"]}" aria-controls="showcase-panel" aria-selected="{str(i == 0).lower()}" tabindex="{0 if i == 0 else -1}" data-screen="{s["id"]}">{esc(s["title"])}</button>' for i, s in enumerate(c["screens"]))
@@ -42,7 +98,7 @@ def page(slug, c):
     stack = "".join(f'<span>{esc(item)}</span>' for item in c["stack"])
     terminal_items = "".join(f'<li>{icon("check")}<span>{esc(item)}</span></li>' for item in c["terminalItems"])
     env_items = "".join(f'<li>{icon("check")}<span>{esc(item)}</span></li>' for item in c["environmentItems"])
-    language_items = "".join(f'<a class="language-card" href="/{code}/" lang="{language}" hreflang="{language}" data-language="{code}" {"aria-current=page" if code == slug else ""}><span>{label}</span><b>{esc(name)}</b></a>' for (code, language, label), name in zip(LANGUAGES, c["languageNames"]))
+    language_items = "".join(f'<a class="language-card" href="{target}" lang="{language}" hreflang="{language}" data-language="{code}" {"aria-current=page" if code == slug else ""}><span>{label}</span><b>{esc(name)}</b></a>' for (code, language, label, target), name in zip(LANGUAGES, c["languageNames"]))
     footer_urls = [docs + "/README.md", docs + "/installation.md", docs + "/security.md", REPO, REPO + "/blob/main/LICENSE"]
     footer_links = "".join(f'<a href="{url}" target="_blank" rel="noopener noreferrer">{esc(label)}</a>' for label, url in zip(c["footerLinks"], footer_urls))
     downloads = SETTINGS["downloadUrl"]
@@ -54,14 +110,20 @@ def page(slug, c):
             "es-es": f'Versión {SETTINGS["version"]} universal para Apple Silicon e Intel, con los tres idiomas. La aplicación no está notarizada por Apple.'
         }[slug]
     gallery_data = json.dumps({"screens": c["screens"], "screenLang": c["screenLang"], "menu": c["menu"], "closeMenu": c["closeMenu"]}, ensure_ascii=False).replace("</", "<\/")
-    schema = json.dumps({"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Vulcan Celox", "applicationCategory": "DeveloperApplication", "operatingSystem": "macOS", "description": c["description"], "url": ORIGIN + "/" + slug + "/", "license": REPO + "/blob/main/LICENSE", "inLanguage": c["lang"]}, ensure_ascii=False)
+    schema = json.dumps(structured_data(c, url, image_url), ensure_ascii=False).replace("<", "\\u003c")
     return f'''<!doctype html>
 <html lang="{c['lang']}">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(c['title'])}</title><meta name="description" content="{esc(c['description'])}"><meta name="theme-color" content="#FAF6EE" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#070D18" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="{ORIGIN}/{slug}/">{alternates}<link rel="alternate" hreflang="x-default" href="{ORIGIN}/pt-br/">
-<meta property="og:type" content="website"><meta property="og:site_name" content="Vulcan Celox"><meta property="og:locale" content="{c['locale']}"><meta property="og:title" content="{esc(c['title'])}"><meta property="og:description" content="{esc(c['description'])}"><meta property="og:url" content="{ORIGIN}/{slug}/"><meta property="og:image" content="{ORIGIN}{image_path}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(c['title'])}"><meta name="twitter:description" content="{esc(c['description'])}"><meta name="twitter:image" content="{ORIGIN}{image_path}">
+<link rel="canonical" href="{url}">
+{alternates}
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Vulcan Celox"><meta property="og:locale" content="{c['locale']}">
+{og_alternates}
+<meta property="og:title" content="{esc(c['title'])}"><meta property="og:description" content="{esc(c['description'])}"><meta property="og:url" content="{url}">
+<meta property="og:image" content="{image_url}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="{image_width}"><meta property="og:image:height" content="{image_height}"><meta property="og:image:alt" content="{esc(image_alt)}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(c['title'])}"><meta name="twitter:description" content="{esc(c['description'])}"><meta name="twitter:image" content="{image_url}"><meta name="twitter:image:alt" content="{esc(image_alt)}">
 <link rel="icon" type="image/png" href="/assets/brand/favicon.png"><link rel="apple-touch-icon" href="/assets/brand/app-icon.png"><link rel="preload" as="font" href="/assets/fonts/InterVariable.woff2" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/site.css">
 <script type="application/ld+json">{schema}</script><script type="application/json" id="page-data">{gallery_data}</script><script src="/assets/site.js" defer></script>
 </head>
@@ -69,7 +131,7 @@ def page(slug, c):
 <a class="skip-link" href="#main">{esc(c['skip'])}</a>
 <header class="site-header">
   <div class="nav-shell container">
-    <a class="brand" href="/{slug}/"><picture>
+    <a class="brand" href="{path}"><picture>
       <source media="(prefers-color-scheme: dark)" srcset="/assets/brand/logo-reverse.svg">
       <img src="/assets/brand/logo-primary.svg" alt="Vulcan Celox" width="280" height="64">
     </picture></a>
@@ -95,7 +157,7 @@ def page(slug, c):
       </div>
       <figure class="hero-screenshot">
         <a class="screenshot-button shot" href="{image_path}" data-zoom aria-label="{esc(c['zoom'])}">
-          <img src="{image_path}" alt="{esc(c['screens'][0]['alt'])}" width="1600" height="1000" fetchpriority="high" decoding="async">
+          <img src="{image_path}" alt="{esc(image_alt)}" width="{image_width}" height="{image_height}" fetchpriority="high" decoding="async">
         </a>
         <figcaption>{esc(c['imageNote'])}</figcaption>
       </figure>
@@ -230,7 +292,7 @@ def page(slug, c):
   <div class="container">
     <div class="footer-top">
       <div>
-        <a class="footer-brand" href="/{slug}/"><picture>
+        <a class="footer-brand" href="{path}"><picture>
           <source media="(prefers-color-scheme: dark)" srcset="/assets/brand/logo-reverse.svg">
           <img src="/assets/brand/logo-primary.svg" alt="Vulcan Celox" width="280" height="64">
         </picture></a>
@@ -251,16 +313,21 @@ def page(slug, c):
 
 
 if __name__ == "__main__":
-    pages = []
-    for slug, _, _ in LANGUAGES:
+    for slug, _, _, path in LANGUAGES:
         content = json.loads((ROOT / "content" / (slug + ".json")).read_text())
         destination = OUT / slug
         destination.mkdir(parents=True, exist_ok=True)
         rendered = page(slug, content)
         (destination / "index.html").write_text(rendered)
-        if slug == "pt-br":
+        if path == "/":
             (OUT / "index.html").write_text(rendered)
-        pages.append(ORIGIN + "/" + slug + "/")
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\nSitemap: " + ORIGIN + "/sitemap.xml\n")
-    (OUT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join("<url><loc>" + url + "</loc></url>" for url in pages) + "</urlset>\n")
+    alternates = '\n'.join(f'    <xhtml:link rel="alternate" hreflang="{lang}" href="{url}" />' for lang, url in ALTERNATES.items())
+    entries = '\n'.join(f'  <url>\n    <loc>{ORIGIN + path}</loc>\n{alternates}\n  </url>' for _, _, _, path in LANGUAGES)
+    sitemap = f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{entries}
+</urlset>
+'''
+    (OUT / "sitemap.xml").write_text(sitemap)
     print("Built /, /pt-br/, /en-us/, /es-es/")
