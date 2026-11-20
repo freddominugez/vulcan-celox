@@ -96,10 +96,11 @@ class SessionHub:
         else:
             self.write_memory(session_id)
 
-    def rename(self, session_id: str, title: str) -> None:
-        if self.sessions.get(session_id):
-            self.sessions.rename(session_id, title)
-            self.mark_dirty(session_id)
+    def update_terminal_identity(self, pty, title: str, tab_color: Optional[str]) -> None:
+        self.sessions.update_identity(pty.id, title, tab_color)
+        if pty.title != title:
+            pty.title = title
+            self.on_session_changed(pty.id)
 
     # ── memory ─────────────────────────────────────────────────────────
     def _render(self, record, pty=None) -> str:

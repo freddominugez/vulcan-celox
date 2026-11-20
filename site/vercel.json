@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": "dist",
+  "trailingSlash": true,
+  "redirects": [
+    {
+      "source": "/downloads/Vulcan-Celox-1.4.0-macos-universal.zip",
+      "destination": "https://github.com/freddominugez/vulcan-celox/releases/download/v1.4.0/Vulcan-Celox-1.4.0-macos.zip",
+      "permanent": false
+    }
+  ]
+}

@@ -21,14 +21,13 @@ export const REASONS = {
 };
 
 // CodeMirror keeps its phrases in English and the code editor does not import i18n.mjs: in English there is no swap
-const PHRASES_PT = {
-  Find: "Buscar", next: "próximo", previous: "anterior", all: "todos", "match case": "maiúsculas", regexp: "regex",
-  "by word": "palavra inteira", close: "fechar", "current match": "atual", "on line": "na linha",
-  "$ unchanged lines": "$ linhas iguais", "$ unchanged line": "$ linha igual",
-};
-
 export function searchPhrases() {
-  return currentLanguage() === "pt" ? PHRASES_PT : {};
+  if (currentLanguage() === "en") return {};
+  return {
+    Find: t("Buscar"), next: t("próximo"), previous: t("anterior"), all: t("todos"), "match case": t("maiúsculas"), regexp: "regex",
+    "by word": t("palavra inteira"), close: t("fechar"), "current match": t("atual"), "on line": t("na linha"),
+    "$ unchanged lines": t("$ linhas iguais"), "$ unchanged line": t("$ linha igual"),
+  };
 }
 
 export function diffNotes(d, scope) {

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vulcan Celox | Claude Code, Codex e projetos locais</title><meta name="description" content="Um espaço de trabalho local para quem desenvolve com Claude Code e Codex. Reúna terminais, sessões, código, projetos PHP e Node no seu Mac."><meta name="theme-color" content="#FAF6EE" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#070D18" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://vulcan-celox.vercel.app/pt-br/"><link rel="alternate" hreflang="pt-BR" href="https://vulcan-celox.vercel.app/pt-br/"><link rel="alternate" hreflang="en-US" href="https://vulcan-celox.vercel.app/en-us/"><link rel="alternate" hreflang="es-ES" href="https://vulcan-celox.vercel.app/es-es/"><link rel="alternate" hreflang="x-default" href="https://vulcan-celox.vercel.app/pt-br/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Vulcan Celox"><meta property="og:locale" content="pt_BR"><meta property="og:title" content="Vulcan Celox | Claude Code, Codex e projetos locais"><meta property="og:description" content="Um espaço de trabalho local para quem desenvolve com Claude Code e Codex. Reúna terminais, sessões, código, projetos PHP e Node no seu Mac."><meta property="og:url" content="https://vulcan-celox.vercel.app/pt-br/"><meta property="og:image" content="https://vulcan-celox.vercel.app/assets/screens/overview-pt.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Vulcan Celox | Claude Code, Codex e projetos locais"><meta name="twitter:description" content="Um espaço de trabalho local para quem desenvolve com Claude Code e Codex. Reúna terminais, sessões, código, projetos PHP e Node no seu Mac."><meta name="twitter:image" content="https://vulcan-celox.vercel.app/assets/screens/overview-pt.png">
+<link rel="icon" type="image/png" href="/assets/brand/favicon.png"><link rel="apple-touch-icon" href="/assets/brand/app-icon.png"><link rel="preload" as="font" href="/assets/fonts/InterVariable.woff2" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Vulcan Celox", "applicationCategory": "DeveloperApplication", "operatingSystem": "macOS", "description": "Um espaço de trabalho local para quem desenvolve com Claude Code e Codex. Reúna terminais, sessões, código, projetos PHP e Node no seu Mac.", "url": "https://vulcan-celox.vercel.app/pt-br/", "license": "https://github.com/freddominugez/vulcan-celox/blob/main/LICENSE", "inLanguage": "pt-BR"}</script><script type="application/json" id="page-data">{"screens": [{"id": "overview", "title": "Visão geral", "caption": "Projetos, tarefas, terminais e sessões recentes, no mesmo ponto de partida.", "alt": "Visão geral do Celox com os projetos e o resumo do trabalho"}, {"id": "agents", "title": "Agentes", "caption": "Sessões de Claude Code e Codex com projeto, branch, atividade e arquivos tocados.", "alt": "Tela de sessões de agentes com projetos e atividade"}, {"id": "code", "title": "Código", "caption": "Acompanhe arquivos e diferenças em um visor somente leitura, sem interferir no trabalho do agente.", "alt": "Árvore de arquivos e visor de código do Celox"}, {"id": "terminals", "title": "Terminais", "caption": "Abas por projeto, temas de identificação, divisão, busca e memória da sessão.", "alt": "Terminais do Celox organizados em abas e painéis"}, {"id": "prompts", "title": "Prompts", "caption": "Instruções reutilizáveis, variáveis preenchidas e envio como colagem. O Enter continua sendo seu.", "alt": "Biblioteca de prompts com prévia e variáveis"}, {"id": "settings", "title": "Configurações", "caption": "Tema, idioma, avisos, preferências e backup. Português, inglês e espanhol no mesmo app.", "alt": "Configurações do Celox e escolha de idioma"}], "screenLang": "pt", "menu": "Abrir menu", "closeMenu": "Fechar menu"}</script><script src="/assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Ir para o conteúdo</a>
+<header class="site-header">
+  <div class="nav-shell container">
+    <a class="brand" href="/pt-br/"><picture>
+      <source media="(prefers-color-scheme: dark)" srcset="/assets/brand/logo-reverse.svg">
+      <img src="/assets/brand/logo-primary.svg" alt="Vulcan Celox" width="280" height="64">
+    </picture></a>
+    <nav class="desktop-nav" aria-label="Produto"><a href="#product">O produto</a><a href="#inside">Por dentro</a><a href="#workflow">Como funciona</a><a href="#faq">Perguntas</a></nav>
+    <div class="nav-actions">
+      <nav class="language-nav" aria-label="Idioma"><a href="/pt-br/" lang="pt-BR" hreflang="pt-BR" data-language="pt-br" aria-current=page>PT</a><a href="/en-us/" lang="en-US" hreflang="en-US" data-language="en-us" >EN</a><a href="/es-es/" lang="es-ES" hreflang="es-ES" data-language="es-es" >ES</a></nav>
+      <a href="#download" class="nav-download">Baixar</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menu"><img class="icon" src="/assets/icons/list.svg" alt="" width="24" height="24" aria-hidden="true"></button>
+    </div>
+  </div>
+  <nav id="mobile-menu" class="mobile-menu container" aria-label="Abrir menu" hidden><a href="#product">O produto</a><a href="#inside">Por dentro</a><a href="#workflow">Como funciona</a><a href="#faq">Perguntas</a><a href="#download">Baixar para macOS</a></nav>
+</header>
+<main id="main">
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-title">Qual agente está parado, e qual branch ficou sem push?</h1>
+        <p class="hero-intro">O Vulcan Celox reúne sessões do Claude Code e do Codex, terminais, prompts e projetos locais em um app nativo para Mac.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="https://github.com/freddominugez/vulcan-celox/releases/download/v1.4.0/Vulcan-Celox-1.4.0-macos.zip">Baixar para macOS</a>
+          <a class="button secondary" href="https://github.com/freddominugez/vulcan-celox">Ver no GitHub</a>
+        </div>
+      </div>
+      <figure class="hero-screenshot">
+        <a class="screenshot-button shot" href="/assets/screens/overview-pt.png" data-zoom aria-label="Ampliar captura de tela">
+          <img src="/assets/screens/overview-pt.png" alt="Visão geral do Celox com os projetos e o resumo do trabalho" width="1600" height="1000" fetchpriority="high" decoding="async">
+        </a>
+        <figcaption>Interface real do produto, com dados de demonstração.</figcaption>
+      </figure>
+    </div>
+    <dl class="spec-strip">
+      <div><dt>Versão</dt><dd>1.4.0</dd></div>
+      <div><dt>Sistema</dt><dd>macOS 13+</dd></div>
+      <div><dt>Arquitetura</dt><dd>Apple Silicon · Intel</dd></div>
+      <div><dt>Licença</dt><dd><a href="https://github.com/freddominugez/vulcan-celox/blob/main/LICENSE">MIT</a></dd></div>
+    </dl>
+  </section>
+
+  <section class="session-band section" id="product" aria-labelledby="product-title">
+    <div class="container session-layout">
+      <div>
+        <h2 id="product-title">Veja até onde cada sessão chegou</h2>
+        <p>Acompanhe o projeto, a branch e os arquivos tocados. A trilha mostra as etapas de edição, commit, push e pull request, para você saber onde retomar.</p>
+      </div>
+      <figure class="session-example">
+        <div class="session-top"><code>feat/checkout-pix</code><span class="session-status">Sem push</span></div>
+        <p class="session-ask">Adicionar pagamento por Pix no checkout</p>
+        <ol class="session-trail">
+          <li class="is-complete">Edição</li><li class="is-complete">Commit</li><li>Push</li><li>PR</li>
+        </ol>
+        <p class="session-meta">Claude Code <span>12 arquivos editados · 34 comandos</span></p>
+        <figcaption>Sessão de exemplo.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="showcase section" id="inside" aria-labelledby="inside-title">
+    <div class="container">
+      <div class="section-heading">
+        <h2 id="inside-title">O que tem no painel</h2>
+        <p>Explore as sessões de agentes, o visor de código, os terminais e a biblioteca de prompts em capturas do app.</p>
+      </div>
+      <div class="showcase-grid">
+        <div class="showcase-sidebar">
+          <div class="screen-tabs" role="tablist" aria-label="Telas do produto"><button type="button" role="tab" id="tab-overview" aria-controls="showcase-panel" aria-selected="true" tabindex="0" data-screen="overview">Visão geral</button><button type="button" role="tab" id="tab-agents" aria-controls="showcase-panel" aria-selected="false" tabindex="-1" data-screen="agents">Agentes</button><button type="button" role="tab" id="tab-code" aria-controls="showcase-panel" aria-selected="false" tabindex="-1" data-screen="code">Código</button><button type="button" role="tab" id="tab-terminals" aria-controls="showcase-panel" aria-selected="false" tabindex="-1" data-screen="terminals">Terminais</button><button type="button" role="tab" id="tab-prompts" aria-controls="showcase-panel" aria-selected="false" tabindex="-1" data-screen="prompts">Prompts</button><button type="button" role="tab" id="tab-settings" aria-controls="showcase-panel" aria-selected="false" tabindex="-1" data-screen="settings">Configurações</button></div>
+          <p class="image-note">Interface real do produto, com dados de demonstração.</p>
+        </div>
+        <div class="gallery">
+          <div class="app-frame shot" id="showcase-panel" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+            <div class="window-bar"><span>Vulcan Celox</span><span id="gallery-window-label">Visão geral</span></div>
+            <a class="screenshot-button" href="/assets/screens/overview-pt.png" data-zoom aria-label="Ampliar captura de tela">
+              <img id="gallery-image" src="/assets/screens/overview-pt.png" alt="Visão geral do Celox com os projetos e o resumo do trabalho" width="1600" height="1000" loading="lazy" decoding="async">
+            </a>
+          </div>
+          <div class="gallery-caption">
+            <p id="gallery-caption" aria-live="polite">Projetos, tarefas, terminais e sessões recentes, no mesmo ponto de partida.</p>
+            <button type="button" class="text-button" data-gallery-zoom>Ampliar captura de tela</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section container split workflow-section" id="workflow" aria-labelledby="workflow-title">
+    <div>
+      <h2 id="workflow-title">Do projeto à mudança no código.</h2>
+      <p>Quando cada agente está em uma janela e cada projeto em outra pasta, o contexto se espalha. O Celox reúne o trabalho local e deixa as relações visíveis.</p>
+    </div>
+    <div class="workflow-list"><article class="workflow-item"><span class="workflow-icon"><img class="icon" src="/assets/icons/folder.svg" alt="" width="24" height="24" aria-hidden="true"></span><div><h3>Abra o projeto</h3><p>Encontre sites PHP, adicione projetos Node ou abra uma pasta. Cada terminal começa no lugar certo.</p></div></article><article class="workflow-item"><span class="workflow-icon"><img class="icon" src="/assets/icons/sparkle.svg" alt="" width="24" height="24" aria-hidden="true"></span><div><h3>Trabalhe com seus agentes</h3><p>Escolha Claude Code ou Codex para aquela aba. Acompanhe sessões, pedidos, arquivos e comandos sem alternar de ferramenta.</p></div></article><article class="workflow-item"><span class="workflow-icon"><img class="icon" src="/assets/icons/git-branch.svg" alt="" width="24" height="24" aria-hidden="true"></span><div><h3>Volte com contexto</h3><p>Retome uma sessão, consulte a memória do terminal e veja o que mudou antes de continuar.</p></div></article></div>
+  </section>
+
+  <section class="section panel-band">
+    <div class="container split terminal-feature">
+      <div>
+        <h2>Um terminal para cada sessão.</h2>
+        <p>Abra um shell ou escolha o agente daquela sessão. Divida o painel, procure na saída e volte ao projeto sem perder os terminais abertos.</p>
+        <ul class="check-list"><li><img class="icon" src="/assets/icons/check.svg" alt="" width="24" height="24" aria-hidden="true"><span>Claude e Codex são escolhidos por aba</span></li><li><img class="icon" src="/assets/icons/check.svg" alt="" width="24" height="24" aria-hidden="true"><span>Prompts enviados sem Enter automático</span></li><li><img class="icon" src="/assets/icons/check.svg" alt="" width="24" height="24" aria-hidden="true"><span>Histórico e memória para retomar o fio</span></li></ul>
+      </div>
+      <figure>
+        <a class="screenshot-button shot" href="/assets/screens/terminals-pt.png" data-zoom aria-label="Ampliar captura de tela">
+          <img src="/assets/screens/terminals-pt.png" alt="Terminais do Celox organizados em abas e painéis" width="1600" height="1000" loading="lazy" decoding="async">
+        </a>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section container split">
+    <div>
+      <h2>PHP e Node no mesmo espaço.</h2>
+      <p>Use Lerd ou Laravel Valet para o ambiente PHP local. Cadastre projetos Node, veja os scripts e abra os comandos no terminal. Sem PHP instalado? Terminais, agentes e organização continuam disponíveis.</p>
+      <div class="tool-strip" aria-label="Trabalha com as ferramentas que você já usa"><span>Claude Code</span><span>Codex</span><span>PHP + Laravel</span><span>Node.js</span><span>Git</span></div>
+    </div>
+    <ul class="check-list environment-list"><li><img class="icon" src="/assets/icons/check.svg" alt="" width="24" height="24" aria-hidden="true"><span>Sites PHP, versões e HTTPS local pelo backend</span></li><li><img class="icon" src="/assets/icons/check.svg" alt="" width="24" height="24" aria-hidden="true"><span>Projetos Node e scripts do package.json</span></li><li><img class="icon" src="/assets/icons/check.svg" alt="" width="24" height="24" aria-hidden="true"><span>Branches, worktrees e histórico dos agentes</span></li></ul>
+  </section>
+
+  <section class="section panel-band">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Seu espaço de trabalho é local.</h2>
+        <p>O app lê os registros locais dos agentes para organizar o contexto. Não exige chave de API para acompanhar Claude Code e Codex e não escreve nas pastas de configuração deles.</p>
+      </div>
+      <div class="privacy-grid"><article class="privacy-item"><img class="icon" src="/assets/icons/database.svg" alt="" width="24" height="24" aria-hidden="true"><h3>Os dados ficam com você</h3><p>Preferências, tarefas, prompts e memórias são guardados localmente. Faça backup quando precisar.</p></article><article class="privacy-item"><img class="icon" src="/assets/icons/lock.svg" alt="" width="24" height="24" aria-hidden="true"><h3>Conexões com propósito</h3><p>Consultas de PR e de atualização têm controles próprios. Documentação com IA só é gerada por uma ação sua, com sua chave da Anthropic.</p></article><article class="privacy-item"><img class="icon" src="/assets/icons/code.svg" alt="" width="24" height="24" aria-hidden="true"><h3>Transparência no código</h3><p>Consulte o projeto, as licenças e a documentação. Celox é open source sob a licença MIT.</p></article></div>
+    </div>
+  </section>
+
+  <section class="section container split">
+    <div>
+      <h2>Use o Celox no seu idioma.</h2>
+      <p>Escolha Português (Brasil), English (US) ou Español (España) nas Configurações. Não é preciso instalar três aplicativos.</p>
+    </div>
+    <nav class="language-cards" aria-label="Idioma"><a class="language-card" href="/pt-br/" lang="pt-BR" hreflang="pt-BR" data-language="pt-br" aria-current=page><span>PT</span><b>Português (Brasil)</b></a><a class="language-card" href="/en-us/" lang="en-US" hreflang="en-US" data-language="en-us" ><span>EN</span><b>English (US)</b></a><a class="language-card" href="/es-es/" lang="es-ES" hreflang="es-ES" data-language="es-es" ><span>ES</span><b>Español (España)</b></a></nav>
+  </section>
+
+  <section class="section container split faq-section" id="faq">
+    <h2>Perguntas frequentes</h2>
+    <div class="faq-list"><details><summary>O Celox substitui o Claude Code ou o Codex?</summary><p>Não. Ele organiza projetos, terminais e sessões ao redor das ferramentas que você já usa. Os agentes continuam executando pelos seus próprios programas e contas.</p></details><details><summary>Preciso de uma chave de API?</summary><p>Não para ler e acompanhar sessões locais de Claude Code e Codex. A função opcional de documentação com IA usa sua chave da Anthropic e só roda quando você solicita.</p></details><details><summary>Posso editar arquivos dentro do app?</summary><p>A tela Código é um visor somente leitura com árvore, busca, acompanhamento e diff. Para editar, use seu editor externo. O Celox não promete salvamento de arquivos nessa tela.</p></details><details><summary>Preciso instalar o Lerd?</summary><p>Somente se quiser usar esse backend para os sites PHP locais. Laravel Valet também é aceito. Projetos Node, terminais, agentes e organização funcionam sem esses backends.</p></details><details><summary>O app está disponível em quais sistemas?</summary><p>A experiência estável é voltada ao macOS. As distribuições de Linux e Windows são pré-lançamentos e devem ser avaliadas com os requisitos e limitações publicados no repositório.</p></details><details><summary>O que sai do meu computador?</summary><p>Os dados do app são locais. Recursos opcionais consultam serviços externos, como GitHub para PRs e versões e Anthropic para documentação solicitada por você. O uso dos próprios agentes segue os serviços e configurações deles.</p></details><details><summary>O pareamento do Codex é exato?</summary><p>O vínculo com uma aba usa pasta e horário. Sessões iniciadas quase juntas na mesma pasta podem ser associadas à aba errada. Essa limitação está documentada e não altera a escolha de iniciar um agente por aba.</p></details><details><summary>O projeto é open source?</summary><p>Sim. O código do Celox é distribuído sob licença MIT. Componentes de terceiros mantêm suas próprias licenças e avisos no repositório.</p></details></div>
+  </section>
+
+  <section class="section download-section" id="download">
+    <div class="container split">
+      <div>
+        <img class="app-icon" src="/assets/brand/app-icon.png" alt="" width="96" height="96" loading="lazy">
+        <h2>Instale o Celox no Mac.</h2>
+        <p>Baixe o app, abra uma pasta e comece com as ferramentas que você já conhece.</p>
+        <div class="download-actions">
+          <a class="button primary" href="https://github.com/freddominugez/vulcan-celox/releases/download/v1.4.0/Vulcan-Celox-1.4.0-macos.zip">Baixar para macOS</a>
+          <a class="download-guide" href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/installation.md" target="_blank" rel="noopener noreferrer">Ler o guia de instalação</a>
+        </div>
+        <p class="requirements">macOS 13 ou posterior, Apple Silicon ou Intel e Python 3.9+. O app orienta a instalação do Python quando necessário. Claude Code, Codex e backends de ambiente são instalados separadamente.</p>
+        <p class="download-note">Versão 1.4.0 universal, para Apple Silicon e Intel, com os três idiomas. Aplicativo sem notarização Apple.</p>
+      </div>
+      <ol class="install-steps"><li><h3>Baixe e extraia o pacote</h3><p>Extraia o ZIP universal e mova Vulcan Celox.app para a pasta Aplicativos.</p></li><li><h3>Abra o Celox</h3><p>Escolha o idioma e encontre seus projetos. Seus dados locais continuam separados do aplicativo.</p></li><li><h3>Abra seu primeiro terminal</h3><p>Comece em shell ou selecione Claude Code ou Codex para aquela aba.</p></li></ol>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <a class="footer-brand" href="/pt-br/"><picture>
+          <source media="(prefers-color-scheme: dark)" srcset="/assets/brand/logo-reverse.svg">
+          <img src="/assets/brand/logo-primary.svg" alt="Vulcan Celox" width="280" height="64">
+        </picture></a>
+        <p>Um espaço de trabalho para desenvolver com contexto.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Produto"><b>Produto</b><a href="#product">O produto</a><a href="#inside">Por dentro</a><a href="#workflow">Como funciona</a><a href="#faq">Perguntas</a></nav>
+      <nav class="footer-nav" aria-label="Recursos"><b>Recursos</b><a href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/README.md" target="_blank" rel="noopener noreferrer">Documentação</a><a href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/installation.md" target="_blank" rel="noopener noreferrer">Instalação</a><a href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/security.md" target="_blank" rel="noopener noreferrer">Segurança e privacidade</a><a href="https://github.com/freddominugez/vulcan-celox" target="_blank" rel="noopener noreferrer">Código-fonte</a><a href="https://github.com/freddominugez/vulcan-celox/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Licença MIT</a></nav>
+    </div>
+    <div class="footer-bottom"><p>Vulcan Celox. Claude Code, Codex e demais marcas pertencem aos seus respectivos titulares.</p></div>
+  </div>
+</footer>
+<dialog id="screenshot-dialog" aria-label="Ampliar captura de tela">
+  <div class="dialog-bar"><span>Vulcan Celox</span><button type="button" data-close-dialog aria-label="Fechar captura ampliada"><img class="icon" src="/assets/icons/x.svg" alt="" width="24" height="24" aria-hidden="true"></button></div>
+  <img id="dialog-image" src="/assets/screens/overview-pt.png" alt="Visão geral do Celox com os projetos e o resumo do trabalho" width="1600" height="1000" loading="lazy">
+  <p id="dialog-caption">Interface real do produto, com dados de demonstração.</p>
+</dialog>
+</body></html>

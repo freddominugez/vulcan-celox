@@ -279,7 +279,8 @@ Unknown ids return 404. Invalid values return 400. In `site`, `*` means all site
 | DELETE | `/api/tags/<tid>` | Delete a tag from everywhere | | 404 |
 | GET | `/api/notes` | Notes | Query: `site`, `q`, `tag`, `terminal` | |
 | POST | `/api/notes` | Create a note | `text`, `color` (default `amarelo`), `tags`, `site`, `terminal` | 201, 400, 404 |
-| PATCH | `/api/notes/<nid>` | Change a note | `text`, `color`, `pinned`, `terminal`, `tags` | 400, 404 |
+| GET | `/api/notes/<nid>` | Read a note and its linked terminal | | 404 |
+| PATCH | `/api/notes/<nid>` | Change a note | `text`, `color`, `pinned`, `terminal`, `tags`, `link_terminal` | 400, 404, 409 |
 | POST | `/api/notes/<nid>/move` | Reorder | `target` (a note id) or `index` | 400, 404 |
 | DELETE | `/api/notes/<nid>` | Delete | | 404 |
 | GET | `/api/tasks` | Tasks, progress, summary and `can_undo` | Query: `site`, `status` (comma list of `todo`, `doing`, `done`), `tag`, `sort` (`priority`, `due`, `manual`, `assignee`), `terminal`, `assignee`, `due` (`late`, `today`, `week`) | |
@@ -319,6 +320,12 @@ Read only: the one write adds or removes a folder from the app's own list. `root
 | GET | `/api/files/search` | Text search in the files Git tracks, without textconv | Query: `root`, `q` | 400 |
 | GET | `/api/files/photo` | Files in the current photo of the disk, for the quick open | Query: `root` | 400, 403 |
 | GET | `/api/files/git` | Git state per file (`M`, `U`, `D`), from the index compared with the disk, with the branch. Cached per root | Query: `root` | 400, 403 |
+
+## Terminal tab identity and sticky note links
+
+`PATCH /api/terminals/<id>` accepts `title` and `tab_color`. The tab color uses an ID from `GET /api/themes`. Use `null` to return to the theme color. The value is stored with the session and appears in terminal and history responses.
+
+`GET /api/notes/<nid>` includes `session` with the linked terminal’s ID, title, site, color and status. In `PATCH /api/notes/<nid>`, `link_terminal` links an unlinked note to an open terminal in the same scope. An incompatible request returns 409.
 
 ## WebSocket
 

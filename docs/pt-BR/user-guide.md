@@ -118,12 +118,13 @@ A tela **Código** mostra a árvore inteira de uma pasta e acompanha o que é es
 
 *Abas, painel de baixo e a memória de cada sessão.*
 
-Cada terminal é uma sessão. Ele abre na pasta escolhida, com um tema de cor que identifica a sessão, e pode já começar com o Claude Code ou o Codex rodando.
+Cada terminal é uma sessão. Ele abre na pasta escolhida, com um tema de cor que identifica a sessão. No diálogo de novo terminal, escolha Claude Code, Codex ou só o shell para aquela aba: a escolha não passa para as próximas. Cada diálogo começa em shell. Com a opção de não perguntar a pasta, as novas abas abrem diretamente em shell; ⇧⌘T volta a mostrar o diálogo.
 
+- **Nome e cor:** selecione uma aba e use Nome e cor para identificá-la. A cor da aba é independente da paleta do shell.
 - **Portas:** a aba mostra as portas que os processos dela abriram, como `:5173 +2`, na barra de abas e na lista de sessões. O clique abre `http://localhost:<porta>` no navegador. Só os processos da própria aba contam.
 - **⌘T** abre um terminal novo; **⌘J** mostra ou esconde o painel de terminal de baixo, nas telas que ainda não mostram um terminal.
 - **Comandos rápidos** do projeto (composer, artisan, npm) ficam na barra do terminal.
-- **Memória:** enquanto o terminal está aberto, o app mantém um arquivo Markdown com os comandos digitados, tarefas, post-its, tags e as últimas 2.000 linhas da saída. Senhas e chaves reconhecidas ficam gravadas como `[segredo]` (`[secret]` com a interface em inglês), e o que você digita num pedido de senha oculto não é registrado. O reconhecimento é por padrão, então um segredo incomum pode passar, e no Windows o pedido oculto não pode ser detectado. Depois de fechar, o arquivo aparece em Sessões recentes e no Índice.
+- **Memória:** enquanto o terminal está aberto, o app mantém um arquivo Markdown com os comandos digitados, tarefas, post-its, tags e as últimas 2.000 linhas da saída. Senhas e chaves reconhecidas ficam gravadas como `[segredo]` (`[secret]` em inglês e `[secreto]` em espanhol), e o que você digita num pedido de senha oculto não é registrado. O reconhecimento é por padrão, então um segredo incomum pode passar, e no Windows o pedido oculto não pode ser detectado. Depois de fechar, o arquivo aparece em Sessões recentes e no Índice.
 - **Destacar:** uma aba pode virar janela própria e voltar depois.
 
 <a id="depuracao"></a>
@@ -218,7 +219,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 *O que fica registrado de cada projeto.*
 
 - **Tarefas:** por site ou globais, com prazo e estado. As abertas aparecem na Visão geral.
-- **Post-its:** notas rápidas por site ou globais.
+- **Post-its:** clique numa nota para editá-la numa janela. Use **Ir para o terminal** para voltar à aba vinculada ou **Ver no Histórico** se a sessão estiver encerrada. Uma nota sem vínculo pode ser associada a um terminal aberto no mesmo escopo.
 - **Tags:** marcam sessões, tarefas e notas para achar depois.
 - **Índice:** lista em Markdown de todas as sessões; cada item abre a memória da sessão. A documentação com IA é opcional, só por clique, e usa a sua própria chave da Anthropic, cadastrada em Configurações e guardada no cofre de senhas do sistema.
 
@@ -230,7 +231,7 @@ O harness é o contrato com itens verificáveis, o estado da execução e o hand
 
 - **Barra lateral:** marque o que quer ver. Vale para os itens do menu e para as listas abaixo dele (Sessões, Sites e Projetos Node). O que você esconder continua na busca (⌘K), e **Mostrar tudo** desfaz. Configurações não pode ser escondida, para você sempre poder voltar.
 - **Barra recolhida:** o botão no alto da barra, ou ⌘B, deixa só os ícones, num trilho estreito; passe o mouse para ver o nome. Sessões, Sites e Projetos Node viram um ícone cada, que abre a lista num menu. A escolha fica guardada; sem escolha, a janela abaixo de 1000 px já abre recolhida.
-- **Aparência:** tema (Sistema, Claro ou Escuro) e idioma (English ou Português).
+- **Aparência:** tema (Sistema, Claro ou Escuro) e idioma: Português (Brasil), English (US) ou Español (España). Troque em Configurações ou pela busca ⌘K. A interface e os menus do macOS acompanham a escolha sem fechar os terminais; o conteúdo criado por você permanece como está.
 - **Ao iniciar:** mostrar ou não a tela de abertura, ligar o Lerd junto com o app, e perguntar a pasta ao abrir um terminal.
 - **Avisos e rede:** notificação quando um agente espera por você, consulta do estado do PR no GitHub (vem desligada) e aviso de versão nova (vem ligado, no máximo uma vez por dia, só lê o número da versão). Dá para desligar cada um.
 - **Backup e segredos:** **Fazer backup** salva todos os dados do app num .zip fora da pasta de dados. Vão tarefas, post-its, tags, memórias, prompts, preferências e o índice dos agentes, mas não a chave da Anthropic, que fica no sistema. O arquivo não é criptografado. **Conferir** lê o .zip sem extrair nada e mostra data, versão, tamanho e quanto há de cada coisa; só então **Restaurar** aparece, e nunca para um arquivo com erro. A troca acontece quando você reabre o app, e os dados atuais ficam na pasta `.restauros`. As **Cópias de restauração** listam essas pastas, e cada uma pode ir para a Lixeira. **Mascarar** reescreve as memórias gravadas antes de a máscara existir, e não tem volta.
@@ -373,7 +374,7 @@ Em Configurações, desmarque o que não usa. Nada é apagado: o item some da ba
 
 **Onde mudo o tema e o idioma?**
 
-Em Configurações, na parte Aparência.
+Em Configurações, na seção Aparência, ou pela busca ⌘K. Escolha Português (Brasil), English (US) ou Español (España). Os menus do macOS também acompanham a mudança, sem fechar os terminais.
 
 **Onde cadastro a chave da Anthropic?**
 

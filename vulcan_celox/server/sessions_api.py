@@ -29,7 +29,7 @@ def session_summary(app, record, agent_tags: Optional[Dict[str, list]] = None) -
         "tasks": {"total": p.total, "done": p.done, "label": p.label}, "notes": len(notes),
         "tags": [{"id": t, "name": tags[t].name, "color": tags[t].color} for t in record.tags if t in tags],
         "memory_file": record.memory_file,
-        "theme": record.theme, "agents": agent_tags.get(record.id, []),
+        "theme": record.theme, "tab_color": record.tab_color, "agents": agent_tags.get(record.id, []),
         "has_doc": has_doc(record),
     }
 

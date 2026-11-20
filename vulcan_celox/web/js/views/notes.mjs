@@ -1,8 +1,9 @@
-// Sticky notes of a site (or Global): in-place editing, colors, pinning, tags and drag to reorder.
+// Sticky notes of a site (or Global): editor, colors, pinning, tags and drag to reorder.
 
 import { del, get, patch, post } from "../api.mjs";
 import { $, debounce, flashFocus, esc, icon, reportError } from "../dom.mjs";
 import { t } from "../i18n.mjs";
+import { noteSessionLabel, openNote } from "../note-dialog.mjs";
 
 const COLOR_NAMES = { amarelo: t("Amarelo"), rosa: t("Rosa"), verde: t("Verde"), azul: t("Azul"), laranja: t("Laranja"), roxo: t("Roxo") };
 
@@ -18,9 +19,7 @@ export class NotesView {
     this.tags = [];
     this.colors = Object.keys(COLOR_NAMES);
     this.dragging = null;
-    this.saveText = new Map();
     this.root.addEventListener("click", (e) => this.onClick(e));
-    this.root.addEventListener("input", (e) => this.onInput(e));
     this.root.addEventListener("keydown", (e) => this.onKey(e));
     // the card is only draggable while the handle is pressed (in WebKit, draggable prevents editing the text)
     this.root.addEventListener("pointerdown", (e) => {
@@ -113,39 +112,32 @@ export class NotesView {
           <div class="spacer"></div>
           <button class="icon-btn icon-btn-sm" data-action="delete" aria-label="${t("Apagar post-it")}">${icon("trash")}</button>
         </header>
-        <textarea class="note-text" rows="5" placeholder="${t("Escreva aqui…")}" aria-label="${t("Texto do post-it")}">${esc(n.text)}</textarea>
-        ${n.terminal_title && !this.sessionScoped ? `<div class="note-session">${icon("terminal")}${esc(n.terminal_title)}</div>` : ""}
+        <button type="button" class="note-preview" data-action="open-note" aria-haspopup="dialog">
+          <span class="note-preview-text">${esc(n.text || t("Post-it sem texto"))}</span>
+          ${icon("external")}
+        </button>
+        ${n.session ? `<div class="note-session">${noteSessionLabel(n.session)}</div>` : ""}
         <footer class="note-foot">
           ${n.chips.map((c) => `<span class="chip" style="--chip:${esc(c.color)}">${esc(c.name)}<button class="chip-x" data-action="untag" data-tag="${c.id}" aria-label="${t("Remover tag {name}", { name: esc(c.name) })}">${icon("x")}</button></span>`).join("")}
           <input class="note-tag-input" data-role="add-tag" placeholder="${t("+ tag")}" list="note-tag-options" aria-label="${t("Adicionar tag")}">
         </footer>
       </article>`).join("") + `<datalist id="note-tag-options">${this.tags.map((t) => `<option value="${esc(t.name)}">`).join("")}</datalist>`;
-    grid.querySelectorAll(".note-text").forEach((ta) => this.autosize(ta));
     const card = flashFocus(grid, this.options, (id) => `.note[data-id="${id}"]`);
-    const text = card && card.querySelector(".note-text");
-    if (text && !text.value) text.focus(); // new sticky note created from the session menu: ready to type
+    if (card) this.openEditor(card.dataset.id, card.querySelector(".note-preview")).catch(reportError);
   }
 
-  autosize(textarea) {
-    textarea.style.height = "auto";
-    textarea.style.height = `${Math.max(96, textarea.scrollHeight)}px`;
+  openEditor(id, trigger) {
+    return openNote(id, trigger, async () => {
+      if (!this.root.isConnected) return;
+      await this.load();
+      const preview = this.root.querySelector(`.note[data-id="${CSS.escape(id)}"] .note-preview`);
+      if (preview && document.activeElement === document.body) preview.focus({ preventScroll: true });
+    });
   }
 
   note(el) {
     const card = el.closest(".note");
     return card ? this.notes.find((n) => n.id === card.dataset.id) : null;
-  }
-
-  onInput(event) {
-    if (!event.target.classList.contains("note-text")) return;
-    const note = this.note(event.target);
-    if (!note) return;
-    this.autosize(event.target);
-    note.text = event.target.value;
-    if (!this.saveText.has(note.id)) {
-      this.saveText.set(note.id, debounce((id, text) => patch(`/api/notes/${id}`, { text }).catch(reportError), 600));
-    }
-    this.saveText.get(note.id)(note.id, note.text);
   }
 
   async onKey(event) {
@@ -178,14 +170,14 @@ export class NotesView {
         const note = await post("/api/notes", { site: this.siteParam, text: "", tags: this.tag ? [this.tag] : [],
           terminal: this.sessionScoped ? this.options.terminal : null });
         await this.load();
-        const ta = this.root.querySelector(`.note[data-id="${note.id}"] .note-text`);
-        if (ta) ta.focus();
+        const preview = this.root.querySelector(`.note[data-id="${CSS.escape(note.id)}"] .note-preview`);
         this.options.onChange();
+        await this.openEditor(note.id, preview || target);
         return;
       }
       const note = this.note(target);
       if (!note) return;
-      if (this.saveText.has(note.id)) this.saveText.get(note.id).flush(note.id, note.text);
+      if (action === "open-note") return await this.openEditor(note.id, target);
       if (action === "pin") await patch(`/api/notes/${note.id}`, { pinned: !note.pinned });
       if (action === "color") await patch(`/api/notes/${note.id}`, { color: target.dataset.color });
       if (action === "untag") await patch(`/api/notes/${note.id}`, { tags: note.chips.map((c) => c.id).filter((id) => id !== target.dataset.tag) });
@@ -222,10 +214,4 @@ export class NotesView {
     }
   }
 
-  destroy() {
-    this.saveText.forEach((fn, id) => {
-      const note = this.notes.find((n) => n.id === id);
-      if (note) fn.flush(id, note.text);
-    });
-  }
 }

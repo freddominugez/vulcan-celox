@@ -90,9 +90,13 @@ def terminal_size(rows, cols):
 def register_terminal_api(app) -> None:
     srv = app.server
 
+    def terminal_info(session):
+        record = app.hub.sessions.get(session.id)
+        return {**session.info(), "tab_color": record.tab_color if record else None}
+
     @srv.route("GET", "/api/terminals")
     def _list(_req: Request):
-        return {"terminals": [s.info() for s in app.terminals.list()]}
+        return {"terminals": [terminal_info(s) for s in app.terminals.list()]}
 
     port_watcher = PortWatcher(app.runner)
 
@@ -129,7 +133,7 @@ def register_terminal_api(app) -> None:
         rows, cols = size
         session = app.spawn_terminal(cwd, title, theme, site=site.name if site else None, rows=rows, cols=cols,
                                       command=command, typed=AGENT_COMMANDS[agent] if agent else None)
-        return 201, session.info()
+        return 201, terminal_info(session)
 
     @srv.route("GET", "/api/themes")
     def _themes(_req: Request):
@@ -141,15 +145,21 @@ def register_terminal_api(app) -> None:
                 "in_use": in_use, "css": themes.css(), "new_terminal": app.new_terminal_prefs()}
 
     @srv.route("PATCH", r"/api/terminals/(?P<tid>[0-9a-f]+)")
-    def _rename(req: Request):
-        session = app.terminals.get(req.params["tid"])
-        if session is None:
-            raise HttpError(404, "terminal não encontrado")
-        title = str(req.json().get("title") or "").strip()
-        if title:
-            session.title = title[:60]
-            app.hub.rename(session.id, session.title)
-        return session.info()
+    def _update_identity(req: Request):
+        tid = req.params["tid"]
+        body = req.json()
+        with app.notebook_api.lock:
+            session = app.terminals.get(tid)
+            record = app.hub.sessions.get(tid)
+            if session is None or record is None:
+                raise HttpError(404, "terminal não encontrado")
+            color = body.get("tab_color", record.tab_color)
+            if color is not None and not themes.is_theme(color):
+                raise HttpError(400, "cor de aba desconhecida")
+            title = str(body.get("title") or "").strip()[:60] or record.title
+            if title != record.title or color != record.tab_color:
+                app.hub.update_terminal_identity(session, title, color)
+            return terminal_info(session)
 
     @srv.route("GET", r"/api/terminals/(?P<tid>[0-9a-f]+)/busy")
     def _busy(req: Request):

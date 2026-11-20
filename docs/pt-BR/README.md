@@ -2,7 +2,7 @@
 
 [English](../en/README.md)
 
-Descreve a versão 1.3.0.
+Descreve a versão 1.4.0.
 
 | Para... | Leia |
 |---------|------|

@@ -33,7 +33,7 @@ export function renderContent(ws) {
   if (ws.mode === "terminal") {
     destroyChild(ws);
     ws.resizeObserver.disconnect();
-    if (live) return renderPanes(ws);
+    if (live && !ws.isHistory(id)) return renderPanes(ws);
     if (id && record) return renderMemory(ws, record);
     if (id && !record) {
       ws.body.innerHTML = `<div class="loading"><span class="skeleton w-40"></span><span class="skeleton w-70"></span></div>`;

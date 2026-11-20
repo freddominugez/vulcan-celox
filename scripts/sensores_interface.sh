@@ -8,6 +8,19 @@ expect() {
     var t = setInterval(function () { if (document.querySelector(s)) { var i = window.__vtErrors.indexOf(tag);
       if (i >= 0) window.__vtErrors.splice(i, 1); clearInterval(t); } }, 150); });"
 }
+step "agente vale somente para o terminal escolhido"
+isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/terminal-agent-scope.png" --route "#/overview" --wait 7 \
+  --eval "$(cat tests/tools/sensor_terminal_agent_scope.js)"
+
+step "três idiomas: catálogo, ajuda e rótulo acessível do terminal"
+for language in en pt es; do
+  SENSOR_LANGUAGE="$language" isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/locale-$language.png" --route "#/config" --wait 6 \
+    --eval "window.__VT_LANGUAGE = '$language'; $(cat tests/tools/sensor_three_locales.js)"
+done
+step "menus mudam de idioma sem encerrar o terminal"
+isolated_env env -u VULCAN_LANGUAGE "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/locale-native-switch.png" --route "#/config" --wait 8 \
+  --eval "window.__VT_SWITCH = true; $(cat tests/tools/sensor_three_locales.js)"
+
 step "CodeMirror vendorizado carrega com a CSP do app"
 # shows as a pending error until the viewer, the diff and each language actually mount in the WKWebView
 CM_JS="(function () { var tag = 'CodeMirror não montou'; window.__vtErrors.push(tag);
@@ -251,7 +264,7 @@ EN_JS="$UNHIDE_JS setTimeout(function () {
   var walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, found = [];
   while ((n = walk.nextNode())) { var el = n.parentElement; if (!el || el.closest('script,style,.xterm,.cm-editor,.ag-first,.turn-ask,.ag-path,.code-dir,.ag-hit,.code-path,.mono')) continue;
     var s = n.textContent.trim(); if (s && pt.test(s) && !/^pedido \d+$/.test(s) && s.indexOf('/') !== 0) found.push(s.slice(0, 70)); }
-  if (document.documentElement.lang !== 'en') found.push('lang=' + document.documentElement.lang);
+  if (document.documentElement.lang !== 'en-US') found.push('lang=' + document.documentElement.lang);
   if (found.length) window.__vtErrors.push('português em ' + location.hash + ': ' + found.slice(0, 12).join(' | '));
 }, 2500);"
 for route in "#/inicio" "#/overview" "#/terminals" "#/agentes" "#/agentes/$CODE_SID" "#/agentes/$CODE_SID/codigo" "#/agentes/historico" "#/agentes/branches" "#/agentes/uso" "#/prompts" "#/tasks" "#/notes" "#/tags" "#/index" "#/ajuda" "#/lerd" "#/depuracao" "#/node" "#/codigo"; do

@@ -20,6 +20,7 @@ from typing import Callable, Optional, Tuple
 
 from vulcan_celox import APP_NAME, __version__
 from vulcan_celox.core.runner import Runner
+from vulcan_celox.core.i18n import tr
 
 BROWSERS = ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable", "brave-browser",
             "microsoft-edge", "microsoft-edge-stable")
@@ -254,8 +255,18 @@ def run_gtk(app, token: str, version: str) -> int:
         elif kind == "focusPopout" and str(body.get("id")) in windows:
             windows[str(body["id"])][0].present()
         elif kind == "pickFolder":
-            dialog = Gtk.FileChooserNative.new("Escolha a pasta onde o terminal vai abrir", window,
-                                               Gtk.FileChooserAction.SELECT_FOLDER, "Abrir terminal aqui", "Cancelar")
+            purpose = body.get("purpose")
+            restore = purpose == "restore"
+            title, button = ((tr("Escolha o arquivo .zip do backup"), tr("Escolher backup")) if restore else
+                             (tr("Escolha onde salvar os backups, fora da pasta de dados"), tr("Salvar aqui")) if purpose == "backup" else
+                             (tr("Escolha a pasta onde o terminal vai abrir"), tr("Abrir terminal aqui")))
+            dialog = Gtk.FileChooserNative.new(title, window,
+                                               Gtk.FileChooserAction.OPEN if restore else Gtk.FileChooserAction.SELECT_FOLDER, button, tr("Cancelar"))
+            if restore:
+                file_filter = Gtk.FileFilter()
+                file_filter.set_name("ZIP")
+                file_filter.add_pattern("*.zip")
+                dialog.add_filter(file_filter)
             start = body.get("start")
             if start:
                 dialog.set_current_folder(os.path.expanduser(str(start)))

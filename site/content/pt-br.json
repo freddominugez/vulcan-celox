@@ -1,0 +1,204 @@
+{
+  "lang": "pt-BR",
+  "screenLang": "pt",
+  "locale": "pt_BR",
+  "name": "Português (Brasil)",
+  "title": "Vulcan Celox | Claude Code, Codex e projetos locais",
+  "description": "Um espaço de trabalho local para quem desenvolve com Claude Code e Codex. Reúna terminais, sessões, código, projetos PHP e Node no seu Mac.",
+  "skip": "Ir para o conteúdo",
+  "menu": "Abrir menu",
+  "closeMenu": "Fechar menu",
+  "nav": [
+    "O produto",
+    "Por dentro",
+    "Como funciona",
+    "Perguntas"
+  ],
+  "download": "Baixar para macOS",
+  "downloadShort": "Baixar",
+  "headline": "Qual agente está parado, e qual branch ficou sem push?",
+  "intro": "O Vulcan Celox reúne sessões do Claude Code e do Codex, terminais, prompts e projetos locais em um app nativo para Mac.",
+  "imageNote": "Interface real do produto, com dados de demonstração.",
+  "stackLabel": "Trabalha com as ferramentas que você já usa",
+  "stack": [
+    "Claude Code",
+    "Codex",
+    "PHP + Laravel",
+    "Node.js",
+    "Git"
+  ],
+  "productTitle": "Do projeto à mudança no código.",
+  "productBody": "Quando cada agente está em uma janela e cada projeto em outra pasta, o contexto se espalha. O Celox reúne o trabalho local e deixa as relações visíveis.",
+  "workflow": [
+    {
+      "title": "Abra o projeto",
+      "text": "Encontre sites PHP, adicione projetos Node ou abra uma pasta. Cada terminal começa no lugar certo."
+    },
+    {
+      "title": "Trabalhe com seus agentes",
+      "text": "Escolha Claude Code ou Codex para aquela aba. Acompanhe sessões, pedidos, arquivos e comandos sem alternar de ferramenta."
+    },
+    {
+      "title": "Volte com contexto",
+      "text": "Retome uma sessão, consulte a memória do terminal e veja o que mudou antes de continuar."
+    }
+  ],
+  "showcaseTitle": "O que tem no painel",
+  "showcaseBody": "Explore as sessões de agentes, o visor de código, os terminais e a biblioteca de prompts em capturas do app.",
+  "zoom": "Ampliar captura de tela",
+  "closeZoom": "Fechar captura ampliada",
+  "galleryLabel": "Telas do produto",
+  "screens": [
+    {
+      "id": "overview",
+      "title": "Visão geral",
+      "caption": "Projetos, tarefas, terminais e sessões recentes, no mesmo ponto de partida.",
+      "alt": "Visão geral do Celox com os projetos e o resumo do trabalho"
+    },
+    {
+      "id": "agents",
+      "title": "Agentes",
+      "caption": "Sessões de Claude Code e Codex com projeto, branch, atividade e arquivos tocados.",
+      "alt": "Tela de sessões de agentes com projetos e atividade"
+    },
+    {
+      "id": "code",
+      "title": "Código",
+      "caption": "Acompanhe arquivos e diferenças em um visor somente leitura, sem interferir no trabalho do agente.",
+      "alt": "Árvore de arquivos e visor de código do Celox"
+    },
+    {
+      "id": "terminals",
+      "title": "Terminais",
+      "caption": "Abas por projeto, temas de identificação, divisão, busca e memória da sessão.",
+      "alt": "Terminais do Celox organizados em abas e painéis"
+    },
+    {
+      "id": "prompts",
+      "title": "Prompts",
+      "caption": "Instruções reutilizáveis, variáveis preenchidas e envio como colagem. O Enter continua sendo seu.",
+      "alt": "Biblioteca de prompts com prévia e variáveis"
+    },
+    {
+      "id": "settings",
+      "title": "Configurações",
+      "caption": "Tema, idioma, avisos, preferências e backup. Português, inglês e espanhol no mesmo app.",
+      "alt": "Configurações do Celox e escolha de idioma"
+    }
+  ],
+  "terminalTitle": "Um terminal para cada sessão.",
+  "terminalBody": "Abra um shell ou escolha o agente daquela sessão. Divida o painel, procure na saída e volte ao projeto sem perder os terminais abertos.",
+  "terminalItems": [
+    "Claude e Codex são escolhidos por aba",
+    "Prompts enviados sem Enter automático",
+    "Histórico e memória para retomar o fio"
+  ],
+  "localTitle": "Seu espaço de trabalho é local.",
+  "localBody": "O app lê os registros locais dos agentes para organizar o contexto. Não exige chave de API para acompanhar Claude Code e Codex e não escreve nas pastas de configuração deles.",
+  "privacy": [
+    {
+      "title": "Os dados ficam com você",
+      "text": "Preferências, tarefas, prompts e memórias são guardados localmente. Faça backup quando precisar."
+    },
+    {
+      "title": "Conexões com propósito",
+      "text": "Consultas de PR e de atualização têm controles próprios. Documentação com IA só é gerada por uma ação sua, com sua chave da Anthropic."
+    },
+    {
+      "title": "Transparência no código",
+      "text": "Consulte o projeto, as licenças e a documentação. Celox é open source sob a licença MIT."
+    }
+  ],
+  "environmentTitle": "PHP e Node no mesmo espaço.",
+  "environmentBody": "Use Lerd ou Laravel Valet para o ambiente PHP local. Cadastre projetos Node, veja os scripts e abra os comandos no terminal. Sem PHP instalado? Terminais, agentes e organização continuam disponíveis.",
+  "environmentItems": [
+    "Sites PHP, versões e HTTPS local pelo backend",
+    "Projetos Node e scripts do package.json",
+    "Branches, worktrees e histórico dos agentes"
+  ],
+  "languagesTitle": "Use o Celox no seu idioma.",
+  "languagesBody": "Escolha Português (Brasil), English (US) ou Español (España) nas Configurações. Não é preciso instalar três aplicativos.",
+  "languageNames": [
+    "Português (Brasil)",
+    "English (US)",
+    "Español (España)"
+  ],
+  "installTitle": "Instale o Celox no Mac.",
+  "installBody": "Baixe o app, abra uma pasta e comece com as ferramentas que você já conhece.",
+  "requirements": "macOS 13 ou posterior, Apple Silicon ou Intel e Python 3.9+. O app orienta a instalação do Python quando necessário. Claude Code, Codex e backends de ambiente são instalados separadamente.",
+  "downloadNote": "O botão abre a distribuição disponível no GitHub. Consulte a versão e os requisitos antes de instalar.",
+  "installSteps": [
+    {
+      "title": "Baixe e extraia o pacote",
+      "text": "Extraia o ZIP universal e mova Vulcan Celox.app para a pasta Aplicativos."
+    },
+    {
+      "title": "Abra o Celox",
+      "text": "Escolha o idioma e encontre seus projetos. Seus dados locais continuam separados do aplicativo."
+    },
+    {
+      "title": "Abra seu primeiro terminal",
+      "text": "Comece em shell ou selecione Claude Code ou Codex para aquela aba."
+    }
+  ],
+  "guide": "Ler o guia de instalação",
+  "faqTitle": "Perguntas frequentes",
+  "faq": [
+    {
+      "q": "O Celox substitui o Claude Code ou o Codex?",
+      "a": "Não. Ele organiza projetos, terminais e sessões ao redor das ferramentas que você já usa. Os agentes continuam executando pelos seus próprios programas e contas."
+    },
+    {
+      "q": "Preciso de uma chave de API?",
+      "a": "Não para ler e acompanhar sessões locais de Claude Code e Codex. A função opcional de documentação com IA usa sua chave da Anthropic e só roda quando você solicita."
+    },
+    {
+      "q": "Posso editar arquivos dentro do app?",
+      "a": "A tela Código é um visor somente leitura com árvore, busca, acompanhamento e diff. Para editar, use seu editor externo. O Celox não promete salvamento de arquivos nessa tela."
+    },
+    {
+      "q": "Preciso instalar o Lerd?",
+      "a": "Somente se quiser usar esse backend para os sites PHP locais. Laravel Valet também é aceito. Projetos Node, terminais, agentes e organização funcionam sem esses backends."
+    },
+    {
+      "q": "O app está disponível em quais sistemas?",
+      "a": "A experiência estável é voltada ao macOS. As distribuições de Linux e Windows são pré-lançamentos e devem ser avaliadas com os requisitos e limitações publicados no repositório."
+    },
+    {
+      "q": "O que sai do meu computador?",
+      "a": "Os dados do app são locais. Recursos opcionais consultam serviços externos, como GitHub para PRs e versões e Anthropic para documentação solicitada por você. O uso dos próprios agentes segue os serviços e configurações deles."
+    },
+    {
+      "q": "O pareamento do Codex é exato?",
+      "a": "O vínculo com uma aba usa pasta e horário. Sessões iniciadas quase juntas na mesma pasta podem ser associadas à aba errada. Essa limitação está documentada e não altera a escolha de iniciar um agente por aba."
+    },
+    {
+      "q": "O projeto é open source?",
+      "a": "Sim. O código do Celox é distribuído sob licença MIT. Componentes de terceiros mantêm suas próprias licenças e avisos no repositório."
+    }
+  ],
+  "footerLine": "Um espaço de trabalho para desenvolver com contexto.",
+  "footerProduct": "Produto",
+  "footerResources": "Recursos",
+  "footerLinks": [
+    "Documentação",
+    "Instalação",
+    "Segurança e privacidade",
+    "Código-fonte",
+    "Licença MIT"
+  ],
+  "footerLegal": "Vulcan Celox. Claude Code, Codex e demais marcas pertencem aos seus respectivos titulares.",
+  "architectureLabel": "Arquitetura",
+  "licenseLabel": "Licença",
+  "versionLabel": "Versão",
+  "systemLabel": "Sistema",
+  "languageLabel": "Idioma",
+  "github": "Ver no GitHub",
+  "exampleTitle": "Veja até onde cada sessão chegou",
+  "exampleBody": "Acompanhe o projeto, a branch e os arquivos tocados. A trilha mostra as etapas de edição, commit, push e pull request, para você saber onde retomar.",
+  "exampleStatus": "Sem push",
+  "exampleAsk": "Adicionar pagamento por Pix no checkout",
+  "exampleEdit": "Edição",
+  "exampleMeta": "12 arquivos editados · 34 comandos",
+  "exampleNote": "Sessão de exemplo."
+}

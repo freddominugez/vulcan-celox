@@ -5,6 +5,12 @@ import { reportError } from "./dom.mjs";
 import { loadThemes, xtermTheme } from "./themes.mjs";
 import { Session } from "./terminal-session.mjs";
 
+/** Route to a terminal session or one of its notebook items. */
+export function sessionHash(session, tab = "terminal", focus = "") {
+  const tail = `${tab}/${encodeURIComponent(session.id)}${focus ? `/${encodeURIComponent(focus)}` : ""}`;
+  return session.site ? `#/sites/${encodeURIComponent(session.site)}/${tail}` : `#/terminals/${tail}`;
+}
+
 export const terminals = {
   sessions: new Map(),
   order: [],
@@ -84,10 +90,15 @@ export const terminals = {
   },
 
   async rename(id, title) {
-    const info = await patch(`/api/terminals/${id}`, { title });
+    return this.updateIdentity(id, { title });
+  },
+
+  async updateIdentity(id, changes) {
+    const info = await patch(`/api/terminals/${id}`, changes);
     const session = this.sessions.get(id);
     if (session) session.info = info;
     this.emit();
+    window.dispatchEvent(new CustomEvent("vulcan-sessions-changed"));
   },
 
   popout(id) {

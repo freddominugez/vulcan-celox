@@ -1,40 +1,58 @@
-"""Language: English by default, Portuguese available. The source text is Portuguese; the dictionary is web/i18n/en.json, the same as the
-interface's. `tr()` translates server text; a key with {nome} also matches already-filled text."""
+"""Offline product locales shared by Python, the web interface and the native shell."""
 
 from __future__ import annotations
 
 import json
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Pattern, Tuple
+from typing import Dict, Mapping, Optional
 
-LANGUAGES = ("en", "pt")
+FOLDER = Path(__file__).resolve().parent.parent / "web" / "i18n"
+LANGUAGE_INFO = tuple(json.loads((FOLDER / "languages.json").read_text(encoding="utf-8")))
+LANGUAGES = tuple(item["id"] for item in LANGUAGE_INFO)
 DEFAULT = "en"
-FILE = Path(__file__).resolve().parent.parent / "web" / "i18n" / "en.json"
-
-_language = os.environ.get("VULCAN_LANGUAGE") if os.environ.get("VULCAN_LANGUAGE") in LANGUAGES else DEFAULT
-_dictionary: Optional[Dict[str, str]] = None
-_patterns: List[Tuple[Pattern, str]] = []
+FILE = FOLDER / "en.json"
 MIN_LITERAL = 4
 
 
-def dictionary() -> Dict[str, str]:
-    global _dictionary, _patterns
-    if _dictionary is None:
-        _dictionary = json.loads(FILE.read_text(encoding="utf-8"))
-        _patterns = []
-        for key, value in _dictionary.items():
-            # a key like "{from} a {to}" would match any English sentence with the word "a" in it
-            if "{" in key and not (key.startswith("{") and len(re.findall(r"[^\W\d_]", re.sub(r"\{\w+\}", "", key))) < MIN_LITERAL):
-                regex = re.sub(r"\\\{(\w+)\\\}", r"(?P<\1>.+?)", re.escape(key))
-                _patterns.append((re.compile("^" + regex + "$", re.S), value))
-    return _dictionary
+def normalize(value) -> Optional[str]:
+    if not isinstance(value, str):
+        return None
+    value = value.strip().replace("_", "-").lower()
+    return next((item["id"] for item in LANGUAGE_INFO if value in item["aliases"]), None)
 
 
-def set_language(language: str) -> None:
+_language = normalize(os.environ.get("VULCAN_LANGUAGE")) or DEFAULT
+
+
+@lru_cache(maxsize=3)
+def _catalog(chosen: str) -> Dict[str, str]:
+    if chosen == "pt":
+        return {}
+    return json.loads((FOLDER / (chosen + ".json")).read_text(encoding="utf-8"))
+
+
+def dictionary(chosen: Optional[str] = None) -> Dict[str, str]:
+    """Resolve before consulting the cache: changing the language cannot reuse another catalog."""
+    return _catalog(normalize(chosen) or _language)
+
+
+@lru_cache(maxsize=3)
+def _patterns(chosen: str):
+    out = []
+    for key, value in dictionary(chosen).items():
+        # A generic key like {from} a {to} must not rewrite user text or already-translated errors.
+        if "{" in key and not (key.startswith("{") and len(re.findall(r"[^\W\d_]", re.sub(r"\{\w+\}", "", key))) < MIN_LITERAL):
+            regex = re.sub(r"\\\{(\w+)\\\}", r"(?P<\1>.+?)", re.escape(key))
+            out.append((re.compile("^" + regex + "$", re.S), value))
+    return out
+
+
+def set_language(value: str) -> None:
     global _language
-    _language = language if language in LANGUAGES else DEFAULT
+    _language = normalize(value) or DEFAULT
 
 
 def language() -> str:
@@ -42,21 +60,21 @@ def language() -> str:
 
 
 def resolve(prefs: Mapping, env: Mapping[str, str]) -> str:
-    """VULCAN_LANGUAGE wins (sensors and tests); then the preference."""
-    chosen = env.get("VULCAN_LANGUAGE") or prefs.get("language") or DEFAULT
-    return chosen if chosen in LANGUAGES else DEFAULT
+    """Environment override, then saved preference; invalid values use the default."""
+    prefs = prefs if isinstance(prefs, Mapping) else {}
+    return normalize(env.get("VULCAN_LANGUAGE") or prefs.get("language")) or DEFAULT
 
 
 def tr(text: str, **values) -> str:
-    """Text in the current language. With values, fills {nome}; without values, it also recognizes already-filled text."""
-    if _language == "pt":
+    chosen = _language
+    if chosen == "pt":
         return text.format(**values) if values else text
-    table = dictionary()
+    table = dictionary(chosen)
     if values:
         return table.get(text, text).format(**values)
     if text in table:
         return table[text]
-    for pattern, value in _patterns:
+    for pattern, value in _patterns(chosen):
         match = pattern.match(text)
         if match:
             return value.format(**match.groupdict())

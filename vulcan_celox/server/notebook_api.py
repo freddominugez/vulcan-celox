@@ -79,7 +79,12 @@ class NotebookApi:
         data["title"] = note.title
         data["chips"] = self.chips(note)
         data["terminal"] = note.terminal or ""
-        data["terminal_title"] = self.terminal_title(note.terminal)
+        record = self.app.hub.sessions.get(note.terminal) if note.terminal else None
+        data["terminal_title"] = record.title if record else ""
+        data["session"] = {
+            "id": record.id, "title": record.title, "site": record.site or "",
+            "open": record.is_open, "theme": record.theme, "tab_color": record.tab_color,
+        } if record else None
         return data
 
     def task_dict(self, task) -> Dict[str, Any]:
@@ -187,6 +192,13 @@ class NotebookApi:
             notes = api.nb.notes_for(site, req.arg("q", "") or "", tag, terminal=req.arg("terminal") or None)
             return {"colors": list(NOTE_COLORS), "notes": [api.note_dict(n) for n in notes]}
 
+        @route("GET", r"/api/notes/(?P<nid>[0-9a-f]+)")
+        def get_note(req):
+            note = api.nb.note(req.params["nid"])
+            if note is None:
+                raise KeyError(req.params["nid"])
+            return api.note_dict(note)
+
         @route("POST", "/api/notes")
         def create_note(req):
             body = req.json()
@@ -202,6 +214,15 @@ class NotebookApi:
             fields = {k: body[k] for k in ("text", "color", "pinned") if k in body}
             if "terminal" in body:
                 fields["terminal"] = api.resolve_terminal(body, None)[0]
+            if "link_terminal" in body:
+                note = api.nb.note(nid)
+                if note is None:
+                    raise KeyError(nid)
+                linked = api.app.hub.sessions.get(note.terminal) if note.terminal else None
+                target = api.app.hub.sessions.get(str(body["link_terminal"]))
+                if linked or not target or not target.is_open or target.site != note.site:
+                    raise HttpError(409, "Não foi possível vincular este post-it ao terminal escolhido.")
+                fields["terminal"] = target.id
             note = api.nb.update_note(nid, **fields)
             if "tags" in body:
                 api.nb.set_item_tags(note, api.resolve_tags(body["tags"]))

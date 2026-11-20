@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://vulcan-celox.vercel.app/sitemap.xml

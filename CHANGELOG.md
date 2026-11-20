@@ -4,6 +4,20 @@ All notable changes to Vulcan Celox, called Vulcan Terminal until 1.0. The forma
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-20
+
+### Added
+
+- Three app languages in one bundle, with English (US), Brazilian Portuguese, and Spanish (Spain).
+- Editable names and colors on terminal tabs.
+- A sticky-note editor that identifies the linked terminal and can take you to the active tab or session history.
+
+### Fixed
+
+- Agent selection applies to the terminal where it was chosen. New terminals start with a shell by default.
+- Invalid language preferences are rejected before any other preference changes.
+
+
 ## [1.3.0] - 2026-11-05
 
 ### Added

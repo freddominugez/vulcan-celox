@@ -635,11 +635,6 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .swatch-amarelo { background: var(--swatch-amarelo); } .swatch-rosa { background: var(--swatch-rosa); } .swatch-verde { background: var(--swatch-verde); }
 .swatch-azul { background: var(--swatch-azul); } .swatch-laranja { background: var(--swatch-laranja); } .swatch-roxo { background: var(--swatch-roxo); }
 .note:focus-within { box-shadow: 0 0 0 2px var(--accent-line); }
-.note-text {
-  flex: 1; min-height: 96px; resize: none; border: 0; outline: 0; background: transparent;
-  padding: 6px 14px 8px; color: var(--note-fg); font-size: 13.5px; line-height: 1.5; overflow: hidden;
-}
-.note-text::placeholder { color: color-mix(in srgb, var(--note-fg) 45%, transparent); }
 .note-foot { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding: 6px 10px 10px; border-top: 1px solid var(--note-line); }
 .note-tag-input { flex: 1; min-width: 60px; height: 20px; border: 0; outline: 0; background: transparent; color: var(--note-fg); font-size: var(--fs-sm); }
 .note-tag-input::placeholder { color: color-mix(in srgb, var(--note-fg) 50%, transparent); }

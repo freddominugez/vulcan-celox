@@ -4,6 +4,20 @@ Mudanças relevantes do Vulcan Celox, chamado Vulcan Terminal até a 1.0. O form
 
 ## [Não lançado]
 
+## [1.4.0] - 2026-11-20
+
+### Adicionado
+
+- Três idiomas no mesmo aplicativo, com inglês dos EUA, português do Brasil e espanhol da Espanha.
+- Nomes e cores editáveis nas abas de terminal.
+- Editor de post-its com identificação da sessão e atalho para a aba aberta ou o Histórico.
+
+### Corrigido
+
+- A escolha de agente vale para a aba em que foi feita. Novos terminais começam em shell por padrão.
+- Um idioma inválido é rejeitado antes que outras preferências sejam gravadas.
+
+
 ## [1.3.0] - 2026-11-05
 
 ### Adicionado
