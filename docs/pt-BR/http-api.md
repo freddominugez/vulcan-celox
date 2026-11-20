@@ -279,7 +279,8 @@ Id desconhecido devolve 404. Valor inválido devolve 400. Em `site`, `*` signifi
 | DELETE | `/api/tags/<tid>` | Apagar uma tag de todos os itens | | 404 |
 | GET | `/api/notes` | Notas | Query: `site`, `q`, `tag`, `terminal` | |
 | POST | `/api/notes` | Criar uma nota | `text`, `color` (padrão `amarelo`), `tags`, `site`, `terminal` | 201, 400, 404 |
-| PATCH | `/api/notes/<nid>` | Mudar uma nota | `text`, `color`, `pinned`, `terminal`, `tags` | 400, 404 |
+| GET | `/api/notes/<nid>` | Ler uma nota e seu terminal vinculado | | 404 |
+| PATCH | `/api/notes/<nid>` | Mudar uma nota | `text`, `color`, `pinned`, `terminal`, `tags`, `link_terminal` | 400, 404, 409 |
 | POST | `/api/notes/<nid>/move` | Reordenar | `target` (id de uma nota) ou `index` | 400, 404 |
 | DELETE | `/api/notes/<nid>` | Apagar | | 404 |
 | GET | `/api/tasks` | Tarefas, progresso, resumo e `can_undo` | Query: `site`, `status` (lista por vírgula de `todo`, `doing`, `done`), `tag`, `sort` (`priority`, `due`, `manual`, `assignee`), `terminal`, `assignee`, `due` (`late`, `today`, `week`) | |
@@ -324,7 +325,7 @@ Só leitura: a única escrita põe ou tira uma pasta da lista do próprio app. `
 
 `PATCH /api/terminals/<id>` aceita `title` e `tab_color`. A cor da aba usa um identificador de `GET /api/themes`. Use `null` para voltar à cor do tema. O valor fica na sessão e aparece nas respostas de terminais e no histórico.
 
-`GET /api/notes/<id>` inclui `session` com ID, nome, site, cor e estado do terminal vinculado. Em `PATCH /api/notes/<id>`, `link_terminal` vincula uma nota avulsa a um terminal aberto do mesmo escopo. Uma tentativa incompatível retorna 409.
+`GET /api/notes/<nid>` inclui `session` com ID, nome, site, cor e estado do terminal vinculado. Em `PATCH /api/notes/<nid>`, `link_terminal` vincula uma nota avulsa a um terminal aberto do mesmo escopo. Uma tentativa incompatível retorna 409.
 
 ## WebSocket
 
