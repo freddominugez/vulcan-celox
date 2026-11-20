@@ -5,7 +5,7 @@ import { get, post } from "../api.mjs";
 import { $, esc, icon, reportError } from "../dom.mjs";
 import { t } from "../i18n.mjs";
 import { renderMarkdown } from "../markdown.mjs";
-import { sessionHash } from "../session-tree.mjs";
+import { sessionHash } from "../terminal-pool.mjs";
 
 function stamp(iso) {
   if (!iso) return "";

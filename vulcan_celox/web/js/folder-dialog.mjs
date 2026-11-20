@@ -57,7 +57,7 @@ export async function askFolder({ suggested = "", site = "" } = {}) {
   const [recent, themes] = await Promise.all([get("/api/fs/recent").catch(() => null), loadThemes(true)]);
   if (recent) data = recent;  // no recents: the dialog keeps working with typing only
   let theme = themes.next || "homebrew";
-  let agent = (themes.newTerminal && themes.newTerminal.agent) || "shell";
+  let agent = "shell";  // agent choice belongs only to this dialog, never to another tab
   const start = suggested || data.home.path || "~";
   return new Promise((resolve) => {
     const backdrop = document.createElement("div");
@@ -156,7 +156,7 @@ export async function askFolder({ suggested = "", site = "" } = {}) {
       if (!resolved) await check();
       if (!resolved) return;
       const skip = form.elements.skip && form.elements.skip.checked;
-      patch("/api/preferences", { new_terminal: { agent, ...(skip ? { skip_folder: true } : {}) } }).catch(() => null);
+      if (skip) patch("/api/preferences", { new_terminal: { skip_folder: true } }).catch(() => null);
       // the suggested theme uses up the rotation ("auto"); a hand-picked theme does not
       finish({ cwd: resolved, title: form.elements.title.value.trim(), theme: theme === themes.next ? "auto" : theme, agent });
     });

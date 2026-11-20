@@ -1,0 +1,5 @@
+[
+  {"id":"en","locale":"en-US","label":"English (US)","aliases":["en","en-us"],"help":"conteudo.en.json"},
+  {"id":"pt","locale":"pt-BR","label":"Português (Brasil)","aliases":["pt","pt-br"],"help":"conteudo.json"},
+  {"id":"es","locale":"es-ES","label":"Español (España)","aliases":["es","es-es"],"help":"conteudo.es.json"}
+]

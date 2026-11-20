@@ -4,7 +4,7 @@ import { dismissSession } from "../attention-state.mjs";
 import { every, get, post } from "../api.mjs";
 import { terminals } from "../terminals.mjs";
 import { esc, icon, reportError, shortPath, toast } from "../dom.mjs";
-import { currentLanguage, t } from "../i18n.mjs";
+import { decimalText, t } from "../i18n.mjs";
 import { CodeView } from "./code/code-view.mjs";
 import { renderTurns, stepTurn } from "./agent-turns.mjs";
 import { loadPr, prHtml } from "../pr-status.mjs";
@@ -27,7 +27,7 @@ function costText(cost) {
   if (!cost || !cost.turns) return "";
   if (cost.value === null) return ` · ${t("custo sem preço conferido")}`;
   const v = cost.value >= 1 ? cost.value.toFixed(2) : cost.value.toFixed(3);
-  return ` · ${cost.partial ? "≥ " : ""}US$ ${currentLanguage() === "pt" ? v.replace(".", ",") : v} ${t("estimado no preço da API")}`;
+  return ` · ${cost.partial ? "≥ " : ""}US$ ${decimalText(v)} ${t("estimado no preço da API")}`;
 }
 
 export class AgentSessionView {

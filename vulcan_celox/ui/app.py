@@ -15,6 +15,7 @@ from typing import Callable, List, Mapping, Optional
 
 from vulcan_celox import APP_NAME, __version__
 from vulcan_celox.core import paths
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.core.backends import detect_backend
 from vulcan_celox.core.debounce import Debouncer
 from vulcan_celox.core.markdown_index import (INDEX_FILENAME, ProjectIndexSettings, ProjectPathMissing,
@@ -29,7 +30,6 @@ from vulcan_celox.ui.search import SearchWindow
 from vulcan_celox.ui.sidebar import Sidebar
 from vulcan_celox.ui.tags import TagManager
 from vulcan_celox.ui.tasks import TasksPanel
-
 STATUS_INTERVAL_MS = 15000
 INDEX_DEBOUNCE_SECONDS = 0.5
 DRAIN_INTERVAL_MS = 100
@@ -77,7 +77,7 @@ class App(tk.Tk):
         text = "".join(traceback.format_exception(exc, val, tb))
         self.errors.append(text)
         sys.stderr.write(text)
-        self.set_message(f"error: {val}", error=True)
+        self.set_message(tr("erro: {val}", val=val), error=True)
 
     def call_in_ui(self, fn: Callable[[], None]) -> None:
         """Schedules fn on the UI thread (safe to call from other threads)."""
@@ -109,15 +109,15 @@ class App(tk.Tk):
     def _build_menu(self) -> None:
         menubar = tk.Menu(self)
         caderno = tk.Menu(menubar, tearoff=0)
-        caderno.add_command(label="Search…", command=self.open_search, accelerator="Cmd+K")
-        caderno.add_command(label="Manage tags…", command=self.open_tags, accelerator="Cmd+T")
+        caderno.add_command(label=tr("Buscar…"), command=self.open_search, accelerator="Cmd+K")
+        caderno.add_command(label=tr("Gerenciar tags…"), command=self.open_tags, accelerator="Cmd+T")
         caderno.add_separator()
-        caderno.add_command(label="Open global TAREFAS.md", command=self.open_global_index)
-        caderno.add_command(label="Open data folder", command=lambda: self._open(["/usr/bin/open", str(self.data_dir)]))
+        caderno.add_command(label=tr("Abrir TAREFAS.md global"), command=self.open_global_index)
+        caderno.add_command(label=tr("Abrir pasta de dados"), command=lambda: self._open(["/usr/bin/open", str(self.data_dir)]))
         caderno.add_separator()
-        caderno.add_command(label="Export notebook…", command=self.export_notebook)
-        caderno.add_command(label="Import notebook…", command=self.import_notebook)
-        menubar.add_cascade(label="Notebook", menu=caderno)
+        caderno.add_command(label=tr("Exportar caderno…"), command=self.export_notebook)
+        caderno.add_command(label=tr("Importar caderno…"), command=self.import_notebook)
+        menubar.add_cascade(label=tr("Caderno"), menu=caderno)
         self.menu_caderno = caderno
         self.config(menu=menubar)
         self.bind_all("<Command-t>", lambda _e: self.open_tags())
@@ -154,8 +154,8 @@ class App(tk.Tk):
             self.show_site(site)
         if hit.kind == "task":
             self.tabs.select(self.tasks_panel)
-            self.tasks_panel.var_status.set("All")
-            self.tasks_panel.var_tag.set("All tags")
+            self.tasks_panel.var_status.set(tr("Todas"))
+            self.tasks_panel.var_tag.set(tr("Todas as tags"))
             self.tasks_panel.render()
             if self.tasks_panel.tree.exists(hit.key):
                 self.tasks_panel.tree.selection_set(hit.key)
@@ -168,26 +168,26 @@ class App(tk.Tk):
             if card is not None:
                 card.text.focus_set()
         if hit.site is not None and site is None:
-            self.set_message(f"'{hit.site}' is not in the project list now; showing Global")
+            self.set_message(tr("'{site}' não está na lista de projetos agora; mostrando Global", site=hit.site))
 
     def export_notebook(self) -> None:
-        path = filedialog.asksaveasfilename(parent=self, title="Export notebook", defaultextension=".json",
+        path = filedialog.asksaveasfilename(parent=self, title=tr("Exportar caderno"), defaultextension=".json",
                                             initialfile="vulcan-celox-caderno.json")
         if path:
             counts = self.notebook.export(path)
-            self.set_message(f"exported: {counts['tasks']} tasks, {counts['notes']} sticky notes, {counts['tags']} tags")
+            self.set_message(tr("exportado: {tasks} tarefas, {notes} post-its, {tags} tags", **counts))
 
     def import_notebook(self) -> None:
-        path = filedialog.askopenfilename(parent=self, title="Import notebook", filetypes=[("JSON", "*.json")])
+        path = filedialog.askopenfilename(parent=self, title=tr("Importar caderno"), filetypes=[("JSON", "*.json")])
         if not path:
             return
         try:
             counts = self.notebook.import_(path)
         except ValueError as exc:
-            messagebox.showerror(APP_NAME, str(exc), parent=self)
+            messagebox.showerror(APP_NAME, tr(str(exc)), parent=self)
             return
         self.show_site(self.current_site)
-        self.set_message(f"imported: {counts['tasks']} tasks, {counts['notes']} sticky notes, {counts['tags']} tags")
+        self.set_message(tr("importado: {tasks} tarefas, {notes} post-its, {tags} tags", **counts))
 
     def _build(self) -> None:
         self._build_menu()
@@ -202,7 +202,7 @@ class App(tk.Tk):
         self.global_bar.pack(side="left")
 
         self.service_buttons = []
-        for text, action in (("Restart", "restart"), ("Stop", "stop"), ("Start", "start")):
+        for text, action in ((tr("Reiniciar"), "restart"), (tr("Parar"), "stop"), (tr("Iniciar"), "start")):
             btn = ttk.Button(header, text=text, command=lambda a=action: self.service(a))
             btn.pack(side="right", padx=4, pady=8)
             self.service_buttons.append(btn)
@@ -210,7 +210,7 @@ class App(tk.Tk):
             for btn in self.service_buttons:
                 btn.state(["disabled"])
         if hasattr(self.backend, "dashboard_url"):
-            ttk.Button(header, text="Dashboard", style="Accent.TButton",
+            ttk.Button(header, text=tr("Painel do Lerd"), style="Accent.TButton",
                        command=self.open_dashboard).pack(side="right", padx=(4, 12), pady=8)
         self.header = header
 
@@ -235,9 +235,9 @@ class App(tk.Tk):
         self.tabs = ttk.Notebook(parent)
         self.tabs.pack(fill="both", expand=True)
         self.tasks_panel = TasksPanel(self.tabs, self.notebook, site_name, on_message=self.set_message)
-        self.tabs.add(self.tasks_panel, text="  Tasks  ")
+        self.tabs.add(self.tasks_panel, text="  " + tr("Tarefas") + "  ")
         self.notes_board = NotesBoard(self.tabs, self.notebook, site_name)
-        self.tabs.add(self.notes_board, text="  Sticky notes  ")
+        self.tabs.add(self.notes_board, text="  " + tr("Post-its") + "  ")
 
     def show_site(self, name: Optional[str]) -> None:
         self.current_site = name
@@ -247,8 +247,8 @@ class App(tk.Tk):
         top.pack(fill="x", pady=(0, 8))
         site = self.sidebar.site(name)
         if site is None:
-            ttk.Label(top, text="Global", style="Title.TLabel").pack(side="left")
-            ttk.Label(top, text="notas e tarefas fora de projeto", style="Dim.TLabel").pack(side="left", padx=12)
+            ttk.Label(top, text=tr("Global"), style="Title.TLabel").pack(side="left")
+            ttk.Label(top, text=tr("notas e tarefas fora de projeto"), style="Dim.TLabel").pack(side="left", padx=12)
         else:
             ttk.Label(top, text=site.name, style="Title.TLabel").pack(side="left")
             php = f"PHP {site.php}  ·  " if site.php else ""
@@ -281,7 +281,7 @@ class App(tk.Tk):
     def update_progress(self) -> None:
         self._progress_job = None
         overall = progress(self.notebook.tasks)
-        self.var_global_progress.set(f"Overall: {overall.label}")
+        self.var_global_progress.set(tr("Geral: {progress}", progress=overall.label))
         self.global_bar["value"] = overall.pct
         if hasattr(self, "site_bar") and self.site_bar.winfo_exists():
             current = progress_by_site(self.notebook.tasks).get(self.current_site, Progress())
@@ -310,11 +310,11 @@ class App(tk.Tk):
         row = ttk.Frame(self.panel)
         row.pack(fill="x", pady=(0, 8))
         self.var_project_index = tk.BooleanVar(value=self.project_index.enabled(site.name))
-        ttk.Checkbutton(row, text=f"Manter {INDEX_FILENAME} na pasta do projeto", variable=self.var_project_index,
+        ttk.Checkbutton(row, text=tr("Manter {file} na pasta do projeto", file=INDEX_FILENAME), variable=self.var_project_index,
                         command=lambda: self.toggle_project_index(site.name)).pack(side="left")
-        ttk.Button(row, text=f"Abrir {INDEX_FILENAME}", style="Small.TButton",
+        ttk.Button(row, text=tr("Abrir {file}", file=INDEX_FILENAME), style="Small.TButton",
                    command=lambda: self.open_project_index(site.name)).pack(side="left", padx=(12, 4))
-        ttk.Button(row, text="Copy Markdown", style="Small.TButton",
+        ttk.Button(row, text=tr("Copiar Markdown"), style="Small.TButton",
                    command=lambda: self.copy_markdown(site.name)).pack(side="left")
 
     def toggle_project_index(self, site_name: str) -> None:
@@ -326,18 +326,18 @@ class App(tk.Tk):
             except ProjectPathMissing:
                 self.var_project_index.set(False)
                 self.project_index.set(site_name, False)
-                self.set_message(f"folder of '{site_name}' does not exist", error=True)
+                self.set_message(tr("a pasta de '{site}' não existe", site=site_name), error=True)
                 return
-            self.set_message(f"{INDEX_FILENAME} kept in {site.path}")
+            self.set_message(tr("{file} mantido em {path}", file=INDEX_FILENAME, path=site.path))
         else:
-            self.set_message(f"{INDEX_FILENAME} of '{site_name}' will no longer be updated (the file stays there)")
+            self.set_message(tr("{file} de '{site}' não será mais atualizado (o arquivo continua lá)", file=INDEX_FILENAME, site=site_name))
         self.project_index.set(site_name, enabled)
 
     def open_project_index(self, site_name: str) -> None:
         site = self.sidebar.site(site_name)
         target = os.path.join(site.path, INDEX_FILENAME)
         if not os.path.exists(target):
-            self.set_message(f"{INDEX_FILENAME} does not exist in the project yet: turn on the option beside it")
+            self.set_message(tr("{file} ainda não existe no projeto: ligue a opção ao lado", file=INDEX_FILENAME))
             return
         self._open(["/usr/bin/open", target])
 
@@ -345,7 +345,7 @@ class App(tk.Tk):
         text = render_project_block(site_name, self.notebook.tasks, self.notebook.tags)
         self.clipboard_clear()
         self.clipboard_append(text)
-        self.set_message("Task Markdown copied")
+        self.set_message(tr("Markdown das tarefas copiado"))
         return text
 
     def open_global_index(self) -> None:
@@ -364,10 +364,10 @@ class App(tk.Tk):
         self.destroy()
 
     def add_manual_site(self) -> None:
-        folder = filedialog.askdirectory(parent=self, title="Project folder")
+        folder = filedialog.askdirectory(parent=self, title=tr("Pasta do projeto"))
         if not folder:
             return
-        name = simpledialog.askstring("Project name", "Name (becomes http://name.test):",
+        name = simpledialog.askstring(tr("Nome do projeto"), tr("Nome (vira http://nome.test):"),
                                       initialvalue=os.path.basename(folder), parent=self)
         if not name:
             return
@@ -376,7 +376,7 @@ class App(tk.Tk):
         self.store.save("sites", self.manual_sites)
         self.reload_sites()
         self.sidebar.select(name)
-        self.set_message(f"project '{name}' added")
+        self.set_message(tr("projeto '{name}' adicionado", name=name))
 
     def remove_manual_site(self) -> None:
         name = self.sidebar.selected_key()
@@ -384,12 +384,12 @@ class App(tk.Tk):
         if site is None:
             return
         if site.kind != "manual":
-            messagebox.showinfo(APP_NAME, f"'{name}' comes from {self.backend.label} ({site.kind}).\n"
-                                f"Use 'unlink' in {self.backend.name} or its dashboard; "
-                                "unregistering from the app arrives in a later version.", parent=self)
+            messagebox.showinfo(APP_NAME, tr("'{name}' vem de {backend} ({kind}).\n"
+                                "Use 'unlink' em {tool} ou seu painel; a remoção pelo app virá numa versão futura.",
+                                name=name, backend=self.backend.label, kind=site.kind, tool=self.backend.name), parent=self)
             return
-        if messagebox.askyesno(APP_NAME, f"Remove '{name}' from the list?\n(the folder is not deleted; "
-                               "notes and tasks stay saved)", parent=self):
+        if messagebox.askyesno(APP_NAME, tr("Remover '{name}' da lista?\n(a pasta não é apagada; "
+                               "notas e tarefas continuam salvas)", name=name), parent=self):
             self.manual_sites.pop(name, None)
             self.store.save("sites", self.manual_sites)
             self.reload_sites()
@@ -411,7 +411,7 @@ class App(tk.Tk):
     def _open(self, argv) -> None:
         self.run_in_background(lambda: self.runner.run(argv, timeout=15),
                                lambda r: self.set_message(" ".join(argv[1:]) if getattr(r, "ok", False)
-                                                          else f"could not open: {getattr(r, 'output', r)}"))
+                                                          else tr("não foi possível abrir: {output}", output=getattr(r, "output", r))))
 
     # ── services ───────────────────────────────────────────────────────
     def service(self, action: str) -> None:
@@ -424,7 +424,7 @@ class App(tk.Tk):
             self.set_message(f"{self.backend.name} {action}: {result}", error=True)
         else:
             text = (result.output or "").strip().splitlines()
-            self.set_message(f"{self.backend.name} {action}: {'ok' if result.ok else 'failed'}"
+            self.set_message(f"{self.backend.name} {action}: {tr('ok') if result.ok else tr('falhou')}"
                              + (f" · {text[-1]}" if text else ""), error=not result.ok)
         self._refresh_status(reschedule=False)
 
@@ -434,7 +434,7 @@ class App(tk.Tk):
         def work():
             return backend.status().summary
 
-        self.run_in_background(work, lambda text: self.var_status.set(str(text)))
+        self.run_in_background(work, lambda text: self.var_status.set(tr(str(text))))
         if reschedule:
             self.after(STATUS_INTERVAL_MS, self._refresh_status)
 
@@ -502,19 +502,19 @@ class App(tk.Tk):
             assert self.notebook.task(task.id) is None
             panel.undo()
             assert self.notebook.task(task.id) is not None
-            panel.var_status.set("To do")
+            panel.var_status.set(tr("A fazer"))
             panel.render()
             assert not panel.tree.exists(task.id)  # it is completed
-            panel.var_status.set("Done")
+            panel.var_status.set(tr("Feito"))
             panel.render()
             assert panel.tree.exists(task.id)
-            panel.var_status.set("All")
+            panel.var_status.set(tr("Todas"))
             panel.render()
 
         def index_flow():
             self.index_debouncer.flush()
             text = global_index_path(self.data_dir).read_text(encoding="utf-8")
-            assert "## Índice" in text and "tarefa editada" in text, text[:200]
+            assert tr("## Índice") in text and "tarefa editada" in text, text[:200]
             assert "vulcan:tarefas:inicio" in self.copy_markdown(None)
             if self.env.get(paths.ENV_HOME):
                 # only with an isolated data directory: creates a throwaway manual project

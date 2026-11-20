@@ -5,7 +5,9 @@ import { confirmDialog } from "./ai.mjs";
 import { del, get, patch, post } from "./api.mjs";
 import { esc, icon, reportError, toast } from "./dom.mjs";
 import { syncPorts } from "./terminal-ports.mjs";
-import { terminals } from "./terminals.mjs";
+import { sessionHash, terminals } from "./terminal-pool.mjs";
+import { editTerminalIdentity } from "./terminal-identity.mjs";
+import { openNote } from "./note-dialog.mjs";
 import { agentMark } from "./agents-ui.mjs";
 import { t } from "./i18n.mjs";
 
@@ -39,12 +41,6 @@ function loadExpanded() {
   }
 }
 
-/** Session route in the right-hand area; `focus` highlights an item inside the tab. */
-export function sessionHash(session, tab = "terminal", focus = "") {
-  const tail = `${tab}/${session.id}${focus ? `/${encodeURIComponent(focus)}` : ""}`;
-  return session.site ? `#/sites/${encodeURIComponent(session.site)}/${tail}` : `#/terminals/${tail}`;
-}
-
 export class SessionTree {
   /** @param {{navigate: Function, route: Function}} options */
   constructor(root, options) {
@@ -52,6 +48,8 @@ export class SessionTree {
     this.options = options;
     this.expanded = loadExpanded();
     this.data = null;
+    window.addEventListener("vulcan-note-changed", () => this.load());
+    window.addEventListener("vulcan-sessions-changed", () => this.load());
     this.signature = "";
     this.closedLimit = PAGE;
     this.root.addEventListener("click", (e) => this.onClick(e));
@@ -167,7 +165,7 @@ export class SessionTree {
     const progress = s.tasks.total ? `<span class="tree-meta">${s.tasks.done}/${s.tasks.total}</span>` : "";
     const where = s.site || "Global";
     return `
-      <div class="tree-node ${s.id === active ? "is-on" : ""} ${s.open ? "is-open" : "is-closed"} ${s.theme ? `has-theme t-${esc(s.theme)}` : ""}" data-id="${s.id}" role="treeitem" aria-expanded="${expanded}">
+      <div class="tree-node ${s.id === active ? "is-on" : ""} ${s.open ? "is-open" : "is-closed"} ${s.tab_color || s.theme ? `has-theme t-${esc(s.tab_color || s.theme)}` : ""}" data-id="${s.id}" role="treeitem" aria-expanded="${expanded}">
         <div class="tree-row">
           <button class="tree-twisty" data-toggle="${key}" aria-expanded="${expanded && items > 0}" aria-label="${expanded ? t("Recolher {title}", { title: esc(s.title) }) : t("Expandir {title}", { title: esc(s.title) })}" ${items ? "" : "disabled"}>
             ${items ? icon("chevron-right", "side-chevron") : ""}</button>
@@ -184,7 +182,7 @@ export class SessionTree {
         ${expanded && items ? `<div class="tree-children">
           ${s.task_list.map((t) => `<a class="tree-leaf status-${t.status}" href="${sessionHash(s, "tasks", t.id)}">
               ${icon(t.status === "done" ? "circle-check" : t.status === "doing" ? "circle-half" : "circle")}<span>${esc(t.title)}</span></a>`).join("")}
-          ${s.note_list.map((n) => `<a class="tree-leaf" href="${sessionHash(s, "notes", n.id)}">
+          ${s.note_list.map((n) => `<a class="tree-leaf" data-note="${esc(n.id)}" aria-haspopup="dialog" href="${sessionHash(s, "notes", n.id)}">
               <span class="tree-swatch swatch-${esc(n.color)}"></span><span>${esc(n.title || t("Post-it sem texto"))}</span></a>`).join("")}
           ${s.tags.length ? `<div class="tree-tags">${s.tags.map((t) => `<a class="chip" style="--chip:${esc(t.color)}" href="${sessionHash(s, "tags", t.id)}">${esc(t.name)}</a>`).join("")}</div>` : ""}
         </div>` : ""}
@@ -205,7 +203,7 @@ export class SessionTree {
     menu.setAttribute("role", "menu");
     menu.innerHTML = `
       <div class="tree-menu-head">${esc(s.title)}</div>
-      <button role="menuitem" data-op="rename">${icon("edit")}<span>${t("Renomear")}</span></button>
+      <button role="menuitem" data-op="${s.open ? "identity" : "rename"}">${icon("edit")}<span>${s.open ? t("Nome e cor da aba") : t("Renomear")}</span></button>
       <button role="menuitem" data-op="note">${icon("note")}<span>${t("Adicionar post-it")}</span></button>
       <button role="menuitem" data-op="task">${icon("check-square")}<span>${t("Adicionar tarefa")}</span></button>
       <div class="tree-menu-sep"></div>
@@ -231,10 +229,16 @@ export class SessionTree {
 
   async runOp(op, s) {
     try {
+      if (op === "identity") {
+        const trigger = this.root.querySelector(`[data-menu="${CSS.escape(s.id)}"]`);
+        return await editTerminalIdentity(s.id, trigger);
+      }
       if (op === "rename") return this.rename(s);
       if (op === "note") {
         const note = await post("/api/notes", { terminal: s.id, text: "" });
-        this.options.navigate(sessionHash(s, "notes", note.id));
+        await this.load();
+        const trigger = this.root.querySelector(`[data-menu="${CSS.escape(s.id)}"]`);
+        await openNote(note.id, trigger);
       }
       if (op === "task") this.options.navigate(sessionHash(s, "tasks", "nova"));
       if (op === "delete") await this.remove(s);
@@ -326,6 +330,12 @@ export class SessionTree {
       event.preventDefault();
       this.toggle(toggle.dataset.toggle);
       this.render(true);
+      return;
+    }
+    const note = event.target.closest("[data-note]");
+    if (note && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+      event.preventDefault();
+      openNote(note.dataset.note, note).catch(reportError);
       return;
     }
     const link = event.target.closest("a.tree-link");

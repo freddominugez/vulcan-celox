@@ -6,13 +6,13 @@ import { get, patch, post, put } from "../api.mjs";
 import { NAV_GROUPS, SIDE_SECTIONS, app, lerdUnavailable, navById } from "../app-state.mjs";
 import { noticesEnabled, setNoticesEnabled } from "../attention-notify.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
-import { currentLanguage, t } from "../i18n.mjs";
+import { currentLanguage, languageOptions, setLanguage, t } from "../i18n.mjs";
 import { prEnabled, setPrEnabled } from "../pr-status.mjs";
 import { isHidden, setHidden } from "../sidebar-prefs.mjs";
 import { THEME_OPTIONS, setThemePref, themePref } from "../theme.mjs";
 import { themes } from "../themes.mjs";
 
-const LANGUAGES = [["en", "English"], ["pt", t("Português")]];
+const LANGUAGES = languageOptions.map((item) => [item.id, item.label]);
 
 const toggle = (key, checked, title, text) => `<label class="cf-row"><input type="checkbox" data-cf="${key}" ${checked ? "checked" : ""}>
   <span class="cf-text"><b>${esc(title)}</b>${text ? `<span class="dim">${esc(text)}</span>` : ""}</span></label>`;
@@ -60,7 +60,7 @@ export class SettingsView {
     const p = this.prefs;
     const auto = app.state && app.state.autostart;
     const canLerd = !lerdUnavailable();
-    const choice = (name, options, current) => `<div class="segmented cf-seg" role="group">${options.map(([id, label]) => `<button type="button" class="seg ${id === current ? "is-on" : ""}" data-${name}="${id}" aria-pressed="${id === current}">${esc(label)}</button>`).join("")}</div>`;
+    const choice = (name, options, current) => `<div class="segmented cf-seg" role="group" aria-label="${name === "lang" ? t("Idioma") : t("Tema")}">${options.map(([id, label]) => `<button type="button" class="seg ${id === current ? "is-on" : ""}" data-${name}="${id}" aria-pressed="${id === current}">${esc(label)}</button>`).join("")}</div>`;
     this.root.innerHTML = `<div class="page cf-page">
       <h1 class="cf-title">${t("Configurações")}</h1>
       <section class="panel cf-panel"><header class="panel-head"><h2>${t("Barra lateral")}</h2>
@@ -128,8 +128,7 @@ export class SettingsView {
         this.mountPanels(await get("/api/ai/config"));
       }
       if (button.dataset.lang && button.dataset.lang !== currentLanguage()) {
-        await patch("/api/preferences", { language: button.dataset.lang });
-        location.reload();
+        await setLanguage(button.dataset.lang);
       }
       if (button.dataset.cfAction === "sidebar-reset") {
         await setHidden([]);

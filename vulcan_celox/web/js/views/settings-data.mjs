@@ -4,7 +4,7 @@ import { confirmDialog } from "../ai.mjs";
 import { get, hasBridge, isNative, native, post } from "../api.mjs";
 import { esc, icon, reportError, toast } from "../dom.mjs";
 import { pickNative } from "../folder-dialog.mjs";
-import { t } from "../i18n.mjs";
+import { currentLocale, t } from "../i18n.mjs";
 
 const REASONS = {
   offline: () => t("Não foi possível consultar: sem conexão."),
@@ -33,7 +33,7 @@ const COUNTS = [
 
 const dateText = (value) => {
   const when = value ? new Date(typeof value === "number" ? value * 1000 : value) : null;
-  return when && !Number.isNaN(when.getTime()) ? when.toLocaleString() : t("data desconhecida");
+  return when && !Number.isNaN(when.getTime()) ? when.toLocaleString(currentLocale()) : t("data desconhecida");
 };
 
 /** The summary of the chosen zip. Restore only shows up when nothing in it would be refused. */

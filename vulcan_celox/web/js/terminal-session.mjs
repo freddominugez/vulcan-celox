@@ -23,6 +23,8 @@ export class Session {
     this.hooks = hooks;
     this.el = document.createElement("div");
     this.el.className = "xterm-host";
+    window.Terminal.strings.promptLabel = t("Entrada do terminal");
+    window.Terminal.strings.tooMuchOutput = t("Saída demais para anunciar. Navegue pelas linhas para ler.");
     this.term = new window.Terminal({
       fontFamily: 'ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace',
       fontSize: 13,

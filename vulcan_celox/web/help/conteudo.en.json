@@ -103,12 +103,13 @@
       "titulo": "Terminals and sessions",
       "resumo": "Tabs, the bottom panel and each session's memory.",
       "blocos": [
-        {"p": "Each terminal is a session. It opens in the folder you chose, with a color theme that identifies the session, and can start with Claude Code or Codex already running."},
+        {"p": "Each terminal is a session. It opens in the chosen folder, with a color theme that identifies the session. In the new terminal dialog, choose Claude Code, Codex or the shell for that tab only: the choice does not carry over to later tabs. Each dialog starts with the shell selected. When asking for the folder is disabled, new tabs open directly in the shell; ⇧⌘T brings the dialog back."},
         {"ul": [
+          "**Name and color:** select a tab and use Name and color to identify it. The tab color is independent of the shell palette.",
           "**Ports:** the tab shows the ports its processes opened, such as `:5173 +2`, in the tab bar and in the session list. Clicking opens `http://localhost:<port>` in the browser. Only the tab's own processes count.",
           "**⌘T** opens a new terminal; **⌘J** shows or hides the bottom terminal panel, on screens that do not already show a terminal.",
           "**Quick commands** for the project (composer, artisan, npm) sit in the terminal bar.",
-          "**Memory:** while a terminal is open, the app keeps a Markdown file with typed commands, tasks, sticky notes, tags and the last 2,000 lines of output. Passwords and keys it recognizes are saved as `[secret]` (`[segredo]` with the interface in Portuguese), and what you type at a hidden password prompt is not recorded. Recognition is by pattern, so an unusual secret can get through, and on Windows the hidden prompt cannot be detected. After it closes, the file shows up in Recent sessions and in the Index.",
+          "**Memory:** while a terminal is open, the app keeps a Markdown file with typed commands, tasks, sticky notes, tags and the last 2,000 lines of output. Passwords and keys it recognizes are saved as `[secret]` (`[segredo]` in Portuguese and `[secreto]` in Spanish), and what you type at a hidden password prompt is not recorded. Recognition is by pattern, so an unusual secret can get through, and on Windows the hidden prompt cannot be detected. After it closes, the file shows up in Recent sessions and in the Index.",
           "**Detach:** a tab can become its own window and come back later."
         ]}
       ]
@@ -196,7 +197,7 @@
       "blocos": [
         {"ul": [
           "**Tasks:** per site or global, with a due date and state. Open ones show in the Overview.",
-          "**Sticky notes:** quick notes per site or global.",
+          "**Sticky notes:** click a note to edit it in a dialog. Use **Go to terminal** to return to the linked tab or **View in History** if the session has ended. You can link an unlinked note to an open terminal in the same scope.",
           "**Tags:** mark sessions, tasks and notes so you can find them later.",
           "**Index:** a Markdown list of all sessions; each entry opens that session's memory. AI documentation is optional, only on click, and uses your own Anthropic key, added in Settings and stored in the system's password store."
         ]}
@@ -210,7 +211,7 @@
         {"ul": [
           "**Sidebar:** check what you want to see. It covers the menu items and the lists below them (Sessions, Sites and Node projects). Whatever you hide stays in the search (⌘K), and **Show all** undoes it. Settings cannot be hidden, so you can always come back.",
           "**Collapsed sidebar:** the button at the top of the bar, or ⌘B, leaves only the icons, in a narrow rail; hover to see the name. Sessions, Sites and Node projects become one icon each, which opens the list in a menu. The choice is kept; without a choice, a window under 1000 px opens collapsed.",
-          "**Appearance:** theme (System, Light or Dark) and language (English or Português).",
+          "**Appearance:** theme (System, Light or Dark) and language: Português (Brasil), English (US) or Español (España). Switch in Settings or through the ⌘K search. The interface and macOS menus follow your choice without closing terminals; content you created stays as it is.",
           "**On startup:** whether to show the opening screen, start Lerd with the app, and ask for the folder when opening a terminal.",
           "**Notices and network:** a notification when an agent is waiting for you, checking the PR state on GitHub (off by default), and the new version notice (on by default, at most once a day, reads only the version number). You can turn each of them off.",
           "**Backup and secrets:** **Back up now** saves all of the app's data in a .zip outside the data folder. It includes tasks, sticky notes, tags, memories, prompts, preferences and the agent index, but not the Anthropic key, which stays in the system. The file is not encrypted. **Check** reads the .zip without extracting anything and shows date, version, size and how much of each thing it holds; only then does **Restore** show up, and never for a file with an error. The swap happens when you reopen the app, and the current data stays in the `.restauros` folder. **Restore copies** lists those folders, and each one can go to the Trash. **Mask** rewrites memories saved before masking existed, and cannot be undone.",
@@ -280,7 +281,7 @@
     {"q": "A notice says the local server stopped.", "a": "The notice shows the exit code and the last error line. Show log opens the `logs/servidor-erro.log` file in the data folder, and Restart server starts another one without closing the app. Open terminals end with it: their memory stays, and they come back as ended, with Resume. Each run's record stays in `logs/servidor.log`, always masked.", "secao": "configuracoes"},
     {"q": "Is a password shown in the terminal saved?", "a": "The app masks what it recognizes before saving the memory, and does not record what you type at a hidden password prompt. Recognition is by pattern and can miss an unusual secret. Older memories are only masked by the Mask button in Settings. The agent index is not masked: it repeats what is already in the Claude Code and Codex files.", "secao": "configuracoes"},
     {"q": "Does the app update itself?", "a": "No. It checks at most once a day whether a new version exists, reading only the number, and tells you. You download and install it from the release page. You can turn this off in Settings.", "secao": "configuracoes"},
-    {"q": "Where do I change the theme and language?", "a": "In Settings, under Appearance.", "secao": "configuracoes"},
+    {"q": "Where do I change the theme and language?", "a": "In Settings, under Appearance, or through the ⌘K search. Choose Português (Brasil), English (US) or Español (España). The macOS menus also follow the change, without closing terminals.", "secao": "configuracoes"},
     {"q": "Where do I add the Anthropic key?", "a": "In Settings. You only need it to generate AI documentation; the rest of the app works without it.", "secao": "configuracoes"},
     {"q": "How do I see a file the agent did not touch?", "a": "Open the **Code** screen: it shows the folder's whole tree. A session's Code tab only shows what that session touched.", "secao": "codigo"},
     {"q": "Why does it say Disk change instead of the agent?", "a": "The app only names the agent when that folder's session recorded the same edit within 60 s. A formatter, a generator, `npm install` and another editor leave no such record. The agent's record may also arrive a little after the write: then the mark changes by itself.", "secao": "codigo"},

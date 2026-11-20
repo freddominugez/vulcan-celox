@@ -320,6 +320,12 @@ Só leitura: a única escrita põe ou tira uma pasta da lista do próprio app. `
 | GET | `/api/files/photo` | Arquivos da foto atual do disco, para a abertura rápida | Query: `root` | 400, 403 |
 | GET | `/api/files/git` | Estado do Git por arquivo (`M`, `U`, `D`), do índice comparado com o disco, com a branch. Guardado por raiz | Query: `root` | 400, 403 |
 
+## Identidade das abas e vínculo dos post-its
+
+`PATCH /api/terminals/<id>` aceita `title` e `tab_color`. A cor da aba usa um identificador de `GET /api/themes`. Use `null` para voltar à cor do tema. O valor fica na sessão e aparece nas respostas de terminais e no histórico.
+
+`GET /api/notes/<id>` inclui `session` com ID, nome, site, cor e estado do terminal vinculado. Em `PATCH /api/notes/<id>`, `link_terminal` vincula uma nota avulsa a um terminal aberto do mesmo escopo. Uma tentativa incompatível retorna 409.
+
 ## WebSocket
 
 | Método | Caminho | Para quê | Parâmetros ou corpo | Status relevantes |

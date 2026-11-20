@@ -6,10 +6,11 @@ from tkinter import ttk
 from typing import Callable, Dict, List, Optional
 
 from vulcan_celox.core.sites import KIND_ORDER, Site
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.ui import theme
 
 GLOBAL_IID = "global"
-SECTION_LABELS = {"lerd": "LERD", "linked": "LINKED", "parked": "PARKED", "manual": "MANUAL"}
+SECTION_LABELS = {"lerd": "Lerd", "linked": tr("Vinculados"), "parked": tr("Em pastas mãe"), "manual": tr("Manuais")}
 
 
 def site_iid(name: str) -> str:
@@ -29,7 +30,7 @@ class Sidebar(ttk.Frame):
         self._sites: Dict[str, Site] = {}
         self._suppress = False
 
-        ttk.Label(self, text="PROJECTS", style="Section.TLabel").pack(anchor="w", padx=12, pady=(12, 4))
+        ttk.Label(self, text=tr("Projetos"), style="Section.TLabel").pack(anchor="w", padx=12, pady=(12, 4))
 
         frame = ttk.Frame(self, style="Panel.TFrame")
         frame.pack(fill="both", expand=True, padx=(8, 0))
@@ -48,7 +49,7 @@ class Sidebar(ttk.Frame):
         buttons.pack(fill="x", padx=8, pady=8)
         for text, cmd, side in (("＋", on_add, "left"), ("－", on_remove, "left"),
                                 ("⟳", on_reload, "left"), ("Terminal", on_terminal, "right"),
-                                ("Open", on_browser, "right")):
+                                (tr("Abrir"), on_browser, "right")):
             ttk.Button(buttons, text=text, command=cmd, style="Small.TButton").pack(side=side, padx=2)
 
     # ── dados ────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ class Sidebar(ttk.Frame):
             self.tree.delete(*self.tree.get_children())
             self._sites = {s.name: s for s in sites}
             progress = progress or {}
-            self.tree.insert("", "end", iid=GLOBAL_IID, text="  Global",
+            self.tree.insert("", "end", iid=GLOBAL_IID, text="  " + tr("Global"),
                              values=(progress.get(None, ""),), tags=("global",))
             for kind in KIND_ORDER:
                 group = [s for s in sites if s.kind == kind]

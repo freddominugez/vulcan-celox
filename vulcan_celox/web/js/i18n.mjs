@@ -1,19 +1,23 @@
 // Interface language. The source text in the code is Portuguese; `t()` returns the translation from the dictionary. Only literal text goes into
 // t(), so the test can check the dictionary: variable values go in {nome}, already escaped by the caller.
 
-import { token } from "./api.mjs";
+import { native, patch, token } from "./api.mjs";
 
 let language = "en";
 let dictionary = {};
+export let languageOptions = [];
 
 // outside the browser (modules running in the test) the source text is kept
 if (typeof document !== "undefined") {
   try {
-    const response = await fetch("/api/i18n", { headers: { "X-Vulcan-Token": token } });
+    const [response, manifest] = await Promise.all([
+      fetch("/api/i18n", { headers: { "X-Vulcan-Token": token } }), fetch("i18n/languages.json"),
+    ]);
     const data = await response.json();
+    languageOptions = await manifest.json();
     language = data.language;
     dictionary = data.dictionary || {};
-    document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+    document.documentElement.lang = currentLocale();
   } catch {
     /* server down: the error screen shows with the source text */
   }
@@ -22,6 +26,27 @@ if (typeof document !== "undefined") {
 export function currentLanguage() {
   return language;
 }
+
+export function currentLocale() {
+  return (languageOptions.find((item) => item.id === language) || {}).locale || "en-US";
+}
+
+export async function setLanguage(value) {
+  if (value === language) return;
+  const prefs = await patch("/api/preferences", { language: value });
+  await new Promise((resolve) => {
+    const done = () => { window.removeEventListener("vulcan-language-applied", done); clearTimeout(timer); resolve(); };
+    const timer = setTimeout(done, 1200);
+    window.addEventListener("vulcan-language-applied", done);
+    if (!native({ type: "language", language: prefs.language })) done();
+  });
+  location.reload();
+}
+
+export const decimalText = (value) => new Intl.NumberFormat(currentLocale(), {
+  minimumFractionDigits: (String(value).split(".")[1] || "").length,
+  maximumFractionDigits: (String(value).split(".")[1] || "").length, useGrouping: false,
+}).format(Number(value));
 
 // the shortcuts are written the Mac way; elsewhere ⌘ is Ctrl+Shift
 const IS_MAC = typeof navigator === "undefined" || /Mac/.test(navigator.platform || navigator.userAgent);

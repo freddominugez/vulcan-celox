@@ -2,14 +2,14 @@
 
 import { get, token } from "../api.mjs";
 import { esc, icon, reportError } from "../dom.mjs";
-import { currentLanguage, t } from "../i18n.mjs";
+import { currentLocale, decimalText, t } from "../i18n.mjs";
 import { AGENT_NAMES, agentMark, copy, RevisionWatch } from "../agents-ui.mjs";
 
 const PERIODS = [7, 30, 90];
 // per-agent colors validated against the dark surface (#202024): luminosity range, chroma, color blindness and contrast
 const AGENT_ORDER = ["claude", "codex"];
 
-const decimal = (v) => (currentLanguage() === "pt" ? v.replace(".", ",") : v);
+const decimal = decimalText;
 
 export function fmtTokens(n) {
   n = n || 0;
@@ -38,7 +38,7 @@ function dayList(from, to) {
 }
 
 function shortDay(day) {
-  return `${day.slice(8, 10)}/${day.slice(5, 7)}`;
+  return new Date(`${day}T12:00:00`).toLocaleDateString(currentLocale(), { day: "2-digit", month: "2-digit" });
 }
 
 export class AgentsUsageView {

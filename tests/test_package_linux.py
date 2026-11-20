@@ -44,7 +44,7 @@ class LinuxPackageTest(unittest.TestCase):
                 checked = 0
                 for source in (ROOT / "vulcan_celox").rglob("*"):
                     relative = source.relative_to(ROOT / "vulcan_celox")
-                    if not source.is_file() or "ui" in relative.parts or "__pycache__" in relative.parts or source.suffix == ".pyc":
+                    if not source.is_file() or "ui" in relative.parts or "__pycache__" in relative.parts or source.suffix == ".pyc" or source.name == ".DS_Store":
                         continue
                     current = source.read_bytes()
                     self.assertEqual(data.extractfile("./opt/vulcan-celox/lib/vulcan_celox/" + relative.as_posix()).read(), current)
@@ -60,6 +60,8 @@ class LinuxPackageTest(unittest.TestCase):
                 self.assertIn(b"/usr/bin/vulcan-celox", desktop)
                 self.assertNotIn(b"@EXEC@", desktop)
                 self.assertFalse(any("__pycache__" in name or name.endswith(".pyc") for name in names))
+                self.assertFalse(any(name.endswith(".DS_Store") for name in names))
+                self.assertFalse(any(name.endswith(".DS_Store") for name in data.getnames()))
             for line in (output / "SHA256SUMS").read_text().splitlines():
                 expected, name = line.split("  ", 1)
                 self.assertEqual(hashlib.sha256((output / name).read_bytes()).hexdigest(), expected)

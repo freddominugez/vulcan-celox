@@ -172,9 +172,9 @@ class VulcanApp:
     def new_terminal_prefs(self) -> Dict[str, Any]:
         data = self.store.load("new_terminal", {})
         data = data if isinstance(data, dict) else {}
-        agent = data.get("agent")
+        # Legacy agent defaults must never start a program in another tab.
         return {"skip_folder": data.get("skip_folder") is True,
-                "agent": agent if agent in NEW_TERMINAL_AGENTS else "shell"}
+                "agent": "shell"}
 
     def save_new_terminal_prefs(self, value) -> None:
         if not isinstance(value, dict):
@@ -187,7 +187,6 @@ class VulcanApp:
         if "agent" in value:
             if value["agent"] not in NEW_TERMINAL_AGENTS:
                 raise HttpError(400, "agent deve ser claude, codex ou shell")
-            prefs["agent"] = value["agent"]
         self.store.save("new_terminal", prefs)
 
     # ── rotas ────────────────────────────────────────────────────────────
@@ -227,6 +226,8 @@ class VulcanApp:
         @srv.route("PATCH", "/api/preferences")
         def _preferences(req: Request):
             body = req.json()
+            if "language" in body and i18n.normalize(body["language"]) is None:
+                raise HttpError(400, "language deve ser en, pt ou es")
             if "autostart_env" in body:
                 if not isinstance(body["autostart_env"], bool):
                     raise HttpError(400, "autostart_env deve ser verdadeiro ou falso")
@@ -247,9 +248,7 @@ class VulcanApp:
                 prefs["theme"] = body["theme"]
                 self.store.save("preferences", prefs)
             if "language" in body:
-                if body["language"] not in i18n.LANGUAGES:
-                    raise HttpError(400, "language deve ser en ou pt")
-                prefs["language"] = body["language"]
+                prefs["language"] = i18n.normalize(body["language"])
                 self.store.save("preferences", prefs)
                 i18n.set_language(i18n.resolve(prefs, self.env))
             if apply_sidebar_prefs(body, prefs):

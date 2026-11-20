@@ -320,6 +320,12 @@ Read only: the one write adds or removes a folder from the app's own list. `root
 | GET | `/api/files/photo` | Files in the current photo of the disk, for the quick open | Query: `root` | 400, 403 |
 | GET | `/api/files/git` | Git state per file (`M`, `U`, `D`), from the index compared with the disk, with the branch. Cached per root | Query: `root` | 400, 403 |
 
+## Terminal tab identity and sticky note links
+
+`PATCH /api/terminals/<id>` accepts `title` and `tab_color`. The tab color uses an ID from `GET /api/themes`. Use `null` to return to the theme color. The value is stored with the session and appears in terminal and history responses.
+
+`GET /api/notes/<id>` includes `session` with the linked terminal’s ID, title, site, color and status. In `PATCH /api/notes/<id>`, `link_terminal` links an unlinked note to an open terminal in the same scope. An incompatible request returns 409.
+
 ## WebSocket
 
 | Method | Path | Purpose | Parameters or body | Notable status |

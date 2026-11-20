@@ -119,6 +119,7 @@ export function bindGlobalEvents() {
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.target.closest?.(".session-dialog")) return;
     // macOS: ⌘; Linux: Ctrl+Shift (Ctrl alone belongs to the terminal)
     const mod = isMac ? event.metaKey : event.ctrlKey && event.shiftKey;
     if (!mod) {

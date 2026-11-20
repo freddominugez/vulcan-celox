@@ -8,12 +8,11 @@ import { prEnabled, setPrEnabled } from "./pr-status.mjs";
 import { setThemePref, THEME_OPTIONS, themePref } from "./theme.mjs";
 import { $, debounce, esc, icon, reportError, shortPath } from "./dom.mjs";
 import { loadHelp } from "./help-content.mjs";
-import { currentLanguage, t } from "./i18n.mjs";
+import { languageOptions, setLanguage, t } from "./i18n.mjs";
 
 let helpSections = [];
 loadHelp().then((d) => { helpSections = d.secoes; }).catch(() => {});
 
-const setLanguage = (language) => (language === currentLanguage() ? null : patch("/api/preferences", { language }).then(() => location.reload()).catch(reportError));
 
 export const palette = {
   items: [],
@@ -42,8 +41,7 @@ export const palette = {
       ...THEME_OPTIONS.map(([id, label]) => ({ kind: t("Tema"), title: themePref() === id ? t("Tema: {label} (em uso)", { label }) : t("Tema: {label}", { label }), icon: "circle-half", run: () => setThemePref(id).catch(reportError) })),
       { kind: t("Ações"), title: prEnabled() ? t("Estado do PR pelo GitHub (usa a rede): desligar") : t("Estado do PR pelo GitHub (usa a rede): ligar"), icon: "branch", run: () => setPrEnabled(!prEnabled()).catch(reportError) },
       { kind: t("Ações"), title: t("Abrir painel do Lerd"), icon: "gauge", run: () => post("/api/open", { kind: "dashboard" }).catch(reportError) },
-      { kind: t("Ações"), title: t("Idioma: English"), icon: "help", run: () => setLanguage("en") },
-      { kind: t("Ações"), title: t("Idioma: Português"), icon: "help", run: () => setLanguage("pt") },
+      ...languageOptions.map((item) => ({ kind: t("Idioma"), title: item.label, icon: "help", run: () => setLanguage(item.id).catch(reportError) })),
       ...[...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => ({ kind: t("Ir para"), title: n.label, icon: n.icon, run: () => navigate(n.hash) })),
       ...helpSections.map((h) => ({ kind: t("Ajuda"), title: t("Ajuda: {titulo}", { titulo: h.titulo }), sub: h.resumo, icon: "help", run: () => navigate(`#/ajuda/${h.id}`) })),
     ];

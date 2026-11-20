@@ -15,22 +15,25 @@ export function formatStamp(iso) {
 
 export function renderTabs(ws) {
   const ids = ws.tabIds();
+  const history = ws.isHistory();
   const tabs = ids.map((id, i) => {
     const live = terminals.get(id);
     const record = ws.records.get(id);
     const title = live ? live.info.title : record ? record.title : id;
-    const active = id === ws.activeId;
+    const active = !history && id === ws.activeId;
     const shown = id === ws.splitId;
     const popped = terminals.popped.has(id);
     const site = live ? live.info.site : record && record.site;
     const where = ws.options.scope === "all" && site ? `<span class="tab-site">${esc(site)}</span>` : "";
-    const theme = (live && live.info.theme) || (record && record.theme) || null;
+    const identityInfo = live ? live.info : record;
+    const identity = identityInfo?.tab_color || identityInfo?.theme;
     const cls = [active && "is-active", shown && "is-shown", popped && "is-popped", !live && "is-closed",
       live && !live.alive && "is-dead", live && live.disconnected && "is-disconnected",
-      theme && `has-theme t-${theme}`].filter(Boolean).join(" ");
+      identity && `has-theme t-${esc(identity)}`].filter(Boolean).join(" ");
     const tip = live ? shortPath(live.info.cwd) : t("Encerrada {when}", { when: formatStamp(record && record.closed_at) });
     const state = live && live.disconnected ? ` · ${t("desconectado: Enter no terminal reconecta")}` : "";
-    return `<div class="tab ${cls}" role="tab" tabindex="${active ? 0 : -1}" aria-selected="${active}" data-action="select" data-id="${id}" title="${esc(tip + state)}">
+    return `<div class="tab ${cls}" role="tab" tabindex="${active ? 0 : -1}" aria-selected="${active}" data-action="select" data-id="${id}" title="${esc([title, tip + state].filter(Boolean).join(" · "))}">
+        <span class="session-color" aria-hidden="true"></span>
         ${icon(!live ? "clock" : popped ? "external" : "terminal")}
         <span class="tab-label">${esc(title)}</span>${where}
         ${live && live.alive && live.info.long_running ? `<span class="tab-long" title="${t("Processo longo: {command}", { command: esc(live.info.command) })}">${t("longo")}</span>` : ""}
@@ -42,14 +45,17 @@ export function renderTabs(ws) {
 
   // the history of closed sessions lives in the sidebar (folder Histórico)
 
-  const terminalTools = ws.mode === "terminal" && ws.isLive(ws.activeId) ? `
+  const identityTool = !history && ws.isLive(ws.activeId)
+    ? `<button class="btn btn-sm tab-identity-btn" data-action="identity" data-id="${ws.activeId}" title="${t("Nome e cor da aba")}" aria-label="${t("Nome e cor da aba")}">${icon("edit")}<span>${t("Nome e cor")}</span></button>`
+    : "";
+  const terminalTools = ws.mode === "terminal" && !history && ws.isLive(ws.activeId) ? `
     <button class="icon-btn ${ws.splitId ? "is-on" : ""}" data-action="split" title="${t("Dividir")}" aria-label="${t("Dividir")}">${icon("split")}</button>
     <button class="icon-btn" data-action="find" title="${t("Buscar no terminal ({key})", { key: isMac ? "⌘F" : "Ctrl+⇧+F" })}" aria-label="${t("Buscar no terminal")}">${icon("search")}</button>
     <button class="icon-btn" data-action="copy-output" title="${t("Copiar a saída do terminal")}" aria-label="${t("Copiar a saída do terminal")}">${icon("copy")}</button>
     <button class="icon-btn" data-action="popout" title="${isNative ? t("Destacar em janela (⇧⌘D)") : t("Destacar em janela")}" aria-label="${t("Destacar em janela")}">${icon("external")}</button>
     <button class="icon-btn" data-action="document" data-id="${ws.activeId}" title="${t("Documentar esta sessão com IA")}" aria-label="${t("Documentar com IA")}">${icon("book")}</button>` : "";
 
-  const viewing = ws.isHistory() ? ws.records.get(ws.activeId) : null;
+  const viewing = history ? ws.records.get(ws.activeId) : null;
   const historyChip = viewing ? `
     <div class="history-chip" title="${t("Sessão encerrada, aberta pela pasta Histórico")}">
       ${icon("clock")}<span>${t("Histórico · {title}", { title: esc(viewing.title) })}</span>
@@ -61,9 +67,9 @@ export function renderTabs(ws) {
     <div class="tabstrip-spacer"></div>
     ${ws.options.scope === "site" && ws.project.commands ? `<button class="btn btn-sm cmd-btn" data-action="commands" aria-haspopup="menu" title="${t("Comandos do projeto")}">${icon("play")}<span>${t("Comandos")}</span></button>` : ""}
     ${ws.project.runtimeChip()}
-    ${terminalTools}`;
+    ${identityTool}${terminalTools}`;
   $$(".tab.is-active", ws.strip).forEach((t) => t.scrollIntoView({ block: "nearest", inline: "nearest" }));
-  const activeLive = ws.mode === "terminal" ? terminals.get(ws.activeId) : null;
+  const activeLive = ws.mode === "terminal" && !history ? terminals.get(ws.activeId) : null;
   ws.promptBar.update(activeLive ? activeLive.info.cwd : null, activeLive ? activeLive.info.id : null);
   if (ws.options.onChange) ws.options.onChange(ws.sessions().length);
   syncTabs();
@@ -72,7 +78,7 @@ export function renderTabs(ws) {
 /** Tabs by keyboard: arrows switch tabs, Enter or space opens the focused one. */
 export function onTabKey(ws, event) {
   const tab = event.target.closest && event.target.closest(".tab[role=tab]");
-  if (!tab || event.target.closest(".tab-close")) return;
+  if (!tab || event.target.closest(".tab-close, .tab-rename")) return;
   const tabs = [...tab.parentElement.querySelectorAll(".tab[role=tab]")];
   const i = tabs.indexOf(tab);
   if (event.key === "Enter" || event.key === " ") {
@@ -89,7 +95,7 @@ export function onTabKey(ws, event) {
 
 export function renameTabOnDblClick(ws, event) {
   const tab = event.target.closest(".tab[data-action='select']");
-  if (!tab) return;
+  if (!tab || event.target.closest("button, input")) return;
   const id = tab.dataset.id;
   const live = terminals.get(id);
   const record = ws.records.get(id);
@@ -98,6 +104,8 @@ export function renameTabOnDblClick(ws, event) {
   const input = document.createElement("input");
   input.className = "tab-rename";
   input.value = live ? live.info.title : record.title;
+  input.maxLength = 60;
+  input.setAttribute("aria-label", t("Nome do terminal"));
   label.replaceWith(input);
   input.focus();
   input.select();

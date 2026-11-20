@@ -13,6 +13,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HELP = ROOT / "vulcan_celox" / "web" / "help"
 LANGS = {
+    "es": {
+        "src": HELP / "conteudo.es.json", "out": ROOT / "docs" / "es" / "user-guide.md", "img": "../../vulcan_celox/web/img/manual",
+        "title": "Manual de Vulcan Celox",
+        "note": "> Generado por `scripts/manual_md.py` a partir de `vulcan_celox/web/help/conteudo.es.json`, el mismo contenido de la Ayuda de la aplicación (⌘?). No edites este archivo a mano.",
+        "toc": "Contenido", "faq": "Preguntas frecuentes", "faq_id": "preguntas-frecuentes",
+        "head": "| Atajo | Acción |\n|-------|--------|\n",
+    },
     "pt": {
         "src": HELP / "conteudo.json", "out": ROOT / "docs" / "pt-BR" / "user-guide.md", "img": "../../vulcan_celox/web/img/manual",
         "title": "Manual do Vulcan Celox",
@@ -68,12 +75,12 @@ def write(lang, target):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if a != "--en"]
-    lang = "en" if "--en" in sys.argv[1:] else "pt"
+    args = [a for a in sys.argv[1:] if a not in ("--en", "--es")]
+    lang = "es" if "--es" in sys.argv[1:] else "en" if "--en" in sys.argv[1:] else "pt"
     if args:
         write(lang, Path(args[0]))
-    elif "--en" in sys.argv[1:]:
-        write("en", LANGS["en"]["out"])
+    elif lang != "pt":
+        write(lang, LANGS[lang]["out"])
     else:
         for code in ("pt", "en"):
             write(code, LANGS[code]["out"])

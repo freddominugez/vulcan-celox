@@ -59,6 +59,44 @@ class SessionApiTest(ServerTestCase):
         summary = next(s for s in self.request("GET", "/api/sessions?site=loja")[1]["open"] if s["id"] == a["id"])
         self.assertEqual((summary["tasks"]["total"], summary["notes"]), (1, 1))
 
+    def test_nome_e_cor_da_aba_persistem_sem_mudar_paleta_ou_processo(self):
+        terminal = self.open_terminal(title="Antes", theme="homebrew")
+        tid = terminal["id"]
+        route = f"/api/terminals/{tid}"
+        pid = self.app.terminals.get(tid).pid
+        status, info, _ = self.request("PATCH", route, body={"title": "  Revisão  ", "tab_color": "oceano"})
+        self.assertEqual(status, 200)
+        self.assertEqual((info["title"], info["tab_color"], info["theme"]),
+                         ("Revisão", "oceano", "homebrew"))
+        self.assertEqual(self.app.terminals.get(tid).pid, pid)
+        self.assertEqual(self.request("PATCH", route, body={"title": "Inválido", "tab_color": []})[0], 400)
+        listed = next(t for t in self.request("GET", "/api/terminals")[1]["terminals"] if t["id"] == tid)
+        self.assertEqual((listed["title"], listed["tab_color"]), ("Revisão", "oceano"))
+        self.assertEqual(self.request("PATCH", route, body={"title": "Final"})[1]["tab_color"], "oceano")
+        self.request("DELETE", route)
+        history = self.request("GET", f"/api/sessions/{tid}")[1]
+        self.assertEqual((history["title"], history["tab_color"], history["open"]), ("Final", "oceano", False))
+
+    def test_post_it_identifica_a_sessao_e_respeita_escopo_ao_vincular(self):
+        a = self.open_terminal(title="Primeiro", theme="homebrew")
+        b = self.open_terminal(title="Segundo", theme="ardosia")
+        self.request("PATCH", f"/api/terminals/{b['id']}", body={"tab_color": "oceano"})
+        note = self.request("POST", "/api/notes", body={"site": "loja", "text": "Verificar pedido"})[1]
+        route = f"/api/notes/{note['id']}"
+        self.assertIsNone(self.request("GET", route)[1]["session"])
+        external = self.request("POST", "/api/terminals", body={"cwd": str(self.tmp)})[1]
+        self.assertEqual(self.request("PATCH", route, body={"link_terminal": external["id"]})[0], 409)
+        self.request("DELETE", f"/api/terminals/{a['id']}")
+        self.assertEqual(self.request("PATCH", route, body={"link_terminal": a["id"]})[0], 409)
+        self.assertEqual(self.request("PATCH", route, body={"link_terminal": b["id"]})[0], 200)
+        self.assertEqual(self.request("PATCH", route, body={"link_terminal": b["id"]})[0], 409)
+        session = self.request("GET", route)[1]["session"]
+        self.assertEqual((session["id"], session["title"], session["tab_color"], session["open"]),
+                         (b["id"], "Segundo", "oceano", True))
+        self.request("DELETE", f"/api/terminals/{b['id']}")
+        self.assertFalse(self.request("GET", route)[1]["session"]["open"])
+        self.assertEqual(self.request("GET", "/api/notes/abc999")[0], 404)
+
     def test_tags_e_titulo_da_sessao(self):
         a = self.open_terminal()
         data = self.request("PATCH", f"/api/sessions/{a['id']}", body={"title": "migrations", "tags": ["banco", "deploy"]})[1]

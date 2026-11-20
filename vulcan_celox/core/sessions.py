@@ -29,7 +29,8 @@ class SessionRecord:
     closed_at: Optional[str] = None
     exit_code: Optional[int] = None
     memory_file: Optional[str] = None
-    theme: Optional[str] = None  # tab color identity, the same as the paired agent session
+    theme: Optional[str] = None  # shell and paired agent palette
+    tab_color: Optional[str] = None  # optional override for the session label
 
     @property
     def is_open(self) -> bool:
@@ -178,6 +179,14 @@ class SessionStore:
         with self._lock:
             record = self._records[session_id]
             record.title = title
+            self._save()
+            return record
+
+    def update_identity(self, session_id: str, title: str, tab_color: Optional[str]) -> SessionRecord:
+        with self._lock:
+            record = self._records[session_id]
+            record.title = title
+            record.tab_color = tab_color
             self._save()
             return record
 

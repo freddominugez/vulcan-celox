@@ -7,25 +7,32 @@ from typing import Callable, List, Pattern, Tuple, Union
 
 MASK = "[segredo]"  # the mark in Portuguese
 MASK_EN = "[secret]"
-MASKS = (MASK, MASK_EN)
+MASK_ES = "[secreto]"
+MASKS = (MASK, MASK_EN, MASK_ES)
 KEY_MASK = "[chave privada removida]"
-_DONE = r"\[(?:segredo|secret)\]"  # either spelling is already masked: masking again must leave it alone
+KEY_MASKS = (KEY_MASK, "[private key removed]", "[clave privada eliminada]")
+_DONE = r"\[(?:segredo|secret|secreto)\]"  # existing masks survive language changes
 
 
 def mask_mark() -> str:
     """The mark in the interface language. What was saved with the other spelling stays as it is, and still counts."""
     from vulcan_celox.core import i18n
-    return MASK_EN if i18n.language() == "en" else MASK
+    return {"en": MASK_EN, "es": MASK_ES}.get(i18n.language(), MASK)
+
+
+def key_mask() -> str:
+    from vulcan_celox.core import i18n
+    return KEY_MASKS[{"pt": 0, "en": 1, "es": 2}[i18n.language()]]
 
 _SECRET_WORDS = r"(?:PASSWORD|PASSWD|PASS|PWD|SECRET|TOKEN|API_?KEY|ACCESS_?KEY|PRIVATE_?KEY|APP_KEY|AUTH|CREDENTIALS?|DSN)"
 
 # (pattern, replacement): the replacement preserves variable names and prefixes useful for understanding the command
 _RULES: List[Tuple[Pattern[str], Union[str, Callable]]] = [
     (re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----.*?-----END [A-Z0-9 ]*PRIVATE KEY-----", re.S),
-     KEY_MASK),
+     lambda _m: key_mask()),
     # cut in half by the size limit of the terminal history: only one of the two markers is left
-    (re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----(?:\s*\n[A-Za-z0-9+/=]+)*"), KEY_MASK),
-    (re.compile(r"(?:^[A-Za-z0-9+/=]{16,}\n)*^[^\n]*-----END [A-Z0-9 ]*PRIVATE KEY-----", re.M), KEY_MASK),
+    (re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----(?:\s*\n[A-Za-z0-9+/=]+)*"), lambda _m: key_mask()),
+    (re.compile(r"(?:^[A-Za-z0-9+/=]{16,}\n)*^[^\n]*-----END [A-Z0-9 ]*PRIVATE KEY-----", re.M), lambda _m: key_mask()),
     (re.compile(r"\bsk-ant-[A-Za-z0-9_\-]{10,}"), lambda _m: mask_mark()),
     (re.compile(r"\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_\-]{20,}"), lambda _m: mask_mark()),
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}"), lambda _m: mask_mark()),
@@ -55,7 +62,7 @@ _RULES: List[Tuple[Pattern[str], Union[str, Callable]]] = [
 
 def masked_count(text: str) -> int:
     """How many masks a text already holds. The session memory arrives masked, and the count must still be true."""
-    return sum(text.count(mark) for mark in MASKS) + text.count(KEY_MASK)
+    return sum(text.count(mark) for mark in (*MASKS, *KEY_MASKS))
 
 
 def redact(text: str) -> Tuple[str, int]:

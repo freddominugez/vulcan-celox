@@ -15,7 +15,7 @@ class SearchWindow(tk.Toplevel):
     def __init__(self, master, sites_provider: Callable[[], Iterable], notebook,
                  on_open: Callable[[Hit], None]):
         super().__init__(master)
-        self.title("Search")
+        self.title(tr("Busca"))
         self.configure(bg=theme.BG)
         self.geometry("620x460")
         self.transient(master)

@@ -2,7 +2,7 @@
 
 import { every, get, hasBridge, native } from "./api.mjs";
 import { esc, toast } from "./dom.mjs";
-import { currentLanguage, t } from "./i18n.mjs";
+import { currentLocale, decimalText, t } from "./i18n.mjs";
 
 export const AGENT_NAMES = { claude: "Claude Code", codex: "Codex" };
 const STEPS = [t("Editou"), "Commit", "Push", "PR"];
@@ -28,7 +28,7 @@ export function relTime(iso) {
   const days = Math.round(s / 86400);
   if (days === 1) return t("ontem");
   if (days < 7) return t("há {n} dias", { n: days });
-  return `${d.getDate()}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+  return d.toLocaleDateString(currentLocale(), { day: "2-digit", month: "2-digit" });
 }
 
 export function clock(iso) {
@@ -39,7 +39,7 @@ export function clock(iso) {
 export function tokens(usage) {
   if (!usage) return "";
   const n = (usage.input || 0) + (usage.output || 0);
-  if (n >= 1e6) return t("{n} mi", { n: currentLanguage() === "pt" ? (n / 1e6).toFixed(1).replace(".", ",") : (n / 1e6).toFixed(1) });
+  if (n >= 1e6) return t("{n} mi", { n: decimalText((n / 1e6).toFixed(1)) });
   if (n >= 1000) return t("{n} mil", { n: Math.round(n / 1000) });
   return String(n);
 }

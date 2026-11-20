@@ -55,6 +55,10 @@ def main(argv=None) -> int:
         return 0
 
     try:
+        import os
+        from vulcan_celox.core import i18n
+        from vulcan_celox.core.store import Store
+        i18n.set_language(i18n.resolve(Store(paths.data_dir()).load("preferences", {}), os.environ))
         from vulcan_celox.ui.app import run
     except ImportError as exc:
         print(f"UI indisponível: {exc}", file=sys.stderr)

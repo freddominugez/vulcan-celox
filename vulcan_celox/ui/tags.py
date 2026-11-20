@@ -9,26 +9,27 @@ from typing import Optional
 from vulcan_celox.core.models import TAG_COLORS
 from vulcan_celox.core.notebook import DuplicateTag, Notebook
 from vulcan_celox.core.progress import progress_by_tag
+from vulcan_celox.core.i18n import tr
 from vulcan_celox.ui import theme
 
 
 class TagManager(tk.Toplevel):
     def __init__(self, master, notebook: Notebook):
         super().__init__(master)
-        self.title("Tags")
+        self.title(tr("Tags"))
         self.configure(bg=theme.BG)
         self.geometry("420x440")
         self.transient(master)
         self.notebook = notebook
 
-        ttk.Label(self, text="Tags", style="Title.TLabel").pack(anchor="w", padx=14, pady=(12, 6))
+        ttk.Label(self, text=tr("Tags"), style="Title.TLabel").pack(anchor="w", padx=14, pady=(12, 6))
 
         frame = ttk.Frame(self)
         frame.pack(fill="both", expand=True, padx=14)
         self.tree = ttk.Treeview(frame, columns=("uso", "progresso"), show="tree headings", selectmode="browse")
-        self.tree.heading("#0", text="Name")
-        self.tree.heading("uso", text="Items")
-        self.tree.heading("progresso", text="Tasks")
+        self.tree.heading("#0", text=tr("Nome"))
+        self.tree.heading("uso", text=tr("Itens"))
+        self.tree.heading("progresso", text=tr("Tarefas"))
         self.tree.column("uso", width=50, anchor="e", stretch=False)
         self.tree.column("progresso", width=110, anchor="e", stretch=False)
         self.tree.pack(fill="both", expand=True)
@@ -40,13 +41,13 @@ class TagManager(tk.Toplevel):
         entry = ttk.Entry(form, textvariable=self.var_name)
         entry.pack(side="left", fill="x", expand=True)
         entry.bind("<Return>", lambda _e: self.create())
-        ttk.Button(form, text="New", style="Accent.TButton", command=self.create).pack(side="left", padx=(6, 0))
+        ttk.Button(form, text=tr("Novo"), style="Accent.TButton", command=self.create).pack(side="left", padx=(6, 0))
 
         actions = ttk.Frame(self)
         actions.pack(fill="x", padx=14, pady=(0, 12))
-        ttk.Button(actions, text="Rename", command=self.rename).pack(side="left")
-        ttk.Button(actions, text="Change color", command=self.cycle_color).pack(side="left", padx=6)
-        ttk.Button(actions, text="Delete", command=self.delete).pack(side="right")
+        ttk.Button(actions, text=tr("Renomear"), command=self.rename).pack(side="left")
+        ttk.Button(actions, text=tr("Trocar cor"), command=self.cycle_color).pack(side="left", padx=6)
+        ttk.Button(actions, text=tr("Excluir tag"), command=self.delete).pack(side="right")
 
         self._unsubscribe = notebook.subscribe(lambda _k: self.refresh())
         self.bind("<Destroy>", self._on_destroy)
@@ -90,7 +91,7 @@ class TagManager(tk.Toplevel):
         try:
             tag = self.notebook.create_tag(self.var_name.get())
         except DuplicateTag:
-            messagebox.showwarning("Tags", "A tag with that name already exists.", parent=self)
+            messagebox.showwarning(tr("Tags"), tr("Já existe uma tag com esse nome."), parent=self)
             return
         except ValueError:
             return
@@ -104,7 +105,7 @@ class TagManager(tk.Toplevel):
         try:
             self.notebook.rename_tag(tag_id, self.var_name.get())
         except DuplicateTag:
-            messagebox.showwarning("Tags", "A tag with that name already exists.", parent=self)
+            messagebox.showwarning(tr("Tags"), tr("Já existe uma tag com esse nome."), parent=self)
         except ValueError:
             pass
 
@@ -121,7 +122,7 @@ class TagManager(tk.Toplevel):
         if not tag_id:
             return
         name = self.notebook.tags[tag_id].name
-        if messagebox.askyesno("Tags", f"Delete the tag '{name}'?\nIt is removed from all notes and tasks.",
+        if messagebox.askyesno(tr("Tags"), tr("Excluir a tag '{name}'?\nEla sai de todos os post-its e tarefas.", name=name),
                                parent=self):
             self.notebook.delete_tag(tag_id)
             self.var_name.set("")

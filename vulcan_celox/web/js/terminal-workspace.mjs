@@ -12,6 +12,7 @@ import { loadThemes, themes as themeState } from "./themes.mjs";
 import { terminals } from "./terminal-pool.mjs";
 import { TerminalSearch } from "./terminal-search.mjs";
 import { ProjectTools } from "./terminal-commands.mjs";
+import { editTerminalIdentity } from "./terminal-identity.mjs";
 import { onTabKey, renameTabOnDblClick, renderTabs } from "./terminal-tabs.mjs";
 import { destroyChild, renderContent } from "./terminal-content.mjs";
 
@@ -66,7 +67,7 @@ export class TerminalWorkspace {
     window.addEventListener("vulcan-sessions-changed", this.onSessionsChanged);
     this.offJobs = onJobsChange(async () => {
       await this.loadSessions();
-      if (this.mode === "terminal" && this.activeId && !this.isLive(this.activeId)) this.renderContent();
+      if (this.mode === "terminal" && this.activeId && (!this.isLive(this.activeId) || this.isHistory())) this.renderContent();
     });
     this.root.addEventListener("click", (e) => this.onClick(e));
     this.root.addEventListener("dblclick", (e) => this.onDblClick(e));
@@ -93,7 +94,7 @@ export class TerminalWorkspace {
   }
 
   visible() {
-    if (this.mode !== "terminal") return [];
+    if (this.mode !== "terminal" || this.isHistory()) return [];
     return [this.activeId, this.splitId]
       .filter((id) => this.isLive(id) && !terminals.popped.has(id))
       .map((id) => terminals.get(id));
@@ -108,7 +109,7 @@ export class TerminalWorkspace {
       this.loaded = true;
       if (first) return this.render();
       this.renderTabs();
-      if (this.mode === "terminal" && this.activeId && !this.isLive(this.activeId)) this.renderContent();
+      if (this.mode === "terminal" && this.activeId && (!this.isLive(this.activeId) || this.isHistory())) this.renderContent();
     } catch (err) {
       reportError(err);
     }
@@ -121,7 +122,8 @@ export class TerminalWorkspace {
 
   isHistory(id = this.activeId) {
     const record = this.records.get(id);
-    return Boolean(id && !this.isLive(id) && record && !record.open);
+    const historyRequested = this.mode === "terminal" && id === this.activeId && this.focus === "historico";
+    return Boolean(record && !record.open && (historyRequested || !this.isLive(id)));
   }
 
   lastLiveId() {
@@ -150,7 +152,7 @@ export class TerminalWorkspace {
       if (prefs.skip_folder && !ask) {
         cwd = await suggestedFolder(site);
         theme = "auto";
-        agent = prefs.agent;
+        agent = "shell";
       } else {
         const choice = await askFolder({ suggested: site ? site.path : "", site: site ? site.name : "" });
         if (!choice) return null;
@@ -201,6 +203,7 @@ export class TerminalWorkspace {
 
   select(id) {
     this.activeId = id;
+    this.focus = null;
     clearTab(id);
     if (this.splitId === id) this.splitId = null;
     this.render();
@@ -262,11 +265,13 @@ export class TerminalWorkspace {
       this.closeTerminal(id);
     }
     if (action === "new") this.newTerminal();
+    if (action === "identity") editTerminalIdentity(id, target).catch(reportError);
     if (action === "find") this.openSearch();
     if (action === "copy-output") this.search.copyOutput();
     if (action === "leave-history") {
       this.activeId = this.lastLiveId();
       this.requestedId = null;
+      this.focus = null;
       this.render();
       if (this.options.onSelect) this.options.onSelect(this.activeId);
     }
@@ -325,7 +330,10 @@ export class TerminalWorkspace {
     this.splitId = this.activeId;
     this.activeId = id;
     this.strip.querySelectorAll(".tab").forEach((tab) => {
-      tab.classList.toggle("is-active", tab.dataset.id === this.activeId);
+      const selected = tab.dataset.id === this.activeId;
+      tab.classList.toggle("is-active", selected);
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
       tab.classList.toggle("is-shown", tab.dataset.id === this.splitId);
     });
     this.body.querySelectorAll(".pane").forEach((pane) => pane.classList.toggle("is-focused", pane.dataset.session === id));

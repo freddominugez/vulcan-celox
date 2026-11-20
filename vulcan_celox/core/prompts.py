@@ -328,7 +328,7 @@ EXAMPLES = [
 def _in(language: str, text: str) -> str:
     """Text of an example in a given language, whatever the current one is."""
     from vulcan_celox.core import i18n
-    return text if language == "pt" else i18n.dictionary().get(text, text)
+    return text if language == "pt" else i18n.dictionary(language).get(text, text)
 
 
 def _example(example, language: str) -> Tuple[str, str]:
