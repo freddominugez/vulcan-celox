@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import stat
 import threading
 import time
 from pathlib import Path
@@ -41,7 +42,12 @@ class CodeRoots:
         with self.lock:
             if now - self.known_at < KNOWN_TTL:
                 return self.known_cache
-        folders = known_folders(self.app)
+        folders = []
+        for path in known_folders(self.app):
+            try:
+                folders.append(str(Path(path).resolve()))
+            except (OSError, RuntimeError, ValueError):
+                continue
         with self.lock:
             self.known_cache, self.known_at = folders, now
         return folders
@@ -72,12 +78,9 @@ class CodeRoots:
         if reason:
             raise HttpError(403, REFUSALS[reason], {"reason": "root_refused", "why": reason})
         real = str(Path(root).resolve())
-        for path in [*self.chosen(), *self.known()]:
-            try:
-                if str(Path(path).resolve()) == real:
-                    return real
-            except (OSError, RuntimeError, ValueError):
-                continue
+        approved = {*self.chosen(), *self.known()}
+        if real in approved and (root not in approved or root == real):
+            return real
         raise HttpError(403, "pasta não permitida", {"reason": "root_refused"})
 
     def _sources(self) -> List[Tuple[str, str]]:
@@ -93,11 +96,13 @@ class CodeRoots:
     def listing(self) -> Dict[str, Any]:
         """Each folder once, with the strongest origin. A known folder that no longer exists does not appear; a chosen one does, so it can be removed."""
         seen: Dict[str, Dict[str, Any]] = {}
-        chosen = {str(Path(p).resolve()) for p in self.chosen()}
+        chosen = set(self.chosen())
         for path, source in self._sources():
             try:
                 real = str(Path(path).resolve())
             except (OSError, RuntimeError, ValueError):
+                continue
+            if source in {"chosen", "session"} and real != path:
                 continue
             exists = os.path.isdir(real)
             if real in seen or self.refusal(real) or (not exists and source != "chosen"):
@@ -107,6 +112,41 @@ class CodeRoots:
         order = {"chosen": 0, "site": 1, "node": 2, "session": 3}
         roots = sorted(seen.values(), key=lambda r: (order[r["source"]], r["name"].casefold(), r["path"]))
         return {"roots": roots, "max_chosen": MAX_CHOSEN}
+
+    def terminal_context(self, terminal_id: str) -> Dict[str, Any]:
+        terminal = self.app.terminals.get(terminal_id)
+        blank = {"root": None, "reason": "choose"}
+        if terminal is None:
+            return blank
+        try:
+            cwd = Path(terminal.cwd).resolve(strict=True)
+        except (OSError, RuntimeError):
+            return blank
+        matches = []
+        for entry in self.listing()["roots"]:
+            path = Path(entry["path"])
+            if entry["exists"] and cwd.is_relative_to(path):
+                try:
+                    matches.append(Path(self.allowed(str(path))))
+                except HttpError:
+                    continue
+        if not matches:
+            return blank
+        best = max(matches, key=lambda path: len(path.parts))
+        # A linked worktree has a .git file. Only inspect markers under an approved
+        # ancestor and require the worktree's own approval before opening it.
+        for folder in [cwd, *cwd.parents]:
+            if not any(folder.is_relative_to(candidate) for candidate in matches):
+                break
+            try:
+                git_mode = (folder / ".git").lstat().st_mode
+            except OSError:
+                continue
+            if stat.S_ISREG(git_mode):
+                return {"root": str(folder), "reason": None} if folder in matches else blank
+            if stat.S_ISDIR(git_mode):
+                break
+        return {"root": str(best), "reason": None}
 
     def add(self, raw: Any) -> Dict[str, Any]:
         if not isinstance(raw, str) or not raw.strip() or "\x00" in raw:

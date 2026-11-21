@@ -203,7 +203,8 @@ export class FileTree {
     const parent = ancestors(key).pop() || null;
     const ghost = this.node(key);
     if (event.change === "added" && ghost && ghost.data.entry && ghost.data.entry.ghost) ghost.data.entry.ghost = false;
-    if (event.change === "added" && !this.node(key)) {
+    if (ghost && event.change === "modified" && ghost.data.entry.kind !== event.kind) ghost.remove();
+    if (event.change !== "deleted" && !this.node(key)) {
       const holder = parent ? this.node(parent) : this.tree.root;
       if (holder && (holder === this.tree.root || holder.children)) {
         const name = key.split("/").pop();
@@ -229,14 +230,16 @@ export class FileTree {
   /** Opens the folders down to the file, loading them one by one, and selects it without firing anything. */
   async reveal(rel) {
     for (const folder of ancestors(rel)) {
+      if (this.destroyed) return;
       const node = this.node(folder);
       if (!node) return;
       if (!node.expanded) await node.setExpanded(true, { noAnimation: true });
     }
+    if (this.destroyed) return;
     const node = this.node(rel);
     if (node) {
       await node.setActive(true, { noEvents: true });
-      node.scrollIntoView();
+      if (!this.destroyed) node.scrollIntoView();
     }
   }
 
@@ -245,6 +248,7 @@ export class FileTree {
   }
 
   destroy() {
+    this.destroyed = true;
     if (this.git) this.git.stop();
     this.tree.destroy();
   }

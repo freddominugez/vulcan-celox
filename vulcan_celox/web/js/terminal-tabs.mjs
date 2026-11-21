@@ -56,21 +56,30 @@ export function renderTabs(ws) {
     <button class="icon-btn" data-action="popout" title="${isNative ? t("Destacar em janela (⇧⌘D)") : t("Destacar em janela")}" aria-label="${t("Destacar em janela")}">${icon("external")}</button>
     <button class="icon-btn" data-action="document" data-id="${ws.activeId}" title="${t("Documentar esta sessão com IA")}" aria-label="${t("Documentar com IA")}">${icon("book")}</button>` : "";
 
+  const code = ws.options.sessionCode && ws.mode === "terminal" && !history && terminals.get(ws.activeId)?.alive;
+  const codeTools = code ? `<div class="segmented session-modes" role="group" aria-label="${t("Visão da sessão")}">
+    <button class="seg ${ws.code?.mode === "code" ? "" : "is-on"}" type="button" data-action="session-pty" aria-pressed="${ws.code?.mode !== "code"}">${t("Terminal")}</button>
+    <button class="seg ${ws.code?.mode === "code" ? "is-on" : ""}" type="button" data-action="session-code" aria-pressed="${ws.code?.mode === "code"}">${t("Código da sessão")}</button>
+  </div>` : "";
   const viewing = history ? ws.records.get(ws.activeId) : null;
   const historyChip = viewing ? `
     <div class="history-chip" title="${t("Sessão encerrada, aberta pela pasta Histórico")}">
       ${icon("clock")}<span>${t("Histórico · {title}", { title: esc(viewing.title) })}</span>
       <button class="tab-close" data-action="leave-history" aria-label="${t("Voltar aos terminais")}" title="${t("Voltar aos terminais")}">${icon("x")}</button>
     </div>` : "";
-  ws.strip.innerHTML = `
+  const html = `
     <div class="tabs">${tabs}</div>${historyChip}
     <button class="icon-btn" data-action="new" title="${t("Novo terminal ({key})", { key: isMac ? "⌘T" : "Ctrl+⇧+T" })}" aria-label="${t("Novo terminal")}">${icon("plus")}</button>
     <div class="tabstrip-spacer"></div>
     ${ws.options.scope === "site" && ws.project.commands ? `<button class="btn btn-sm cmd-btn" data-action="commands" aria-haspopup="menu" title="${t("Comandos do projeto")}">${icon("play")}<span>${t("Comandos")}</span></button>` : ""}
     ${ws.project.runtimeChip()}
-    ${identityTool}${terminalTools}`;
+    ${identityTool}${terminalTools}${codeTools}`;
+  if (ws.strip.markup !== html) {
+    ws.strip.innerHTML = html;
+    ws.strip.markup = html;
+  }
   $$(".tab.is-active", ws.strip).forEach((t) => t.scrollIntoView({ block: "nearest", inline: "nearest" }));
-  const activeLive = ws.mode === "terminal" && !history ? terminals.get(ws.activeId) : null;
+  const activeLive = ws.mode === "terminal" && ws.code?.mode !== "code" && !history ? terminals.get(ws.activeId) : null;
   ws.promptBar.update(activeLive ? activeLive.info.cwd : null, activeLive ? activeLive.info.id : null);
   if (ws.options.onChange) ws.options.onChange(ws.sessions().length);
   syncTabs();

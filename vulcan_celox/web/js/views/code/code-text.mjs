@@ -12,6 +12,7 @@ export const REASONS = {
   binary: [t("Arquivo binário"), t("O visor só mostra texto.")],
   unreadable: [t("Não foi possível abrir"), t("Não é um arquivo comum ou falta permissão de leitura.")],
   root_refused: [t("Pasta não aberta no visor"), t("Esta sessão rodou numa pasta que contém os dados dos agentes, como a pasta pessoal.")],
+  previous_unavailable: [t("Sem versão anterior disponível"), t("A revisão anterior não está disponível neste repositório local.")],
   no_repo: [t("Sem repositório git"), t("A pasta deste arquivo não está num repositório git.")],
   no_git: [t("Git não encontrado"), t("Instale o git para comparar com o último commit.")],
   no_diff: [t("Edição sem diff próprio"), t("O registro desta edição não traz o texto, ou a linha passa de 5 MB.")],
@@ -32,6 +33,7 @@ export function searchPhrases() {
 
 export function diffNotes(d, scope) {
   const notes = [];
+  if (scope === "git" && d.base) notes.push(["info", t("Base Git HEAD {sha}", { sha: d.base.slice(0, 12) })]);
   if (d.state === "failed") notes.push(["alert", t("Esta edição falhou: o arquivo não mudou.")]);
   if (d.truncated) notes.push(["alert", t("Cortado em 2 MB: o final não aparece.")]);
   if (d.replace_all) notes.push(["info", t("O agente trocou todas as ocorrências.")]);

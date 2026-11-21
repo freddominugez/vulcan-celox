@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from vulcan_celox.core import code_files
+from vulcan_celox.core.code_boundary import directory
 from vulcan_celox.core.agents.repos import SAFE_GIT
 from vulcan_celox.core.runner import capture
 
@@ -154,7 +155,7 @@ def sensitive_entry(rel: str, is_dir: bool) -> bool:
 
 def real_folder(root: str, rel: str) -> Path:
     """The folder itself, without passing through a link: links appear in the tree but are not followed."""
-    base = Path(root).resolve()
+    base = Path(root)
     target = base / rel if rel else base
     try:
         real = target.resolve()
@@ -184,16 +185,24 @@ def _entry(item: os.DirEntry, rel: str, is_dir: bool, is_link: bool, ignored: Ig
 def list_folder(root: str, rel: str, ignored: Ignored, limit: int = MAX_ENTRIES) -> Dict[str, Any]:
     real = real_folder(root, rel)
     try:
-        with os.scandir(real) as it:
-            items = [i for i in it if i.name.lower() not in HIDDEN]
+        with directory(real) as folder, os.scandir(folder) as it:
+            rows = _folder_entries(it, rel, ignored, limit)
     except FileNotFoundError:
         raise code_files.CodeReadError(404, "missing", "a pasta não existe mais") from None
     except NotADirectoryError:
         raise code_files.CodeReadError(400, "not_dir", "não é uma pasta") from None
     except OSError:
         raise code_files.CodeReadError(403, "unreadable", "não foi possível abrir a pasta") from None
-    rows: List[Any] = []
+    entries, total = rows
+    return {"root": root, "path": rel, "entries": entries, "truncated": total > limit,
+            "total": total, "ignored": ignored.matches(rel), "fixed_ignore": ignored.fixed}
+
+
+def _folder_entries(items, rel, ignored, limit):
+    rows = []
     for item in items:
+        if item.name.lower() in HIDDEN:
+            continue
         try:
             is_link = item.is_symlink()
             is_dir = not is_link and item.is_dir(follow_symlinks=False)
@@ -202,5 +211,4 @@ def list_folder(root: str, rel: str, ignored: Ignored, limit: int = MAX_ENTRIES)
         rows.append((not is_dir, item.name.casefold(), item.name, item, is_dir, is_link))
     rows.sort(key=lambda r: r[:3])
     entries = [_entry(r[3], f"{rel}/{r[2]}" if rel else r[2], r[4], r[5], ignored) for r in rows[:limit]]
-    return {"root": str(Path(root).resolve()), "path": rel, "entries": entries, "truncated": len(rows) > limit,
-            "total": len(rows), "ignored": ignored.matches(rel), "fixed_ignore": ignored.fixed}
+    return entries, len(rows)

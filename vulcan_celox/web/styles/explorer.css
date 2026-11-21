@@ -129,3 +129,24 @@
 .ce-branch { display: inline-flex; align-items: center; gap: 4px; min-width: 0; max-width: 40%; margin-left: auto; font-size: var(--fs-sm); color: var(--fg-2); }
 .ce-branch span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .ce-branch .i { flex: none; }
+
+/* Session code beside the existing terminal. Narrow layouts put the same tree in a drawer. */
+.session-code { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg); }
+.session-code-tools, .session-files-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px; border-bottom: 1px solid var(--line); }
+.session-code-status { margin: 0; padding: 4px 8px; color: var(--fg-2); font-size: var(--fs-xs); }
+.session-code-status:empty { display: none; }
+.session-code-folder { padding: 8px; }
+.session-code-view .code-bar { flex-wrap: wrap; }
+.session-code-view .code-path { min-width: 0; }
+.session-files { display: flex; flex: 0 0 288px; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg-side); border-left: 1px solid var(--line); }
+.session-files-top { justify-content: space-between; }
+.session-files.is-drawer { position: absolute; z-index: 8; inset: 0 0 0 auto; width: min(320px, 86%); box-shadow: var(--shadow-pop); }
+.session-changes { overflow: auto; min-width: 0; padding: 6px 8px; }
+.session-events { list-style: none; padding: 0; margin: 0; }
+.session-events li { padding: 4px 0; overflow-wrap: anywhere; }
+.session-events button { width: 100%; text-align: left; background: var(--bg-raise); color: var(--fg); border: 1px solid var(--line); border-radius: var(--r); padding: 6px; }
+.session-events small { display: block; color: var(--fg-3); }
+.session-modes { flex: none; }
+@media (max-width: 1020px) {
+  .session-modes .seg { padding-inline: 6px; }
+}

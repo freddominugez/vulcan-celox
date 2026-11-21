@@ -10,6 +10,7 @@ import { startTheme } from "./theme.mjs";
 import { clearTab, dismissSession, latestAttention, startAttention } from "./attention-state.mjs";
 import { isMac, isNative } from "./api.mjs";
 import { app } from "./app-state.mjs";
+import { showSessionMode } from "./terminal-code.mjs";
 import { stepTerminalTurn } from "./terminal-watch.mjs";
 import { loadNodeProjects, navigate, refreshState, reportDragRegions, route, runCommand, service, toggleAutostart } from "./app.mjs";
 import { CurrentSession } from "./current-session.mjs";
@@ -61,7 +62,7 @@ export function bindGlobalEvents() {
         return;
       }
       navigate(hash);
-      if (app.view?.workspace?.activeId === id) terminals.get(id)?.focus();
+      if (app.view?.workspace?.activeId === id) showSessionMode(app.view.workspace, false);
     },
   });
   $("#nav").addEventListener("click", (event) => {

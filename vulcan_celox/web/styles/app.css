@@ -684,7 +684,8 @@ button.summary-pill:hover { border-color: var(--line-strong); color: var(--fg); 
 .toast .btn, .toast .i { flex: none; }
 
 /* ── sessions: history, memory and tags ───────────────────────────────── */
-.ws-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.ws-layout { flex: 1; min-height: 0; min-width: 0; display: flex; position: relative; }
+.ws-body { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 .ws-child { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); }
 .ws-child > * { flex: 1; min-height: 0; }
 .ws-body > .memory { background: var(--bg); }
