@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contexto, memória e prompts para agentes de código | Vulcan Celox</title>
+<meta name="description" content="Entenda a diferença entre janela de contexto, histórico do agente e memória local do terminal. Monte um prompt curto de retomada.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://celox.byvulcan.com/artigos/contexto-memoria-e-prompts-para-agentes/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Vulcan Celox">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Contexto, memória e prompts para agentes de código | Vulcan Celox">
+<meta property="og:description" content="Entenda a diferença entre janela de contexto, histórico do agente e memória local do terminal. Monte um prompt curto de retomada.">
+<meta property="og:url" content="https://celox.byvulcan.com/artigos/contexto-memoria-e-prompts-para-agentes/">
+<meta property="og:image" content="https://celox.byvulcan.com/assets/screens/overview-pt.png">
+<meta property="og:image:width" content="1800">
+<meta property="og:image:height" content="1145">
+<meta property="og:image:alt" content="Projetos e sessões no Vulcan Celox">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contexto, memória e prompts para agentes de código | Vulcan Celox">
+<meta name="twitter:description" content="Entenda a diferença entre janela de contexto, histórico do agente e memória local do terminal. Monte um prompt curto de retomada.">
+<meta name="twitter:image" content="https://celox.byvulcan.com/assets/screens/overview-pt.png">
+<meta name="twitter:image:alt" content="Projetos e sessões no Vulcan Celox">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Vulcan Celox", "item": "https://celox.byvulcan.com/"}, {"@type": "ListItem", "position": 2, "name": "Biblioteca", "item": "https://celox.byvulcan.com/recursos/"}, {"@type": "ListItem", "position": 3, "name": "Contexto, memória e prompts para agentes de código", "item": "https://celox.byvulcan.com/artigos/contexto-memoria-e-prompts-para-agentes/"}]}, {"@type": "Article", "headline": "Contexto, memória e prompts para agentes de código", "description": "Entenda a diferença entre janela de contexto, histórico do agente e memória local do terminal. Monte um prompt curto de retomada.", "image": "https://celox.byvulcan.com/assets/screens/overview-pt.png", "inLanguage": "pt-BR", "mainEntityOfPage": "https://celox.byvulcan.com/artigos/contexto-memoria-e-prompts-para-agentes/", "author": {"@type": "Organization", "name": "Vulcan Celox", "url": "https://celox.byvulcan.com/"}}]}</script>
+<link rel="icon" type="image/png" href="/assets/brand/favicon.png">
+<link rel="stylesheet" href="/assets/editorial.css">
+
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="top">
+  <div class="top-inner wrap">
+    <a class="brand" href="/"><img src="/assets/brand/logo-primary.svg" width="175" height="40" alt="Vulcan Celox"></a>
+    <nav class="nav" aria-label="Navegação principal"><a href="/recursos/">Recursos</a><a href="/guias/claude-code-e-codex-no-mac/">Guias</a><a href="/artigos/contexto-memoria-e-prompts-para-agentes/" aria-current=page>Artigos</a><a href="/prompts/">Prompts</a><a href="/repositorios/">GitHub</a><a href="/radar/">Radar Harpya</a></nav>
+    <a class="button small header-download" href="/guias/instalar-vulcan-celox-no-macos/">Baixar para Mac</a>
+  </div>
+</header>
+<nav class="wrap breadcrumb" aria-label="Navegação estrutural"><a href="/recursos/">Biblioteca</a><span aria-hidden="true">/</span><span>Artigo</span></nav>
+<main id="conteudo">
+<div class="wrap read-layout">
+<article class="article">
+  <header class="page-heading"><p class="kicker">Artigo</p><h1>Contexto, memória e prompts para agentes de código</h1><p class="lead">Entenda a diferença entre janela de contexto, histórico do agente e memória local do terminal. Monte um prompt curto de retomada.</p><p class="meta">Vulcan Celox 1.4.0 · Exemplos de demonstração</p></header>
+  <section><h2 id="tres-camadas">O que fica em cada lugar</h2>
+<p>Quando você volta para um projeto, três coisas podem ajudar. Identifique qual delas tem a informação que falta.</p>
+<dl class="definitions">
+<div><dt>Janela de contexto do modelo</dt><dd>É o limite de entrada e saída que o modelo pode processar em uma chamada, conforme o modelo e o provedor. Um arquivo aberto no Mac só entra no contexto se a ferramenta o consultar ou se você fornecer o trecho. A Harpya explica por que os textos são fracionados em tokens.</dd></div>
+<div><dt>Histórico do agente</dt><dd>Claude Code e Codex registram seu trabalho localmente. O Celox lê os registros compatíveis e usa as informações para apresentar projeto, branch, pedidos e arquivos tocados. A retomada usa o comando do próprio agente.</dd></div>
+<div><dt>Memória do terminal</dt><dd>O Celox mantém uma memória local em Markdown com comandos, tarefas, post-its, tags e a saída recente. Após fechar a aba, consulte Sessões recentes ou abra o post-it vinculado e escolha Ver no Histórico.</dd></div>
+</dl>
+<div class="links"><a href="https://www.harpya.org/comecando/tokens/">Ler sobre tokens na Harpya</a><a href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/user-guide.md#terminais">Conferir a memória do terminal no manual</a></div>
+</section>
+<section><h2 id="exemplo">Monte uma retomada em quatro linhas</h2>
+<p>Imagine que você deixou uma correção no branch <code>feat/checkout-pix</code>. Antes de enviar a instrução, compare a memória da sessão com o estado atual do Git. Use um trecho curto de log e omita dados de clientes, chaves e caminhos pessoais.</p>
+<pre><code>Objetivo: corrigir o total no checkout quando há cupom.
+Escopo: CheckoutTotal e o teste da regra de desconto.
+Já conferido: checkout sem cupom passou; falta cupom vencido.
+Próximo passo: leia o diff e diga qual teste cobre o cenário.</code></pre>
+<p>Separe a ação de ler da ação de editar. Se a próxima tarefa for só localizar a falha, peça a análise e espere a resposta. Um bom retorno informa qual arquivo sustenta a conclusão, qual teste passou e qual cenário ainda está em aberto.</p>
+</section>
+<section><h2 id="leitura">Leitura cruzada com a Harpya</h2>
+<p>Use o artigo sobre tokens para entender o custo de anexar texto indiscriminadamente. O exemplo acima aplica essa leitura a uma tarefa concreta com registros e evidências do seu projeto. O Radar também inclui uma pesquisa sobre custo e prazo de agentes, com o escopo do estudo separado da prática no Celox.</p>
+<div class="links"><a href="/radar/">Abrir o Radar Harpya do Celox</a><a href="/prompts/#retomar">Copiar o prompt de retomada</a></div>
+</section>
+</article>
+<aside class="reading-nav"><nav aria-label="Nesta página"><h2>Nesta página</h2><ol><li><a href="#tres-camadas">O que fica em cada lugar</a></li><li><a href="#exemplo">Monte uma retomada em quatro linhas</a></li><li><a href="#leitura">Leitura cruzada com a Harpya</a></li></ol></nav></aside>
+</div>
+<section class="wrap related"><h2>Continue no Celox</h2><div class="card-grid compact"><article class="resource-card"><p class="kicker">Prompts</p><h3><a href="/prompts/">Prompts para Claude Code e Codex</a></h3><p>Copie modelos para retomar uma sessão, revisar uma mudança, investigar um teste e preparar o handoff de um projeto.</p></article><article class="resource-card"><p class="kicker">Harpya</p><h3><a href="/radar/">Radar Harpya para quem usa agentes de código</a></h3><p>Leituras selecionadas do RSS público da Harpya, com fontes primárias e aplicações práticas para quem usa o Celox.</p></article></div></section></main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <a href="/recursos/">Biblioteca Celox</a><a href="/">Site oficial</a><a href="https://github.com/freddominugez/vulcan-celox">Código e manual</a><a href="https://www.harpya.org/">Harpya</a>
+  </div>
+</footer>
+</body>
+</html>

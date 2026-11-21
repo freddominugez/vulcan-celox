@@ -10,9 +10,12 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from biblioteca.conteudo import ARTICLES, HUB, PAGES as LIBRARY_PAGES, PROMPTS
+
 ROOT = Path(__file__).resolve().parent
 DIST = ROOT / "dist"
 PAGES = [DIST / "index.html"] + [DIST / slug / "index.html" for slug in ("pt-br", "en-us", "es-es")]
+LIBRARY_PATHS = {DIST / route.strip("/") / "index.html": route for route in LIBRARY_PAGES}
 SETTINGS = json.loads((ROOT / "settings.json").read_text())
 ORIGIN = SETTINGS["origin"].rstrip("/")
 CANONICALS = {"pt-BR": ORIGIN + "/", "en-US": ORIGIN + "/en-us/", "es-ES": ORIGIN + "/es-es/"}
@@ -108,12 +111,40 @@ def check_page_metadata(page, language):
     return errors
 
 
+def check_library_metadata(page, route):
+    errors = []
+    canonical = ORIGIN + route
+    if page.canonicals != [canonical] or page.metadata.get("og:url") != [canonical]:
+        errors.append("library canonical/social URL")
+    if page.alternates:
+        errors.append("library pages in this edition have no translated equivalents")
+    if page.metadata.get("description") != [LIBRARY_PAGES[route][1]]:
+        errors.append("library description")
+    if page.metadata.get("robots") != ["index, follow, max-image-preview:large"]:
+        errors.append("library robots meta")
+    image = page.metadata.get("og:image", [])
+    if (len(image) != 1 or not image[0].startswith(ORIGIN + "/assets/screens/")
+            or not (DIST / urlsplit(image[0]).path.lstrip("/")).is_file()
+            or page.metadata.get("twitter:image") != image):
+        errors.append("library social image")
+    graph = next((item["@graph"] for item in page.inline if "@graph" in item), [])
+    entities = {entity["@type"]: entity for entity in graph}
+    expected_crumbs = [ORIGIN + "/"] + ([ORIGIN + HUB] if route != HUB else []) + [canonical]
+    crumbs = entities.get("BreadcrumbList", {}).get("itemListElement", [])
+    if [crumb.get("item") for crumb in crumbs] != expected_crumbs:
+        errors.append("library breadcrumb data")
+    if route in ARTICLES and entities.get("Article", {}).get("mainEntityOfPage") != canonical:
+        errors.append("library Article data")
+    return errors
+
+
 def check_crawl_files():
     errors = []
     sitemap = ET.parse(DIST / "sitemap.xml")
     entries = sitemap.findall("s:url", SITEMAP_NS)
     locations = [entry.findtext("s:loc", namespaces=SITEMAP_NS) for entry in entries]
-    if Counter(locations) != Counter(CANONICALS.values()):
+    expected_locations = [*CANONICALS.values(), *(ORIGIN + route for route in LIBRARY_PAGES)]
+    if Counter(locations) != Counter(expected_locations):
         errors.append("Sitemap locations differ from canonical URLs")
     for entry, location in zip(entries, locations):
         alternates = [
@@ -121,7 +152,8 @@ def check_crawl_files():
             for link in entry.findall("x:link", SITEMAP_NS)
             if link.get("rel") == "alternate"
         ]
-        if Counter(alternates) != Counter(ALTERNATES.items()):
+        expected = ALTERNATES.items() if location in CANONICALS.values() else []
+        if Counter(alternates) != Counter(expected):
             errors.append(f"Sitemap hreflang mismatch at {location}")
     robots = (DIST / "robots.txt").read_text().splitlines()
     if robots != ["User-agent: *", "Allow: /", f"Sitemap: {ORIGIN}/sitemap.xml"]:
@@ -134,16 +166,25 @@ if __name__ == "__main__":
     parser.add_argument("--allow-pending-download", action="store_true")
     args = parser.parse_args()
     errors, checked, pending = [], [], []
-    for path in PAGES:
+    all_pages = {}
+    for path in [*PAGES, *LIBRARY_PATHS]:
         parsed = Page()
         source = path.read_text()
         parsed.feed(source)
+        all_pages[path] = parsed
+    for path, parsed in all_pages.items():
         expected_lang = {"pt-br": "pt-BR", "en-us": "en-US", "es-es": "es-ES"}.get(path.parent.name, "pt-BR")
         if parsed.lang != expected_lang:
             errors.append(f"{path}: wrong language")
         if parsed.h1 != 1:
             errors.append(f"{path}: expected one h1")
-        errors.extend(f"{path}: invalid {error}" for error in check_page_metadata(parsed, expected_lang))
+        if path in LIBRARY_PATHS:
+            issues = check_library_metadata(parsed, LIBRARY_PATHS[path])
+        else:
+            issues = check_page_metadata(parsed, expected_lang)
+            if HUB not in parsed.refs:
+                issues.append("missing library navigation")
+        errors.extend(f"{path}: invalid {error}" for error in issues)
         duplicates = [name for name, count in Counter(parsed.ids).items() if count > 1]
         if duplicates:
             errors.append(f"{path}: duplicate ids {duplicates}")
@@ -166,6 +207,9 @@ if __name__ == "__main__":
                     pending.append(ref)
                 else:
                     errors.append(f"{path}: missing {ref}")
+            if url.fragment and destination in all_pages and url.fragment not in all_pages[destination].ids:
+                errors.append(f"{path}: missing anchor {ref}")
+        source = path.read_text()
         if "—" in source or "TODO" in source:
             errors.append(f"{path}: prohibited marker")
         checked.append({"page": str(path.relative_to(DIST)), "lang": parsed.lang, "images": len(parsed.images), "h1": parsed.h1, "inline_json": len(parsed.inline)})
@@ -180,6 +224,10 @@ if __name__ == "__main__":
             errors.append(f"Missing CSS asset: {url}")
     if (DIST / "assets/fonts/InterVariable.woff2").read_bytes()[:4] != b"wOF2":
         errors.append("Font is not WOFF2")
+    for slug, _, _, _, _, body in PROMPTS:
+        download = DIST / "prompts" / "arquivos" / f"{slug}.md"
+        if not download.is_file() or not download.read_text().endswith(f"---\n{body}\n"):
+            errors.append(f"Missing or stale prompt download: {slug}")
     errors.extend(check_crawl_files())
     print(json.dumps({"pages": checked, "locale_shapes_equal": not any(shape(c) != shape(catalogs[0]) for c in catalogs), "pending_downloads": sorted(set(pending)), "errors": errors}, ensure_ascii=False, indent=2))
     raise SystemExit(bool(errors))

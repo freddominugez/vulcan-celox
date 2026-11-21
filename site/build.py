@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Build three complete static pages, with no runtime framework or external asset."""
+import argparse
 import html
 import json
 import struct
 from pathlib import Path
+
+from biblioteca import render as biblioteca
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "dist"
@@ -80,6 +83,7 @@ def page(slug, c):
     docs_lang = "pt-BR" if slug == "pt-br" else "en"
     docs = REPO + "/blob/main/docs/" + docs_lang
     nav = "".join(f'<a href="#{section}">{esc(label)}</a>' for label, section in zip(c["nav"], nav_ids))
+    nav += f'<a href="{biblioteca.HUB}" hreflang="pt-BR">{esc(c["resourceLibrary"])}</a>'
     languages = "".join(f'<a href="{target}" lang="{lang}" hreflang="{lang}" data-language="{code}" {"aria-current=page" if code == slug else ""}>{label}</a>' for code, lang, label, target in LANGUAGES)
     alternates = "\n".join(f'<link rel="alternate" hreflang="{lang}" href="{href}">' for lang, href in ALTERNATES.items())
     og_alternates = "\n".join(f'<meta property="og:locale:alternate" content="{lang.replace("-", "_")}">' for _, lang, _, _ in LANGUAGES if lang != c["lang"])
@@ -313,6 +317,11 @@ def page(slug, c):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--atualizar-harpya", action="store_true", help="Atualiza a seleção do RSS da Harpya antes do build.")
+    args = parser.parse_args()
+    if args.atualizar_harpya:
+        biblioteca.update_snapshot()
     for slug, _, _, path in LANGUAGES:
         content = json.loads((ROOT / "content" / (slug + ".json")).read_text())
         destination = OUT / slug
@@ -323,11 +332,13 @@ if __name__ == "__main__":
             (OUT / "index.html").write_text(rendered)
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\nSitemap: " + ORIGIN + "/sitemap.xml\n")
     alternates = '\n'.join(f'    <xhtml:link rel="alternate" hreflang="{lang}" href="{url}" />' for lang, url in ALTERNATES.items())
+    biblioteca.build(OUT, ORIGIN)
     entries = '\n'.join(f'  <url>\n    <loc>{ORIGIN + path}</loc>\n{alternates}\n  </url>' for _, _, _, path in LANGUAGES)
+    entries += '\n' + '\n'.join(f'  <url><loc>{ORIGIN + path}</loc></url>' for path in biblioteca.PAGES)
     sitemap = f'''<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 {entries}
 </urlset>
 '''
     (OUT / "sitemap.xml").write_text(sitemap)
-    print("Built /, /pt-br/, /en-us/, /es-es/")
+    print(f"Built /, /pt-br/, /en-us/, /es-es/ and {len(biblioteca.PAGES)} library pages")

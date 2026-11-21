@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Como acompanhar branches, commits e PRs de agentes de código | Vulcan Celox</title>
+<meta name="description" content="Use a trilha do Celox para revisar uma sessão de Claude Code ou Codex e confirme o estado do trabalho no Git e no GitHub.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://celox.byvulcan.com/artigos/acompanhar-branches-commits-e-prs/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Vulcan Celox">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Como acompanhar branches, commits e PRs de agentes de código | Vulcan Celox">
+<meta property="og:description" content="Use a trilha do Celox para revisar uma sessão de Claude Code ou Codex e confirme o estado do trabalho no Git e no GitHub.">
+<meta property="og:url" content="https://celox.byvulcan.com/artigos/acompanhar-branches-commits-e-prs/">
+<meta property="og:image" content="https://celox.byvulcan.com/assets/screens/agents-pt.png">
+<meta property="og:image:width" content="1800">
+<meta property="og:image:height" content="1145">
+<meta property="og:image:alt" content="Sessões de agentes e estado do trabalho no Vulcan Celox">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Como acompanhar branches, commits e PRs de agentes de código | Vulcan Celox">
+<meta name="twitter:description" content="Use a trilha do Celox para revisar uma sessão de Claude Code ou Codex e confirme o estado do trabalho no Git e no GitHub.">
+<meta name="twitter:image" content="https://celox.byvulcan.com/assets/screens/agents-pt.png">
+<meta name="twitter:image:alt" content="Sessões de agentes e estado do trabalho no Vulcan Celox">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Vulcan Celox", "item": "https://celox.byvulcan.com/"}, {"@type": "ListItem", "position": 2, "name": "Biblioteca", "item": "https://celox.byvulcan.com/recursos/"}, {"@type": "ListItem", "position": 3, "name": "Como acompanhar branches, commits e PRs de agentes de código", "item": "https://celox.byvulcan.com/artigos/acompanhar-branches-commits-e-prs/"}]}, {"@type": "Article", "headline": "Como acompanhar branches, commits e PRs de agentes de código", "description": "Use a trilha do Celox para revisar uma sessão de Claude Code ou Codex e confirme o estado do trabalho no Git e no GitHub.", "image": "https://celox.byvulcan.com/assets/screens/agents-pt.png", "inLanguage": "pt-BR", "mainEntityOfPage": "https://celox.byvulcan.com/artigos/acompanhar-branches-commits-e-prs/", "author": {"@type": "Organization", "name": "Vulcan Celox", "url": "https://celox.byvulcan.com/"}}]}</script>
+<link rel="icon" type="image/png" href="/assets/brand/favicon.png">
+<link rel="stylesheet" href="/assets/editorial.css">
+
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="top">
+  <div class="top-inner wrap">
+    <a class="brand" href="/"><img src="/assets/brand/logo-primary.svg" width="175" height="40" alt="Vulcan Celox"></a>
+    <nav class="nav" aria-label="Navegação principal"><a href="/recursos/">Recursos</a><a href="/guias/claude-code-e-codex-no-mac/">Guias</a><a href="/artigos/contexto-memoria-e-prompts-para-agentes/" aria-current=location>Artigos</a><a href="/prompts/">Prompts</a><a href="/repositorios/">GitHub</a><a href="/radar/">Radar Harpya</a></nav>
+    <a class="button small header-download" href="/guias/instalar-vulcan-celox-no-macos/">Baixar para Mac</a>
+  </div>
+</header>
+<nav class="wrap breadcrumb" aria-label="Navegação estrutural"><a href="/recursos/">Biblioteca</a><span aria-hidden="true">/</span><span>Artigo</span></nav>
+<main id="conteudo">
+<div class="wrap read-layout">
+<article class="article">
+  <header class="page-heading"><p class="kicker">Artigo</p><h1>Como acompanhar branches, commits e PRs de agentes de código</h1><p class="lead">Use a trilha do Celox para revisar uma sessão de Claude Code ou Codex e confirme o estado do trabalho no Git e no GitHub.</p><p class="meta">Vulcan Celox 1.4.0 · Exemplos de demonstração</p></header>
+  <section><h2 id="trilha">Leia a trilha da sessão</h2>
+<p>Em Agentes, abra a sessão e confira projeto, branch e arquivos tocados. A trilha mostra evidências de edição, commit, push e pull request a partir dos registros disponíveis. Uma indicação na trilha ajuda a localizar o trabalho. Para tomar decisões de publicação, confirme o estado no Git e no GitHub.</p>
+<figure class="article-figure"><img src="/assets/screens/agents-pt.png" width="1800" height="1145" alt="Tela Agentes do Celox com sessões de projetos e estado do trabalho" loading="lazy"><figcaption>Captura do Celox com sessões de demonstração.</figcaption></figure>
+</section>
+<section><h2 id="git">Confira o histórico no seu checkout</h2>
+<p>Abra um terminal na pasta do projeto. Estes comandos mostram o branch atual, o estado dos arquivos e o último commit. O quarto consulta a referência upstream quando ela existe. Essa referência local reflete o último conhecimento do remoto e pode estar desatualizada.</p>
+<pre><code>git branch --show-current
+git status --short --branch
+git log -1 --oneline
+git rev-list --left-right --count @{upstream}...HEAD</code></pre>
+<p>Se o upstream ainda não estiver configurado, registre essa condição. Para confirmar o PR no GitHub, abra a página do repositório ou rode <code>gh pr status</code> em um repositório com GitHub CLI autenticada. No Celox, a consulta opcional de PR em Configurações usa a sua própria autenticação do <code>gh</code>.</p>
+</section>
+<section><h2 id="caso">Exemplo de revisão antes de publicar</h2>
+<p>Em <code>feat/checkout-pix</code>, a linha do tempo mostra a alteração e um commit. O próximo passo é revisar o diff, executar o teste do checkout e confirmar se esse commit já chegou ao PR. Registre no post-it o teste executado e o link do PR, quando houver. Em seguida, confirme a decisão de publicar de acordo com as regras do projeto.</p>
+<div class="links"><a href="/prompts/#revisar">Usar o prompt de revisão</a><a href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/user-guide.md#agentes">Ler a seção Agentes do manual</a></div>
+</section>
+</article>
+<aside class="reading-nav"><nav aria-label="Nesta página"><h2>Nesta página</h2><ol><li><a href="#trilha">Leia a trilha da sessão</a></li><li><a href="#git">Confira o histórico no seu checkout</a></li><li><a href="#caso">Exemplo de revisão antes de publicar</a></li></ol></nav></aside>
+</div>
+<section class="wrap related"><h2>Continue no Celox</h2><div class="card-grid compact"><article class="resource-card"><p class="kicker">Guia</p><h3><a href="/guias/claude-code-e-codex-no-mac/">Como organizar sessões de Claude Code e Codex no Mac</a></h3><p>Use abas nomeadas, cores e post-its vinculados para trabalhar com Claude Code e Codex e retomar projetos no Vulcan Celox.</p></article><article class="resource-card"><p class="kicker">Prompts</p><h3><a href="/prompts/">Prompts para Claude Code e Codex</a></h3><p>Copie modelos para retomar uma sessão, revisar uma mudança, investigar um teste e preparar o handoff de um projeto.</p></article></div></section></main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <a href="/recursos/">Biblioteca Celox</a><a href="/">Site oficial</a><a href="https://github.com/freddominugez/vulcan-celox">Código e manual</a><a href="https://www.harpya.org/">Harpya</a>
+  </div>
+</footer>
+</body>
+</html>

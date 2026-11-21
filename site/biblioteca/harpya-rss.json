@@ -1,0 +1,29 @@
+{
+  "feed": "https://www.harpya.org/rss.xml",
+  "fetchedAt": "2026-11-21T00:53:27+00:00",
+  "feedSha256": "2ac2b3206e8acda18458b9d939cdd19b906031003bbcc72c01a43b54b0254343",
+  "matchedOnRefresh": [
+    "https://www.harpya.org/noticias/2026-11-19-cascata-modelos-agentes-codigo/",
+    "https://www.harpya.org/noticias/2026-11-20-kaist-prkv-cache-contexto-longo/"
+  ],
+  "items": [
+    {
+      "url": "https://www.harpya.org/noticias/2026-11-19-cascata-modelos-agentes-codigo/",
+      "title": "Estudo simula modelo menor antes do maior para reduzir custo de agentes de programação",
+      "feedDate": "2026-11-18",
+      "categories": [
+        "NotícIAs",
+        "Pesquisa e fronteira"
+      ]
+    },
+    {
+      "url": "https://www.harpya.org/noticias/2026-11-20-kaist-prkv-cache-contexto-longo/",
+      "title": "Pesquisadores da KAIST testam PageRank para reduzir o cache de modelos de IA",
+      "feedDate": "2026-11-16",
+      "categories": [
+        "NotícIAs",
+        "Pesquisa e fronteira"
+      ]
+    }
+  ]
+}

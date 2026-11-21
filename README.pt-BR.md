@@ -10,7 +10,7 @@ Um painel desktop para quem programa sozinho com agentes de código. Terminais r
 
 **Situação:** a versão estável mais recente é a 1.4.0, para macOS. As versões de teste mais recentes para Windows e Linux estão na página de [Releases](https://github.com/freddominugez/vulcan-celox/releases). Nenhuma das versões de teste foi aceita ainda numa máquina real. Escolha English (US), Português (Brasil) ou Español (España) em Configurações.
 
-[Site do produto](https://celox.byvulcan.com/)
+[Site do produto](https://celox.byvulcan.com/) · [Guias e recursos](https://celox.byvulcan.com/recursos/)
 
 ## Por que existe
 

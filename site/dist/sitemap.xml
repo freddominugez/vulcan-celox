@@ -21,4 +21,12 @@
     <xhtml:link rel="alternate" hreflang="es-ES" href="https://celox.byvulcan.com/es-es/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://celox.byvulcan.com/" />
   </url>
+  <url><loc>https://celox.byvulcan.com/recursos/</loc></url>
+  <url><loc>https://celox.byvulcan.com/guias/claude-code-e-codex-no-mac/</loc></url>
+  <url><loc>https://celox.byvulcan.com/guias/instalar-vulcan-celox-no-macos/</loc></url>
+  <url><loc>https://celox.byvulcan.com/artigos/contexto-memoria-e-prompts-para-agentes/</loc></url>
+  <url><loc>https://celox.byvulcan.com/artigos/acompanhar-branches-commits-e-prs/</loc></url>
+  <url><loc>https://celox.byvulcan.com/prompts/</loc></url>
+  <url><loc>https://celox.byvulcan.com/repositorios/</loc></url>
+  <url><loc>https://celox.byvulcan.com/radar/</loc></url>
 </urlset>
