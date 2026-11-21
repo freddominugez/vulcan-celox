@@ -153,7 +153,7 @@ def register_terminal_api(app) -> None:
             record = app.hub.sessions.get(tid)
             if session is None or record is None:
                 raise HttpError(404, "terminal não encontrado")
-            if not session.alive or not record.is_open:
+            if body.get("require_alive") is True and (not session.alive or not record.is_open):
                 raise HttpError(409, "Terminal encerrado")
             color = body.get("tab_color", record.tab_color)
             if color is not None and not themes.is_theme(color):

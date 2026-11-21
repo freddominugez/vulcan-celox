@@ -266,6 +266,7 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 
 - `core/agents/edits.py`: table `session_edits` with path, time, tool, turn and offset. Content is read on demand from the session file by `edit_detail()`, so a session deleted by the agent has no diff. On Claude Code the sources are `Edit`, `MultiEdit` and `Write`; `originalFile` is only read, never stored. On Codex the `FileChange` item carries the diff, and a readable patch covers the older format.
 - `core/code_files.py`, `core/code_diff.py`, `server/code_api.py`, `server/known_roots.py`: read-only viewer. The HEAD side comes from `git cat-file blob`, and the current side is read directly, so `diff.external`, `textconv` and clean filters from the analyzed repository never run.
+- `core/code_boundary.py` walks canonical path components without following links on POSIX. The tree, file reads and the observer use this boundary on disk. Each observer client keeps its own cursor and folder scope.
 - `core/agents/attention.py`, `core/agents/attention_hook.py`: turn state per session and the optional hook for permission requests.
 - `core/agents/turns.py`: events and edits grouped by request, with the same count as the reader.
 - `core/listening_ports.py`: ports of each PTY and its descendants, with `lsof` on macOS and `/proc/net` on Linux, cached for 10 s.

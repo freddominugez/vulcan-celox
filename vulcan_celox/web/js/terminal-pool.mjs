@@ -135,7 +135,7 @@ export const terminals = {
   },
 
   async updateIdentity(id, changes) {
-    const info = await patch(`/api/terminals/${id}`, changes);
+    const info = await patch(`/api/terminals/${id}`, { ...changes, require_alive: true });
     this.revision += 1;
     const session = this.get(id);
     if (session) {
