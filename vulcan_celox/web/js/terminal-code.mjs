@@ -1,4 +1,6 @@
 // Code workspace attached to a terminal. A context owns its tree, viewer and poll.
+import { CodexComposer } from "./codex-composer.mjs";
+import { openDraftShelf } from "./codex-shelf.mjs";
 import { get, post } from "./api.mjs";
 import { esc, icon } from "./dom.mjs";
 import { t } from "./i18n.mjs";
@@ -25,13 +27,15 @@ export class TerminalCode {
     this.marks = new Marks();
     host.insertAdjacentHTML("beforeend", `<section class="session-code" aria-label="${t("Código da sessão")}" hidden>
       <header class="session-code-tools">
+        <button type="button" class="btn btn-sm" data-sc="codex" aria-expanded="false">Codex</button>
         <button type="button" class="btn btn-sm" data-sc="files" aria-expanded="false">${icon("tree")}${t("Arquivos")}</button>
         <button type="button" class="btn btn-sm" data-sc="folder" aria-expanded="false">${icon("folder-plus")}${t("Abrir pasta")}</button>
         <button type="button" class="btn btn-sm ce-follow" data-sc="follow" hidden></button>
         <button type="button" class="icon-btn" data-sc="expand" aria-pressed="false" aria-label="${t("Ampliar visor")}" title="${t("Ampliar visor")}">${icon("external")}</button>
       </header>
       <div class="session-code-folder" hidden>${addFolderForm()}</div>
-      <p class="session-code-status" role="status"></p>
+      <p class="session-code-root mono"></p><p class="session-code-status" role="status"></p>
+      <div class="codex-composer" hidden></div>
       <div class="ce-view session-code-view"></div>
     </section>
     <aside class="session-files" aria-label="${t("Arquivos")}" hidden>
@@ -80,14 +84,15 @@ export class TerminalCode {
 
   inContext(ticket, root = this.root) {
     return !this.destroyed && this.host.isConnected && this.ticket === ticket && this.root === root &&
-      this.ws.activeId === this.id && this.ws.mode === "terminal";
+      [this.id, this.handoffId].includes(this.ws.activeId) && this.ws.mode === "terminal";
   }
 
   sync(terminal) {
     const id = terminal?.info.id || null;
-    if (this.id === id) return;
+    if (this.id === id || (id && this.handoffId === id)) return;
     this.reset();
     this.id = id;
+    this.composer?.sync();
     if (id) this.resolveRoot();
     else this.showTerminal();
   }
@@ -97,6 +102,7 @@ export class TerminalCode {
     this.manual = 0;
     this.root = null;
     this.started = null;
+    this.lost = false;
     this.last = new Map();
     this.events = [];
     this.poll?.stop();
@@ -111,6 +117,7 @@ export class TerminalCode {
     this.marks.clear();
     this.viewer.reset(null);
     this.error.textContent = "";
+    this.host.querySelector(".session-code-root").textContent = "";
     this.button("follow").hidden = true;
     this.showFolder(false);
     this.paintChanges();
@@ -120,6 +127,27 @@ export class TerminalCode {
     this.mode = "terminal";
     this.paintVisibility();
     if (focus) this.ws.visible().find((session) => session.info.id === this.ws.activeId)?.focus();
+  }
+
+  focusDestination(id) {
+    this.showTerminal();
+    this.handoffId = id === this.id ? null : id;
+    this.ws.select(id, { handoff: true });
+    this.ws.renderTabs();
+  }
+
+  toggleComposer() {
+    const host = this.host.querySelector(".codex-composer");
+    this.composer ||= new CodexComposer(this, host);
+    this.composer.sync();
+    host.hidden = !host.hidden;
+    this.button("codex").setAttribute("aria-expanded", String(!host.hidden));
+    if (!host.hidden) this.composer.area.focus();
+  }
+
+  search() {
+    this.viewer.search();
+    return true;
   }
 
   showCode() {
@@ -191,6 +219,8 @@ export class TerminalCode {
   async openRoot(root) {
     this.reset();
     this.root = root;
+    this.host.querySelector(".session-code-root").textContent = root;
+    this.composer?.sync();
     const ticket = this.ticket;
     this.viewer.reset(root);
     this.viewer.message(t("Carregando…"), "");
@@ -200,7 +230,11 @@ export class TerminalCode {
       if (!this.inContext(ticket, root)) return;
       const tree = new FileTree(WB, this.treeEl.firstElementChild, {
         marks: this.marks, label: t("Árvore de arquivos"), load,
-        onOpen: (path) => this.inContext(ticket, root) && this.openFile(path),
+        onOpen: (path) => {
+          if (!this.inContext(ticket, root)) return;
+          this.showCode();
+          this.openFile(path);
+        },
         onExpand: () => {},
       });
       this.tree = tree;
@@ -221,10 +255,12 @@ export class TerminalCode {
   async changes(data) {
     const context = this.ticket;
     if (data.missing) {
+      this.lost = true;
       this.error.textContent = t("A pasta não existe mais");
       return;
     }
-    if (data.reset) {
+    const reset = data.reset || this.lost;
+    if (reset) {
       const ticket = this.ticket;
       const root = this.root;
       const listing = await get(`/api/files/tree?${query({ root })}`);
@@ -236,12 +272,13 @@ export class TerminalCode {
       if (!this.inContext(ticket, root)) return;
       await this.viewer.refresh();
       if (!this.inContext(ticket, root)) return;
+      this.lost = false;
     }
     this.started ??= new Date();
     const notices = [];
     if (data.partial) notices.push(t("Pasta grande: só o que está aberto é observado"));
     if (data.interval > 3) notices.push(t("A atualização pode levar {n} s.", { n: Math.ceil(data.interval) }));
-    if (data.reset) notices.push(t("A observação foi retomada com uma nova referência."));
+    if (reset) notices.push(t("A observação foi retomada com uma nova referência."));
     this.error.textContent = notices.join(" · ");
     for (const event of data.events) {
       this.marks.apply(event);
@@ -304,6 +341,7 @@ export class TerminalCode {
       return;
     }
     const name = action.dataset.sc;
+    if (name === "codex") this.toggleComposer();
     if (name === "files") this.setColumn(this.column.hidden, true);
     if (name === "close") this.setColumn(false, true);
     if (name === "expand") this.setExpanded(!this.center.classList.contains("is-expanded"));
@@ -329,6 +367,7 @@ export class TerminalCode {
     this.reset();
     this.ws.body.hidden = false;
     this.viewer.destroy();
+    this.composer?.destroy();
     this.follow.destroy();
     this.layout.disconnect();
     document.removeEventListener("keydown", this.key);
@@ -341,6 +380,11 @@ export class TerminalCode {
 export function showSessionMode(ws, code, { focus = true } = {}) {
   if (!code) ws.code?.showTerminal();
   if (code && ws.options.sessionCode && terminals.get(ws.activeId)?.alive) {
+    if (ws.code?.handoffId) {
+      const source = ws.code.id;
+      ws.code.handoffId = null;
+      if (terminals.get(source)) ws.select(source, { handoff: true });
+    }
     ws.code ||= new TerminalCode(ws, ws.body.parentElement);
     ws.code.showCode();
   }
@@ -348,4 +392,9 @@ export function showSessionMode(ws, code, { focus = true } = {}) {
   if (!focus) return;
   if (code) ws.code?.button("files").focus();
   else if (!terminals.popped.has(ws.activeId)) terminals.get(ws.activeId)?.focus();
+}
+
+export function sessionTools(ws, action, target) {
+  if (action === "session-code" || action === "session-pty") showSessionMode(ws, action === "session-code");
+  if (action === "window-drafts") openDraftShelf(ws.code?.composer, target);
 }

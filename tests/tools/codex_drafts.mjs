@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { Drafts, validateDraft } from "../../vulcan_celox/web/js/codex-drafts.mjs";
+
+assert.deepEqual(validateDraft(" \t/a {{literal}}\r\nOlá 🧭\r "), { text: " \t/a {{literal}}\nOlá 🧭\n ", error: "" });
+assert.equal(validateDraft(" \t\n").error, "empty");
+assert.equal(validateDraft("🙂".repeat(4000)).error, "");
+assert.equal(validateDraft("🙂".repeat(4001)).error, "size");
+for (const control of ["\u0000", "\u001b", "\u007f", "\u0085"]) assert.equal(validateDraft("x" + control).error, "control");
+const book = new Drafts();
+const a = { id: "a", label: "Igual", root: "/projeto" };
+const b = { ...a, id: "b" };
+const source = book.draft(a);
+const bSource = book.draft(b);
+source.text = "texto A";
+assert.equal(bSource.text, "");
+const target = book.bind(a, b);
+assert.equal(target.text, "texto A");
+assert.equal(source.text, "");
+assert.equal(book.draft({ ...a, root: "/worktree" }).text, "");
+assert.equal(book.draft(b).text, "");
+assert.equal(book.draft(a), target);
+assert.equal(book.draft(a).terminal.id, "b");
+assert.equal(book.transfer(target, bSource), true);
+assert.equal(bSource.text, "texto A");
+assert.equal(target.text, "");

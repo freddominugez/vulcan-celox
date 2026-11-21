@@ -73,7 +73,9 @@ export function renderTabs(ws) {
     <div class="tabstrip-spacer"></div>
     ${ws.options.scope === "site" && ws.project.commands ? `<button class="btn btn-sm cmd-btn" data-action="commands" aria-haspopup="menu" title="${t("Comandos do projeto")}">${icon("play")}<span>${t("Comandos")}</span></button>` : ""}
     ${ws.project.runtimeChip()}
-    ${identityTool}${terminalTools}${codeTools}`;
+    ${identityTool}${terminalTools}${codeTools}
+    ${ws.options.sessionCode ? `<button type="button" class="icon-btn" data-action="window-drafts"
+      aria-label="${t("Rascunhos desta janela")}" title="${t("Rascunhos desta janela")}">${icon("note")}</button>` : ""}`;
   if (ws.strip.markup !== html) {
     ws.strip.innerHTML = html;
     ws.strip.markup = html;
@@ -133,6 +135,7 @@ export function renameTabOnDblClick(ws, event) {
         reportError(err);
       }
     }
+    ws.strip.markup = null;
     ws.renderTabs();
   };
   input.addEventListener("keydown", (e) => {

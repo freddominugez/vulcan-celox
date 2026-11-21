@@ -85,15 +85,17 @@ function copySync(text) {
     ok = false;
   }
   area.remove();
-  if (previous && previous.focus) previous.focus();
+  if (previous && previous.focus) previous.focus({ preventScroll: true });
   return ok;
 }
 
 /** Copies and notifies. Call directly in the click handler, before any await. */
-export async function copy(text, message) {
-  // in the app (macOS and Linux) the shell copies: NSPasteboard or Gtk.Clipboard, without depending on WebKit
-  let ok = hasBridge && native({ type: "copy", text });
-  if (!ok) ok = copySync(text);  // in the browser: the sync path first, because after an await the click is already gone
+export async function copyToClipboard(text) {
+  // Sending to the native bridge does not acknowledge the system clipboard.
+  try {
+    if (hasBridge && native({ type: "copy", text })) return "unconfirmed";
+  } catch { /* The browser copy remains available if the bridge rejected the message. */ }
+  let ok = copySync(text);  // in the browser: keep the user gesture for WebKit
   if (!ok && navigator.clipboard && navigator.clipboard.writeText) {
     try {
       await navigator.clipboard.writeText(text);
@@ -102,6 +104,11 @@ export async function copy(text, message) {
       ok = false;
     }
   }
+  return ok ? "copied" : "denied";
+}
+
+export async function copy(text, message) {
+  const ok = (await copyToClipboard(text)) !== "denied";
   toast(ok ? message : t("Não deu para copiar. Selecione o texto e use ⌘C."), { kind: ok ? "ok" : "error" });
   return ok;
 }

@@ -105,6 +105,9 @@
       "blocos": [
         {"p": "Cada terminal é uma sessão. Ele abre na pasta escolhida, com um tema de cor que identifica a sessão. No diálogo de novo terminal, escolha Claude Code, Codex ou só o shell para aquela aba: a escolha não passa para as próximas. Cada diálogo começa em shell. Com a opção de não perguntar a pasta, as novas abas abrem diretamente em shell; ⇧⌘T volta a mostrar o diálogo."},
         {"ul": [
+          "**Terminais na barra lateral:** a lista reúne os PTYs vivos. Use o nome para focar uma aba e o botão ao lado para editar nome e cor. Abra **Histórico** para consultar as sessões encerradas.",
+          "**Código da sessão:** abra pela aba de terminal global ou de um site. **Arquivos** mostra a árvore e as mudanças salvas desde a abertura. Use **Arquivo** para ler o texto completo ou veja o diff contra HEAD. A leitura manual pausa os saltos do acompanhamento.",
+          "**Codex:** escreva no rascunho, escolha e confirme a aba de destino. Use **Copiar prompt** e **Abrir terminal**. Confira se o campo do Codex está em primeiro plano, cole e pressione Enter na CLI. **Rascunhos desta janela** guarda o texto até a janela fechar ou recarregar.",
           "**Nome e cor:** selecione uma aba e use Nome e cor para identificá-la. A cor da aba é independente da paleta do shell.",
           "**Portas:** a aba mostra as portas que os processos dela abriram, como `:5173 +2`, na barra de abas e na lista de sessões. O clique abre `http://localhost:<porta>` no navegador. Só os processos da própria aba contam.",
           "**⌘T** abre um terminal novo; **⌘J** mostra ou esconde o painel de terminal de baixo, nas telas que ainda não mostram um terminal.",

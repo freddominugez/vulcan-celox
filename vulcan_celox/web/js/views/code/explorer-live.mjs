@@ -49,9 +49,9 @@ export class LivePoll {
     try {
       const data = await get(this.url());
       if (this.stopped) return;
+      await this.onData(data);
       this.cursor = data.cursor;
       this.failures = 0;
-      await this.onData(data);
 
     } catch (_) {
       if (!this.stopped) this.onError?.();

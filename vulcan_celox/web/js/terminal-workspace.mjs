@@ -15,7 +15,7 @@ import { ProjectTools } from "./terminal-commands.mjs";
 import { editTerminalIdentity } from "./terminal-identity.mjs";
 import { onTabKey, renameTabOnDblClick, renderTabs } from "./terminal-tabs.mjs";
 import { destroyChild, renderContent } from "./terminal-content.mjs";
-import { showSessionMode } from "./terminal-code.mjs";
+import { sessionTools } from "./terminal-code.mjs";
 
 const MODES = ["terminal", "tasks", "notes", "tags", "harness", "logs", "debug"];
 
@@ -176,6 +176,7 @@ export class TerminalWorkspace {
   reveal(id, mode, focus = null) {
     if (MODES.includes(mode)) this.mode = mode;
     if (id) {
+      if (this.code && id !== this.code.handoffId) this.code.handoffId = null;
       if (this.splitId === id) this.splitId = this.activeId;
       this.activeId = id;
       if (!this.isLive(id)) {
@@ -201,7 +202,8 @@ export class TerminalWorkspace {
     if (this.isLive(this.activeId)) terminals.popout(this.activeId);
   }
 
-  select(id) {
+  select(id, { handoff = false } = {}) {
+    if (!handoff && this.code) this.code.handoffId = null;
     this.activeId = id;
     this.focus = null;
     clearTab(id);
@@ -266,7 +268,7 @@ export class TerminalWorkspace {
     }
     if (action === "new") this.newTerminal();
     if (action === "identity") editTerminalIdentity(id, target).catch(reportError);
-    if (action === "session-code" || action === "session-pty") showSessionMode(this, action === "session-code");
+    sessionTools(this, action, target);
     if (action === "find") this.openSearch();
     if (action === "copy-output") this.search.copyOutput();
     if (action === "leave-history") {
@@ -350,14 +352,10 @@ export class TerminalWorkspace {
   }
 
   openSearch() {
-    if (this.code?.mode === "code") {
-      this.code.viewer.search();
-      return true;
-    }
+    if (this.code?.mode === "code") return this.code.search();
     return this.search.open();
   }
 
-  // ── desenho ────────────────────────────────────────────────────────────
   render() {
     const ids = this.tabIds();
     // before the first load the session requested by the route may not have a record yet

@@ -134,7 +134,8 @@
 .session-code { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg); }
 .session-code-tools, .session-files-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px; border-bottom: 1px solid var(--line); }
 .session-code-status { margin: 0; padding: 4px 8px; color: var(--fg-2); font-size: var(--fs-xs); }
-.session-code-status:empty { display: none; }
+.session-code-root { margin: 0; padding: 4px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-xs); }
+.session-code-root:empty, .session-code-status:empty { display: none; }
 .session-code-folder { padding: 8px; }
 .session-code-view .code-bar { flex-wrap: wrap; }
 .session-code-view .code-path { min-width: 0; }
@@ -150,3 +151,13 @@
 @media (max-width: 1020px) {
   .session-modes .seg { padding-inline: 6px; }
 }
+
+.codex-composer { flex: 0 1 auto; min-height: 0; max-height: 55%; padding: 8px; overflow: auto; border-bottom: 1px solid var(--line); }
+.codex-input, .codex-shelf textarea { display: block; width: 100%; resize: vertical; font: var(--fs-sm)/1.35 var(--mono); }
+.codex-actions, .codex-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+.codex-picker label { min-width: 0; }
+.codex-picker select { max-width: 100%; }
+.codex-destination, .codex-status { margin: 4px 0 0; font-size: var(--fs-xs); overflow-wrap: anywhere; }
+.codex-status:empty { display: none; }
+.codex-shelf details { margin-bottom: 8px; overflow-wrap: anywhere; }
+.codex-shelf textarea { margin: 6px 0; }
