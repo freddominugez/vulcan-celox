@@ -45,7 +45,8 @@ export function renderSidebar() {
   const refocus = had && (had.dataset.navGroup ? `[data-nav-group="${CSS.escape(had.dataset.navGroup)}"]`
     : had.getAttribute("href") ? `.nav-item[href="${CSS.escape(had.getAttribute("href"))}"]` : null);
   nav.innerHTML = NAV_GROUPS.map((g) => {
-    const items = g.items.map((id) => navById[id]).filter((n) => !isHidden(n.id) && !(n.id === "ambiente" && lerdUnavailable()));
+    if (g.id === "ajuda") return "";
+    const items = g.items.filter((id) => id !== "terminals").map((id) => navById[id]).filter((n) => !isHidden(n.id) && !(n.id === "ambiente" && lerdUnavailable()));
     if (!items.length) return "";
     const closed = Boolean(g.label && !isRail() && app.tree && app.tree.isOpen(`nav:${g.id}-closed`));  // the rail shows every icon
     // collapsed, the group still shows the current screen's item
