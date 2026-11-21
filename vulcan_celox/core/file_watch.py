@@ -30,11 +30,12 @@ def next_interval(scan_seconds: float, low: float = MIN_INTERVAL, high: float = 
     return min(high, max(low, scan_seconds * 10))
 
 
-def _read_folder(path: str) -> Optional[Dict[str, Photo]]:
-    """name -> (size, mtime_ns, kind) without following links. None if the folder does not exist; raises PermissionError."""
+def _read_folder(path: str, root: Optional[str] = None) -> Optional[Dict[str, Photo]]:
+    """name -> (size, mtime_ns, kind) without following links. None if the folder does not exist; raises PermissionError.
+    `root` is the watched canonical root: folders above it may be traversable without being readable."""
     out: Dict[str, Photo] = {}
     try:
-        with directory(Path(path)) as folder, os.scandir(folder) as it:
+        with directory(Path(path), Path(root) if root else None) as folder, os.scandir(folder) as it:
             for item in it:
                 if item.name.lower() in HIDDEN or has_bad_name(item.name):
                     continue
@@ -122,7 +123,7 @@ class RootWatch:
         """Compares one folder with its last photo and returns the subfolders to visit, each with `was it just created?`."""
         path = os.path.join(self.root, rel) if rel else self.root
         try:
-            now = _read_folder(path)
+            now = _read_folder(path, self.root)
         except OSError:
             return []  # no permission now: keeps the last photo instead of inventing a deletion
         if now is None:

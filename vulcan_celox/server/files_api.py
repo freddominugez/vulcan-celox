@@ -48,7 +48,7 @@ def _stamp(root: str, rel: str):
         target = code_files.resolve_inside(rel, [root], canonical=True)
         if code_files.is_sensitive(rel) or code_files.is_sensitive(str(target)):
             return None
-        with directory(target.parent) as folder:
+        with directory(target.parent, Path(root)) as folder:
             if isinstance(folder, int):
                 info = os.stat(target.name, dir_fd=folder, follow_symlinks=False)
             else:

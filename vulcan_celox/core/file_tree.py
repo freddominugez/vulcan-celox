@@ -185,7 +185,7 @@ def _entry(item: os.DirEntry, rel: str, is_dir: bool, is_link: bool, ignored: Ig
 def list_folder(root: str, rel: str, ignored: Ignored, limit: int = MAX_ENTRIES) -> Dict[str, Any]:
     real = real_folder(root, rel)
     try:
-        with directory(real) as folder, os.scandir(folder) as it:
+        with directory(real, Path(root)) as folder, os.scandir(folder) as it:
             rows = _folder_entries(it, rel, ignored, limit)
     except FileNotFoundError:
         raise code_files.CodeReadError(404, "missing", "a pasta não existe mais") from None

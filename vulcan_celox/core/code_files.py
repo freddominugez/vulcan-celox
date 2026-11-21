@@ -7,7 +7,7 @@ import hashlib
 import os
 import stat
 from pathlib import Path
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Optional
 
 from vulcan_celox.core.code_boundary import open_file
 
@@ -59,15 +59,32 @@ def resolve_inside(path: str, roots: Iterable[str], *, canonical: bool = False) 
     return real
 
 
+def _containing_root(real: Path, roots: Iterable[str], canonical: bool) -> Optional[Path]:
+    """The longest approved root that contains `real`: the walk may anchor on it when a folder above is unreadable."""
+    found = []
+    for r in roots:
+        if not r:
+            continue
+        try:
+            base = Path(r) if canonical else Path(r).resolve()
+        except (OSError, RuntimeError):
+            continue
+        if real == base or real.is_relative_to(base):
+            found.append(base)
+    return max(found, key=lambda p: len(p.parts)) if found else None
+
+
 def read_for_viewer(path: str, roots: Iterable[str], *, canonical: bool = False) -> Dict[str, Any]:
     roots = list(roots)
     real = resolve_inside(path, roots, canonical=canonical)
+    anchor = _containing_root(real, roots, canonical)
     # the requested name and the real name: a link called notas.txt that points to .env is also refused
     if is_sensitive(path) or is_sensitive(str(real)):
         raise CodeReadError(403, "sensitive", "arquivo com nome sensível não é exibido")
     try:
         # without following a link in the last component, and without hanging if someone swaps the file for a FIFO
-        fd = open_file(real, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0))
+        fd = open_file(real, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0),
+                       root=anchor)
     except FileNotFoundError:
         raise CodeReadError(404, "missing", "o arquivo não existe mais") from None
     except OSError:  # on Windows, opening a folder gives a permission error: the result is the same
