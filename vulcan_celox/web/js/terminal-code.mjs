@@ -108,9 +108,8 @@ export class TerminalCode {
     this.poll?.stop();
     this.poll = null;
     if (this.tree) {
-      const el = this.tree.el;
       this.tree.destroy();
-      el.replaceWith(document.createElement("div"));
+      this.treeEl.replaceChildren(document.createElement("div"));
       this.tree = null;
     }
     this.follow.reset();
@@ -233,7 +232,7 @@ export class TerminalCode {
         onOpen: (path) => {
           if (!this.inContext(ticket, root)) return;
           this.showCode();
-          this.openFile(path);
+          this.openFile(path, false);
         },
         onExpand: () => {},
       });
@@ -311,8 +310,8 @@ export class TerminalCode {
     }
   }
 
-  openFile(path) {
-    this.tree?.reveal(path).catch(() => {});
+  openFile(path, reveal = true) {
+    if (reveal) this.tree?.reveal(path).catch(() => {});
     return this.viewer.open(path);
   }
 

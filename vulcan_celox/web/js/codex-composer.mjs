@@ -225,4 +225,3 @@ export class CodexComposer {
     this.host.remove();
   }
 }
-

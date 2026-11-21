@@ -58,6 +58,11 @@ function closeMenu() {
   document.querySelectorAll("[data-rail][aria-expanded=true]").forEach((b) => b.setAttribute("aria-expanded", "false"));
 }
 
+function positionMenu(el, button) {
+  const top = Math.min(button.getBoundingClientRect().top, window.innerHeight - el.offsetHeight - 8);
+  el.style.top = `${Math.max(8, top)}px`;
+}
+
 function openMenu(button) {
   const section = SECTIONS.find((s) => s.id === button.dataset.rail);
   const el = section && $(section.el);
@@ -66,9 +71,7 @@ function openMenu(button) {
   closeMenu();
   if (wasOpen) return;
   el.classList.add("is-pop");
-  // next to its icon, but always whole inside the window
-  const top = Math.min(button.getBoundingClientRect().top, window.innerHeight - el.offsetHeight - 8);
-  el.style.top = `${Math.max(8, top)}px`;
+  positionMenu(el, button);
   button.setAttribute("aria-expanded", "true");
   const first = el.querySelector("a, button:not([disabled]), input");
   if (first) first.focus({ preventScroll: true });
@@ -98,7 +101,12 @@ export function startRail() {
     try { localStorage.setItem(KEY, JSON.stringify(chosen)); } catch (_) { /* no storage */ }
     apply();
   }).catch(() => {});
-  window.addEventListener("resize", () => { if (chosen === null) apply(); });
+  window.addEventListener("resize", () => {
+    if (chosen === null) apply();
+    const menu = document.querySelector(".side-section.is-pop");
+    const button = document.querySelector("[data-rail][aria-expanded=true]");
+    if (menu && button) positionMenu(menu, button);
+  });
   window.addEventListener("vulcan-sidebar", renderRailSections);
   $("#side-collapse").addEventListener("click", () => toggleRail());
   document.addEventListener("click", (event) => {

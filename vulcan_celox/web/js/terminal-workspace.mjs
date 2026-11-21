@@ -47,7 +47,7 @@ export class TerminalWorkspace {
         <button class="icon-btn icon-btn-sm" data-search="next" aria-label="${t("Próximo")}" title="${t("Próximo (Enter)")}">${icon("chevron-down")}</button>
         <button class="icon-btn icon-btn-sm" data-search="close" aria-label="${t("Fechar busca")}" title="${t("Fechar (Esc)")}">${icon("x")}</button>
       </div>
-      <div class="prompt-bar" hidden></div><div class="ws-layout"><div class="ws-body"></div></div></div>`;
+      <div class="prompt-bar" hidden></div><div class="session-switcher" hidden></div><div class="ws-layout"><div class="ws-body"></div></div></div>`;
     this.search = new TerminalSearch(this, $(".term-search", this.root));
     this.project = new ProjectTools(this);
     this.strip = $(".tabstrip", this.root);

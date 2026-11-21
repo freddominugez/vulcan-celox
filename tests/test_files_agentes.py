@@ -75,6 +75,19 @@ class AtribuicaoTest(AgentsServerCase):
         self.assertEqual(later["events"], [])
         self.assertEqual(later["attributed"], [{"rel": "tarde.py", "agent": {"agent": "claude", "session": SID}}])
 
+    def test_observacao_do_terminal_nao_herda_atribuicao_por_caminho(self):
+        since = self.cursor
+        (self.project / "tarde.py").write_text("uma versão do editor", encoding="utf-8")
+        event = self.wait_event()["events"][0]
+        self.assertIsNone(event["agent"])
+        self.record("tarde.py")
+        time.sleep(1.1)
+        self.assertTrue(self.changes()["attributed"])
+        route = f"/api/files/changes?root={quote(self.root)}&since={since}&source=disk&client=terminal"
+        data = self.request("GET", route)[1]
+        self.assertEqual(data["attributed"], [])
+        self.assertEqual([(e["rel"], e["agent"]) for e in data["events"]], [("tarde.py", None)])
+
     def test_outro_caminho_nao_ganha_autor(self):
         self.record("outro.py")
         self.app.files.attribution.cache.clear()

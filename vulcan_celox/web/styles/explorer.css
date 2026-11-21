@@ -147,13 +147,17 @@
 .session-events li { padding: 4px 0; overflow-wrap: anywhere; }
 .session-events button { width: 100%; text-align: left; background: var(--bg-raise); color: var(--fg); border: 1px solid var(--line); border-radius: var(--r); padding: 6px; }
 .session-events small { display: block; color: var(--fg-3); }
+.session-switcher { display: flex; align-items: center; gap: 6px; flex: none; padding: 2px 6px; background: var(--bg); border-bottom: 1px solid var(--line); }
 .session-modes { flex: none; }
 @media (max-width: 1020px) {
   .session-modes .seg { padding-inline: 6px; }
 }
 
 .codex-composer { flex: 0 1 auto; min-height: 0; max-height: 55%; padding: 8px; overflow: auto; border-bottom: 1px solid var(--line); }
-.codex-input, .codex-shelf textarea { display: block; width: 100%; resize: vertical; font: var(--fs-sm)/1.35 var(--mono); }
+textarea.codex-input, .codex-shelf textarea {
+  display: block; width: 100%; height: auto; min-height: 3.6em; padding: 5px 8px;
+  resize: vertical; font: var(--fs-sm)/1.35 var(--mono);
+}
 .codex-actions, .codex-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
 .codex-picker label { min-width: 0; }
 .codex-picker select { max-width: 100%; }

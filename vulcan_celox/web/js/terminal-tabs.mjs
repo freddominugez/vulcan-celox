@@ -73,12 +73,18 @@ export function renderTabs(ws) {
     <div class="tabstrip-spacer"></div>
     ${ws.options.scope === "site" && ws.project.commands ? `<button class="btn btn-sm cmd-btn" data-action="commands" aria-haspopup="menu" title="${t("Comandos do projeto")}">${icon("play")}<span>${t("Comandos")}</span></button>` : ""}
     ${ws.project.runtimeChip()}
-    ${identityTool}${terminalTools}${codeTools}
-    ${ws.options.sessionCode ? `<button type="button" class="icon-btn" data-action="window-drafts"
-      aria-label="${t("Rascunhos desta janela")}" title="${t("Rascunhos desta janela")}">${icon("note")}</button>` : ""}`;
+    ${identityTool}${terminalTools}`;
   if (ws.strip.markup !== html) {
     ws.strip.innerHTML = html;
     ws.strip.markup = html;
+  }
+  const switcher = ws.root.querySelector(".session-switcher");
+  switcher.hidden = !ws.options.sessionCode;
+  const modes = codeTools + `<button type="button" class="icon-btn" data-action="window-drafts"
+    aria-label="${t("Rascunhos desta janela")}" title="${t("Rascunhos desta janela")}">${icon("note")}</button>`;
+  if (ws.options.sessionCode && switcher.markup !== modes) {
+    switcher.innerHTML = modes;
+    switcher.markup = modes;
   }
   $$(".tab.is-active", ws.strip).forEach((t) => t.scrollIntoView({ block: "nearest", inline: "nearest" }));
   const activeLive = ws.mode === "terminal" && ws.code?.mode !== "code" && !history ? terminals.get(ws.activeId) : null;

@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 
 from tests.server_helpers import ServerTestCase
 from tests.test_files_seguranca import git
+from vulcan_celox.core import code_diff
 from vulcan_celox.core.file_tree import Ignored
 from vulcan_celox.core.file_watch import RootWatch
 
@@ -42,6 +43,22 @@ class WatchScopeTest(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("git"), "sem git")
 class CodeContextTest(ServerTestCase):
+    def test_versao_anterior_truncada_mantem_base(self):
+        project = self.tmp / "truncado"
+        project.mkdir()
+        git(project, "init", "-q")
+        previous = project / "arquivo.txt"
+        previous.write_bytes(b"a" * (code_diff.MAX_OUTPUT + 3))
+        git(project, "add", "arquivo.txt")
+        git(project, "-c", "user.email=fixture@example.invalid", "-c", "user.name=Fixture", "commit", "-qm", "base")
+        previous.write_text("nova versão", encoding="utf-8")
+        root = str(project.resolve())
+        self.request("POST", "/api/files/roots", body={"path": root})
+        query = urlencode({"root": root, "path": "arquivo.txt"})
+        diff = self.request("GET", f"/api/files/diff?{query}")[1]
+        self.assertEqual((diff["status"], diff["complete"], diff["truncated"]), ("modified", False, True))
+        self.assertEqual((len(diff["old"]), len(diff["base"])), (code_diff.MAX_OUTPUT, 40))
+
     def test_head_valido_e_worktree_que_exige_abertura_explicita(self):
         project = self.tmp / "repo"
         project.mkdir()
