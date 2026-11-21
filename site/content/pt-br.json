@@ -3,8 +3,8 @@
   "screenLang": "pt",
   "locale": "pt_BR",
   "name": "Português (Brasil)",
-  "title": "Vulcan Celox | Claude Code, Codex e projetos locais",
-  "description": "Um espaço de trabalho local para quem desenvolve com Claude Code e Codex. Reúna terminais, sessões, código, projetos PHP e Node no seu Mac.",
+  "title": "Vulcan Celox | Terminal para Claude Code e Codex no Mac",
+  "description": "Terminal gratuito e de código aberto para macOS. Organize sessões do Claude Code e do Codex, abas com nome e cor, post-its e projetos locais.",
   "skip": "Ir para o conteúdo",
   "menu": "Abrir menu",
   "closeMenu": "Fechar menu",
@@ -17,7 +17,7 @@
   "download": "Baixar para macOS",
   "downloadShort": "Baixar",
   "headline": "Qual agente está parado, e qual branch ficou sem push?",
-  "intro": "O Vulcan Celox reúne sessões do Claude Code e do Codex, terminais, prompts e projetos locais em um app nativo para Mac.",
+  "intro": "O Vulcan Celox é um terminal e espaço de trabalho local de código aberto para macOS. Reúne sessões do Claude Code e do Codex, projetos, comandos e notas em um só aplicativo.",
   "imageNote": "Interface real do produto, com dados de demonstração.",
   "stackLabel": "Trabalha com as ferramentas que você já usa",
   "stack": [
@@ -70,7 +70,7 @@
     {
       "id": "terminals",
       "title": "Terminais",
-      "caption": "Abas por projeto, temas de identificação, divisão, busca e memória da sessão.",
+      "caption": "Abas com nome e cor, divisão de painel, busca na saída e memória da sessão.",
       "alt": "Terminais do Celox organizados em abas e painéis"
     },
     {
@@ -87,11 +87,11 @@
     }
   ],
   "terminalTitle": "Um terminal para cada sessão.",
-  "terminalBody": "Abra um shell ou escolha o agente daquela sessão. Divida o painel, procure na saída e volte ao projeto sem perder os terminais abertos.",
+  "terminalBody": "Abra um shell ou escolha Claude Code ou Codex por aba. Dê nome e cor aos terminais para identificar sessões abertas e vincule post-its ao trabalho correspondente.",
   "terminalItems": [
-    "Claude e Codex são escolhidos por aba",
-    "Prompts enviados sem Enter automático",
-    "Histórico e memória para retomar o fio"
+    "Abas com nome e cor por sessão",
+    "Post-its vinculados a terminais e ao histórico",
+    "Divisão de painel, busca na saída e biblioteca de prompts"
   ],
   "localTitle": "Seu espaço de trabalho é local.",
   "localBody": "O app lê os registros locais dos agentes para organizar o contexto. Não exige chave de API para acompanhar Claude Code e Codex e não escreve nas pastas de configuração deles.",
@@ -144,6 +144,14 @@
   "guide": "Ler o guia de instalação",
   "faqTitle": "Perguntas frequentes",
   "faq": [
+    {
+      "q": "O que é o Vulcan Celox?",
+      "a": "É um app gratuito de código aberto para macOS que reúne terminais, sessões do Claude Code e do Codex, projetos locais e notas. A versão estável para Macs Apple Silicon e Intel está disponível no GitHub."
+    },
+    {
+      "q": "Como identificar uma aba e voltar ao terminal de um post-it?",
+      "a": "Na barra de abas, use Nome e cor para identificar a sessão. Ao abrir um post-it vinculado, a janela mostra o terminal correspondente e permite voltar à aba aberta ou consultar a memória da sessão encerrada."
+    },
     {
       "q": "O Celox substitui o Claude Code ou o Codex?",
       "a": "Não. Ele organiza projetos, terminais e sessões ao redor das ferramentas que você já usa. Os agentes continuam executando pelos seus próprios programas e contas."

@@ -23,7 +23,7 @@
   const syncLanguageLinks = () => {
     const hash = location.hash;
     document.querySelectorAll("[data-language]").forEach((link) => {
-      link.href = `/${link.dataset.language}/${hash}`;
+      link.hash = hash;
     });
   };
   syncLanguageLinks();
