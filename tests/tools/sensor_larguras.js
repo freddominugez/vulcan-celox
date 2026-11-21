@@ -23,7 +23,7 @@
       if (!document.getElementById('app').classList.contains('is-rail') || side > 49) fail('barra lateral não recolheu: ' + Math.round(side) + ' px');
       if (view.width < window.innerWidth - 50) fail('sobrou ' + Math.round(view.width) + ' px para a tela');
       var code = document.querySelector('.ce-main'); if (code && code.offsetParent && code.getBoundingClientRect().width < 480) fail('visor da tela Código com ' + Math.round(code.getBoundingClientRect().width) + ' px');
-      Array.prototype.forEach.call(document.querySelectorAll('#nav .nav-item, .rail-btn, #side-collapse'), function (el) {
+      Array.prototype.forEach.call(document.querySelectorAll('#nav .nav-item, #side-terminal-head .nav-item, #side-footer .nav-item, .rail-btn, #side-collapse'), function (el) {
         if (!el.title) fail('ícone do trilho sem dica'); if (el.getBoundingClientRect().right > side + 1) fail('ícone fora do trilho'); });
       Array.prototype.forEach.call(document.querySelectorAll('.rail-btn'), function (el) { if (el.getBoundingClientRect().bottom > window.innerHeight) fail('ícone de seção abaixo da janela'); });
       var sites = document.querySelector('[data-rail=section-sites]');
