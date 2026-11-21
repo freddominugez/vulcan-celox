@@ -136,6 +136,7 @@
 .session-code-status { margin: 0; padding: 4px 8px; color: var(--fg-2); font-size: var(--fs-xs); }
 .session-code-root { margin: 0; padding: 4px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-xs); }
 .session-code-root:empty, .session-code-status:empty { display: none; }
+.session-code.is-expanded .codex-composer, .session-code.is-expanded [data-sc="codex"] { display: none; }
 .session-code-folder { padding: 8px; }
 .session-code-view .code-bar { flex-wrap: wrap; }
 .session-code-view .code-path { min-width: 0; }
