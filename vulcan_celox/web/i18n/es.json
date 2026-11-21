@@ -1872,5 +1872,9 @@
 "Nenhum rascunho nesta janela.": "No hay borradores en esta ventana.",
 "Destino {id}": "Destino {id}",
 "Descartar rascunho": "Descartar borrador",
-"Transferir para o rascunho atual": "Trasladar al borrador actual"
+"Transferir para o rascunho atual": "Trasladar al borrador actual",
+"Trazer": "Traer",
+"Rascunho exibido: o do destino {id}.": "Borrador mostrado: el del destino {id}.",
+"Rascunho exibido: o desta aba, sem destino.": "Borrador mostrado: el de esta pestaña, sin destino.",
+"O rascunho anterior ficou com o destino {id}.": "El borrador anterior quedó con el destino {id}."
 }

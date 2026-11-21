@@ -122,7 +122,7 @@ Each terminal is a session. It opens in the chosen folder, with a color theme th
 
 - **Terminals in the sidebar:** the list shows live PTYs. Use the name to focus a tab and the adjacent button to edit its name and color. Open **History** to browse ended sessions.
 - **Session code:** open it from a global or site terminal tab. **Files** shows the tree and changes saved since opening it. Use **File** to read the full text or view the diff against HEAD. Reading manually pauses automatic jumps.
-- **Codex:** write a draft, then choose and confirm the destination tab. Use **Copy prompt** and **Open terminal**. Check that the Codex input is in the foreground, paste and press Enter in the CLI. **Drafts in this window** keeps the text until the window closes or reloads.
+- **Codex:** write a draft, then choose and confirm the destination tab. Use **Copy prompt** and **Open terminal**. Check that the Codex input is in the foreground, paste and press Enter in the CLI. If you confirm another destination, the text stays with the previous one and a notice shows its ID with **Bring it here**; only that click brings the text over. A draft written before the tab had a folder stays in the field when the folder is opened. **Drafts in this window** keeps the text until the window closes or reloads.
 - **Name and color:** select a tab and use Name and color to identify it. The tab color is independent of the shell palette.
 - **Ports:** the tab shows the ports its processes opened, such as `:5173 +2`, in the tab bar and in the session list. Clicking opens `http://localhost:<port>` in the browser. Only the tab's own processes count.
 - **⌘T** opens a new terminal; **⌘J** shows or hides the bottom terminal panel, on screens that do not already show a terminal.

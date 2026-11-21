@@ -12,6 +12,7 @@ export function validateDraft(raw) {
 }
 
 const originKey = ({ id, root }) => JSON.stringify([id, root]);
+const destinationKey = (draft, root) => JSON.stringify([draft.session ? "session" : "terminal", draft.session || draft.terminal.id, root]);
 
 export class Drafts {
   constructor() {
@@ -26,7 +27,38 @@ export class Drafts {
 
   draft(origin) {
     const key = originKey(origin);
+    this.adopt(origin);
     return this.origins.get(key) || this.read(key, { origin, terminal: null, session: null, pairing: null });
+  }
+
+  // A null root is not a root. When the same tab gets its first root, its own drafts change key ([id, null] -> [id, root]
+  // and [kind, destination, null] -> [kind, destination, root]): nothing moves between drafts, and two non-null roots never
+  // share one. A slot that already holds text is left alone.
+  adopt(origin) {
+    if (origin.root == null) return;
+    const before = originKey({ id: origin.id, root: null });
+    const after = originKey(origin);
+    const free = (key) => !this.entries.has(key) || this.entries.get(key).text === "";
+    const bound = this.origins.get(before);
+    if (bound && !this.origins.has(after)) {
+      const from = destinationKey(bound, null);
+      const to = destinationKey(bound, origin.root);
+      if (this.entries.get(from) === bound && free(to)) {
+        this.entries.delete(from);
+        this.entries.set(to, bound);
+        bound.origin = { ...bound.origin, root: origin.root };
+      }
+      if (this.entries.get(to) === bound) {
+        this.origins.delete(before);
+        this.origins.set(after, bound);
+      }
+    }
+    const loose = this.entries.get(before);
+    if (loose && !loose.terminal && loose.text && !this.origins.has(after) && free(after)) {
+      this.entries.delete(before);
+      this.entries.set(after, loose);
+      loose.origin = { ...loose.origin, root: origin.root };
+    }
   }
 
   bind(origin, terminal, { session = null, pairing = null } = {}) {

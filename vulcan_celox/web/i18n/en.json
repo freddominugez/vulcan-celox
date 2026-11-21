@@ -1872,5 +1872,9 @@
 "Nenhum rascunho nesta janela.": "No drafts in this window.",
 "Destino {id}": "Destination {id}",
 "Descartar rascunho": "Discard draft",
-"Transferir para o rascunho atual": "Move to the current draft"
+"Transferir para o rascunho atual": "Move to the current draft",
+"Trazer": "Bring it here",
+"Rascunho exibido: o do destino {id}.": "Draft shown: the one for destination {id}.",
+"Rascunho exibido: o desta aba, sem destino.": "Draft shown: this tab's, with no destination.",
+"O rascunho anterior ficou com o destino {id}.": "The previous draft stayed with destination {id}."
 }

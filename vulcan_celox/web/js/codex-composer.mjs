@@ -27,6 +27,8 @@ export class CodexComposer {
         <button type="button" class="btn btn-sm" data-codex="choose" aria-expanded="false">${t("Escolher terminal")}</button>
       </div>
       <div class="codex-destination" aria-live="polite"></div>
+      <div class="codex-notice" role="status"><span></span>
+        <button type="button" class="btn btn-sm" data-codex="bring" hidden>${t("Trazer")}</button></div>
       <div class="codex-picker" hidden>
         <label>${t("Terminal de destino")} <select class="select"></select></label>
         <label class="codex-verify"><input type="checkbox"> ${t("Abri ou retomei o Codex nesta aba.")}</label>
@@ -42,10 +44,12 @@ export class CodexComposer {
     this.status = host.querySelector(".codex-status");
     this.status.id = this.statusId;
     this.dest = host.querySelector(".codex-destination");
+    this.noticeText = host.querySelector(".codex-notice span");
     this.area.addEventListener("input", () => {
       if (!this.draft) return;
       this.turn += 1;
       this.draft.text = this.area.value;
+      this.notice("");
       this.button("select").hidden = true;
       this.validate();
     });
@@ -62,6 +66,7 @@ export class CodexComposer {
       if (action === "choose") this.showPicker(this.picker.hidden);
       if (action === "confirm") this.confirm();
       if (action === "open") this.open();
+      if (action === "bring") this.bring();
     });
     this.unsubscribe = terminals.subscribe(() => this.paintTarget());
   }
@@ -74,12 +79,19 @@ export class CodexComposer {
     if (!terminal || this.origin?.id === id && this.origin.root === root) return;
     this.turn += 1;
     this.origin = { id, root, label: terminal.info.title, cwd: terminal.info.cwd };
+    this.notice("");
     this.draft = drafts.draft(this.origin);
     this.verified = false;
     this.renderDraft();
   }
 
   renderDraft() {
+    // another draft in view (other tab, other root or other destination): say which one, never its text
+    if (this.shown && this.shown !== this.draft) {
+      const id = this.draft.terminal?.id;
+      this.notice(id ? t("Rascunho exibido: o do destino {id}.", { id }) : t("Rascunho exibido: o desta aba, sem destino."));
+    }
+    this.shown = this.draft;
     this.area.value = this.draft.text;
     this.showPicker(false);
     this.button("select").hidden = true;
@@ -88,6 +100,22 @@ export class CodexComposer {
   }
 
   message(text) { this.status.textContent = text; }
+
+  // the draft left with the previous destination: only its ID appears, and only the click on Trazer moves the text
+  notice(text, left = null) {
+    this.left = left;
+    this.noticeText.textContent = text;
+    this.button("bring").hidden = !left;
+  }
+
+  bring() {
+    const left = this.left;
+    this.notice("");
+    if (left && drafts.transfer(left, this.draft)) {
+      this.renderDraft();
+      this.area.focus();
+    }
+  }
 
   validate() {
     const result = validateDraft(this.area.value);
@@ -183,10 +211,14 @@ export class CodexComposer {
     if (data.foreground === "other") return this.message(t("Abra ou retome o Codex na aba escolhida e confirme novamente."));
     if (data.foreground !== "codex" && !this.checked.checked) return this.message(t("Confira o Codex em primeiro plano e confirme a aba."));
     const pairing = pairedId(data);
+    const previous = this.draft;
     this.draft = drafts.bind(this.origin, { ...target.info }, { pairing, session: data.chosen === pairing ? pairing : null });
     this.verified = true;
     this.confirmedForeground = data.foreground;
     this.renderDraft();
+    if (previous !== this.draft && previous.terminal && previous.text && !this.draft.text) {
+      this.notice(t("O rascunho anterior ficou com o destino {id}.", { id: previous.terminal.id }), previous);
+    }
     this.button("open").focus();
   }
 
