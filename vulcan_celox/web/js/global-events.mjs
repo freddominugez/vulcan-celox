@@ -21,7 +21,7 @@ import { SessionTree } from "./session-tree.mjs";
 import { renderSidebar } from "./sidebar.mjs";
 import { addSiteDialog } from "./site-add.mjs";
 import { TerminalPanel } from "./terminal-panel.mjs";
-import { terminals } from "./terminals.mjs";
+import { sessionHash, terminals } from "./terminal-pool.mjs";
 import { addNodeDialog } from "./views/node.mjs";
 
 export function bindGlobalEvents() {
@@ -52,19 +52,20 @@ export function bindGlobalEvents() {
     if (item) palette.run(Number(item.dataset.index));
   });
 
-  app.tree = new SessionTree($("#side-terminals"), {
-    navigate, route: () => app.route,
-    openTerminal: (id, hash) => {
-      if (!terminals.get(id)?.alive) return;
-      clearTab(id);
-      if (terminals.popped.has(id)) {
-        terminals.focusPopout(id);
-        return;
-      }
-      navigate(hash);
-      if (app.view?.workspace?.activeId === id) showSessionMode(app.view.workspace, false);
-    },
-  });
+  const openTerminal = (id) => {
+    const terminal = terminals.get(id);
+    if (!terminal?.alive) return;
+    clearTab(id);
+    if (terminals.popped.has(id)) {
+      terminals.focusPopout(id);
+      return;
+    }
+    navigate(sessionHash(terminal.info));
+    const workspace = app.view?.workspace;
+    if (workspace?.activeId === id) showSessionMode(workspace, false);
+  };
+  app.tree = new SessionTree($("#side-terminals"), { navigate, route: () => app.route, openTerminal });
+  window.addEventListener("vulcan-focus-terminal", (event) => openTerminal(event.detail));
   $("#nav").addEventListener("click", (event) => {
     const head = event.target.closest("[data-nav-group]");
     if (!head) return;

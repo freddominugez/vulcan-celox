@@ -4,7 +4,7 @@ import { clearTab } from "./attention-state.mjs";
 import { drafts, validateDraft } from "./codex-drafts.mjs";
 import { esc } from "./dom.mjs";
 import { t } from "./i18n.mjs";
-import { sessionHash, terminals } from "./terminal-pool.mjs";
+import { terminals } from "./terminal-pool.mjs";
 
 const choices = () => terminals.live();
 const destination = ({ id, title, cwd }) => `${title} · ${cwd} · ${id}`;
@@ -216,7 +216,7 @@ export class CodexComposer {
     clearTab(id);
     if (terminals.popped.has(id)) terminals.focusPopout(id);
     else if (this.code.ws.sessions().includes(terminal)) this.code.focusDestination(id);
-    else location.hash = sessionHash(terminal.info);
+    else window.dispatchEvent(new CustomEvent("vulcan-focus-terminal", { detail: id }));
   }
 
   destroy() {

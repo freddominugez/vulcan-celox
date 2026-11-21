@@ -378,7 +378,7 @@ export class SessionTree {
       if (!this.isOpen(id)) this.toggle(id);
       if (link.dataset.live && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
         event.preventDefault();
-        this.options.openTerminal(link.dataset.live, link.hash);
+        this.options.openTerminal(link.dataset.live);
       }
     }
   }

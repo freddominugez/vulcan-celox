@@ -30,7 +30,7 @@
     return response;
   };
   (async () => {
-    const { root, executable, site, theme } = window.__fixture;
+    const { root, executable, site, theme, cross = false } = window.__fixture;
     const [{ post, get, patch }, { terminals }, { t }, { setThemePref }] = await Promise.all([
       import("./js/api.mjs"), import("./js/terminal-pool.mjs"), import("./js/i18n.mjs"), import("./js/theme.mjs"),
     ]);
@@ -43,7 +43,7 @@
     check($("#side-live .tree-empty"), "lista inicial vazia ausente");
     await post("/api/files/roots", { path: root });
     const a = await post("/api/terminals", { site, cwd: root, title: "Codex fixture", command: `/usr/bin/python3 ${executable} recebido-a.txt` });
-    const b = await post("/api/terminals", { site, cwd: root, title: "Codex fixture", command: `/usr/bin/python3 ${executable} leia.txt` });
+    const b = await post("/api/terminals", { site: cross ? null : site, cwd: root, title: "Codex fixture", command: `/usr/bin/python3 ${executable} leia.txt` });
     const shell = await post("/api/terminals", { site, cwd: root, title: "Shell fixture", command: "cat" });
     await patch(`/api/terminals/${b.id}`, { title: a.title });
     await terminals.sync();
@@ -98,6 +98,15 @@
     check(document.activeElement.closest(".xterm-host")?.dataset.tabId === b.id, "entrada não focou B");
     check(sent.length === 0 && !events.some(({ body, path }) => body?.includes("{{literal}}") || path.href.includes("{{literal}}")),
       "compositor escreveu na API ou no PTY");
+    if (cross) {
+      check(location.hash.startsWith("#/terminals/terminal/"), "destino global não abriu a rota de Terminais");
+      $("[data-action=window-drafts]").click();
+      const preview = $(".codex-shelf textarea");
+      preview.closest("details").open = true;
+      check(preview.value === prompt, "rascunho não ficou disponível na rota de destino");
+      window.__vtErrors.splice(window.__vtErrors.indexOf(pending), 1);
+      return;
+    }
     const session = terminals.get(b.id);
     await wait(() => session.term.modes.bracketedPasteMode, "fixture não entrou em modo de colagem");
     // The sensor performs the two manual steps on the test terminal, after proving the composer sent no bytes.
