@@ -272,6 +272,7 @@ dialog img:not(.icon) { width: 100%; max-height: 76vh; object-fit: contain; back
 @media (max-width: 28rem) {
   .nav-download { display: none; }
   .nav-shell { min-height: 4.25rem; }
+  .nav-shell .brand img { width: clamp(6.5rem, 38vw, 9rem); }
   .gallery-caption { flex-wrap: wrap; }
   .footer-top { grid-template-columns: 1fr 1fr; }
   .footer-top > div:first-child { grid-column: 1 / -1; }
