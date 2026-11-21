@@ -41,11 +41,10 @@ export const SIDE_SECTIONS = [
 // stable groups, in fixed order, collapsible (state remembered); the first one and Help, at the end, have no title
 export const NAV_GROUPS = [
   { id: "geral", label: "", title: t("Geral"), items: ["inicio", "overview"] },
-  { id: "projetos", label: t("Projetos"), items: ["node", "codigo", "terminals"] },
+  { id: "projetos", label: t("Projetos"), items: ["node", "codigo"] },
   { id: "ambiente", label: t("Ambiente"), items: ["ambiente", "depuracao"] },
   { id: "agentes", label: t("Agentes"), items: ["agentes", "prompts", "agentes-uso", "agentes-branches", "agentes-historico"] },
   { id: "organizar", label: t("Organizar"), items: ["tasks", "notes", "tags", "index"] },
-  { id: "ajuda", label: "", title: t("Ajuda e ajustes"), items: ["ajuda", "config"] },
 ];
 export const navById = Object.fromEntries([...NAV, ...AGENT_NAV, ...HELP_NAV].map((n) => [n.id, n]));
 // Lerd does not run directly on Windows: no item for it there

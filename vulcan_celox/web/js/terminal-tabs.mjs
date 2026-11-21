@@ -37,6 +37,7 @@ export function renderTabs(ws) {
         ${icon(!live ? "clock" : popped ? "external" : "terminal")}
         <span class="tab-label">${esc(title)}</span>${where}
         ${live && live.alive && live.info.long_running ? `<span class="tab-long" title="${t("Processo longo: {command}", { command: esc(live.info.command) })}">${t("longo")}</span>` : ""}
+        ${live && !live.alive ? `<span class="tab-long">${t("Encerrado")}</span>` : ""}
         ${live && i < 9 && !isNative ? `<kbd class="tab-kbd">${isMac ? "⌘" : "Ctrl+⇧+"}${i + 1}</kbd>` : ""}
         <button class="tab-close" data-action="close" data-id="${id}" aria-label="${live ? t("Fechar terminal") : t("Tirar da barra")}"
           title="${live ? t("Fechar terminal e salvar a memória") : t("Tirar da barra (a memória continua salva)")}">${icon("x")}</button>

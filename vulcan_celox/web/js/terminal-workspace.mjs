@@ -177,6 +177,7 @@ export class TerminalWorkspace {
   reveal(id, mode, focus = null) {
     if (MODES.includes(mode)) this.mode = mode;
     if (id) {
+      if (this.splitId === id) this.splitId = this.activeId;
       this.activeId = id;
       if (!this.isLive(id)) {
         this.requestedId = id;

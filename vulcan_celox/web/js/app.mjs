@@ -336,7 +336,7 @@ function boot() {
   bindGlobalEvents();
   bindServerDown();
   const explicit = Boolean(location.hash && location.hash !== "#" && location.hash !== "#/");
-  terminals.sync().then(() => { if (app.panel) app.panel.collapseIfEmpty(); }).catch(reportError);
+  terminals.watch().then(() => { if (app.panel) app.panel.collapseIfEmpty(); });
   refreshState().then(async () => {
     if (!explicit && app.state) navigate(await initialRoute(app.state), { replace: true });
     else route();

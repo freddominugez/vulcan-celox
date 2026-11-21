@@ -51,7 +51,19 @@ export function bindGlobalEvents() {
     if (item) palette.run(Number(item.dataset.index));
   });
 
-  app.tree = new SessionTree($("#side-sessions"), { navigate, route: () => app.route });
+  app.tree = new SessionTree($("#side-terminals"), {
+    navigate, route: () => app.route,
+    openTerminal: (id, hash) => {
+      if (!terminals.get(id)?.alive) return;
+      clearTab(id);
+      if (terminals.popped.has(id)) {
+        terminals.focusPopout(id);
+        return;
+      }
+      navigate(hash);
+      if (app.view?.workspace?.activeId === id) terminals.get(id)?.focus();
+    },
+  });
   $("#nav").addEventListener("click", (event) => {
     const head = event.target.closest("[data-nav-group]");
     if (!head) return;

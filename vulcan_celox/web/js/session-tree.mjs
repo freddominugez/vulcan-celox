@@ -2,8 +2,11 @@
 // Clicking a node opens the session (or the item) in the right-hand area.
 
 import { confirmDialog } from "./ai.mjs";
+import { labelFor } from "./attention-state.mjs";
+import { isHidden } from "./sidebar-prefs.mjs";
+import { isRail } from "./sidebar-rail.mjs";
 import { del, get, patch, post } from "./api.mjs";
-import { esc, icon, reportError, toast } from "./dom.mjs";
+import { esc, icon, reportError, shortPath, toast } from "./dom.mjs";
 import { syncPorts } from "./terminal-ports.mjs";
 import { sessionHash, terminals } from "./terminal-pool.mjs";
 import { editTerminalIdentity } from "./terminal-identity.mjs";
@@ -12,7 +15,8 @@ import { agentMark } from "./agents-ui.mjs";
 import { t } from "./i18n.mjs";
 
 const STORAGE_KEY = "vulcan-tree-open";
-const DEFAULT_OPEN = ["section:sessions", "section:sites", "group:open", "group:closed"];
+const DEFAULT_OPEN = ["section:sites", "group:open"];
+const MAX_CLOSED = 200;
 const PAGE = 30;
 const WEEKDAYS = [t("dom"), t("seg"), t("ter"), t("qua"), t("qui"), t("sex"), t("sáb")];
 
@@ -35,7 +39,8 @@ function dayLabel(key) {
 function loadExpanded() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return new Set(raw ? JSON.parse(raw) : DEFAULT_OPEN);
+    const saved = raw && JSON.parse(raw);
+    return new Set(Array.isArray(saved) && saved.every((value) => typeof value === "string") ? saved : DEFAULT_OPEN);
   } catch {
     return new Set(DEFAULT_OPEN);
   }
@@ -50,7 +55,9 @@ export class SessionTree {
     this.data = null;
     window.addEventListener("vulcan-note-changed", () => this.load());
     window.addEventListener("vulcan-sessions-changed", () => this.load());
-    this.signature = "";
+    this.head = root.querySelector("#side-terminal-head");
+    this.body = root.querySelector("#side-sessions");
+    this.generation = 0;
     this.closedLimit = PAGE;
     this.root.addEventListener("click", (e) => this.onClick(e));
     this.root.addEventListener("contextmenu", (e) => {
@@ -83,8 +90,11 @@ export class SessionTree {
   }
 
   async load() {
+    const generation = ++this.generation;
     try {
-      this.data = await get(`/api/sessions/tree?closed=${this.closedLimit}`);
+      const data = await get(`/api/sessions/tree?closed=${this.closedLimit}`);
+      if (generation !== this.generation) return;
+      this.data = data;
       this.render();
       syncPorts();
     } catch {
@@ -93,37 +103,51 @@ export class SessionTree {
   }
 
   render(force = false) {
-    if (!this.data) return;
     const route = this.options.route();
     const active = route.session || "";
-    const signature = JSON.stringify([this.data, [...this.expanded], active]);
-    if (!force && signature === this.signature) return;
-    this.signature = signature;
-    const { open, closed, closed_total: closedTotal } = this.data;
-    const sectionOpen = this.isOpen("section:sessions");
-    this.root.innerHTML = `
-      <button class="side-heading side-toggle" data-toggle="section:sessions" aria-expanded="${sectionOpen}">
-        ${icon("chevron-right", "side-chevron")}<span>${t("Sessões")}</span><span class="side-heading-count">${open.length + closedTotal || ""}</span>
-      </button>
-      ${sectionOpen ? `<div class="tree" role="tree" aria-label="${t("Sessões de terminal")}">
-        ${this.groupHtml("open", t("Abertas"), open, open.length, active)}
-        ${this.historyHtml(closed, closedTotal, active)}
-      </div>` : ""}`;
+    const section = !isHidden("section-sessions");
+    const link = !isHidden("terminals");
+    const rail = isRail();
+    const expanded = this.isOpen("group:open");
+    const live = terminals.live();
+    const headLink = link ? `<a class="nav-item ${route.name === "terminals" ? "is-on" : ""}" href="#/terminals"
+      title="${t("Terminais")}" ${route.name === "terminals" ? 'aria-current="page"' : ""}>${icon("terminal")}<span>${t("Terminais")}</span></a>` : "";
+    const groupLabel = link ? "" : t("Terminais abertos");
+    this.paint(this.head, headLink + (section ? `<button class="side-heading side-toggle" data-toggle="group:open"
+      aria-expanded="${expanded}" aria-controls="side-live" aria-label="${t("Terminais abertos")}" title="${t("Terminais abertos")}">
+      ${icon("chevron-right", "side-chevron")}<span>${groupLabel}</span><span class="side-heading-count">${live.length}</span></button>` : ""), force);
+
+    const records = new Map((this.data?.open || []).map((s) => [s.id, s]));
+    const { closed = [], closed_total: total = 0 } = this.data || {};
+    const rows = live.map(({ info }) => {
+      const record = records.get(info.id);
+      return this.sessionHtml({
+        task_list: [], note_list: [], tags: [], tasks: {}, ...record, ...info, open: true,
+      }, active);
+    }).join("");
+    this.paint(this.body, section ? `
+      <section id="side-live" aria-label="${t("Terminais abertos")}" ${expanded || rail ? "" : "hidden"}>
+        <div class="tree">${rows || `<div class="tree-empty">${t("Nenhum terminal aberto")}</div>`}</div>
+      </section>
+      ${terminals.stale ? `<div class="tree-empty" role="status">${t("Lista de terminais desatualizada.")}</div>` : ""}
+      <section class="tree" aria-label="${t("Histórico")}">${this.historyHtml(closed, total, active)}</section>` : "", force);
+    syncPorts();
   }
 
-  groupHtml(key, label, sessions, total, active) {
-    const groupKey = `group:${key}`;
-    const expanded = this.isOpen(groupKey);
-    const body = sessions.length
-      ? sessions.map((s) => this.sessionHtml(s, active)).join("")
-      : `<div class="tree-empty">${t("Nenhum terminal aberto.")}</div>`;
-    return `
-      <div class="tree-group" role="group">
-        <button class="tree-group-head" data-toggle="${groupKey}" aria-expanded="${expanded}">
-          ${icon("chevron-right", "side-chevron")}<span>${label}</span><span class="tree-count">${total || ""}</span>
-        </button>
-        ${expanded ? `<div class="tree-group-body">${body}</div>` : ""}
-      </div>`;
+  paint(host, html, force) {
+    if (!force && host.markup === html) return;
+    const old = document.activeElement;
+    const had = host.contains(old);
+    const row = had && old.closest("[data-id]");
+    const attrs = ["data-toggle", "data-menu", "data-identity", "data-port", "href", "data-action"];
+    const attr = had && attrs.find((key) => old.hasAttribute(key));
+    host.innerHTML = html;
+    host.markup = html;
+    if (!had) return;
+    const scope = row ? host.querySelector(`[data-id="${CSS.escape(row.dataset.id)}"]`) : host;
+    const next = attr && scope?.querySelector(`[${attr}="${CSS.escape(old.getAttribute(attr))}"]`);
+    if (next) next.focus({ preventScroll: true });
+    else this.head.querySelector("[data-toggle], a")?.focus({ preventScroll: true });
   }
 
   /** Histórico folder: closed sessions in per-day subfolders (the most recent open by default). */
@@ -147,7 +171,8 @@ export class SessionTree {
         </div>`;
     }).join("");
     const body = closed.length
-      ? folders + (total > closed.length ? `<button class="tree-more" data-action="more">${t("Carregar mais ({n})", { n: total - closed.length })}</button>` : "")
+      ? folders + (total > closed.length && closed.length < MAX_CLOSED ? `<button class="tree-more" data-action="more">${t("Carregar mais ({n})", { n: total - closed.length })}</button>` : "")
+        + (closed.length >= MAX_CLOSED ? `<a class="tree-more" href="#/index">${t("Consultar mais sessões no Índice")}</a>` : "")
       : `<div class="tree-empty">${t("Ao fechar um terminal ele aparece aqui, com a memória do que foi feito.")}</div>`;
     return `
       <div class="tree-group tree-history" role="group">
@@ -163,20 +188,24 @@ export class SessionTree {
     const expanded = this.isOpen(key);
     const items = s.task_list.length + s.note_list.length + s.tags.length;
     const progress = s.tasks.total ? `<span class="tree-meta">${s.tasks.done}/${s.tasks.total}</span>` : "";
-    const where = s.site || "Global";
+    const where = s.open && s.cwd ? shortPath(s.cwd) : s.site || "Global";
+    const attention = s.open ? labelFor(s.id) : "";
+    const popped = s.open && terminals.popped.has(s.id);
     return `
-      <div class="tree-node ${s.id === active ? "is-on" : ""} ${s.open ? "is-open" : "is-closed"} ${s.tab_color || s.theme ? `has-theme t-${esc(s.tab_color || s.theme)}` : ""}" data-id="${s.id}" role="treeitem" aria-expanded="${expanded}">
+      <div class="tree-node ${s.id === active ? "is-on" : ""} ${s.open ? "is-open" : "is-closed"} ${s.tab_color || s.theme ? `has-theme t-${esc(s.tab_color || s.theme)}` : ""}" data-id="${s.id}" role="${s.open ? "group" : "treeitem"}" aria-expanded="${expanded}">
         <div class="tree-row">
           <button class="tree-twisty" data-toggle="${key}" aria-expanded="${expanded && items > 0}" aria-label="${expanded ? t("Recolher {title}", { title: esc(s.title) }) : t("Expandir {title}", { title: esc(s.title) })}" ${items ? "" : "disabled"}>
             ${items ? icon("chevron-right", "side-chevron") : ""}</button>
-          <a class="tree-link" href="${sessionHash(s)}" title="${esc(`${s.title} · ${where}${s.has_doc ? ` · ${t("documentada")}` : ""}`)}">
-            ${icon(s.open ? "terminal" : "clock")}
+          <a class="tree-link" href="${sessionHash(s, "terminal", s.open ? "" : "historico")}" ${s.open ? `data-live="${s.id}"` : ""} ${s.id === active ? 'aria-current="true"' : ""} title="${esc(`${s.title} · ${where}${s.has_doc ? ` · ${t("documentada")}` : ""}`)}">
+            ${icon(popped ? "external" : s.open ? "terminal" : "clock")}
             <span class="tree-title">${esc(s.title)}</span>
             <span class="tree-site">${esc(where)}</span>
             ${(s.agents || []).length ? `<span class="tree-agents" title="${t("Sessões de agente pareadas")}">${[...new Set(s.agents.map((a) => a.agent))].map(agentMark).join("")}</span>` : ""}
             ${s.has_doc ? `<span class="tree-doc" title="${t("Tem documentação")}">${icon("book")}</span>` : ""}
+            ${attention ? `<span class="dot dot-ok" title="${esc(attention)}" aria-label="${esc(attention)}"></span>` : ""}
             ${progress}
           </a>
+          ${s.open ? `<button class="tree-menu-btn live-identity" data-identity="${s.id}" aria-label="${t("Nome e cor da aba")} · ${esc(s.title)}" title="${t("Nome e cor da aba")}">${icon("edit")}</button>` : ""}
           <button class="tree-menu-btn" data-menu="${s.id}" aria-label="${t("Opções da sessão {title}", { title: esc(s.title) })}" title="${t("Opções")}">${icon("dots")}</button>
         </div>
         ${expanded && items ? `<div class="tree-children">
@@ -191,7 +220,10 @@ export class SessionTree {
 
   // ── session options ──────────────────────────────────────────────────
   findSession(id) {
-    return this.data ? [...this.data.open, ...this.data.closed].find((s) => s.id === id) : null;
+    const live = terminals.get(id);
+    const record = this.data && [...this.data.open, ...this.data.closed].find((s) => s.id === id);
+    if (live?.alive) return { task_list: [], note_list: [], ...record, ...live.info, open: true };
+    return record;
   }
 
   openMenu(id, x, y) {
@@ -203,7 +235,7 @@ export class SessionTree {
     menu.setAttribute("role", "menu");
     menu.innerHTML = `
       <div class="tree-menu-head">${esc(s.title)}</div>
-      <button role="menuitem" data-op="${s.open ? "identity" : "rename"}">${icon("edit")}<span>${s.open ? t("Nome e cor da aba") : t("Renomear")}</span></button>
+      ${s.open ? "" : `<button role="menuitem" data-op="rename">${icon("edit")}<span>${t("Renomear")}</span></button>`}
       <button role="menuitem" data-op="note">${icon("note")}<span>${t("Adicionar post-it")}</span></button>
       <button role="menuitem" data-op="task">${icon("check-square")}<span>${t("Adicionar tarefa")}</span></button>
       <div class="tree-menu-sep"></div>
@@ -229,10 +261,6 @@ export class SessionTree {
 
   async runOp(op, s) {
     try {
-      if (op === "identity") {
-        const trigger = this.root.querySelector(`[data-menu="${CSS.escape(s.id)}"]`);
-        return await editTerminalIdentity(s.id, trigger);
-      }
       if (op === "rename") return this.rename(s);
       if (op === "note") {
         const note = await post("/api/notes", { terminal: s.id, text: "" });
@@ -267,15 +295,14 @@ export class SessionTree {
       const title = input.value.trim();
       if (save && title && title !== s.title) {
         try {
-          if (terminals.get(s.id)) await terminals.rename(s.id, title);
-          else await patch(`/api/sessions/${s.id}`, { title });
+          await patch(`/api/sessions/${s.id}`, { title });
           toast(t("Sessão renomeada para “{title}”.", { title }), { kind: "ok" });
           window.dispatchEvent(new CustomEvent("vulcan-sessions-changed"));
         } catch (err) {
           reportError(err);
         }
       }
-      this.signature = "";
+      this.body.markup = null;
       await this.load();
     };
     input.addEventListener("keydown", (e) => {
@@ -313,6 +340,11 @@ export class SessionTree {
   }
 
   onClick(event) {
+    const identity = event.target.closest("[data-identity]");
+    if (identity) {
+      editTerminalIdentity(identity.dataset.identity, identity).catch(reportError);
+      return;
+    }
     const menuBtn = event.target.closest("[data-menu]");
     if (menuBtn) {
       event.preventDefault();
@@ -321,7 +353,7 @@ export class SessionTree {
       return;
     }
     if (event.target.closest("[data-action='more']")) {
-      this.closedLimit += PAGE;
+      this.closedLimit = Math.min(MAX_CLOSED, this.closedLimit + PAGE);
       this.load();
       return;
     }
@@ -330,6 +362,7 @@ export class SessionTree {
       event.preventDefault();
       this.toggle(toggle.dataset.toggle);
       this.render(true);
+      this.root.querySelector(`[data-toggle="${CSS.escape(toggle.dataset.toggle)}"]`)?.focus({ preventScroll: true });
       return;
     }
     const note = event.target.closest("[data-note]");
@@ -343,6 +376,10 @@ export class SessionTree {
       // opening a session also shows its items
       const id = link.closest(".tree-node").querySelector("[data-toggle^='s:']").dataset.toggle;
       if (!this.isOpen(id)) this.toggle(id);
+      if (link.dataset.live && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+        event.preventDefault();
+        this.options.openTerminal(link.dataset.live, link.hash);
+      }
     }
   }
 }

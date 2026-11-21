@@ -1823,5 +1823,10 @@
 "último commit verde: <span class=\"mono\">{value}</span>": "last green commit: <span class=\"mono\">{value}</span>",
 "“{title}” ainda está rodando {processes}.": "“{title}” is still running {processes}.",
 "⋮⋮ arrastar · ☆ fixar · ● cor · salva sozinho": "⋮⋮ drag · ☆ pin · ● color · saves itself",
-"⌘T abre um terminal; as tarefas e notas dele viram memória em Markdown.": "⌘T opens a terminal; its tasks and notes become Markdown memory."
+"⌘T abre um terminal; as tarefas e notas dele viram memória em Markdown.": "⌘T opens a terminal; its tasks and notes become Markdown memory.",
+"Terminais abertos": "Open terminals",
+"Lista de terminais desatualizada.": "Terminal list is out of date.",
+"Consultar mais sessões no Índice": "Find more sessions in the Index",
+"Encerrado": "Ended",
+"Se a janela não vier para frente, selecione a janela destacada.": "If the window does not come to the front, select the detached window."
 }

@@ -7,7 +7,8 @@ import { themes, loadThemes } from "./themes.mjs";
 export async function editTerminalIdentity(id, trigger) {
   await loadThemes();
   const terminal = terminals.get(id);
-  if (!terminal || document.getElementById("terminal-identity")) return;
+  if (document.getElementById("terminal-identity")) return;
+  if (!terminal?.alive) throw new Error(t("Terminal encerrado"));
   const { title, tab_color: color } = terminal.info;
   const dialog = document.createElement("dialog");
   dialog.className = "dialog session-dialog";
@@ -45,7 +46,8 @@ export async function editTerminalIdentity(id, trigger) {
   dialog.addEventListener("close", () => {
     dialog.remove();
     if (trigger?.isConnected) trigger.focus();
-    else document.querySelector(`.tab[data-id="${CSS.escape(id)}"]`)?.focus();
+    else (document.querySelector(`[data-identity="${CSS.escape(id)}"], .tab[data-id="${CSS.escape(id)}"]`)
+      || document.querySelector("#side-terminal-head a, #side-collapse"))?.focus({ preventScroll: true });
   });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -61,7 +63,7 @@ export async function editTerminalIdentity(id, trigger) {
       await terminals.updateIdentity(id, { title: nextTitle, tab_color: form.elements.color.value || null });
       dialog.close();
     } catch (err) {
-      error.textContent = t(err.message);
+      error.textContent = err.status === 409 || err.status === 404 ? t("Terminal encerrado") : t(err.message);
       error.hidden = false;
     } finally {
       save.disabled = cancel.disabled = false;

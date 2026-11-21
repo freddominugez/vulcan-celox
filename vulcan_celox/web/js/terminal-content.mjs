@@ -32,8 +32,8 @@ export function renderContent(ws) {
   const record = ws.records.get(id);
   if (ws.mode === "terminal") {
     destroyChild(ws);
-    ws.resizeObserver.disconnect();
     if (live && !ws.isHistory(id)) return renderPanes(ws);
+    ws.resizeObserver.disconnect();
     if (id && record) return renderMemory(ws, record);
     if (id && !record) {
       ws.body.innerHTML = `<div class="loading"><span class="skeleton w-40"></span><span class="skeleton w-70"></span></div>`;
@@ -77,8 +77,14 @@ export function renderContent(ws) {
 }
 
 function renderPanes(ws) {
+  const key = JSON.stringify([ws.activeId, ws.splitId, [ws.activeId, ws.splitId].map((id) =>
+    terminals.popped.has(id) ? terminals.get(id)?.info.title : terminals.get(id)?.info.theme)]);
+  const existing = ws.body.firstElementChild;
+  if (existing?.classList.contains("panes") && existing.paneKey === key) return;
+  ws.resizeObserver.disconnect();
   ws.body.innerHTML = `<div class="panes ${ws.splitId ? "is-split" : ""}"></div>`;
   const panes = $(".panes", ws.body);
+  panes.paneKey = key;
   const order = ws.tabIds();
   const shownIds = [ws.activeId, ws.splitId].filter(Boolean).sort((a, b) => order.indexOf(a) - order.indexOf(b));
   for (const id of shownIds) {

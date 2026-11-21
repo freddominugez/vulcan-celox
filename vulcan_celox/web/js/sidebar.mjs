@@ -1,7 +1,7 @@
 // Sidebar; split out of app.mjs.
 
 import { attentionCount } from "./attention-state.mjs";
-import { NAV_GROUPS, SIDE_SECTIONS, app, lerdUnavailable, navById } from "./app-state.mjs";
+import { HELP_NAV, NAV_GROUPS, SIDE_SECTIONS, app, lerdUnavailable, navById } from "./app-state.mjs";
 import { $, esc, icon } from "./dom.mjs";
 import { t } from "./i18n.mjs";
 import { isHidden } from "./sidebar-prefs.mjs";
@@ -11,6 +11,7 @@ import { terminals } from "./terminals.mjs";
 window.addEventListener("vulcan-attention", () => {
   const badge = document.querySelector("[data-attention-count]");
   if (!badge || Number(badge.dataset.attentionCount) !== attentionCount()) renderSidebar();
+  else app.tree?.render();
 });
 window.addEventListener("vulcan-sidebar", () => renderSidebar());
 
@@ -20,7 +21,6 @@ const envStarting = (state) => Boolean(state.autostart && ["starting", "checking
 export function renderSidebar() {
   const state = app.state;
   const counts = {
-    terminals: terminals.list().length,
     agentes: attentionCount(),
     tasks: state ? state.progress.overall.total - state.progress.overall.done : 0,
   };
@@ -55,9 +55,17 @@ export function renderSidebar() {
         ${icon("chevron-right", "side-chevron")}<span>${esc(g.label)}</span></button>` : ""}
       ${shown.map(navItem).join("")}</div>`;
   }).join("");
+  const footer = $("#side-footer");
+  const footerHtml = HELP_NAV.filter((n) => n.locked || !isHidden(n.id)).map(navItem).join("");
+  if (footer.dataset.html !== footerHtml) {
+    const activeId = footer.contains(document.activeElement) && document.activeElement.hash;
+    footer.innerHTML = footerHtml;
+    footer.dataset.html = footerHtml;
+    if (activeId) [...footer.querySelectorAll("a")].find((a) => a.hash === activeId)?.focus({ preventScroll: true });
+  }
   if (refocus) {
     const again = nav.querySelector(refocus);
-    if (again) again.focus();
+    if (again) again.focus({ preventScroll: true });
   }
   SIDE_SECTIONS.forEach((section) => { $(section.el).hidden = isHidden(section.id); });
 
