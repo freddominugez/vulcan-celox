@@ -346,3 +346,40 @@ step "atalhos do painel: ⌘J sem painel avisa, ⇧⌘D destaca no painel de bai
 ATALHOS_ROOT="$(cd "$TMP_ROOT/explorer-atalhos/proj" && pwd -P)"
 isolated_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/atalhos.png" --route "#/overview" --wait 14 \
   --eval "$UNHIDE_JS window.__ROOT = '$ATALHOS_ROOT'; $(cat tests/tools/sensor_atalhos.js)"
+
+step "Terminais e Codex: rascunho, destino por ID, zero bytes e foco"
+# PTY fixture copied to an executable named exactly codex (procinfo recognizes the agent by that name), in a Git repository
+# of its own. The site variants get their own simulated Lerd, stopped with an explicit kill: no trap here, the cleanup
+# EXIT trap of validate.sh stays the only one.
+codex_fixture() {
+  mkdir -p "$1/projeto"
+  git -C "$1/projeto" init -q
+  printf 'linha antiga\n' > "$1/projeto/leia.txt"
+  git -C "$1/projeto" add leia.txt
+  git -C "$1/projeto" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm base
+  cp tests/tools/fixture_codex.py "$1/codex"
+  chmod +x "$1/codex"
+}
+for combo in "1440x900 pt claro global" "900x500 en escuro site" "900x480 es claro cross"; do
+  set -- $combo
+  codex_dir="$TMP_ROOT/codex-$4"
+  codex_fixture "$codex_dir"
+  codex_root="$(cd "$codex_dir/projeto" && pwd -P)"
+  codex_exe="$(cd "$codex_dir" && pwd -P)/codex"
+  codex_site=null; codex_cross=false; codex_lerd_bin="$TMP_ROOT/sem-lerd"; codex_lerd_api="http://127.0.0.1:1"; CODEX_LERD_PID=""
+  if [ "$4" != global ]; then
+    "$PY" -I tests/tools/fake_lerd_api.py --site-path "loja=$codex_root" > "$codex_dir/lerd.port" 2> "$codex_dir/lerd.err" &
+    CODEX_LERD_PID=$!
+    for _ in $(seq 1 100); do [ -s "$codex_dir/lerd.port" ] && break; sleep 0.3; done
+    [ -s "$codex_dir/lerd.port" ] || { echo "a API simulada do Lerd não anunciou a porta"; cat "$codex_dir/lerd.err"; kill "$CODEX_LERD_PID" 2>/dev/null; exit 1; }
+    codex_site='"loja"'; codex_lerd_bin="$ROOT/tests/tools/fake-lerd"; codex_lerd_api="http://127.0.0.1:$(head -n 1 "$codex_dir/lerd.port")"
+  fi
+  [ "$4" = cross ] && codex_cross=true
+  codex_ok=0
+  SENSOR_LANGUAGE="$2" isolated_env SHELL=/bin/sh VULCAN_LERD_BIN="$codex_lerd_bin" VULCAN_LERD_API="$codex_lerd_api" \
+    "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$TMP_ROOT/codex-$1-$2-$4.png" --size "$1" --route "#/terminals" --wait 27 \
+    --eval "window.__fixture = { root: '$codex_root', executable: '$codex_exe', site: $codex_site, theme: '$3', cross: $codex_cross, label: '$1-$2-$4' }; $(cat tests/tools/sensor_terminais_codex.js)" \
+    || codex_ok=$?
+  if [ -n "$CODEX_LERD_PID" ]; then kill "$CODEX_LERD_PID" 2>/dev/null || true; wait "$CODEX_LERD_PID" 2>/dev/null || true; fi
+  [ "$codex_ok" -eq 0 ] || { echo "falhou: Terminais e Codex em $1 $2 $3 $4 (saída $codex_ok)"; exit 1; }
+done
