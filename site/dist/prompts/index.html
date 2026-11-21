@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompts para Claude Code e Codex | Vulcan Celox</title>
+<meta name="description" content="Copie modelos para retomar uma sessão, revisar uma mudança, investigar um teste e preparar o handoff de um projeto.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://celox.byvulcan.com/prompts/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Vulcan Celox">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Prompts para Claude Code e Codex | Vulcan Celox">
+<meta property="og:description" content="Copie modelos para retomar uma sessão, revisar uma mudança, investigar um teste e preparar o handoff de um projeto.">
+<meta property="og:url" content="https://celox.byvulcan.com/prompts/">
+<meta property="og:image" content="https://celox.byvulcan.com/assets/screens/overview-pt.png">
+<meta property="og:image:width" content="1800">
+<meta property="og:image:height" content="1145">
+<meta property="og:image:alt" content="Projetos e sessões no Vulcan Celox">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Prompts para Claude Code e Codex | Vulcan Celox">
+<meta name="twitter:description" content="Copie modelos para retomar uma sessão, revisar uma mudança, investigar um teste e preparar o handoff de um projeto.">
+<meta name="twitter:image" content="https://celox.byvulcan.com/assets/screens/overview-pt.png">
+<meta name="twitter:image:alt" content="Projetos e sessões no Vulcan Celox">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Vulcan Celox", "item": "https://celox.byvulcan.com/"}, {"@type": "ListItem", "position": 2, "name": "Biblioteca", "item": "https://celox.byvulcan.com/recursos/"}, {"@type": "ListItem", "position": 3, "name": "Prompts para Claude Code e Codex", "item": "https://celox.byvulcan.com/prompts/"}]}]}</script>
+<link rel="icon" type="image/png" href="/assets/brand/favicon.png">
+<link rel="stylesheet" href="/assets/editorial.css">
+<script src="/assets/editorial.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="top">
+  <div class="top-inner wrap">
+    <a class="brand" href="/"><img src="/assets/brand/logo-primary.svg" width="175" height="40" alt="Vulcan Celox"></a>
+    <nav class="nav" aria-label="Navegação principal"><a href="/recursos/">Recursos</a><a href="/guias/claude-code-e-codex-no-mac/">Guias</a><a href="/artigos/contexto-memoria-e-prompts-para-agentes/">Artigos</a><a href="/prompts/" aria-current=page>Prompts</a><a href="/repositorios/">GitHub</a><a href="/radar/">Radar Harpya</a></nav>
+    <a class="button small header-download" href="/guias/instalar-vulcan-celox-no-macos/">Baixar para Mac</a>
+  </div>
+</header>
+<nav class="wrap breadcrumb" aria-label="Navegação estrutural"><a href="/recursos/">Biblioteca</a><span aria-hidden="true">/</span><span>Prompts</span></nav>
+<main id="conteudo"><header class="wrap page-heading"><p class="kicker">Prompts</p><h1>Prompts para Claude Code e Codex</h1><p class="lead">Copie modelos para retomar uma sessão, revisar uma mudança, investigar um teste e preparar o handoff de um projeto.</p></header>
+<div class="wrap">
+<p class="intro-strip">No Celox, salve o Markdown em <code>.vulcan/prompts/</code> no projeto. Ao escolher uma sessão, preencha ou confira as variáveis. O compositor cola o texto no terminal pareado e você decide quando enviar. Fora do Celox, substitua os campos entre chaves antes de usar.</p>
+<nav class="jump-links" aria-label="Modelos de prompt"><a href="#retomar">Retomar uma sessão</a><a href="#revisar">Revisar antes do PR</a><a href="#investigar">Investigar um teste que falhou</a><a href="#handoff">Preparar o handoff</a></nav>
+<div class="prompt-grid"><article class="prompt-card" id="retomar">
+<p class="kicker">Sessões</p><h2>Retomar uma sessão</h2><p>Para voltar a uma tarefa sem perder o ponto em que ela parou.</p>
+<pre><code id="prompt-retomar">Projeto {{projectName}}, branch {{branch}}.
+Leia o resumo anterior, o diff local e os testes citados na sessão.
+Separe fatos confirmados de hipóteses e cite arquivos ou resultados.
+Entregue objetivo, última evidência, pendência e o próximo passo.
+Nesta etapa, trabalhe em leitura e apresente o plano antes de editar.</code></pre>
+<div class="links"><button type="button" class="button small copy" data-copy="prompt-retomar">Copiar prompt</button>
+<a href="/prompts/arquivos/retomar.md" download>Baixar Markdown</a><a href="/artigos/contexto-memoria-e-prompts-para-agentes/#exemplo">Ver exemplo relacionado</a><span class="copy-status" role="status"></span></div>
+</article><article class="prompt-card" id="revisar">
+<p class="kicker">Git</p><h2>Revisar antes do PR</h2><p>Para conferir uma alteração antes de enviar ou integrar.</p>
+<pre><code id="prompt-revisar">Revise as mudanças do branch {{branch}} em {{projectName}}.
+Liste possíveis regressões e caminhos afetados, em ordem de gravidade.
+Para cada achado, cite o arquivo, o cenário e o teste que deve cobri-lo.
+Informe os testes já executados e a saída esperada dos que faltam.
+Pare após a revisão. Qualquer commit, push ou merge depende de autorização.</code></pre>
+<div class="links"><button type="button" class="button small copy" data-copy="prompt-revisar">Copiar prompt</button>
+<a href="/prompts/arquivos/revisar.md" download>Baixar Markdown</a><a href="/artigos/acompanhar-branches-commits-e-prs/">Ver exemplo relacionado</a><span class="copy-status" role="status"></span></div>
+</article><article class="prompt-card" id="investigar">
+<p class="kicker">Testes</p><h2>Investigar um teste que falhou</h2><p>Para transformar um erro em uma hipótese verificável.</p>
+<pre><code id="prompt-investigar">No projeto {{projectName}}, examine o teste que falhou neste terminal.
+Registre entrada, resultado esperado e resultado observado, sem expor dados privados.
+Identifique a menor reprodução que distingue as hipóteses.
+Execute apenas verificações autorizadas no workspace. Relate comando e resultado.
+Ao final, proponha a próxima mudança e o teste que a confirmaria.</code></pre>
+<div class="links"><button type="button" class="button small copy" data-copy="prompt-investigar">Copiar prompt</button>
+<a href="/prompts/arquivos/investigar.md" download>Baixar Markdown</a><a href="/guias/claude-code-e-codex-no-mac/">Ver exemplo relacionado</a><span class="copy-status" role="status"></span></div>
+</article><article class="prompt-card" id="handoff">
+<p class="kicker">Sessões</p><h2>Preparar o handoff</h2><p>Para que outra sessão consiga continuar com a mesma evidência.</p>
+<pre><code id="prompt-handoff">Resuma o trabalho de {{projectName}} no branch {{branch}}.
+Inclua objetivo, alterações por arquivo, comandos de teste, evidências e pendências.
+Identifique o último commit conferido e o estado de push ou PR, com link se disponível.
+Destaque decisões ainda abertas e indique a próxima verificação.
+Use caminhos relativos e omita dados privados e credenciais.</code></pre>
+<div class="links"><button type="button" class="button small copy" data-copy="prompt-handoff">Copiar prompt</button>
+<a href="/prompts/arquivos/handoff.md" download>Baixar Markdown</a><a href="/artigos/acompanhar-branches-commits-e-prs/">Ver exemplo relacionado</a><span class="copy-status" role="status"></span></div>
+</article></div>
+<p class="standalone-link"><a href="https://github.com/freddominugez/vulcan-celox/blob/main/docs/pt-BR/user-guide.md#prompts">Ler a documentação de prompts do Celox</a></p>
+</div></main>
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <a href="/recursos/">Biblioteca Celox</a><a href="/">Site oficial</a><a href="https://github.com/freddominugez/vulcan-celox">Código e manual</a><a href="https://www.harpya.org/">Harpya</a>
+  </div>
+</footer>
+</body>
+</html>

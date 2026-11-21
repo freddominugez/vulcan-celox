@@ -5,6 +5,16 @@
   "installCommand": "",
   "outputDirectory": "dist",
   "trailingSlash": true,
+  "headers": [
+    {
+      "source": "/prompts/arquivos/:file(.*\\.md)",
+      "headers": [
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" },
+        { "key": "Content-Disposition", "value": "attachment" },
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    }
+  ],
   "redirects": [
     {
       "source": "/pt-br/",

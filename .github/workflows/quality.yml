@@ -21,6 +21,13 @@ jobs:
       # development tools only: the app itself still installs nothing
       - run: pip install ruff==0.8.6
       - run: ruff check .
+      - name: Build and verify the website
+        run: |
+          python3 site/build.py
+          python3 site/check.py
+          node --check site/dist/assets/site.js
+          node --check site/dist/assets/editorial.js
+          git diff --exit-code -- site/dist
       - name: Shell scripts
         run: git ls-files '*.sh' packaging/linux/vulcan-celox packaging/linux/vulcan-celox-deps | xargs shellcheck --severity=error
   coverage:
