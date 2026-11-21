@@ -19,7 +19,7 @@ The origin in `settings.json` is `https://celox.byvulcan.com`. Brazilian Portugu
 
 ## Content library
 
-The landing pages link to `/recursos/`. The guides, articles, prompts, GitHub directory and Harpya radar are maintained in `biblioteca/`. All pages are built as static HTML. Prompt downloads are served as Markdown under `/prompts/arquivos/`; the sitemap lists the library pages.
+The landing pages link to `/recursos/`. The guides, articles, prompts, GitHub directory and Harpya radar are maintained in `biblioteca/`. All pages are built as static HTML, and the sitemap lists the library pages. Prompt downloads are served as Markdown under `/prompts/arquivos/`.
 
 The documented Harpya references come from a checked-in copy of its public RSS. The normal build works offline. To refresh the selected references, run `python3 build.py --atualizar-harpya`, review changes to `biblioteca/harpya-rss.json` and the generated pages, then commit both. Adding a new reference requires reviewing the original and adding its URL and practical context to `FEED_TOPICS`.
 
