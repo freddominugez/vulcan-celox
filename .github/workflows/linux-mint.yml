@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Existing Linux test sensor (Python 3.9)
         run: bash scripts/test_linux.sh
       - name: Build Linux packages
@@ -36,7 +36,7 @@ jobs:
           tar xzf vulcan-celox-*-linux.tar.gz -C "$RUNNER_TEMP"
           PREFIX="$RUNNER_TEMP/vulcan-prefix" sh "$RUNNER_TEMP"/vulcan-celox-*/install.sh --sem-dependencias
           VULCAN_CELOX_HOME="$RUNNER_TEMP/vulcan-tar-home" "$RUNNER_TEMP/vulcan-prefix/bin/vulcan-celox" --check
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: vulcan-celox-linux-mint
           path: executaveis/linux/
