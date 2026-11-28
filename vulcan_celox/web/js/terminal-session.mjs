@@ -93,7 +93,7 @@ export class Session {
   }
 
   connect() {
-    if (this.ws) return;
+    if (this.ws || this.disposed || (!this.alive && this.opened && this.retry)) return;
     this.term.reset();
     const ws = new WebSocket(wsUrl(`/ws/terminals/${this.info.id}`));
     ws.binaryType = "arraybuffer";

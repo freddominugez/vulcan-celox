@@ -10,10 +10,13 @@ const SLOWEST = 15000;
 const MAX_FOLDERS = 100;
 
 export class LivePoll {
-  constructor(root, scope, onData) {
+  constructor(root, scope, onData, { source, onError } = {}) {
     this.root = root;
     this.scope = scope;
     this.onData = onData;
+    this.onError = onError;
+    this.client = globalThis.crypto.randomUUID();
+    this.source = source;
     this.cursor = null;
     this.failures = 0;
     this.stopped = false;
@@ -32,7 +35,8 @@ export class LivePoll {
 
   url() {
     const { file, open } = this.scope();
-    const params = { root: this.root };
+    const params = { root: this.root, client: this.client };
+    if (this.source) params.source = this.source;
     if (this.cursor !== null) params.since = this.cursor;
     if (file) params.file = file;
     const folders = open.slice(-MAX_FOLDERS).map((f) => `&open=${encodeURIComponent(f)}`).join("");
@@ -45,11 +49,12 @@ export class LivePoll {
     try {
       const data = await get(this.url());
       if (this.stopped) return;
+      await this.onData(data);
       this.cursor = data.cursor;
       this.failures = 0;
-      await this.onData(data);
-      if (data.missing) return;
+
     } catch (_) {
+      if (!this.stopped) this.onError?.();
       this.failures += 1;
     } finally {
       this.busy = false;

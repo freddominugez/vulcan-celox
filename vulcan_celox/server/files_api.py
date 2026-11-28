@@ -4,12 +4,14 @@
 from __future__ import annotations
 
 import os
+import re
 import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List
 
 from vulcan_celox.core import code_diff, code_files, file_tree, file_watch, git_marks
+from vulcan_celox.core.code_boundary import directory
 from vulcan_celox.server.code_roots import CodeRoots
 from vulcan_celox.server.files_agents import EditAttribution
 from vulcan_celox.server.local_http import HttpError, Request
@@ -43,10 +45,17 @@ class GitMarksCache:
 
 def _stamp(root: str, rel: str):
     try:
-        info = os.stat(os.path.join(root, rel))
-    except OSError:
+        target = code_files.resolve_inside(rel, [root], canonical=True)
+        if code_files.is_sensitive(rel) or code_files.is_sensitive(str(target)):
+            return None
+        with directory(target.parent, Path(root)) as folder:
+            if isinstance(folder, int):
+                info = os.stat(target.name, dir_fd=folder, follow_symlinks=False)
+            else:
+                info = target.lstat()
+    except (OSError, code_files.CodeReadError):
         return None
-    return info.st_size, info.st_mtime_ns
+    return info.st_size, info.st_mtime_ns, info.st_ctime_ns, info.st_dev, info.st_ino
 
 
 class FilesService:
@@ -54,7 +63,7 @@ class FilesService:
         self.app = app
         self.roots = CodeRoots(app)
         self.ignores = file_tree.IgnoreCache()
-        self.watches = file_watch.FileWatches(self.ignores.get)
+        self.watches = file_watch.FileWatches(self.ignores.get, canonical=True)
         self.attribution = EditAttribution(app)
         self.git = GitMarksCache()
 
@@ -74,9 +83,34 @@ class FilesService:
             except code_files.CodeReadError:
                 continue
         rel = self.rel(req, "file")
+        opened = [path for path in opened if self.scope_folder(root, path)]
+        if rel and not self.scope_file(root, rel):
+            rel = ""
+        client = req.arg("client") or ""
+        if client and not re.fullmatch(r"[a-zA-Z0-9_-]{1,64}", client):
+            raise HttpError(400, "observador inválido", {"reason": "invalid"})
         watch = self.watches.watch(root)
-        data = watch.poll(cursor, opened, rel)  # first the sweep that was due, so a fresh event already leaves with its author
+        data = watch.poll(cursor, opened, rel, client=client)
+        if req.arg("source") == "disk":
+            return {**data, "events": [{**event, "agent": None} for event in data["events"]], "attributed": []}
+        # Existing Code screen shows nearby entries from the agent log. That
+        # legacy correlation is intentionally excluded from session disk events.
         return {**data, "attributed": self.attribution.apply(root, watch.recent())}
+
+    @staticmethod
+    def scope_folder(root: str, rel: str) -> bool:
+        try:
+            return file_tree.real_folder(root, rel).is_dir()
+        except code_files.CodeReadError:
+            return False
+
+    @classmethod
+    def scope_file(cls, root: str, rel: str) -> bool:
+        try:
+            real = code_files.resolve_inside(rel, [root], canonical=True)
+        except code_files.CodeReadError:
+            return False
+        return not (code_files.is_sensitive(rel) or code_files.is_sensitive(str(real))) and cls.scope_folder(root, rel.rpartition("/")[0])
 
     def root(self, req: Request) -> str:
         return self.roots.allowed(req.arg("root"))
@@ -100,7 +134,7 @@ class FilesService:
             raise HttpError(400, "caminho inválido", {"reason": "invalid"})
         try:
             before = _stamp(root, rel)
-            data = code_files.read_for_viewer(rel, [root])
+            data = code_files.read_for_viewer(rel, [root], canonical=True)
         except code_files.CodeReadError as err:
             raise HttpError(err.status, err.message, {"reason": err.reason}) from None
         if before != _stamp(root, rel):
@@ -126,12 +160,12 @@ class FilesService:
         if not rel:
             raise HttpError(400, "caminho inválido", {"reason": "invalid"})
         try:
-            real = code_files.resolve_inside(rel, [root])
+            real = code_files.resolve_inside(rel, [root], canonical=True)
         except code_files.CodeReadError as err:
             raise HttpError(err.status, err.message, {"reason": err.reason}) from None
         if code_files.is_sensitive(rel) or code_files.is_sensitive(str(real)):
             raise HttpError(403, "arquivo com nome sensível não é exibido", {"reason": "sensitive"})
-        return {"rel": rel, "language": code_files.language_of(str(real)), "scope": "git", **code_diff.git_sides(real)}
+        return {"rel": rel, "language": code_files.language_of(str(real)), "scope": "git", **code_diff.git_sides(real, allowed_root=root)}
 
 
 def register_files_api(app) -> FilesService:
@@ -139,8 +173,12 @@ def register_files_api(app) -> FilesService:
     srv = app.server
 
     @srv.route("GET", "/api/files/roots")
-    def _roots(_req: Request):
-        return service.roots.listing()
+    def _roots(req: Request):
+        result = service.roots.listing()
+        terminal = req.arg("terminal")
+        if terminal:
+            result["context"] = service.roots.terminal_context(terminal)
+        return result
 
     @srv.route("POST", "/api/files/roots")
     def _add_root(req: Request):
@@ -179,7 +217,7 @@ def register_files_api(app) -> FilesService:
     def _git(req: Request):
         root = service.root(req)
         watch = service.watches.watch(root)
-        watch.poll(None, watch.opened, watch.open_file)  # the sweep that was due runs first, as for the changes
+        watch.refresh()
         with watch.lock:
             seq = watch.seq
         data = service.git.get(root, seq)

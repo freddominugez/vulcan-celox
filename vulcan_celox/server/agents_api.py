@@ -371,7 +371,11 @@ def register_agents_api(app) -> AgentsService:
         terminal = req.arg("terminal") or ""
         s = service.paired_with(terminal) if terminal else None
         alive = bool(s) and procinfo.tab_runs_agent(service.app.terminals.get(terminal), s.agent)
-        return {"session": card(s) if s else None, "alive": alive}
+        data = {"session": card(s) if s else None, "alive": alive}
+        if req.arg("foreground") == "1":
+            data["foreground"] = procinfo.codex_foreground(app.terminals.get(terminal))
+            data["chosen"] = service.chosen_id()
+        return data
 
     @srv.route("GET", "/api/agents/current")
     def current(_req: Request):

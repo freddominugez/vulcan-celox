@@ -9,8 +9,8 @@ export { terminals };
 export { TerminalWorkspace } from "./terminal-workspace.mjs";
 
 export function mountPopout(root, id) {
-  root.innerHTML = `<div class="popout"><div class="popout-bar" data-drag><span class="popout-title"></span></div><div class="pane popout-pane"></div></div>`;
-  terminals.sync().then(() => {
+  root.innerHTML = `<div class="popout"><div class="popout-bar" data-drag><span class="session-color" aria-hidden="true"></span><span class="popout-title"></span></div><div class="pane popout-pane"></div></div>`;
+  terminals.watch().then(() => {
     const session = terminals.get(id);
     const title = $(".popout-title", root);
     if (!session) {
@@ -19,7 +19,17 @@ export function mountPopout(root, id) {
       root.querySelector("[data-close]").addEventListener("click", () => native({ type: "close" }) || window.close());
       return;
     }
-    title.textContent = `${session.info.title} · ${shortPath(session.info.cwd)}`;
+    const update = () => {
+      if (session.disposed) return;
+      const color = session.info.tab_color || session.info.theme;
+      title.parentElement.className = color ? `popout-bar has-theme t-${color}` : "popout-bar";
+      title.textContent = `${session.info.title} · ${shortPath(session.info.cwd)}`;
+      document.title = `${session.info.title} · Vulcan Celox`;
+      native({ type: "setTitle", title: document.title });
+    };
+    update();
+    terminals.subscribe(update);
+    window.vulcanFocusTerminal = () => session.focus();
     session.mount($(".popout-pane", root));
     new ResizeObserver(() => session.resizeSoon()).observe($(".popout-pane", root));
     session.focus();

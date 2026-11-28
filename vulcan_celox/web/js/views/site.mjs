@@ -47,7 +47,7 @@ class SessionTabsView {
 
   mountWorkspace(body, extra) {
     this.workspace = new TerminalWorkspace(body, {
-      ...extra,
+      ...extra, sessionCode: true,
       mode: this.tab,
       sessionId: this.options.sessionId,
       focus: this.options.focus,

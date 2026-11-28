@@ -32,7 +32,7 @@ function activeTabId() {
   return tab ? tab.dataset.id : null;
 }
 
-function labelFor(id) {
+export function labelFor(id) {
   const session = unread().find((s) => s.terminal_id === id);
   if (session) return `${session.project || t("Sessão")}: ${ATTENTION_LABELS[session.state]}`;
   const local = fromTerminal.get(id);

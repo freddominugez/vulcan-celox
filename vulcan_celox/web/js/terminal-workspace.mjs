@@ -15,6 +15,7 @@ import { ProjectTools } from "./terminal-commands.mjs";
 import { editTerminalIdentity } from "./terminal-identity.mjs";
 import { onTabKey, renameTabOnDblClick, renderTabs } from "./terminal-tabs.mjs";
 import { destroyChild, renderContent } from "./terminal-content.mjs";
+import { sessionTools } from "./terminal-code.mjs";
 
 const MODES = ["terminal", "tasks", "notes", "tags", "harness", "logs", "debug"];
 
@@ -46,7 +47,7 @@ export class TerminalWorkspace {
         <button class="icon-btn icon-btn-sm" data-search="next" aria-label="${t("Próximo")}" title="${t("Próximo (Enter)")}">${icon("chevron-down")}</button>
         <button class="icon-btn icon-btn-sm" data-search="close" aria-label="${t("Fechar busca")}" title="${t("Fechar (Esc)")}">${icon("x")}</button>
       </div>
-      <div class="prompt-bar" hidden></div><div class="ws-body"></div></div>`;
+      <div class="prompt-bar" hidden></div><div class="session-switcher" hidden></div><div class="ws-layout"><div class="ws-body"></div></div></div>`;
     this.search = new TerminalSearch(this, $(".term-search", this.root));
     this.project = new ProjectTools(this);
     this.strip = $(".tabstrip", this.root);
@@ -79,7 +80,6 @@ export class TerminalWorkspace {
     this.project.loadCommands();
   }
 
-  // ── dados ──────────────────────────────────────────────────────────────
   siteParam() {
     if (this.options.scope === "all") return "*";
     return this.options.site ? this.options.site.name : "";
@@ -138,7 +138,6 @@ export class TerminalWorkspace {
     return (live && live.info.site) || (record && record.site) || "";
   }
 
-  // ── actions ────────────────────────────────────────────────────────────
   async newTerminal(command = null, title = null, { ask = false } = {}) {
     const site = this.options.scope === "site" ? this.options.site : null;
     let cwd = null;
@@ -177,6 +176,8 @@ export class TerminalWorkspace {
   reveal(id, mode, focus = null) {
     if (MODES.includes(mode)) this.mode = mode;
     if (id) {
+      if (this.code && id !== this.code.handoffId) this.code.handoffId = null;
+      if (this.splitId === id) this.splitId = this.activeId;
       this.activeId = id;
       if (!this.isLive(id)) {
         this.requestedId = id;
@@ -201,7 +202,8 @@ export class TerminalWorkspace {
     if (this.isLive(this.activeId)) terminals.popout(this.activeId);
   }
 
-  select(id) {
+  select(id, { handoff = false } = {}) {
+    if (!handoff && this.code) this.code.handoffId = null;
     this.activeId = id;
     this.focus = null;
     clearTab(id);
@@ -209,7 +211,7 @@ export class TerminalWorkspace {
     this.render();
     if (this.options.onSelect) this.options.onSelect(id);
     const s = terminals.get(id);
-    if (s && this.mode === "terminal" && !terminals.popped.has(id)) s.focus();
+    if (s && this.mode === "terminal" && this.code?.mode !== "code" && !terminals.popped.has(id)) s.focus();
   }
 
   async closeTerminal(id, force = false) {
@@ -266,6 +268,7 @@ export class TerminalWorkspace {
     }
     if (action === "new") this.newTerminal();
     if (action === "identity") editTerminalIdentity(id, target).catch(reportError);
+    sessionTools(this, action, target);
     if (action === "find") this.openSearch();
     if (action === "copy-output") this.search.copyOutput();
     if (action === "leave-history") {
@@ -349,10 +352,10 @@ export class TerminalWorkspace {
   }
 
   openSearch() {
+    if (this.code?.mode === "code") return this.code.search();
     return this.search.open();
   }
 
-  // ── desenho ────────────────────────────────────────────────────────────
   render() {
     const ids = this.tabIds();
     // before the first load the session requested by the route may not have a record yet
@@ -370,7 +373,13 @@ export class TerminalWorkspace {
   renderContent() {
     // the dark scope is for the terminal: tasks, notes, harness and logs follow the app's theme
     this.body.classList.toggle("is-terminal", this.mode === "terminal");
-    return renderContent(this);
+    const output = renderContent(this);
+    if (this.mode === "terminal") this.code?.sync(this.isHistory() ? null : terminals.get(this.activeId));
+    else if (this.code) {
+      this.code.destroy();
+      this.code = null;
+    }
+    return output;
   }
 
   destroy() {
@@ -381,6 +390,7 @@ export class TerminalWorkspace {
     this.promptBar.destroy();
     window.removeEventListener("vulcan-sessions-changed", this.onSessionsChanged);
     this.resizeObserver.disconnect();
+    this.code?.destroy();
     destroyChild(this);
     // sessions stay in the pool: leaving the screen does not end terminals
     this.sessions().forEach((s) => s.el.remove());

@@ -179,13 +179,17 @@ if [ -f scripts/build_app.sh ]; then
       var i = document.querySelector('.pc-field input[name=branch]'); if (!i || !document.querySelector('.pc-preview mark')) return;
       i.value = 'teste-do-sensor'; i.dispatchEvent(new Event('input', { bubbles: true }));
       if (document.querySelector('.pc-preview').textContent.indexOf('teste-do-sensor') >= 0) window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1); }, 2500);"; wait_s=5; fi
-    # fixed groups, no item lost (18, with Configurações and without the Sites PHP shortcut) and the Agentes group collapses and comes back
+    # fixed groups, no item lost (15 in #nav; Terminais in the sessions header, Ajuda and Configurações in the footer) and the Agentes
+    # group collapses and comes back
     # keyboard focus stays on the group header after collapsing
     # the palette (⌘K) opens and lists: it was the only part of the old app.mjs without a script
     if [ "$route" = "#/overview" ]; then extra="setTimeout(function () {
       var ids = Array.prototype.map.call(document.querySelectorAll('.nav-group'), function (g) { return g.dataset.group; }).join(',');
-      if (ids !== 'geral,projetos,ambiente,agentes,organizar,ajuda') window.__vtErrors.push('grupos: ' + ids);
-      var n = document.querySelectorAll('#nav .nav-item').length; if (n !== 18) window.__vtErrors.push('itens na barra: ' + n);
+      if (ids !== 'geral,projetos,ambiente,agentes,organizar') window.__vtErrors.push('grupos: ' + ids);
+      var n = document.querySelectorAll('#nav .nav-item').length; if (n !== 15) window.__vtErrors.push('itens na barra: ' + n);
+      if (!document.querySelector('#side-terminal-head a[href=\"#/terminals\"]')) window.__vtErrors.push('cabeçalho sem o link Terminais');
+      var foot = Array.prototype.map.call(document.querySelectorAll('#side-footer .nav-item'), function (a) { return a.getAttribute('href'); }).join(',');
+      if (foot !== '#/ajuda,#/config') window.__vtErrors.push('rodapé: ' + foot);
       document.querySelector('[data-nav-group=agentes]').click();
       var c = document.querySelectorAll('.nav-group[data-group=agentes] .nav-item').length;
       document.querySelector('[data-nav-group=agentes]').click();
@@ -200,7 +204,7 @@ if [ -f scripts/build_app.sh ]; then
       setTimeout(function () { if (document.querySelectorAll('.pal-item').length) window.__vtErrors.splice(window.__vtErrors.indexOf(pal), 1); }, 800); }, 2500);"; wait_s=6; fi
     # every sidebar item has its card and its hint; the empty terminal panel does not cover the page
     if [ "$route" = "#/inicio" ]; then extra="setTimeout(function () {
-      Array.prototype.forEach.call(document.querySelectorAll('#nav .nav-item'), function (n) {
+      Array.prototype.forEach.call(document.querySelectorAll('#nav .nav-item, #side-terminal-head .nav-item, #side-footer .nav-item'), function (n) {
         if (!n.title) window.__vtErrors.push('item sem dica: ' + n.textContent.trim());
         var h = n.getAttribute('href'); var has = Array.prototype.some.call(document.querySelectorAll('.in-area'), function (c) { return c.getAttribute('href') === h; }); if (h !== '#/inicio' && !has) window.__vtErrors.push('item sem cartão: ' + h); });
       var tp = document.getElementById('term-panel'); if (tp.classList.contains('is-open') || tp.getBoundingClientRect().height > 40) window.__vtErrors.push('painel de terminal vazio aberto'); }, 3000);"; fi
@@ -208,9 +212,12 @@ if [ -f scripts/build_app.sh ]; then
     if [ "$route" = "#/config" ]; then extra="var tag = 'esconder item nas Configurações'; window.__vtErrors.push(tag); setTimeout(function () {
       var box = document.querySelector('[data-side=tags]'); box.click();
       if (!document.querySelector('[data-side=config]').disabled) window.__vtErrors.push('Configurações pode ser escondida');
+      setTimeout(function () { document.querySelector('[data-side=terminals]').click(); }, 300);
       setTimeout(function () {
-        var still = Array.prototype.some.call(document.querySelectorAll('#nav .nav-item'), function (n) { return n.getAttribute('href') === '#/tags'; }); if (still) window.__vtErrors.push('item escondido continua na barra');
+        var still = Array.prototype.some.call(document.querySelectorAll('#nav .nav-item, #side-terminal-head .nav-item, #side-footer .nav-item'), function (n) { return n.getAttribute('href') === '#/tags'; }); if (still) window.__vtErrors.push('item escondido continua na barra');
         else window.__vtErrors.splice(window.__vtErrors.indexOf(tag), 1);
+        if (document.querySelector('#side-terminal-head a[href=\"#/terminals\"]')) window.__vtErrors.push('link Terminais escondido continua no cabeçalho');
+        if (!document.querySelector('#side-terminal-head [data-toggle=\"group:open\"]') || !document.getElementById('side-live')) window.__vtErrors.push('lista de terminais sumiu com o link escondido');
         document.querySelector('[data-cf-action=sidebar-reset]').click(); }, 900); }, 2500);
       setTimeout(function () { if (document.querySelector('#app.is-offline')) window.__vtErrors.push('aviso de servidor indisponível com o servidor no ar'); }, 5500);"; wait_s=6; fi
     lerd_env "dist/Vulcan Celox.app/Contents/MacOS/vulcan-celox" --snapshot "$shot" --route "$route" --wait "$wait_s" \

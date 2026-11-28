@@ -77,6 +77,14 @@ class SessionApiTest(ServerTestCase):
         history = self.request("GET", f"/api/sessions/{tid}")[1]
         self.assertEqual((history["title"], history["tab_color"], history["open"]), ("Final", "oceano", False))
 
+    def test_identidade_viva_recusa_saida_sem_alterar_a_memoria(self):
+        terminal = self.open_terminal(command="exit 0", title="Antes")
+        tid = terminal["id"]
+        self.assertTrue(wait_for(lambda: not self.app.hub.sessions.get(tid).is_open))
+        status, _, _ = self.request("PATCH", f"/api/terminals/{tid}", body={"title": "Novo", "require_alive": True})
+        self.assertEqual(status, 409)
+        self.assertEqual(self.request("GET", f"/api/sessions/{tid}")[1]["title"], "Antes")
+
     def test_post_it_identifica_a_sessao_e_respeita_escopo_ao_vincular(self):
         a = self.open_terminal(title="Primeiro", theme="homebrew")
         b = self.open_terminal(title="Segundo", theme="ardosia")

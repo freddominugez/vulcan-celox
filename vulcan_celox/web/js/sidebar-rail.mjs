@@ -10,7 +10,7 @@ import { isHidden } from "./sidebar-prefs.mjs";
 const KEY = "vulcan-sidebar-collapsed";
 const NARROW = 1000;
 const SECTIONS = [
-  { id: "section-sessions", el: "#side-sessions", icon: "history", label: () => t("Sessões") },
+  { id: "section-sessions", el: "#side-sessions", icon: "history", label: () => t("Terminais abertos") },
   { id: "section-sites", el: "#side-sites", icon: "globe", label: () => t("Sites") },
   { id: "section-node", el: "#side-node", icon: "hex", label: () => t("Projetos Node") },
 ];
@@ -44,13 +44,23 @@ function paintButton() {
 export function renderRailSections() {
   const box = $("#rail-sections");
   if (!box) return;
-  box.innerHTML = SECTIONS.filter((s) => !isHidden(s.id)).map((s) => `<button type="button" class="icon-btn rail-btn" data-rail="${s.id}"
-    title="${s.label()}" aria-label="${s.label()}" aria-haspopup="true" aria-expanded="false">${icon(s.icon)}</button>`).join("");
+  const html = SECTIONS.filter((s) => !isHidden(s.id)).map((s) => `<button type="button" class="icon-btn rail-btn" data-rail="${s.id}"
+    title="${s.label()}" aria-label="${s.label()}" aria-controls="${s.el.slice(1)}" aria-expanded="false">${icon(s.icon)}</button>`).join("");
+  if (box.markup === html) return;
+  const key = box.contains(document.activeElement) && document.activeElement.dataset.rail;
+  box.innerHTML = html;
+  box.markup = html;
+  if (key) box.querySelector(`[data-rail="${CSS.escape(key)}"]`)?.focus({ preventScroll: true });
 }
 
 function closeMenu() {
   document.querySelectorAll(".side-section.is-pop").forEach((el) => { el.classList.remove("is-pop"); el.style.top = ""; });
   document.querySelectorAll("[data-rail][aria-expanded=true]").forEach((b) => b.setAttribute("aria-expanded", "false"));
+}
+
+function positionMenu(el, button) {
+  const top = Math.min(button.getBoundingClientRect().top, window.innerHeight - el.offsetHeight - 8);
+  el.style.top = `${Math.max(8, top)}px`;
 }
 
 function openMenu(button) {
@@ -61,11 +71,9 @@ function openMenu(button) {
   closeMenu();
   if (wasOpen) return;
   el.classList.add("is-pop");
-  // next to its icon, but always whole inside the window
-  const top = Math.min(button.getBoundingClientRect().top, window.innerHeight - el.offsetHeight - 8);
-  el.style.top = `${Math.max(8, top)}px`;
+  positionMenu(el, button);
   button.setAttribute("aria-expanded", "true");
-  const first = el.querySelector("a, button, input");
+  const first = el.querySelector("a, button:not([disabled]), input");
   if (first) first.focus({ preventScroll: true });
 }
 
@@ -86,12 +94,19 @@ export function startRail() {
   apply();
   paintButton();
   renderRailSections();
+  const initialChoice = chosen;
   patch("/api/preferences", {}).then((prefs) => {
+    if (chosen !== initialChoice) return;
     chosen = typeof prefs.sidebar_collapsed === "boolean" ? prefs.sidebar_collapsed : null;
     try { localStorage.setItem(KEY, JSON.stringify(chosen)); } catch (_) { /* no storage */ }
     apply();
   }).catch(() => {});
-  window.addEventListener("resize", () => { if (chosen === null) apply(); });
+  window.addEventListener("resize", () => {
+    if (chosen === null) apply();
+    const menu = document.querySelector(".side-section.is-pop");
+    const button = document.querySelector("[data-rail][aria-expanded=true]");
+    if (menu && button) positionMenu(menu, button);
+  });
   window.addEventListener("vulcan-sidebar", renderRailSections);
   $("#side-collapse").addEventListener("click", () => toggleRail());
   document.addEventListener("click", (event) => {
@@ -104,6 +119,9 @@ export function startRail() {
     if (!event.target.closest(".side-section.is-pop") || event.target.closest(".side-section.is-pop a")) closeMenu();
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && document.querySelector(".side-section.is-pop")) closeMenu();
+    if (event.key !== "Escape" || !document.querySelector(".side-section.is-pop")) return;
+    const control = document.querySelector("[data-rail][aria-expanded=true]");
+    closeMenu();
+    control?.focus({ preventScroll: true });
   });
 }

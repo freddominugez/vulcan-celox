@@ -7,7 +7,9 @@ import hashlib
 import os
 import stat
 from pathlib import Path
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Optional
+
+from vulcan_celox.core.code_boundary import open_file
 
 MAX_BYTES = 1024 * 1024
 SENSITIVE_NAMES = (".env*", "*.pem", "*.key", "*.p12", "*.pfx", "id_rsa*", "id_dsa*", "id_ecdsa*", "id_ed25519*", "credentials*", ".netrc",
@@ -42,14 +44,14 @@ def language_of(path: str) -> str:
     return LANGUAGES.get(Path(path).suffix.lower(), "")
 
 
-def resolve_inside(path: str, roots: Iterable[str]) -> Path:
+def resolve_inside(path: str, roots: Iterable[str], *, canonical: bool = False) -> Path:
     """Real path (links resolved) inside one of the roots. A relative path counts from the first root."""
     roots = [r for r in roots if r]
     if not path or "\x00" in path or not roots:
         raise CodeReadError(400, "invalid", "caminho inválido")
     try:
         real = Path(roots[0], path).resolve()
-        real_roots = [Path(r).resolve() for r in roots]
+        real_roots = [Path(r) if canonical else Path(r).resolve() for r in roots]
     except (OSError, ValueError, RuntimeError):
         raise CodeReadError(400, "invalid", "caminho inválido") from None
     if not any(real == r or real.is_relative_to(r) for r in real_roots):
@@ -57,15 +59,32 @@ def resolve_inside(path: str, roots: Iterable[str]) -> Path:
     return real
 
 
-def read_for_viewer(path: str, roots: Iterable[str]) -> Dict[str, Any]:
+def _containing_root(real: Path, roots: Iterable[str], canonical: bool) -> Optional[Path]:
+    """The longest approved root that contains `real`: the walk may anchor on it when a folder above is unreadable."""
+    found = []
+    for r in roots:
+        if not r:
+            continue
+        try:
+            base = Path(r) if canonical else Path(r).resolve()
+        except (OSError, RuntimeError):
+            continue
+        if real == base or real.is_relative_to(base):
+            found.append(base)
+    return max(found, key=lambda p: len(p.parts)) if found else None
+
+
+def read_for_viewer(path: str, roots: Iterable[str], *, canonical: bool = False) -> Dict[str, Any]:
     roots = list(roots)
-    real = resolve_inside(path, roots)
+    real = resolve_inside(path, roots, canonical=canonical)
+    anchor = _containing_root(real, roots, canonical)
     # the requested name and the real name: a link called notas.txt that points to .env is also refused
     if is_sensitive(path) or is_sensitive(str(real)):
         raise CodeReadError(403, "sensitive", "arquivo com nome sensível não é exibido")
     try:
         # without following a link in the last component, and without hanging if someone swaps the file for a FIFO
-        fd = os.open(real, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0))
+        fd = open_file(real, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0),
+                       root=anchor)
     except FileNotFoundError:
         raise CodeReadError(404, "missing", "o arquivo não existe mais") from None
     except OSError:  # on Windows, opening a folder gives a permission error: the result is the same

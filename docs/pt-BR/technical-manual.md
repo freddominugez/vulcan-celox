@@ -266,6 +266,7 @@ Task {id, site|null, title, status: todo|doing|done, priority: 1..3, tags[], due
 
 - `core/agents/edits.py`: tabela `session_edits` com caminho, hora, ferramenta, turno e offset. O conteúdo é lido sob demanda do arquivo da sessão por `edit_detail()`, então sessão apagada pelo agente fica sem diff. No Claude Code as fontes são `Edit`, `MultiEdit` e `Write`; `originalFile` só é lido, nunca guardado. No Codex o item `FileChange` traz o diff, e o patch legível cobre o formato antigo.
 - `core/code_files.py`, `core/code_diff.py`, `server/code_api.py`, `server/known_roots.py`: visor só leitura. O lado de HEAD vem de `git cat-file blob`, e o atual é lido direto, então `diff.external`, `textconv` e filtros `clean` do repositório analisado nunca rodam.
+- `core/code_boundary.py` percorre componentes canônicos sem seguir links no POSIX. A árvore, a leitura e o observador usam essa fronteira ao acessar o disco. Cada cliente do observador mantém seu cursor e seu escopo de pastas.
 - `core/agents/attention.py`, `core/agents/attention_hook.py`: estado do turno por sessão e o hook opcional dos pedidos de permissão.
 - `core/agents/turns.py`: eventos e edições agrupados por pedido, na mesma contagem do leitor.
 - `core/listening_ports.py`: portas de cada PTY e seus descendentes, com `lsof` no macOS e `/proc/net` no Linux, com cache de 10 s.

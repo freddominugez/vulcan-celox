@@ -9,9 +9,11 @@ import threading
 import time
 from collections import deque
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
 
 from vulcan_celox.core import code_files
+from vulcan_celox.core.code_boundary import directory
 from vulcan_celox.core.file_tree import HIDDEN, Ignored, has_bad_name, sensitive_entry
 
 BUDGET = 20000
@@ -20,18 +22,20 @@ MIN_INTERVAL = 1.0
 MAX_INTERVAL = 15.0
 MAX_EVENTS = 2000
 POLL_WAIT = 0.25
-Photo = Tuple[int, int, str]
+Photo = Tuple[int, int, str, int, int, int]
+MAX_CLIENTS = 32
 
 
 def next_interval(scan_seconds: float, low: float = MIN_INTERVAL, high: float = MAX_INTERVAL) -> float:
     return min(high, max(low, scan_seconds * 10))
 
 
-def _read_folder(path: str) -> Optional[Dict[str, Photo]]:
-    """name -> (size, mtime_ns, kind) without following links. None if the folder does not exist; raises PermissionError."""
+def _read_folder(path: str, root: Optional[str] = None) -> Optional[Dict[str, Photo]]:
+    """name -> (size, mtime_ns, kind) without following links. None if the folder does not exist; raises PermissionError.
+    `root` is the watched canonical root: folders above it may be traversable without being readable."""
     out: Dict[str, Photo] = {}
     try:
-        with os.scandir(path) as it:
+        with directory(Path(path), Path(root) if root else None) as folder, os.scandir(folder) as it:
             for item in it:
                 if item.name.lower() in HIDDEN or has_bad_name(item.name):
                     continue
@@ -40,7 +44,8 @@ def _read_folder(path: str) -> Optional[Dict[str, Photo]]:
                     kind = "link" if item.is_symlink() else "dir" if item.is_dir(follow_symlinks=False) else "file"
                 except OSError:
                     continue  # it disappeared between listing and looking: the next sweep tells
-                out[item.name] = (0 if kind == "dir" else info.st_size, 0 if kind == "dir" else info.st_mtime_ns, kind)
+                signature = (0, 0, 0) if kind == "dir" else (info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+                out[item.name] = (signature[0], signature[1], kind, signature[2], info.st_ino, info.st_dev)
     except (FileNotFoundError, NotADirectoryError):
         return None
     return out
@@ -66,8 +71,9 @@ class RootWatch:
     """One thread per root with the screen open. It stops if nobody asks for `idle` seconds."""
 
     def __init__(self, root: str, ignored: Callable[[str], Ignored], first_seq: int, budget: int = BUDGET, idle: float = IDLE_SECONDS,
-                 low: float = MIN_INTERVAL, high: float = MAX_INTERVAL, on_stop: Optional[Callable[["RootWatch"], None]] = None):
-        self.root = root
+                 low: float = MIN_INTERVAL, high: float = MAX_INTERVAL, on_stop: Optional[Callable[["RootWatch"], None]] = None,
+                 canonical: bool = False):
+        self.root = root if canonical else str(Path(root).resolve())
         self.ignored = ignored
         self.budget = budget
         self.idle = idle
@@ -82,8 +88,7 @@ class RootWatch:
         self.missing = False
         self.interval = low
         self.scan_seconds = 0.0
-        self.opened: Set[str] = set()
-        self.open_file = ""
+        self.clients: Dict[str, Tuple[Set[str], str, float]] = {}
         self.last_poll = time.monotonic()
         self.ready = threading.Event()
         self.wake = threading.Event()
@@ -118,10 +123,11 @@ class RootWatch:
         """Compares one folder with its last photo and returns the subfolders to visit, each with `was it just created?`."""
         path = os.path.join(self.root, rel) if rel else self.root
         try:
-            now = _read_folder(path)
+            now = _read_folder(path, self.root)
         except OSError:
             return []  # no permission now: keeps the last photo instead of inventing a deletion
         if now is None:
+            self._forget(sweep, rel)
             return []
         before = self.dirs.get(rel)
         self.dirs[rel] = now
@@ -139,6 +145,8 @@ class RootWatch:
                     self._record(sweep, _join(rel, name), "added", photo[2])
                     created.add(name)
                 elif old != photo:
+                    if old[2] == "dir":
+                        self._forget(sweep, _join(rel, name))
                     self._record(sweep, _join(rel, name), "modified", photo[2])
             for name, photo in before.items():
                 if name not in now:
@@ -167,11 +175,18 @@ class RootWatch:
 
     def sweep(self) -> None:
         with self.lock:
-            opened, open_file = set(self.opened), self.open_file
+            now = time.monotonic()
+            self.clients = {k: v for k, v in self.clients.items() if now - v[2] <= self.idle}
+            opened = {rel for folders, _, _ in self.clients.values() for rel in folders}
+            open_parents = {_parent(file) for _, file, _ in self.clients.values() if file}
         started = time.perf_counter()
         self.last_sweep = time.monotonic()
-        sweep = _Sweep([], self.ignored(self.root))
-        if not os.path.isdir(self.root):
+        try:
+            available = Path(self.root).resolve(strict=True) == Path(self.root) and os.path.isdir(self.root)
+        except (OSError, RuntimeError):
+            available = False
+        sweep = _Sweep([], self.ignored(self.root) if available else Ignored())
+        if not available:
             if not self.missing:
                 self._forget(sweep, "")
             self.missing = True
@@ -188,10 +203,9 @@ class RootWatch:
             targets = set(opened)
             if self.partial:
                 targets.add("")
-                if open_file:
-                    targets.add(_parent(open_file))
+                targets.update(open_parents)
             else:
-                targets = {t for t in targets if t not in self.dirs or self._prune(sweep, t)}
+                targets = {t for t in targets | open_parents if t not in self.dirs or self._prune(sweep, t)}
             self._shallow(sweep, sorted(targets))
         self.scan_seconds = time.perf_counter() - started
         self.interval = next_interval(self.scan_seconds, self.low, self.high)
@@ -219,21 +233,27 @@ class RootWatch:
                 self.on_stop(self)
 
     # ── what the screen asks ────────────────────────────────────────────
-    def poll(self, since: Optional[int], opened: Iterable[str], open_file: str) -> Dict[str, Any]:
-        opened = set(opened)
-        # the sweep that was due runs just before the answer: a write takes one polling interval to show, not two
+    def refresh(self) -> None:
         if time.monotonic() - self.last_sweep >= self.interval * 0.9 and self.ready.is_set():
             self.swept.clear()
             self.wake.set()
             self.swept.wait(min(POLL_WAIT, self.scan_seconds * 2 + 0.01))
+
+    def poll(self, since: Optional[int], opened: Iterable[str], open_file: str, client: str = "") -> Dict[str, Any]:
+        opened = set(opened)
+        now = time.monotonic()
         with self.lock:
-            self.last_poll = time.monotonic()
-            news = bool(opened - self.opened)
-            self.opened, self.open_file = opened, open_file
+            self.last_poll = now
+            previous = self.clients.pop(client, (set(), "", 0))
+            if len(self.clients) >= MAX_CLIENTS:
+                self.clients.pop(next(iter(self.clients)))
+            self.clients[client] = (opened, open_file, now)
+        self.refresh()
+        with self.lock:
             events = list(self.events)
             cursor, partial, missing = self.seq, self.partial, self.missing
-        if news:
-            self.wake.set()  # a folder just opened enters the photo now, not at the next sweep
+        if opened - previous[0] or open_file != previous[1]:
+            self.wake.set()
         out: Dict[str, Any] = {"cursor": cursor, "events": [], "partial": partial, "reset": False, "missing": missing,
                                "interval": self.interval, "watching": sum(1 for _ in list(self.dirs))}
         if since is None:
@@ -242,7 +262,10 @@ class RootWatch:
         if since > cursor or since < self.floor or since < first - 1:
             out["reset"] = True
             return out
-        out["events"] = [e for e in events if e["seq"] > since]
+        coverage = {"", *opened}
+        if open_file:
+            coverage.add(_parent(open_file))
+        out["events"] = [e for e in events if e["seq"] > since and (not partial or _parent(e["rel"]) in coverage)]
         return out
 
     def recent(self) -> List[Dict[str, Any]]:
@@ -272,18 +295,19 @@ class FileWatches:
         self.watches: Dict[str, RootWatch] = {}
         self.last_seq: Dict[str, int] = {}
 
-    def _gone(self, watch: RootWatch) -> None:
+    def _gone(self, root: str, watch: RootWatch) -> None:
         with self.lock:
-            if self.watches.get(watch.root) is watch:
-                del self.watches[watch.root]
-            self.last_seq[watch.root] = watch.seq
+            if self.watches.get(root) is watch:
+                del self.watches[root]
+            self.last_seq[root] = watch.seq
 
     def watch(self, root: str) -> RootWatch:
         with self.lock:
             watch = self.watches.get(root)
             created = watch is None
             if created:
-                watch = RootWatch(root, self.ignored, self.last_seq.get(root, 0) + 1, on_stop=self._gone, **self.options)
+                watch = RootWatch(root, self.ignored, self.last_seq.get(root, 0) + 1,
+                                  on_stop=lambda stopped: self._gone(root, stopped), **self.options)
                 self.watches[root] = watch
                 watch.start()
         if created:

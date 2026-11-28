@@ -10,6 +10,7 @@ import { startTheme } from "./theme.mjs";
 import { clearTab, dismissSession, latestAttention, startAttention } from "./attention-state.mjs";
 import { isMac, isNative } from "./api.mjs";
 import { app } from "./app-state.mjs";
+import { showSessionMode } from "./terminal-code.mjs";
 import { stepTerminalTurn } from "./terminal-watch.mjs";
 import { loadNodeProjects, navigate, refreshState, reportDragRegions, route, runCommand, service, toggleAutostart } from "./app.mjs";
 import { CurrentSession } from "./current-session.mjs";
@@ -20,7 +21,7 @@ import { SessionTree } from "./session-tree.mjs";
 import { renderSidebar } from "./sidebar.mjs";
 import { addSiteDialog } from "./site-add.mjs";
 import { TerminalPanel } from "./terminal-panel.mjs";
-import { terminals } from "./terminals.mjs";
+import { sessionHash, terminals } from "./terminal-pool.mjs";
 import { addNodeDialog } from "./views/node.mjs";
 
 export function bindGlobalEvents() {
@@ -51,7 +52,20 @@ export function bindGlobalEvents() {
     if (item) palette.run(Number(item.dataset.index));
   });
 
-  app.tree = new SessionTree($("#side-sessions"), { navigate, route: () => app.route });
+  const openTerminal = (id) => {
+    const terminal = terminals.get(id);
+    if (!terminal?.alive) return;
+    clearTab(id);
+    if (terminals.popped.has(id)) {
+      terminals.focusPopout(id);
+      return;
+    }
+    navigate(sessionHash(terminal.info));
+    const workspace = app.view?.workspace;
+    if (workspace?.activeId === id) showSessionMode(workspace, false);
+  };
+  app.tree = new SessionTree($("#side-terminals"), { navigate, route: () => app.route, openTerminal });
+  window.addEventListener("vulcan-focus-terminal", (event) => openTerminal(event.detail));
   $("#nav").addEventListener("click", (event) => {
     const head = event.target.closest("[data-nav-group]");
     if (!head) return;

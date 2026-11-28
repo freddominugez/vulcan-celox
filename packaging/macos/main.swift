@@ -320,7 +320,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func focusPopout(id: String) {
-        popouts[id]?.window.makeKeyAndOrderFront(nil)
+        if let controller = popouts[id] { controller.window.makeKeyAndOrderFront(nil); controller.evaluate("window.vulcanFocusTerminal?.()") }
     }
 
     func popoutClosed(id: String) {

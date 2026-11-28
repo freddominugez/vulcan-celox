@@ -92,3 +92,12 @@ def tab_runs_agent(terminal, agent: str) -> bool:
         return False
     foreground = terminal.foreground() if hasattr(terminal, "foreground") else None
     return foreground is None or agent_running(foreground, agent)
+
+
+def codex_foreground(terminal) -> str:
+    if terminal is None or not terminal.alive:
+        return "closed"
+    processes = terminal.foreground() if hasattr(terminal, "foreground") else None
+    if not processes:
+        return "unknown"
+    return "codex" if agent_running(processes, "codex") else "other"

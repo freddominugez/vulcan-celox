@@ -32,7 +32,9 @@ export class ExplorerViewer {
     this.layout = savedLayout();
     this.editor = null;
     this.ticket = 0;
-    host.addEventListener("click", (e) => this.clicked(e));
+    this.host = host;
+    this.click = (event) => this.clicked(event);
+    host.addEventListener("click", this.click);
   }
 
   reset(root) {
@@ -91,7 +93,7 @@ export class ExplorerViewer {
     try {
       CM = await loadCodeMirror();
     } catch (_) {
-      this.message(t("Visor indisponível"), t("o visor de código não carregou"));
+      if (ticket === this.ticket && !this.destroyed) this.message(t("Visor indisponível"), t("o visor de código não carregou"));
       return;
     }
     if (ticket !== this.ticket || this.destroyed) return;
@@ -131,13 +133,15 @@ export class ExplorerViewer {
     }
     if (ticket !== this.ticket || this.destroyed) return;
     const back = `<button type="button" class="btn btn-sm" data-ce-mode="file">${t("Ver o arquivo")}</button>`;
-    if (!data.available) {
+    if (!data.available || data.reason === "previous_unavailable") {
       const [title, text] = REASONS[data.reason] || [t("Não foi possível mostrar"), t("Tente outro arquivo.")];
       this.message(title, text, back);
+      this.notes.innerHTML = diffNotes(data, "git");
       return;
     }
-    if (data.old === data.new) {
+    if (!data.truncated && data.old === data.new) {
       this.message(t("Sem diferença"), t("O arquivo está igual ao último commit."), back);
+      this.notes.innerHTML = diffNotes(data, "git");
       return;
     }
     this.clear();
@@ -153,7 +157,9 @@ export class ExplorerViewer {
     if (!editing) {
       const scroller = this.body.querySelector(".cm-scroller");
       const top = scroller ? scroller.scrollTop : 0;
+      const ticket = this.ticket + 1;
       await this.open(this.path);
+      if (ticket !== this.ticket || this.destroyed) return;
       const again = this.body.querySelector(".cm-scroller");
       if (again) again.scrollTop = top;
       return;
@@ -225,6 +231,7 @@ export class ExplorerViewer {
 
   destroy() {
     this.destroyed = true;
+    this.host.removeEventListener("click", this.click);
     this.ticket += 1;
     this.clear();
   }

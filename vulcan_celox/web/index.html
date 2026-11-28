@@ -94,12 +94,15 @@
       <a class="side-brand" href="#/overview" aria-label="Vulcan Celox, ir para a Visão geral" data-i18n-aria-label="Vulcan Celox, ir para a Visão geral">
         <img class="for-light" src="img/brand/celox-mark.png" alt=""><img class="for-dark" src="img/brand/celox-mark-reverse.png" alt="">
       </a>
-      <button class="icon-btn side-collapse" id="side-collapse" type="button" aria-controls="nav"></button>
+      <button class="icon-btn side-collapse" id="side-collapse" type="button" aria-controls="side-scroll"></button>
     </div>
-    <nav class="nav" id="nav"></nav>
-    <div class="rail-sections" id="rail-sections"></div>
-    <div class="side-scroll">
-      <section class="side-section side-sessions" id="side-sessions" aria-label="Sessões" data-i18n-aria-label="Sessões"></section>
+    <div class="side-scroll" id="side-scroll">
+      <div id="side-terminals">
+        <div id="side-terminal-head" class="side-terminal-head"></div>
+        <div class="side-section side-sessions" id="side-sessions"></div>
+      </div>
+      <div class="rail-sections" id="rail-sections"></div>
+      <nav class="nav" id="nav"></nav>
       <section class="side-section" id="side-sites" aria-label="Sites" data-i18n-aria-label="Sites">
         <button class="side-heading side-toggle" data-side-toggle="section:sites" aria-expanded="true">
           <svg class="i side-chevron" aria-hidden="true"><use href="#i-chevron-right"></use></svg><span data-i18n="Sites">Sites</span>
@@ -125,6 +128,7 @@
         </div>
       </section>
     </div>
+    <footer id="side-footer" class="nav side-footer"></footer>
   </aside>
 
   <header class="toolbar" data-drag>
